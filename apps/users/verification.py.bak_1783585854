@@ -1,0 +1,80 @@
+"""Email verification helpers - OTP code version."""
+from __future__ import annotations
+import logging
+import random
+import string
+from typing import Optional, Tuple
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
+from django.core.cache import cache
+from django.template.loader import render_to_string
+from .models import EmailLog
+
+logger = logging.getLogger(__name__)
+User = get_user_model()
+CODE_LENGTH = 6
+CODE_TTL_SECONDS = 900
+RESEND_COOLDOWN_SECONDS = 60
+
+def generate_otp_code():
+    return "".join(random.choices(string.digits, k=CODE_LENGTH))
+
+def save_otp_code(user):
+    code = generate_otp_code()
+    key = f"email_verify_{user.pk}"
+    cache.set(key, code, CODE_TTL_SECONDS)
+    return code
+
+def verify_otp_code(user, code):
+    key = f"email_verify_{user.pk}"
+    stored = cache.get(key)
+    if stored is None:
+        return False, "Code expired"
+    if stored != code.strip():
+        return False, "Wrong code"
+    cache.delete(key)
+    return True, None
+
+def send_verification_email(user, request=None):
+    code = save_otp_code(user)
+    subject = "Код подтверждения — Aspect Coffee"
+    name = user.first_name or user.email
+    text_body = f"Здравствуйте, {name}!\n\nВаш код подтверждения: {code}\n\nКод действителен 15 минут.\n\nЕсли вы не регистрировались, просто проигнорируйте это письмо.\n\nС уважением,\nкоманда Aspect Coffee"
+    html_body = render_to_string(
+        "users/emails/verify_email.html",
+        {"user": user, "code": code, "site_name": "Aspect Coffee"},
+    )
+    success = False
+    error_message = ""
+    try:
+        sent = send_mail(
+            subject=subject,
+            message=text_body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            html_message=html_body,
+            fail_silently=False,
+        )
+        success = bool(sent)
+    except Exception as exc:
+        error_message = str(exc)
+    EmailLog.objects.create(
+        recipient=user.email, subject=subject, body=text_body,
+        success=success, error_message=error_message,
+    )
+    return success
+
+
+def is_email_confirmation_enabled():
+    """Feature flag: require email (OTP) confirmation before login.
+
+    Referenced by login_view / register but was never defined, which raised
+    ImportError -> HTTP 500 on valid login and on registration completion.
+    Reads settings.EMAIL_CONFIRMATION_ENABLED, defaulting to False so existing
+    accounts (email_confirmed=False) are not locked out and the previous
+    working login/register behaviour is restored. Toggle to True (via env)
+    to enable the OTP flow.
+    """
+    from django.conf import settings
+    return getattr(settings, "EMAIL_CONFIRMATION_ENABLED", False)

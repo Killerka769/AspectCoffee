@@ -1,0 +1,821 @@
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE APP EXPERIENCE — "Flutter-grade" responsive
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 0. CSS Variables ── */
+:root {
+  --mob-nav-h: 64px;
+  --mob-header-h: 56px;
+  --mob-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --mob-safe-top: env(safe-area-inset-top, 0px);
+  --mob-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --mob-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ═══════════════════════════════════════════════════
+   1. MOBILE BOTTOM NAVIGATION BAR
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 1099px) {
+  .mob-bottom-nav {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: calc(var(--mob-nav-h) + var(--mob-safe-bottom)) !important;
+    padding-bottom: var(--mob-safe-bottom) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-top: 0.5px solid rgba(0, 0, 0, 0.08) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    z-index: 9990 !important;
+    transform: translateY(0);
+    transition: transform 0.3s var(--mob-ease);
+  }
+  .mob-bottom-nav.nav-hidden {
+    transform: translateY(100%);
+  }
+  .mob-bottom-nav__item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 !important;
+    height: 100% !important;
+    text-decoration: none !important;
+    color: rgba(0, 0, 0, 0.4) !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em;
+    gap: 2px !important;
+    position: relative !important;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s var(--mob-ease);
+    min-height: unset !important;
+    min-width: unset !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: none !important;
+    border: none !important;
+  }
+  .mob-bottom-nav__item.active {
+    color: #000 !important;
+  }
+  .mob-bottom-nav__item svg {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: unset !important;
+    min-height: unset !important;
+    transition: transform 0.2s var(--mob-spring);
+  }
+  .mob-bottom-nav__item:active svg {
+    transform: scale(0.85);
+  }
+  .mob-bottom-nav__item.active svg {
+    transform: scale(1.05);
+  }
+  .mob-bottom-nav__badge {
+    position: absolute;
+    top: 6px;
+    right: calc(50% - 18px);
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    background: #000;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+    border: 2px solid #fff;
+    transform: scale(0);
+    transition: transform 0.25s var(--mob-spring);
+  }
+  .mob-bottom-nav__badge.has-items {
+    transform: scale(1);
+  }
+  /* Body padding for bottom nav */
+  body {
+    padding-bottom: calc(var(--mob-nav-h) + var(--mob-safe-bottom)) !important;
+  }
+  /* Notifications above bottom nav */
+  .fixed.bottom-6 {
+    bottom: calc(var(--mob-nav-h) + var(--mob-safe-bottom) + 12px) !important;
+  }
+}
+@media (min-width: 1100px) {
+  .mob-bottom-nav { display: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════
+   2. MOBILE HEADER — minimal fixes for drawer/backdrop
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 1099px) {
+
+  /* ── A. Header bar: always sticky, always on top ── */
+  #header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 200 !important;
+    background: #F5F5F7 !important;
+    height: var(--mob-header-h) !important;
+  }
+  #header.open-menu {
+    background: #F5F5F7 !important; /* Force opaque background on open menu, hides underlying text */
+    height: var(--mob-header-h) !important;
+  }
+  #header .header-cart__btn .pl-2 {
+    display: none !important; /* Hide "0 P / 0 шт" text on mobile header, keep only the icon */
+  }
+
+  /* ── B. Header group: compact row ── */
+  #header .header-group {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    height: var(--mob-header-h) !important;
+    padding: 0 12px !important;
+    gap: 4px !important;
+  }
+
+  /* ── C. Hide desktop-only items ── */
+  #header .mob-header-hide { display: none !important; }
+  #header .header-enter { display: none !important; }
+  #header hr[data-v-fb25dd5c] { display: none !important; }
+
+  /* Logo + burger placement */
+  #header .app-header-logo {
+    order: 1 !important;
+    margin-right: auto !important;
+  }
+  #header .app-header-burger {
+    order: 5 !important;
+    margin-right: 0 !important;
+    display: flex !important;
+  }
+  #header.open-menu .app-header-burger { display: flex !important; }
+  #header.open-menu .app-header-logo { display: flex !important; }
+  #header .header-search { order: 3 !important; }
+  #header .app-header-card { order: 4 !important; }
+  #header #wishlist-badge-wrap { display: none !important; }
+
+  /* ── D. Wrapper div → backdrop, starts BELOW header ── */
+  #header > div:first-child {
+    position: relative !important;
+    height: var(--mob-header-h) !important;
+    background: transparent !important;
+    padding-right: 0 !important;
+  }
+  #header.open-menu > div:first-child {
+    position: fixed !important;
+    top: var(--mob-header-h) !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: calc(100dvh - var(--mob-header-h)) !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    z-index: 180 !important;
+    padding-right: 0 !important;
+    cursor: pointer;
+    animation: fadeInBackdrop 0.2s var(--mob-ease) forwards;
+  }
+  @keyframes fadeInBackdrop {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slideInFromLeft {
+    from { transform: translateX(-100%); opacity: 0.4; }
+    to   { transform: translateX(0);     opacity: 1; }
+  }
+
+  /* ── E. Nav-list = drawer panel inside wrapper ── */
+  #header .header-nav-list {
+    display: none !important;
+  }
+  #header.open-menu .header-nav-list[data-v-fb25dd5c],
+  #header.open-menu .header-nav-list {
+    display: block !important;
+    position: fixed !important;
+    top: var(--mob-header-h) !important;
+    left: 0 !important;
+    right: auto !important;
+    bottom: 0 !important;
+    width: 82vw !important;
+    min-width: 0 !important;
+    max-width: 320px !important;
+    flex: none !important;
+    height: auto !important;
+    background: #fff !important;
+    z-index: 186 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 0 calc(var(--mob-nav-h) + 140px) !important; /* Bottom padding so items don't overlap city footer */
+    box-shadow: 4px 0 24px rgba(0,0,0,0.12) !important;
+    animation: slideInFromLeft 0.25s var(--mob-ease) forwards;
+    margin: 0 !important; /* reset Nuxt layout margin */
+  }
+
+  /* Nav list items styling */
+  #header.open-menu .header-nav-list__ul {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+  }
+  #header.open-menu .header-nav-list__ul > li {
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+  #header.open-menu .nav-title,
+  #header.open-menu .header-nav-list__ul > li > a,
+  #header.open-menu .header-nav-list__ul > li > div > a {
+    display: block !important;
+    padding: 14px 20px !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: #000 !important;
+    text-decoration: none !important;
+  }
+  /* Sub-menus */
+  #header.open-menu .header-nav-list__ul ul {
+    padding: 0 0 8px 20px !important;
+    margin: 0 !important;
+    list-style: none !important;
+  }
+  #header.open-menu .header-nav-list__ul ul li a {
+    padding: 8px 20px !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    text-transform: none !important;
+    color: rgba(0,0,0,0.7) !important;
+    text-decoration: none !important;
+  }
+
+  /* City selector at bottom of drawer */
+  #header .header-select-city { display: none !important; }
+  #header.open-menu .header-select-city[data-v-fb25dd5c],
+  #header.open-menu .header-select-city {
+    display: block !important;
+    position: fixed !important;
+    bottom: var(--mob-nav-h) !important;
+    left: 0 !important;
+    width: 82vw !important;
+    min-width: 0 !important;
+    max-width: 320px !important;
+    z-index: 187 !important;
+    background: #fff !important;
+    padding: 16px 20px !important;
+    border-top: 1px solid rgba(0,0,0,0.06) !important;
+    margin: 0 !important; /* reset Nuxt layout margin */
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.03) !important; /* soft top-shadow so it merges with the white drawer */
+  }
+
+  /* Contact info at bottom of menu — hide on mobile */
+  #header [class*="group-[.open-menu]:mt-auto"] { display: none !important; }
+
+  /* Original close/backdrop buttons — keep them for click-outside-to-close */
+  #header.open-menu button[aria-label="close"] {
+    z-index: 181 !important;
+  }
+
+  /* Disable original .backdrop */
+  .backdrop,
+  body.show-backdrop .backdrop {
+    display: none !important;
+    pointer-events: none !important;
+  }
+
+  /* ── F. Search overlay ── */
+  #header .header-search form[x-show="searchOpen"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: var(--mob-header-h) !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08) !important;
+    z-index: 210 !important;
+    padding: 0 8px !important;
+    background: #fff !important;
+  }
+  #header .header-search form select { display: none !important; }
+  #header .header-search form input[type="text"] { font-size: 16px !important; }
+  #header .header-search form > div[x-show] {
+    position: fixed !important;
+    top: var(--mob-header-h) !important;
+    left: 0 !important;
+    right: 0 !important;
+    max-height: calc(100dvh - var(--mob-header-h)) !important;
+    border-radius: 0 0 20px 20px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   3. HERO SECTION — MOBILE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  main > .w-full:first-child {
+    padding-top: 8px !important;
+  }
+  /* Hero text */
+  main > .w-full:first-child .container > p {
+    font-size: 26px !important;
+    line-height: 1.15 !important;
+    margin-bottom: 16px !important;
+    max-width: 100% !important;
+  }
+  /* Hero grid — single column */
+  main > .w-full:first-child .grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  main > .w-full:first-child .grid > a {
+    padding-top: 140px !important;
+    border-radius: 20px !important;
+  }
+  main > .w-full:first-child .grid > a > span {
+    font-size: 22px !important;
+    border-radius: 20px !important;
+  }
+  main > .w-full:first-child .grid > a > span small {
+    font-size: 16px !important;
+  }
+  main > .w-full:first-child .grid > div {
+    border-radius: 20px !important;
+  }
+  main > .w-full:first-child .grid > div > div {
+    border-radius: 20px !important;
+    padding: 20px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   4. CONTAINER — MOBILE OVERRIDE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 575px) {
+  .container {
+    max-width: 100% !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  .header-group {
+    max-width: 100% !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   5. PRODUCT CARDS — MOBILE (2-column grid)
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* Product grid */
+  .tc-product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  /* Product card */
+  .tc-tile {
+    padding: 10px !important;
+    border-radius: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  /* Product image */
+  .tc-tile__picture {
+    margin-bottom: 6px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+  .tc-tile__picture img {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1;
+    object-fit: contain !important;
+  }
+  /* Product title */
+  .tc-tile__title {
+    min-height: auto !important;
+  }
+  .tc-tile__title .text-\[20px\],
+  .tc-tile__title [class*="text-[20px]"] {
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+  }
+  /* Product subtitle/category */
+  .tc-tile__category,
+  .tc-tile .text-\[12px\] {
+    font-size: 11px !important;
+  }
+  /* Price + action buttons */
+  .tc-tile__actions,
+  .tc-tile__footer {
+    margin-top: auto !important;
+  }
+  .tc-tile__price {
+    font-size: 14px !important;
+  }
+  /* Action icons row — smaller */
+  .tc-tile .tc-card-actions {
+    gap: 4px !important;
+  }
+  .tc-tile .tc-card-actions button,
+  .tc-tile .tc-card-actions a {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+  }
+  .tc-tile .tc-card-actions svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  /* Taste notes */
+  .tc-tile .tc-taste-tags {
+    display: none !important; /* hide on 2-col to save space */
+  }
+  /* Flavor bars (Плотность, Кислотность) */
+  .tc-tile .tc-flavor-bar,
+  .tc-tile .tc-characteristic-bar {
+    display: none !important; /* hide on 2-col grid */
+  }
+  /* Weekly badge */
+  .tc-tile .tc-badge-weekly {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+  }
+}
+@media (max-width: 400px) {
+  .tc-product-grid {
+    gap: 6px !important;
+  }
+  .tc-tile {
+    padding: 8px !important;
+    border-radius: 14px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   5b. HOMEPAGE PRODUCT CARDS (weekly specials etc.)
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .tc-weekly-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  /* Individual product cards on homepage (not in catalog grid) */
+  .tc-weekly-grid .tc-tile .tc-taste-tags,
+  .tc-weekly-grid .tc-tile .tc-flavor-bar,
+  .tc-weekly-grid .tc-tile .tc-characteristic-bar {
+    display: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   6. CATALOG PAGE — MOBILE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .tc-catalog-page {
+    padding-top: 8px !important;
+  }
+  .tc-container {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  .tc-catalog-header {
+    flex-direction: row !important;
+    align-items: center !important;
+    margin-bottom: 12px !important;
+  }
+  .tc-catalog-h1 {
+    font-size: 22px !important;
+  }
+  /* Horizontal scrolling filters */
+  .tc-catalog-toolbar,
+  .tc-hashtag-row {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tc-catalog-toolbar::-webkit-scrollbar,
+  .tc-hashtag-row::-webkit-scrollbar {
+    display: none;
+  }
+  /* Sidebar — hidden on mobile */
+  .tc-catalog-sidebar {
+    display: none !important;
+  }
+  .tc-catalog-sidebar.mob-sheet-open {
+    display: flex !important;
+    position: fixed !important;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 9995 !important;
+    background: rgba(0,0,0,0.4);
+    align-items: flex-end;
+  }
+  .tc-catalog-sidebar.mob-sheet-open > * {
+    background: #fff;
+    border-radius: 24px 24px 0 0;
+    max-height: 85dvh;
+    overflow-y: auto;
+    width: 100%;
+    padding: 24px 16px calc(24px + var(--mob-nav-h));
+    animation: sheetSlideUp 0.35s var(--mob-ease) forwards;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   7. FOOTER — MOBILE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  footer {
+    padding-bottom: calc(40px + var(--mob-nav-h) + var(--mob-safe-bottom)) !important;
+  }
+  footer .container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   8. CART / MINI-CART — MOBILE (bottom sheet)
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  [x-show="cartOpen"] {
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 24px 24px 0 0 !important;
+    max-height: 80dvh !important;
+    padding-bottom: calc(16px + var(--mob-nav-h)) !important;
+  }
+  [x-show="wishlistOpen"] {
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 24px 24px 0 0 !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   9. PROFILE / ACCOUNT PAGES — MOBILE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .tc-account-page,
+  .tc-profile-section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  /* Account nav → horizontal scrollable */
+  .tc-account-nav,
+  [class*="base_account"] nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    white-space: nowrap;
+    padding-bottom: 8px;
+    display: flex !important;
+    gap: 8px;
+  }
+  .tc-account-nav::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   10. BLOG / COMMUNITY — MOBILE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .tc-blog-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   11. BANNER SLIDER — MOBILE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .tc-banner-slider {
+    border-radius: 20px !important;
+  }
+  .tc-banner-slider h2,
+  .tc-banner-slider .text-3xl,
+  .tc-banner-slider .text-4xl {
+    font-size: 22px !important;
+    line-height: 1.2 !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   12. PRODUCT DETAIL PAGE — MOBILE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .tc-product-detail {
+    padding: 0 !important;
+  }
+  .tc-product-detail .tc-product-images {
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+  .tc-product-detail .tc-product-info {
+    padding: 16px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   13. BASKET PAGE — MOBILE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .tc-basket-page {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  .tc-basket-page .tc-basket-items {
+    gap: 8px !important;
+  }
+  .tc-basket-page .tc-checkout-summary {
+    border-radius: 20px !important;
+    padding: 16px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   14. COMPARE PAGE — MOBILE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .tc-compare-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 16px;
+  }
+  .tc-compare-wrapper::-webkit-scrollbar { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════
+   15. AUTH PAGES — MOBILE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .tc-auth-page,
+  .tc-login-page {
+    padding: 24px 16px !important;
+  }
+  .tc-auth-page .tc-auth-card,
+  .tc-auth-page form {
+    max-width: 100% !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   16. ANIMATIONS
+   ═══════════════════════════════════════════════════ */
+@keyframes sheetSlideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 1099px) {
+  /* Page content fade-in */
+  main {
+    animation: fadeInUp 0.3s var(--mob-ease) forwards;
+  }
+  /* Smooth scroll */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* No tap highlight */
+  a, button, .tc-btn, .tc-tile, .mob-bottom-nav__item {
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Card press animation */
+  .tc-tile,
+  .tc-hero-tiles > a,
+  main > .w-full:first-child .grid > a {
+    transition: transform 0.15s var(--mob-ease) !important;
+  }
+  .tc-tile:active,
+  .tc-hero-tiles > a:active,
+  main > .w-full:first-child .grid > a:active {
+    transform: scale(0.97) !important;
+  }
+  /* Button press animation */
+  .tc-btn:active,
+  button:active {
+    transform: scale(0.96);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   17. GENERAL MOBILE POLISH
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 1099px) {
+  /* Prevent horizontal overflow */
+  body, html {
+    overflow-x: hidden !important;
+    width: 100%;
+  }
+  .body-wrap {
+    overflow-x: hidden;
+  }
+  /* Better touch targets — only for standalone buttons/links */
+  button:not(.mob-bottom-nav__item):not(nav *):not(footer *):not(.tc-tile *):not(.header-nav-list *):not([class*="text-["]),
+  a:not(.mob-bottom-nav__item):not(nav *):not(footer *):not(.tc-tile *):not(.header-nav-list *):not([class*="text-["]):not(p a):not(span a):not(li a) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* Status bar padding for iOS */
+  body {
+    padding-top: var(--mob-safe-top);
+  }
+  /* Rounded cards */
+  .rounded-3xl { border-radius: 20px !important; }
+  /* App-like background */
+  body {
+    background-color: #F5F5F7 !important;
+  }
+  main {
+    background: #F5F5F7;
+    min-height: calc(100dvh - var(--mob-header-h) - var(--mob-nav-h));
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   18. PROFILE SIDEBAR → MOBILE HORIZONTAL TABS
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 1099px) {
+  .mob-account-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0 !important;
+    white-space: nowrap !important;
+    padding: 0 12px 12px !important;
+    margin: 0 -16px !important;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    space-y-0: true;
+  }
+  .mob-account-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .mob-account-nav > li {
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .mob-account-nav > li > a {
+    font-size: 12px !important;
+    padding: 6px 14px !important;
+    background: rgba(0,0,0,0.04);
+    border-radius: 20px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    color: rgba(0,0,0,0.6) !important;
+    margin-right: 6px;
+    transition: all 0.2s ease;
+  }
+  .mob-account-nav > li > a[style*="font-size:24px"] {
+    background: #000 !important;
+    color: #fff !important;
+    font-size: 12px !important;
+  }
+  /* Hide the HR after sidebar on mobile */
+  .mob-account-nav + hr {
+    display: none !important;
+  }
+}

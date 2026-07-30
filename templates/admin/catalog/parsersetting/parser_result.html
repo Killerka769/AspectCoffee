@@ -1,0 +1,62 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  .log-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+  .log-table th, .log-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; }
+  .log-table th { font-weight: 600; background: #f8f9fa; }
+  .log-table .status-success { color: #28a745; font-weight: 600; }
+  .log-table .status-failed { color: #dc3545; font-weight: 600; }
+  .log-table .status-running { color: #ffc107; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <div class="module">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <a href="{% url 'admin:catalog_parsersetting_changelist' %}" style="text-decoration:none;font-size:16px;">&larr; К настройкам парсера</a>
+      <h1 style="margin:0;">История запусков парсера</h1>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <a href="{% url 'admin:catalog_parsersetting_run_parser' %}" style="display:inline-block;padding:8px 20px;background:#1a1a2e;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;">
+        &plus; Новый запуск
+      </a>
+    </div>
+
+    {% if logs %}
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Дата запуска</th>
+          <th>Статус</th>
+          <th>Завершён</th>
+          <th>Создано</th>
+          <th>Обновлено</th>
+          <th>Всего</th>
+          <th>Ошибки</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td>{{ log.started_at }}</td>
+          <td class="status-{{ log.status }}">{{ log.status }}</td>
+          <td>{{ log.finished_at|default:"—" }}</td>
+          <td>{{ log.created_count|default:"0" }}</td>
+          <td>{{ log.updated_count|default:"0" }}</td>
+          <td>{{ log.total_products|default:"0" }}</td>
+          <td>{{ log.errors|truncatechars:80|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>Парсер ещё ни разу не запускался.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Как выбрать кофе — Гайд для начинающих и профи{% endblock %}
+{% block meta_description %}Полный гид по выбору кофе: степени обжарки, вкусовые профили, страны происхождения. Поможем найти ваш идеальный кофе.{% endblock %}
+
+{% block content %}
+<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
+  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
+    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
+      <a href="/" class="hover:text-black transition-colors">Главная</a>
+      <span class="text-black/20">/</span>
+      <span class="text-black font-medium">Как выбрать кофе</span>
+    </nav>
+    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-4">Как выбрать кофе</h1>
+    <p class="text-[16px] text-black/50 max-w-2xl mb-12">Разбираемся в степенях обжарки, вкусовых профилях и странах произрастания, чтобы вы могли выбрать идеальный кофе для себя.</p>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
+      <h2 class="text-[24px] font-din-black uppercase mb-6 flex items-center gap-3">
+        <svg class="w-8 h-8"><use href="{% static 'asset/images/sprite.svg' %}#icons--fire"></use></svg>
+        Степени обжарки
+      </h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-[#faf8f0] rounded-2xl p-6 border border-amber-200/40">
+          <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-amber-600"><use href="{% static 'asset/images/sprite.svg' %}#icons--sun"></use></svg>
+          </div>
+          <h3 class="font-bold text-[17px] mb-2">Светлая обжарка</h3>
+          <p class="text-[13px] text-black/50 mb-3">Light Roast</p>
+          <p class="text-[14px] text-black/70 leading-relaxed mb-3">Сохраняет максимум вкусовых качеств зерна. Яркая кислотность, цветочные и фруктовые ноты, сложный аромат.</p>
+          <p class="text-[13px] text-black/50">Лучше всего для: фильтр, пуровер, кемекс, аэропресс</p>
+        </div>
+        <div class="bg-[#f5f0eb] rounded-2xl p-6 border border-amber-300/40">
+          <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-amber-700"><use href="{% static 'asset/images/sprite.svg' %}#icons--fire"></use></svg>
+          </div>
+          <h3 class="font-bold text-[17px] mb-2">Средняя обжарка</h3>
+          <p class="text-[13px] text-black/50 mb-3">Medium Roast</p>
+          <p class="text-[14px] text-black/70 leading-relaxed mb-3">Сбалансированный вкус с умеренной кислотностью и сладостью. Карамельные, ореховые и шоколадные ноты.</p>
+          <p class="text-[13px] text-black/50">Лучше всего для: универсальный вариант для любых методов</p>
+        </div>
+        <div class="bg-[#f0ebe5] rounded-2xl p-6 border border-amber-300/40">
+          <div class="w-12 h-12 bg-amber-300 rounded-full flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-amber-800"><use href="{% static 'asset/images/sprite.svg' %}#icons--fire"></use></svg>
+          </div>
+          <h3 class="font-bold text-[17px] mb-2">Тёмная обжарка</h3>
+          <p class="text-[13px] text-black/50 mb-3">Dark Roast</p>
+          <p class="text-[14px] text-black/70 leading-relaxed mb-3">Насыщенный плотный вкус с низкой кислотностью. Горький шоколад, карамель, дымные ноты, орехи.</p>
+          <p class="text-[13px] text-black/50">Лучше всего для: эспрессо, мока, турка</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
+      <h2 class="text-[24px] font-din-black uppercase mb-6 flex items-center gap-3">
+        <svg class="w-8 h-8"><use href="{% static 'asset/images/sprite.svg' %}#icons--coffee"></use></svg>
+        Вкусовые профили
+      </h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0"><svg class="w-5 h-5 text-red-600"><use href="{% static 'asset/images/sprite.svg' %}#icons--eco-leaf"></use></svg></div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Фруктовые и ягодные</h3>
+            <p class="text-[13px] text-black/60">Африканские сорта: Эфиопия, Кения, Руанда. Яркая кислотность, ноты ягод, цитрусовых, тропических фруктов.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0"><svg class="w-5 h-5 text-amber-600"><use href="{% static 'asset/images/sprite.svg' %}#icons--chocolate"></use></svg></div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Ореховые и шоколадные</h3>
+            <p class="text-[13px] text-black/60">Центральная и Южная Америка: Бразилия, Колумбия, Гватемала. Миндаль, фундук, какао, карамель.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center shrink-0"><svg class="w-5 h-5 text-yellow-600"><use href="{% static 'asset/images/sprite.svg' %}#icons--eco-leaf"></use></svg></div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Цветочные</h3>
+            <p class="text-[13px] text-black/60">Эфиопия и Йемен. Ноты жасмина, бергамота, лаванды, розы. Деликатный и ароматный профиль.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0"><svg class="w-5 h-5 text-green-600"><use href="{% static 'asset/images/sprite.svg' %}#icons--fire"></use></svg></div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Пряные и насыщенные</h3>
+            <p class="text-[13px] text-black/60">Индонезия, Суматра, Вьетнам. Пряности, табак, тёмный шоколад, плотное тело, низкая кислотность.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
+      <h2 class="text-[24px] font-din-black uppercase mb-6 flex items-center gap-3">
+        <svg class="w-8 h-8"><use href="{% static 'asset/images/sprite.svg' %}#icons--globe"></use></svg>
+        Страны происхождения
+      </h2>
+      <div class="space-y-4">
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <img src="{% static 'asset/images/flag-ethiopia.svg' %}" alt="Эфиопия" class="w-8 h-8 rounded-full object-cover" onerror="this.style.display='none'">
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Эфиопия</h3>
+            <p class="text-[13px] text-black/60">Родина кофе. Сорта с яркой кислотностью, цветочными и фруктовыми нотами. Легендарные Иргачефф, Йиргачеффе, Сидамо.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <img src="{% static 'asset/images/flag-colombia.svg' %}" alt="Колумбия" class="w-8 h-8 rounded-full object-cover" onerror="this.style.display='none'">
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Колумбия</h3>
+            <p class="text-[13px] text-black/60">Сбалансированный кофе с карамельной сладостью, ореховыми нотами и мягкой кислотностью. Один из самых популярных регионов.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <img src="{% static 'asset/images/flag-brazil.svg' %}" alt="Бразилия" class="w-8 h-8 rounded-full object-cover" onerror="this.style.display='none'">
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Бразилия</h3>
+            <p class="text-[13px] text-black/60">Мягкий, сладкий кофе с нотами шоколада, карамели и орехов. Низкая кислотность, плотное тело. Отлично для эспрессо.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <img src="{% static 'asset/images/flag-kenya.svg' %}" alt="Кения" class="w-8 h-8 rounded-full object-cover" onerror="this.style.display='none'">
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Кения</h3>
+            <p class="text-[13px] text-black/60">Яркий, сложный кофе с высокой кислотностью. Ноты чёрной смородины, цитрусовых, томата. Любимец специалитет-энтузиастов.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-black text-white rounded-[24px] p-6 md:p-10 mb-8">
+      <h2 class="text-[24px] font-din-black uppercase mb-4">Не знаете с чего начать?</h2>
+      <p class="text-[15px] text-white/60 mb-6 max-w-xl">Напишите нам, и мы поможем подобрать идеальный кофе под ваш вкус и способ заваривания.</p>
+      <a href="/contact-us/" class="inline-block bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-[14px]">Связаться с нами →</a>
+    </div>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,227 @@
+{% extends "users/base_account.html" %}
+{% load static %}
+
+{% block title %}Заказ #{{ order.pk }}{% endblock %}
+
+{% block account_content %}
+<div class="space-y-10">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div class="space-y-2">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'users:orders' %}" class="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition-all group">
+                    <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                </a>
+                <h2 class="text-3xl font-din-black uppercase tracking-tight">Заказ #{{ order.pk }}</h2>
+            </div>
+            <p class="text-xs text-black/30 font-bold uppercase tracking-widest pl-14">от {{ order.created_at|date:"d F Y, H:i" }}</p>
+        </div>
+        
+        <div class="flex items-center gap-3 flex-wrap">
+            <form action="{% url 'users:reorder' order.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="bg-black text-white px-4 py-2 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-gray-800 transition-colors">
+                    Повторить заказ
+                </button>
+            </form>
+            <span class="px-4 py-2 rounded-2xl text-[11px] font-black uppercase tracking-widest border
+                {% if order.status == 'cancelled' %}bg-red-50 text-red-600 border-red-100
+                {% elif order.status == 'delivered' or order.status == 'completed' %}bg-green-50 text-green-600 border-green-100
+                {% elif order.status == 'shipped' %}bg-blue-50 text-blue-600 border-blue-100
+                {% else %}bg-gray-50 text-gray-400 border-gray-100{% endif %}">
+                {{ order.get_status_display }}
+            </span>
+            
+            {% if order.payment_status == 'paid' %}
+            <span class="px-4 py-2 rounded-2xl text-[11px] font-black uppercase tracking-widest bg-black text-white shadow-lg shadow-black/10">Оплачено</span>
+            {% else %}
+            <span class="px-4 py-2 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-black/10 text-black/40">Ожидает оплаты</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if payment_unpaid %}
+    <section class="{% if payment_expired %}bg-red-50 border-red-100{% else %}bg-amber-50 border-amber-100{% endif %} border rounded-[24px] p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <p class="text-[13px] font-din-black uppercase tracking-wider mb-1">
+                {% if payment_expired %}Время оплаты истекло{% else %}Заказ ожидает оплаты{% endif %}
+            </p>
+            {% if payment_can_resume %}
+            <p class="text-[12px] text-black/55 m-0"
+               x-data="{ remaining: {{ payment_remaining_seconds|default:0 }} }"
+               x-init="setInterval(() => { if (remaining > 0) remaining -= 1 }, 1000)">
+                Вернуться к оплате можно в течение
+                <span class="font-bold" x-text="String(Math.floor(remaining / 60)).padStart(2, '0') + ':' + String(remaining % 60).padStart(2, '0')"></span>
+            </p>
+            {% else %}
+            <p class="text-[12px] text-black/55 m-0">Оплата не подтверждена, заказ не передан в работу.</p>
+            {% endif %}
+        </div>
+        {% if payment_can_resume %}
+        <a href="{% url 'orders:resume_payment' order.pk %}" class="rounded-xl bg-black text-white px-5 py-3 text-[11px] font-din-black uppercase tracking-wider hover:bg-black/80 transition-colors text-center">
+            Вернуться к оплате
+        </a>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    {% if recurring_plan %}
+    <section class="bg-white border border-black/5 rounded-[24px] p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <p class="text-[13px] font-din-black uppercase tracking-wider mb-1">Автоповтор заказа</p>
+            <p class="text-[12px] text-black/50 m-0">
+                {{ recurring_plan.get_status_display }} · каждые {{ recurring_plan.interval_weeks }} нед.
+                {% if recurring_plan.next_charge_at %}· следующее списание {{ recurring_plan.next_charge_at|date:"d.m.Y H:i" }}{% endif %}
+            </p>
+            {% if recurring_plan.last_error %}<p class="text-[12px] text-red-600 mt-2 mb-0">{{ recurring_plan.last_error }}</p>{% endif %}
+        </div>
+        {% if recurring_plan.status != 'cancelled' %}
+        <form action="{% url 'users:cancel_recurring_order' order.pk %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="rounded-xl border border-black/10 bg-white px-4 py-2 text-[11px] font-din-black uppercase tracking-wider hover:bg-black hover:text-white transition-colors">Отключить автоповтор</button>
+        </form>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-8">
+        <div class="space-y-8">
+            <!-- Items -->
+            <section class="bg-gray-50/50 rounded-[40px] border border-gray-100 p-8">
+                <h3 class="text-lg font-din-black uppercase mb-6 tracking-tight">Состав заказа</h3>
+                <div class="space-y-4">
+                    {% for item in order.items.all %}
+                    <div class="flex items-center gap-6 bg-white p-4 rounded-3xl border border-gray-50 shadow-sm group hover:border-black/5 transition-all">
+                        <div class="w-16 h-16 bg-gray-50 rounded-2xl shrink-0 overflow-hidden border border-gray-100">
+                            {% if item.variant.product.main_image %}
+                                <img src="{{ item.variant.product.main_image.url }}" class="w-full h-full object-cover">
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-bold text-base mb-0.5 truncate">{{ item.product_name }}</p>
+                            <p class="text-xs text-black/30 font-bold uppercase tracking-widest">
+                                {{ item.variant.weight }}g • {{ item.variant.get_grind_display }}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs font-black text-black/20 uppercase tracking-widest mb-1">{{ item.qty }} шт × {{ item.price_at_order|floatformat:0 }} ₽</p>
+                            <p class="text-lg font-din-black">{{ item.total_price|floatformat:0 }} ₽</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Delivery & Contact Info -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Delivery -->
+                <div class="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm">
+                    <h4 class="text-xs font-black uppercase text-black/30 tracking-widest mb-6">Доставка</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </div>
+                            <div class="leading-tight">
+                                <p class="text-sm font-bold mb-1">{{ order.delivery_address.city }}</p>
+                                <p class="text-xs text-black/40 font-medium">{{ order.delivery_address.street }}{% if order.delivery_address.house %}, д. {{ order.delivery_address.house }}{% endif %}{% if order.delivery_address.apartment %}, кв. {{ order.delivery_address.apartment }}{% endif %}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
+                            </div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-black/60">{{ order.get_delivery_type_display }}</p>
+                        </div>
+                        {% if order.cdek_track_number %}
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke-width="2"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold uppercase tracking-widest text-black/60">Трек СДЭК</p>
+                                <p class="text-sm font-bold text-blue-600">{{ order.cdek_track_number }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm">
+                    <h4 class="text-xs font-black uppercase text-black/30 tracking-widest mb-6">Получатель{% if order.has_other_recipient %} · другой{% endif %}</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center shrink-0 font-bold text-xs uppercase">{{ order.delivery_recipient_name|first|default:"?" }}</div>
+                            <div class="leading-tight">
+                                <p class="text-sm font-bold mb-1">{{ order.delivery_recipient_name }}</p>
+                                <p class="text-xs text-black/40 font-bold uppercase tracking-widest">{{ order.delivery_recipient_phone }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-black/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <p class="text-xs font-bold text-black/60">{{ order.contact_email }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if order.comment %}
+            <div class="bg-orange-50 border border-orange-100 rounded-[32px] p-8">
+                <h4 class="text-[10px] font-black uppercase tracking-widest text-orange-600/50 mb-3">Комментарий к заказу</h4>
+                <p class="text-sm font-medium text-orange-900 leading-relaxed italic">«{{ order.comment }}»</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar Summary -->
+        <aside class="space-y-6">
+            <div class="bg-white rounded-[40px] border border-gray-100 p-8 shadow-sm">
+                <h4 class="text-xs font-black uppercase text-black/30 tracking-widest mb-8 text-center border-b border-gray-50 pb-4">Итого по счету</h4>
+                
+                <div class="space-y-4 mb-8">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-black/40 font-bold uppercase tracking-widest text-[10px]">Товары</span>
+                        <span class="font-bold">{{ order.items_subtotal|floatformat:0 }} ₽</span>
+                    </div>
+                    {% if order.discount_amount %}
+                    <div class="flex justify-between text-sm">
+                        <span class="text-green-600 font-bold uppercase tracking-widest text-[10px]">Скидка</span>
+                        <span class="font-black text-green-600">−{{ order.discount_amount|floatformat:0 }} ₽</span>
+                    </div>
+                    {% endif %}
+                    <div class="flex justify-between text-sm">
+                        <span class="text-black/40 font-bold uppercase tracking-widest text-[10px]">Доставка</span>
+                        <span class="font-bold">{{ order.delivery_cost|floatformat:0 }} ₽{% if order.delivery_cost and not order.delivery_included_in_total %} <small class="block text-[9px] text-orange-600">не включена в оплату</small>{% endif %}</span>
+                    </div>
+                </div>
+                
+                <div class="pt-6 border-t border-black/5 text-center">
+                    <p class="text-4xl font-din-black mb-1 leading-none">{{ order.total_amount|floatformat:0 }} ₽</p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-black/20">{{ order.get_payment_method_display }}</p>
+                </div>
+            </div>
+            
+            <div class="space-y-2">
+                <form action="{% url 'users:reorder' order.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full bg-black text-white hover:bg-gray-800 py-5 rounded-2xl font-din-black uppercase tracking-widest text-sm transition-all shadow-xl shadow-black/10 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m0 0H15"></path></svg>
+                        Повторить заказ
+                    </button>
+                </form>
+                
+                {% if user.is_wholesale %}
+                <a href="{% url 'users:download_invoice' order.pk %}" class="w-full bg-gray-50 text-black hover:bg-gray-100 py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 border border-gray-100">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-width="2"></path></svg>
+                    Скачать инвойс
+                </a>
+                {% endif %}
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,212 @@
+{% extends "users/base_account.html" %}{% load static %}{% block account_content %}
+<div class="space-y-8 md:space-y-12">
+
+  {# INFO CARDS #}
+  {% if not request.session.dismissed_notices|default:False or "roasting" not in request.session.dismissed_notices %}
+  <div class="grid md:grid-cols-2 gap-4 -mb-4 md:-mb-8">
+    <div id="notice-roasting" class="bg-[var(--white)] rounded-2xl p-4 2xl:pt-5 2xl:pb-4 2xl:pl-8 2xl:pr-16 flex flex-wrap items-center space-y-4 2xl:space-y-2">
+      <div class="flex items-center 2xl:order-1 mr-auto 2xl:w-full">
+        <div class="bg-[var(--black-4)] rounded-full w-10 h-10 flex items-center justify-center shrink-0 mr-4">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <span class="text-[14px] leading-[1.2] font-din-black uppercase tracking-[0.04em]">Обжарка</span>
+      </div>
+      <button type="button" class="relative flex items-center !mt-0 2xl:order-4 2xl:absolute 2xl:top-0 2xl:bottom-0 2xl:!m-auto 2xl:right-9 2xl:h-[28.8px] cursor-pointer bg-transparent border-0 p-0"
+              hx-post="{% url 'users:dismiss_notice' 'roasting' %}"
+              hx-target="#notice-roasting"
+              hx-swap="outerHTML">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+      <div class="w-full 2xl:order-2 2xl:max-w-[368px]">
+        <p class="text-[14px] leading-[1.2] m-0">Передаём на обжарку в 13:00 по Москве.</p>
+        <p class="text-[14px] leading-[1.2] m-0 mt-1">Отправим на следующий день.</p>
+      </div>
+      <div class="mr-auto 2xl:order-5 2xl:w-full"></div>
+    </div>
+    {% if not request.session.dismissed_notices|default:False or "delivery" not in request.session.dismissed_notices %}
+    <div id="notice-delivery" class="bg-[var(--white)] rounded-2xl p-4 2xl:pt-5 2xl:pb-4 2xl:pl-8 2xl:pr-16 flex flex-wrap items-center space-y-4 2xl:space-y-2">
+      <div class="flex items-center 2xl:order-1 mr-auto 2xl:w-full">
+        <div class="bg-[var(--black-4)] rounded-full w-10 h-10 flex items-center justify-center shrink-0 mr-4">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+        </div>
+        <span class="text-[14px] leading-[1.2] font-din-black uppercase tracking-[0.04em]">Доставка</span>
+      </div>
+      <button type="button" class="relative flex items-center !mt-0 2xl:order-4 2xl:absolute 2xl:top-0 2xl:bottom-0 2xl:!m-auto 2xl:right-9 2xl:h-[28.8px] cursor-pointer bg-transparent border-0 p-0"
+              hx-post="{% url 'users:dismiss_notice' 'delivery' %}"
+              hx-target="#notice-delivery"
+              hx-swap="outerHTML">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+      <div class="w-full 2xl:order-2 2xl:max-w-[368px]">
+        <p class="text-[14px] leading-[1.2] m-0">Заказы на аксессуары и чай обрабатываем вместе с кофе</p>
+      </div>
+      <div class="mr-auto 2xl:order-5 2xl:w-full"></div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if not orders %}
+
+    {# EMPTY STATE #}
+    <div class="col-span-12 xl:col-span-8 2xl:col-span-6 pt-16 xs:pt-[152px] xl:pt-[88px] text-center flex flex-col items-center">
+      <div class="w-20 h-20 bg-[var(--white)] rounded-full flex items-center justify-center mb-6">
+        <svg class="w-10 h-10 text-[var(--black-16)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+      </div>
+      <p class="text-[24px] font-din-black uppercase leading-[1.2] mb-2 m-0">Вы пока ещё ничего не купили</p>
+      <p class="text-[14px] text-[var(--black-50)] mb-6 m-0">Давайте что‑нибудь выберем в каталоге</p>
+      <a href="{% url 'catalog:catalog' %}" class="tc-btn btn-dark">В каталог</a>
+    </div>
+
+  {% else %}
+
+    {# CURRENT ORDERS #}
+    {% if current_orders %}
+    <div class="space-y-4">
+      <h2 class="-mb-2 xl:mb-0 text-[24px] font-din-black uppercase leading-[1.2] m-0">
+        {% if current_orders|length > 1 %}текущие заказы{% else %}текущий заказ{% endif %}
+        <span class="text-[14px] text-[var(--black-50)] ml-2">({{ current_orders|length }})</span>
+      </h2>
+      {% for order in current_orders %}
+      <a href="{% url 'users:order_detail' order.pk %}" class="block bg-[var(--white)] rounded-2xl 2xl:rounded-3xl -mx-4 sm:w-full sm:mx-0 relative overflow-hidden no-underline text-[var(--black)] hover:shadow-md transition-shadow">
+        <div class="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-[var(--black-4)] rounded-xl flex items-center justify-center shrink-0">
+              <svg class="w-6 h-6 sm:w-7 sm:h-7 text-[var(--black-50)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-din-black text-[16px] leading-[1.2]">Заказ #{{ order.pk }}</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
+                  {% if order.status == 'new' %}bg-blue-100 text-blue-700
+                  {% elif order.status == 'paid' %}bg-indigo-100 text-indigo-700
+                  {% elif order.status == 'assembling' %}bg-amber-100 text-amber-700
+                  {% elif order.status == 'shipped' %}bg-purple-100 text-purple-700
+                  {% elif order.status == 'delivered' %}bg-green-100 text-green-700
+                  {% elif order.status == 'completed' %}bg-green-100 text-green-700
+                  {% elif order.status == 'cancelled' %}bg-red-100 text-red-700
+                  {% else %}bg-gray-100 text-gray-700{% endif %}">
+                  {{ order.get_status_display }}
+                </span>
+              </div>
+              <p class="text-[13px] text-[var(--black-50)] m-0 mt-1">{{ order.created_at|date:"d.m.Y H:i" }}</p>
+              <div class="flex items-center gap-1 mt-1.5 flex-wrap">
+                {% for item in order.items.all|slice:":3" %}
+                <span class="text-[12px] text-[var(--black-50)] bg-[var(--black-4)] rounded-md px-1.5 py-0.5">{{ item.product_name|truncatechars:20 }}</span>
+                {% endfor %}
+                {% if order.items.count > 3 %}
+                <span class="text-[12px] text-[var(--black-50)]">+{{ order.items.count|add:"-3" }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between sm:justify-end gap-6 sm:gap-8">
+            <div class="text-right">
+              <div class="text-[10px] text-[var(--black-50)] font-din-black uppercase tracking-[0.1em]">Сумма</div>
+              <div class="text-[22px] font-din-black leading-[1.2]">{{ order.total_amount|floatformat:0 }} <span class="rub">₽</span></div>
+            </div>
+            <div class="text-[var(--black-50)]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </div>
+          </div>
+        </div>
+      </a>
+      <div class="flex justify-end gap-2 -mt-2">
+      {% if order.payment_status == 'pending' and order.payment.confirmation_url %}
+      <a href="{% url 'orders:resume_payment' order.pk %}" class="rounded-xl bg-black text-white px-4 py-2 text-[11px] font-din-black uppercase tracking-wider hover:bg-black/80 transition-colors">Вернуться к оплате</a>
+      {% endif %}
+      <form action="{% url 'users:reorder' order.pk %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="rounded-xl border border-black/10 bg-white px-4 py-2 text-[11px] font-din-black uppercase tracking-wider hover:bg-black hover:text-white transition-colors">Повторить заказ</button>
+      </form>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {# ORDER HISTORY #}
+    <div class="space-y-4">
+      {% regroup orders by created_at|date:"F Y" as order_months %}
+      {% for month_group in order_months %}
+      <div class="space-y-4">
+        <h2 class="-mb-2 xl:mb-0 text-[24px] font-din-black uppercase leading-[1.2] m-0 text-[var(--black)]">{{ month_group.grouper }}</h2>
+        {% for order in month_group.list %}
+        <a href="{% url 'users:order_detail' order.pk %}" class="block bg-[var(--white)] rounded-2xl 2xl:rounded-3xl -mx-4 sm:w-full sm:mx-0 relative overflow-hidden no-underline text-[var(--black)] hover:shadow-md transition-shadow">
+          <div class="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 bg-[var(--black-4)] rounded-xl flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 sm:w-7 sm:h-7 text-[var(--black-50)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-din-black text-[16px] leading-[1.2]">Заказ #{{ order.pk }}</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
+                    {% if order.status == 'new' %}bg-blue-100 text-blue-700
+                    {% elif order.status == 'paid' %}bg-indigo-100 text-indigo-700
+                    {% elif order.status == 'assembling' %}bg-amber-100 text-amber-700
+                    {% elif order.status == 'shipped' %}bg-purple-100 text-purple-700
+                    {% elif order.status == 'delivered' %}bg-green-100 text-green-700
+                    {% elif order.status == 'completed' %}bg-green-100 text-green-700
+                    {% elif order.status == 'cancelled' %}bg-red-100 text-red-700
+                    {% else %}bg-gray-100 text-gray-700{% endif %}">
+                    {{ order.get_status_display }}
+                  </span>
+                </div>
+                <p class="text-[13px] text-[var(--black-50)] m-0 mt-1">{{ order.created_at|date:"d.m.Y H:i" }}</p>
+                <div class="flex items-center gap-1 mt-1.5 flex-wrap">
+                  {% for item in order.items.all|slice:":3" %}
+                  <span class="text-[12px] text-[var(--black-50)] bg-[var(--black-4)] rounded-md px-1.5 py-0.5">{{ item.product_name|truncatechars:20 }}</span>
+                  {% endfor %}
+                  {% if order.items.count > 3 %}
+                  <span class="text-[12px] text-[var(--black-50)]">+{{ order.items.count|add:"-3" }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between sm:justify-end gap-6 sm:gap-8">
+              <div class="text-right">
+                <div class="text-[10px] text-[var(--black-50)] font-din-black uppercase tracking-[0.1em]">Сумма</div>
+                <div class="text-[22px] font-din-black leading-[1.2]">{{ order.total_amount|floatformat:0 }} <span class="rub">₽</span></div>
+              </div>
+              <div class="text-[var(--black-50)]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+              </div>
+            </div>
+          </div>
+        </a>
+        <div class="flex justify-end gap-2 -mt-2">
+        {% if order.payment_status == 'pending' and order.payment.confirmation_url %}
+        <a href="{% url 'orders:resume_payment' order.pk %}" class="rounded-xl bg-black text-white px-4 py-2 text-[11px] font-din-black uppercase tracking-wider hover:bg-black/80 transition-colors">Вернуться к оплате</a>
+        {% endif %}
+        <form action="{% url 'users:reorder' order.pk %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="rounded-xl border border-black/10 bg-white px-4 py-2 text-[11px] font-din-black uppercase tracking-wider hover:bg-black hover:text-white transition-colors">Повторить заказ</button>
+        </form>
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+
+    {# PAGINATION #}
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="flex items-center justify-center gap-2 pt-4">
+      {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}" class="w-10 h-10 rounded-xl bg-[var(--white)] flex items-center justify-center hover:bg-[var(--black-5)]">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+      </a>
+      {% endif %}
+      {% for num in page_obj.paginator.page_range %}
+      <a href="?page={{ num }}" class="w-10 h-10 rounded-xl flex items-center justify-center text-[12px] font-din-black {% if num == page_obj.number %}bg-[var(--black)] text-[var(--white)]{% else %}bg-[var(--white)] hover:bg-[var(--black-5)]{% endif %}">{{ num }}</a>
+      {% endfor %}
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" class="w-10 h-10 rounded-xl bg-[var(--white)] flex items-center justify-center hover:bg-[var(--black-5)]">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  {% endif %}
+</div>
+{% endblock %}

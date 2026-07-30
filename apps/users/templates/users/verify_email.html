@@ -1,0 +1,43 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Подтверждение email{% endblock %}
+{% block body_extra_class %} grey-theme{% endblock %}
+
+{% block content %}
+<div style="display:flex;justify-content:center;padding:40px 20px;">
+  <div style="width:100%;max-width:488px;">
+    <div class="bg-white rounded-3xl p-6 md:p-8">
+      <div class="w-full mb-4">
+        <p class="text-[40px] font-din-black uppercase leading-[1.2] md:tracking-[0.01em] mb-0">Подтверждение email</p>
+      </div>
+
+      {% if messages %}
+      <div class="space-y-3 mb-8">
+        {% for message in messages %}
+        <div class="p-4 rounded-xl {% if message.tags == 'error' %}bg-red-50 text-red-600 border border-red-100{% elif message.tags == 'success' %}bg-green-50 text-green-600 border border-green-100{% else %}bg-blue-50 text-blue-600 border border-blue-100{% endif %} text-xs font-bold flex items-center gap-2">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="post" class="w-full space-y-8">
+        {% csrf_token %}
+        <div class="tc-input input-white xl:input-secondary">
+          <label class="tc-input__label" for="email-code">Код подтверждения</label>
+          <div class="tc-input__field">
+            <input id="email-code" type="text" name="code" required placeholder="000000" maxlength="6" pattern="[0-9]{6}"
+                   autocomplete="one-time-code" inputmode="numeric"
+                   class="tc-input__field--input text-center tracking-[0.3em] text-2xl">
+          </div>
+        </div>
+
+        <button type="submit" class="tc-btn btn-dark w-full">
+          <span class="text-primary duration-200">Подтвердить</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

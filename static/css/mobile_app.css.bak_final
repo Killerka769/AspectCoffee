@@ -1,0 +1,955 @@
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE APP EXPERIENCE — "Flutter-grade" responsive
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 0. CSS Variables ── */
+:root {
+  --mob-nav-h: 64px;
+  --mob-header-h: 56px;
+  --mob-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --mob-safe-top: env(safe-area-inset-top, 0px);
+  --mob-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --mob-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* =====================================================
+   11. MOBILE MENU FRAME — ordered, right-aligned drawer
+   ===================================================== */
+.aspect-mobile-menu {
+  display: none;
+}
+
+@media (max-width: 1099px) {
+  .header-mobile-cart-count {
+    position: absolute;
+    top: -5px;
+    right: -7px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    color: #fff;
+    background: #000;
+    border: 2px solid #fff;
+    border-radius: 9px;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    transform: scale(0);
+    transition: transform 0.2s var(--mob-spring);
+  }
+  .header-mobile-cart-count.has-items {
+    transform: scale(1);
+  }
+
+  /* Keep the compact icon bar in place while the menu is open. */
+  #header.open-menu .header-group {
+    position: fixed !important;
+    top: 8px !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: auto !important;
+    height: var(--mob-header-h) !important;
+    min-width: 0 !important;
+    max-width: 380px !important;
+    margin: 0 auto !important;
+    padding: 0 16px !important;
+    align-items: center !important;
+    background: #fff !important;
+    border-radius: 20px 20px 0 0 !important;
+    z-index: 220 !important;
+  }
+  #header.open-menu .header-group::after {
+    display: none !important;
+  }
+  #header.open-menu .app-header-burger,
+  #header.open-menu .header-nav-list,
+  #header.open-menu .header-cdek-location,
+  #header.open-menu .header-enter,
+  #header.open-menu .aspect-header-socials,
+  #header.open-menu .header-group > button[aria-label="close"] {
+    display: none !important;
+  }
+
+  .aspect-mobile-menu {
+    position: fixed;
+    display: block;
+    /* The drawer lives inside the backdrop that already starts below the header. */
+    top: var(--mob-header-h) !important;
+    right: 12px;
+    bottom: calc(var(--mob-nav-h) + var(--mob-safe-bottom) + 12px);
+    width: calc(100vw - 24px);
+    max-width: 380px;
+    min-width: 0;
+    padding: 12px 16px 20px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+    z-index: 195;
+    cursor: default;
+  }
+
+  .aspect-mobile-menu__close {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    margin: 0 0 -36px auto;
+    padding: 0;
+    color: #000;
+    background: rgba(255, 255, 255, 0.96);
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .aspect-mobile-menu__close svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+
+  .aspect-mobile-menu__nav {
+    display: flex;
+    flex-direction: column;
+  }
+  .aspect-mobile-menu__section,
+  .aspect-mobile-menu__nav > .aspect-mobile-menu__title {
+    display: block;
+    margin: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding-left: 16px !important;
+  }
+  .aspect-mobile-menu__nav > .aspect-mobile-menu__title:first-of-type {
+    padding-right: 42px;
+  }
+  .aspect-mobile-menu__title {
+    color: #000 !important;
+    font-family: "DIN Pro Black", "DIN Pro Bold Fallback", sans-serif;
+    font-size: 21px;
+    line-height: 1.1;
+    letter-spacing: 0.015em;
+    text-decoration: none !important;
+    text-transform: uppercase;
+  }
+  .aspect-mobile-menu__section > .aspect-mobile-menu__title {
+    display: block;
+    padding-right: 42px;
+  }
+  .aspect-mobile-menu__children {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 6px 0 0 16px;
+  }
+  .aspect-mobile-menu__children a {
+    display: block;
+    padding: 5px 0;
+    color: rgba(0, 0, 0, 0.72) !important;
+    font-size: 15px;
+    line-height: 1.25;
+    text-decoration: none !important;
+  }
+  .aspect-mobile-menu__row,
+  .aspect-mobile-menu__account-row,
+  .aspect-mobile-menu__location-row {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .aspect-mobile-menu__muted,
+  .aspect-mobile-menu__discount {
+    color: rgba(0, 0, 0, 0.45) !important;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none !important;
+    text-transform: none;
+    white-space: nowrap;
+  }
+  .aspect-mobile-menu__info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    font: 700 10px/1 Arial, sans-serif;
+  }
+
+  .aspect-mobile-menu__account,
+  .aspect-mobile-menu__contacts,
+  .aspect-mobile-menu__location {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  .aspect-mobile-menu__logout {
+    display: inline-block;
+    margin-top: 6px;
+    color: rgba(0, 0, 0, 0.48) !important;
+    font-size: 14px;
+    text-decoration: none !important;
+  }
+  .aspect-mobile-menu__contacts p {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .aspect-mobile-menu__contacts nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .aspect-mobile-menu__contacts a,
+  .aspect-mobile-menu__contacts svg {
+    display: block;
+    width: 32px;
+    height: 32px;
+  }
+
+  .aspect-mobile-menu__location {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .aspect-mobile-menu__location-row > button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    padding: 0;
+    color: #000;
+    font-size: 14px;
+    line-height: 1.2;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+  .aspect-mobile-menu__location-row > button svg {
+    width: 10px;
+    height: 10px;
+  }
+  .aspect-mobile-menu__location-row > span {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 13px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .aspect-mobile-menu__cities {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding-top: 10px;
+  }
+  .aspect-mobile-menu__cities button {
+    min-width: 0;
+    min-height: 34px;
+    padding: 6px 8px;
+    overflow: hidden;
+    color: #000;
+    font-size: 12px;
+    line-height: 1.15;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: #f5f5f7;
+    border: 0;
+    border-radius: 8px;
+  }
+  .aspect-mobile-menu__cities button.active {
+    color: #fff;
+    background: #000;
+  }
+}
+
+@media (min-width: 1100px) {
+  .aspect-mobile-menu {
+    display: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   1. MOBILE BOTTOM NAVIGATION BAR
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 1099px) {
+  .mob-bottom-nav {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: calc(var(--mob-nav-h) + var(--mob-safe-bottom)) !important;
+    padding-bottom: var(--mob-safe-bottom) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-top: 0.5px solid rgba(0, 0, 0, 0.08) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    z-index: 9990 !important;
+    transform: translateY(0);
+    transition: transform 0.3s var(--mob-ease);
+  }
+  .mob-bottom-nav.nav-hidden {
+    transform: translateY(0) !important;
+  }
+  .mob-bottom-nav__item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 !important;
+    height: 100% !important;
+    text-decoration: none !important;
+    color: rgba(0, 0, 0, 0.4) !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em;
+    gap: 2px !important;
+    position: relative !important;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s var(--mob-ease);
+    min-height: unset !important;
+    min-width: unset !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: none !important;
+    border: none !important;
+  }
+  .mob-bottom-nav__item.active {
+    color: #000 !important;
+  }
+  .mob-bottom-nav__item svg {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: unset !important;
+    min-height: unset !important;
+    transition: transform 0.2s var(--mob-spring);
+  }
+  .mob-bottom-nav__item:active svg {
+    transform: scale(0.85);
+  }
+  .mob-bottom-nav__item.active svg {
+    transform: scale(1.05);
+  }
+  .mob-bottom-nav__badge {
+    position: absolute;
+    top: 6px;
+    right: calc(50% - 18px);
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    background: #000;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+    border: 2px solid #fff;
+    transform: scale(0);
+    transition: transform 0.25s var(--mob-spring);
+  }
+  .mob-bottom-nav__badge.has-items {
+    transform: scale(1);
+  }
+  /* Body padding for bottom nav */
+  body {
+    padding-bottom: calc(var(--mob-nav-h) + var(--mob-safe-bottom)) !important;
+  }
+  /* Notifications above bottom nav */
+  .fixed.bottom-6 {
+    bottom: calc(var(--mob-nav-h) + var(--mob-safe-bottom) + 12px) !important;
+  }
+}
+@media (min-width: 1100px) {
+  .mob-bottom-nav { display: none !important; }
+  .header-mobile-cart-count { display: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════
+   2. MOBILE HEADER — minimal fixes for drawer/backdrop
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 1099px) {
+
+  /* ── A. Header bar: always sticky, always on top ── */
+  #header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 200 !important;
+    background: #F5F5F7 !important;
+    height: var(--mob-header-h) !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  #header.open-menu {
+    background: #F5F5F7 !important; /* Force opaque background on open menu, hides underlying text */
+  }
+  #header:not(.open-menu) .header-cart__btn .pl-2 {
+    display: none !important; /* Hide "0 P / 0 шт" text on the COMPACT closed header, show it once drawer opens (matches reference) */
+  }
+
+  /* ── B. Header group: compact row ── */
+  #header .header-group {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    height: var(--mob-header-h) !important;
+    padding: 0 12px !important;
+    gap: 4px !important;
+  }
+
+  /* ── C. Hide desktop-only items ── */
+  #header:not(.open-menu) .mob-header-hide { display: none !important; } /* still hidden closed; group-[.open-menu]:flex reveals notif/pickup-count when drawer opens */
+  #header:not(.open-menu) .header-enter { display: none !important; } /* reveal login/logout auth block when drawer opens, matches reference group-[.open-menu]:block */
+  #header hr[data-v-fb25dd5c] { display: none !important; }
+
+  /* Logo + burger placement */
+  #header .app-header-logo {
+    order: 1 !important;
+    margin-right: auto !important;
+  }
+  #header .app-header-burger {
+    order: 6 !important;
+    margin-right: 0 !important;
+    display: flex !important;
+  }
+  #header.open-menu .app-header-burger { display: none !important; }
+  #header.open-menu .app-header-logo { display: flex !important; }
+  #header .header-search { order: 3 !important; }
+  #header .app-header-card { order: 5 !important; }
+  #header:not(.open-menu) #wishlist-badge-wrap { display: none !important; } /* reveal wishlist icon when drawer opens, matches reference group-[.open-menu]:flex */
+  #header #wishlist-badge-wrap { order: 4 !important; }
+  /* Keep icon row pinned to true top of header (containing block = #header, which is sticky)
+     instead of drifting down with the backdrop wrapper when the drawer opens */
+  #header.open-menu .header-group {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 210 !important;
+  }
+
+  /* ── D. Wrapper div → backdrop, starts BELOW header ── */
+  #header > div:first-child {
+    position: relative !important;
+    height: 0 !important;
+    background: transparent !important;
+    padding-right: 0 !important;
+  }
+  #header.open-menu > div:first-child {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: 100dvh !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    z-index: 180 !important;
+    padding-right: 0 !important;
+    cursor: pointer;
+    animation: fadeInBackdrop 0.2s var(--mob-ease) forwards;
+  }
+  @keyframes fadeInBackdrop {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slideInFromLeft {
+    from { transform: translateX(-100%); opacity: 0.4; }
+    to   { transform: translateX(0);     opacity: 1; }
+  }
+
+  /* ── E. Nav-list = drawer panel inside wrapper ── */
+  #header .header-nav-list {
+    display: none !important;
+  }
+  #header.open-menu .header-nav-list[data-v-fb25dd5c],
+  #header.open-menu .header-nav-list {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: auto !important;
+    bottom: 0 !important;
+    width: 82vw !important;
+    min-width: 0 !important;
+    max-width: 320px !important;
+    flex: none !important;
+    height: auto !important;
+    background: #fff !important;
+    z-index: 186 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 0 calc(var(--mob-nav-h) + 280px) !important; /* Bottom padding so items don't overlap city/pickup-count/contact/auth stack */
+    box-shadow: 4px 0 24px rgba(0,0,0,0.12) !important;
+    animation: slideInFromLeft 0.25s var(--mob-ease) forwards;
+    margin: 0 !important; /* reset Nuxt layout margin */
+  }
+
+  /* Nav list items styling */
+  #header.open-menu .header-nav-list__ul {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+    /* Vendor CSS sets height:100%; overflow:auto here, which — once the
+       outer .header-nav-list gets a definite fixed-position height (top+bottom
+       set above) — turns this <ul> into a SECOND nested scroll container.
+       That silently clips Отзывы/Сообщество/Журнал/etc below the fold with
+       no visible scrollbar. Let the outer .header-nav-list (already
+       overflow-y:auto) be the single scroll container instead. */
+    height: auto !important;
+    overflow: visible !important;
+  }
+  #header.open-menu .header-nav-list__ul > li {
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+  #header.open-menu .nav-title,
+  #header.open-menu .header-nav-list__ul > li > a,
+  #header.open-menu .header-nav-list__ul > li > div > a {
+    display: block !important;
+    padding: 14px 20px !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: #000 !important;
+    text-decoration: none !important;
+  }
+  /* Sub-menus */
+  #header.open-menu .header-nav-list__ul ul {
+    padding: 0 0 8px 20px !important;
+    margin: 0 !important;
+    list-style: none !important;
+  }
+  #header.open-menu .header-nav-list__ul ul li a {
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    text-transform: none !important;
+    color: rgba(0,0,0,0.7) !important;
+    text-decoration: none !important;
+  }
+
+  /* City selector at bottom of drawer */
+  #header .header-select-city { display: none !important; }
+  #header.open-menu .header-select-city[data-v-fb25dd5c],
+  #header.open-menu .header-select-city {
+    display: block !important;
+    position: fixed !important;
+    bottom: var(--mob-nav-h) !important;
+    left: 0 !important;
+    width: 82vw !important;
+    min-width: 0 !important;
+    max-width: 320px !important;
+    z-index: 187 !important;
+    background: #fff !important;
+    padding: 20px 20px !important;
+    border-top: 1px solid rgba(0,0,0,0.06) !important;
+    margin: 0 !important; /* reset Nuxt layout margin */
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.03) !important; /* soft top-shadow so it merges with the white drawer */
+  }
+
+  /* Contact icons block ("Связаться с нами") — pull out of the cramped icon row
+     (group-[.open-menu]:mt-auto only works in a tall flex column, not our compact
+     nowrap header-group) and dock it at the very bottom of the drawer, below the
+     city selector, matching reference layout */
+  #header.open-menu .order-12.mr-auto {
+    display: block !important;
+    position: fixed !important;
+    bottom: calc(var(--mob-nav-h) + 123px) !important;
+    left: 0 !important;
+    width: 82vw !important;
+    min-width: 0 !important;
+    max-width: 320px !important;
+    z-index: 189 !important;
+    background: #fff !important;
+    padding: 20px 20px 24px !important;
+    border-top: 1px solid rgba(0,0,0,0.06) !important;
+    margin: 0 !important;
+  }
+  #header.open-menu .order-12.mr-auto p {
+    font-size: 12px !important;
+    color: rgba(0,0,0,0.5) !important;
+    margin: 0 0 6px !important;
+  }
+  #header.open-menu .order-12.mr-auto nav a svg {
+    color: #000 !important;
+  }
+  #header.open-menu .order-12.mr-auto nav a {
+    padding: 6px 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  /* Login/logout auth block (.header-enter) — same nowrap-row overflow problem as
+     contact/pickup blocks; detach and stack above them, matching reference */
+  #header.open-menu .header-enter {
+    display: block !important;
+    position: fixed !important;
+    bottom: calc(var(--mob-nav-h) + 205px) !important;
+    left: 0 !important;
+    width: 82vw !important;
+    max-width: 320px !important;
+    background: #fff !important;
+    padding: 16px 20px !important;
+    z-index: 189 !important;
+    margin: 0 !important;
+    border-top: 1px solid rgba(0,0,0,0.06) !important;
+  }
+
+  /* Pickup-point count — pull out of the cramped icon row (was overflowing off-screen
+     under flex-wrap:nowrap) and anchor it just above the city selector, matching reference */
+  #header.open-menu [data-v-52f27e61].mob-header-hide {
+    display: block !important;
+    position: fixed !important;
+    bottom: calc(var(--mob-nav-h) + 81px) !important;
+    left: 0 !important;
+    width: 82vw !important;
+    max-width: 320px !important;
+    background: #fff !important;
+    padding: 6px 20px !important;
+    z-index: 187 !important;
+    margin: 0 !important;
+  }
+  #header.open-menu [data-v-52f27e61].mob-header-hide button {
+    color: rgba(0,0,0,0.5) !important;
+    font-size: 13px !important;
+    width: auto !important;
+  }
+
+  /* Original close/backdrop buttons — keep them for click-outside-to-close */
+  #header.open-menu button[aria-label="close"] {
+    z-index: 181 !important;
+  }
+
+  /* Disable original .backdrop */
+  .backdrop,
+  body.show-backdrop .backdrop {
+    display: none !important;
+    pointer-events: none !important;
+  }
+
+  /* -- F. Rounded Floating Search Modal -- */
+  #header .header-search form[x-show="searchOpen"] {
+    position: fixed !important;
+    top: 8px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: 380px !important;
+    margin: 0 auto !important;
+    height: var(--mob-header-h) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.16) !important;
+    z-index: 220 !important;
+    padding: 0 12px !important;
+    background: #fff !important;
+    transform: none !important;
+  }
+  #header .header-search form select {
+    display: block !important;
+    flex: 0 0 98px;
+    width: 98px;
+    max-width: 98px;
+    padding-left: 8px !important;
+    padding-right: 18px !important;
+    font-size: 11px !important;
+    background-position: right 4px center !important;
+    border-radius: 14px 0 0 14px !important;
+  }
+  #header .header-search form input[type="text"] { font-size: 15px !important; }
+  #header .header-search form > div[x-show] {
+    position: fixed !important;
+    top: calc(var(--mob-header-h) + 14px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: 380px !important;
+    margin: 0 auto !important;
+    max-height: calc(100dvh - var(--mob-header-h) - var(--mob-nav-h) - 30px) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.2) !important;
+    background: #fff !important;
+    z-index: 219 !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* ???????????????????????????????????????????????????????????????
+   FINAL CONTRACT ? Menu Card, Basket Bottom Sheet, Search Backdrop
+   ??????????????????????????????????????????????????????????????? */
+@media (max-width: 1099px) {
+
+  /* ??? 1. HIDE OLD LEFT-DRAWER on mobile ??????????????????????? */
+  #header.open-menu .header-nav-list,
+  #header.open-menu .header-nav-list[data-v-fb25dd5c] {
+    display: none !important;
+  }
+
+  /* ??? 2. UNIFIED FLOATING PANEL: header-group ?????????????????? */
+  #header.open-menu .header-group {
+    position: fixed !important;
+    top: 8px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: 380px !important;
+    margin: 0 auto !important;
+    height: var(--mob-header-h) !important;
+    min-height: var(--mob-header-h) !important;
+    max-height: var(--mob-header-h) !important;
+    background: #fff !important;
+    border-radius: 20px 20px 0 0 !important;
+    z-index: 220 !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    box-shadow: none !important;
+    border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+    will-change: opacity, transform !important;
+    animation: panelHeaderIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+  }
+
+  @keyframes panelHeaderIn {
+    from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ??? 3. FLOATING MENU CARD (aside) ???????????????????????????? */
+  /* Show drawer only when its parent header is open (Alpine x-show controls the rest). */
+  #header.open-menu .aspect-mobile-menu {
+    display: block !important;
+  }
+  #header.open-menu aside.aspect-mobile-menu {
+    position: fixed !important;
+    top: calc(8px + var(--mob-header-h)) !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: 380px !important;
+    margin: 0 auto !important;
+    max-height: calc(100dvh - var(--mob-header-h) - 8px - var(--mob-nav-h) - 8px) !important;
+    overflow-y: auto !important;
+    background: #fff !important;
+    border-radius: 0 0 20px 20px !important;
+    z-index: 218 !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.22) !important;
+    padding: 8px 0 20px !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ??? 4. MENU BACKDROP ?????????????????????????????????????????? */
+  #header.open-menu > div:first-child {
+    position: fixed !important;
+    top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+    height: 100dvh !important;
+    background: rgba(0, 0, 0, 0.48) !important;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    z-index: 180 !important;
+    cursor: pointer;
+    animation: fadeInBackdrop 0.22s ease forwards;
+  }
+
+  /* ??? 5. BASKET ? BOTTOM SHEET ?????????????????????????????????? */
+  /* The cart dropdown (tc-modal or direct dropdown) */
+  #header .app-header-card .tc-modal,
+  #header .header-cart .tc-modal {
+    position: fixed !important;
+    top: auto !important;
+    bottom: var(--mob-nav-h) !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 80dvh !important;
+    z-index: 9500 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    align-items: stretch !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  #header .app-header-card .tc-modal .tc-modal__box,
+  #header .header-cart .tc-modal .tc-modal__box {
+    border-radius: 24px 24px 0 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    max-height: 80dvh !important;
+    overflow-y: auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 24px 16px 16px !important;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.18) !important;
+  }
+
+  /* Basket backdrop */
+  #header .app-header-card .tc-modal::before,
+  #header .header-cart .tc-modal::before {
+    background: rgba(0,0,0,0.48) !important;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    z-index: -1 !important;
+  }
+
+  /* ??? 6. SEARCH BACKDROP ??????????????????????????????????????? */
+  #header.search-open > div:first-child {
+    position: fixed !important;
+    top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+    height: 100dvh !important;
+    background: rgba(0,0,0,0.48) !important;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    z-index: 179 !important;
+    cursor: pointer;
+    pointer-events: auto;
+    animation: fadeInBackdrop 0.2s ease forwards;
+  }
+
+  /* ??? 7. STAGGERED MENU ITEM ANIMATIONS ???????????????????????? */
+  #header.open-menu aside.aspect-mobile-menu > * {
+    opacity: 0;
+    animation: menuItemFadeUp 0.28s ease forwards;
+  }
+  #header.open-menu aside.aspect-mobile-menu > *:nth-child(1)  { animation-delay: 0.04s; }
+  #header.open-menu aside.aspect-mobile-menu > *:nth-child(2)  { animation-delay: 0.07s; }
+  #header.open-menu aside.aspect-mobile-menu > *:nth-child(3)  { animation-delay: 0.10s; }
+  #header.open-menu aside.aspect-mobile-menu > *:nth-child(4)  { animation-delay: 0.13s; }
+  #header.open-menu aside.aspect-mobile-menu > *:nth-child(5)  { animation-delay: 0.16s; }
+  #header.open-menu aside.aspect-mobile-menu > *:nth-child(6)  { animation-delay: 0.19s; }
+  #header.open-menu aside.aspect-mobile-menu > *:nth-child(7)  { animation-delay: 0.22s; }
+  #header.open-menu aside.aspect-mobile-menu > *:nth-child(8)  { animation-delay: 0.25s; }
+  #header.open-menu aside.aspect-mobile-menu > *:nth-child(9)  { animation-delay: 0.28s; }
+  #header.open-menu aside.aspect-mobile-menu > *:nth-child(n+10) { animation-delay: 0.30s; }
+
+  @keyframes menuItemFadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+/* ═══════════════════════════════════════════════════════════
+   CART BOTTOM-SHEET (v=20260725-2) — slides up from bottom
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .mobile-mini-cart {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 88dvh !important;
+    border-radius: 24px 24px 0 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.18) !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    transform: none !important;
+  }
+
+  .mobile-mini-cart__handle {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    padding: 10px 0 6px !important;
+    cursor: grab !important;
+    touch-action: none !important;
+    background: transparent !important;
+    border: 0 !important;
+  }
+  .mobile-mini-cart__handle:active { cursor: grabbing !important; }
+  .mobile-mini-cart__handle span {
+    display: block !important;
+    width: 44px !important;
+    height: 4px !important;
+    background: #d1d5db !important;
+    border-radius: 4px !important;
+    transition: background 0.15s ease !important;
+  }
+  .mobile-mini-cart__handle:hover span { background: #9ca3af !important; }
+}
+
+/* Full-screen backdrop overlay for cart/search — visibility controlled by Alpine x-show */
+.mobile-shell-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  -webkit-backdrop-filter: blur(1px) !important;
+  backdrop-filter: blur(1px) !important;
+  z-index: 9990 !important;
+}
+.mobile-shell-backdrop.is-cart {
+  background: rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Lock body scroll while cart bottom-sheet is open */
+html.mobile-cart-open,
+html.mobile-cart-open body {
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+
+}
+
+
+/* 2026-07-25: keep search above its backdrop; cart remains interactive */
+.mobile-shell-backdrop.is-search {
+  z-index: 179 !important;
+  pointer-events: auto !important;
+}
+.mobile-shell-backdrop.is-cart {
+  z-index: 9990 !important;
+  pointer-events: auto !important;
+}
+#header.search-open,
+#header.search-open .header-group,
+#header.search-open .header-search,
+#header.search-open .header-search form[x-show="searchOpen"] {
+  z-index: 220 !important;
+}
+#header.search-open .header-search form[x-show="searchOpen"] { pointer-events: auto !important; }
+.mobile-mini-cart { pointer-events: auto !important; }
+.mobile-mini-cart__handle { user-select: none !important; -webkit-user-select: none !important; }
+@media (max-width: 767px) {
+  .mobile-mini-cart { z-index: 9999 !important; }
+  .mobile-mini-cart .mini-cart-panel { max-height: calc(88dvh - 12px); }
+}

@@ -1,0 +1,10 @@
+import requests
+r = requests.get("http://127.0.0.1:8000/reviews/")
+if "review-level" in r.text:
+    print("FOUND")
+else:
+    print("NOT FOUND")
+    # Find review-name to check
+    idx = r.text.find("review-name")
+    if idx >= 0:
+        print("Context:", r.text[idx:idx+300])

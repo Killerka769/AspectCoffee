@@ -1,0 +1,70 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Разблокировка аккаунта{% endblock %}
+{% block body_extra_class %} grey-theme{% endblock %}
+
+{% block content %}
+<div style="display:flex;justify-content:center;padding:40px 20px;">
+  <div style="width:100%;max-width:488px;">
+    <div class="bg-white rounded-3xl p-6 md:p-8">
+      <div class="w-full mb-4">
+        <p class="text-[40px] font-din-black uppercase leading-[1.2] md:tracking-[0.01em] mb-0">Разблокировка</p>
+      </div>
+
+      {% if messages %}
+      <div class="space-y-3 mb-8">
+        {% for message in messages %}
+        <div class="p-4 rounded-xl {% if message.tags == 'error' %}bg-red-50 text-red-600 border border-red-100{% elif message.tags == 'success' %}bg-green-50 text-green-600 border border-green-100{% else %}bg-blue-50 text-blue-600 border border-blue-100{% endif %} text-xs font-bold flex items-center gap-2">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if step == "code" %}
+      <p class="text-sm text-gray-600 mb-6">Мы отправили код на {{ email }}. Введите его ниже, чтобы разблокировать вход.</p>
+      <form method="post" class="w-full space-y-8">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="verify_code">
+        <div class="tc-input input-white xl:input-secondary">
+          <label class="tc-input__label" for="unlock-code">Код разблокировки</label>
+          <div class="tc-input__field">
+            <input id="unlock-code" type="text" name="code" required placeholder="000000" maxlength="6" pattern="[0-9]{6}"
+                   autocomplete="one-time-code" inputmode="numeric"
+                   class="tc-input__field--input text-center tracking-[0.3em] text-2xl">
+          </div>
+        </div>
+        <button type="submit" class="tc-btn btn-dark w-full">
+          <span class="text-primary duration-200">Разблокировать</span>
+        </button>
+      </form>
+      <form method="post" action="{% url 'resend_unlock_code' %}" class="mt-4">
+        {% csrf_token %}
+        <button type="submit" class="text-sm text-gray-700 hover:text-black hover:underline bg-transparent border-0 p-0 cursor-pointer">Отправить код повторно</button>
+      </form>
+      {% else %}
+      <p class="text-sm text-gray-600 mb-6">Слишком много неудачных попыток входа. Введите email аккаунта — мы отправим код для снятия блокировки.</p>
+      <form method="post" class="w-full space-y-8">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="request_code">
+        <div class="tc-input input-white xl:input-secondary">
+          <label class="tc-input__label" for="unlock-email">Электронная почта</label>
+          <div class="tc-input__field">
+            <input id="unlock-email" type="email" name="email" autocomplete="email" value="{{ email|default:'' }}"
+                   class="tc-input__field--input">
+          </div>
+        </div>
+        <button type="submit" class="tc-btn btn-dark w-full">
+          <span class="text-primary duration-200">Отправить код</span>
+        </button>
+      </form>
+      {% endif %}
+
+      <div class="mt-6 text-center">
+        <a href="{% url 'login' %}" class="text-sm text-gray-700 hover:text-black hover:underline">Вернуться ко входу</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

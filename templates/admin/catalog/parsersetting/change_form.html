@@ -1,0 +1,32 @@
+{% extends "admin/unfold/change_form.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  .parser-button-wrap { margin-bottom: 20px; padding: 16px; background: #fff; border: 1px solid #eee; border-radius: 8px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .parser-button-wrap h3 { margin: 0; font-size: 16px; }
+  .parser-btn { display: inline-block; padding: 10px 24px; background: #1a1a2e; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; }
+  .parser-btn:hover { opacity: 0.9; color: #fff; }
+  .last-run { font-size: 13px; color: #666; }
+  .last-run .status-success { color: #28a745; font-weight: 600; }
+  .last-run .status-failed { color: #dc3545; font-weight: 600; }
+  .last-run .status-running { color: #ffc107; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block field_sets %}
+{% if parser_url %}
+<div class="parser-button-wrap">
+  <h3>Парсер каталога</h3>
+  <a href="{{ parser_url }}" class="parser-btn">▶ Запустить парсер</a>
+  {% if parser_result %}
+    <span class="last-run">
+      Последний: <span class="status-{{ parser_result.status }}">{{ parser_result.status }}</span>
+      ({{ parser_result.started_at|date:"d.m.Y H:i" }})
+    </span>
+  {% endif %}
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+{% load account_extras %}
+
+{% block body_extra_class %} grey-theme{% endblock %}
+
+{% block content %}
+<style>
+:root {
+  --black: #000;
+  --black-50: rgba(0,0,0,0.5);
+  --black-49: rgba(0,0,0,0.49);
+  --black-30: rgba(0,0,0,0.3);
+  --black-20: rgba(0,0,0,0.2);
+  --black-16: rgba(0,0,0,0.16);
+  --black-5: rgba(0,0,0,0.05);
+  --black-4: rgba(0,0,0,0.04);
+  --black-6: rgba(0,0,0,0.06);
+  --black-80: rgba(0,0,0,0.8);
+  --white: #fff;
+  --ts: all 0.3s ease;
+}
+.font-din-black { font-family: 'DIN Pro Black','DIN Pro Bold Fallback',sans-serif; }
+.font-din-medium { font-family: 'DIN Pro Medium','DIN Pro Medium Fallback',sans-serif; }
+.tc-btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; border: none; transition: var(--ts); font-family: inherit; }
+.tc-btn.btn-white { background: var(--white); color: var(--black); }
+.tc-btn.btn-dark { background: var(--black); color: var(--white); }
+.tc-btn.btn-dark:hover { background: var(--black-80); }
+.tc-btn.btn-secondary { background: var(--black-4); color: var(--black); }
+.tc-btn.btn-secondary:hover { background: var(--black-5); }
+.tc-btn.btn-xs { font-size: 11px; padding: 0.5rem 1rem; min-height: 32px; }
+.tc-btn.btn-xs:hover { background: rgba(255,255,255,0.9); }
+.tc-input { display: block; position: relative; width: 100%; }
+.tc-input__field { display: block; position: relative; width: 100%; }
+.tc-input__field--input { background: var(--black-4); border: 1px solid var(--black-4); border-radius: 12px; font-size: 16px; height: 44px; line-height: 44px; padding: 8px 12px; text-overflow: ellipsis; transition: background-color var(--ts), border-color var(--ts); width: 100%; outline: none; }
+.tc-input__field--input:not([class*="pr-"]) { padding-right: 12px; }
+.tc-input__field--input::placeholder { color: var(--black-50); opacity: 1; }
+.tc-input__field--input:hover { background: var(--black-5); border-color: var(--black-5); }
+.tc-input__field--input:active { background: var(--black-4); border-color: var(--black-4); }
+.tc-input__field--input[type=password] { letter-spacing: 4px; }
+.tc-input__field--input[type=password]::placeholder { letter-spacing: 0; }
+.tc-input__field--btn-right { align-items: center; display: flex; height: 40px; justify-content: center; inset: 0 0 0 auto; margin: auto 0; position: absolute; width: 40px; }
+</style>
+
+<main>
+<div class="container xl:pt-8 mb-10 md:mb-20">
+
+  {# === HEADER: Личный кабинет + Пополнить + Баланс === #}
+  <div class="group flex items-center flex-wrap min-h-[38px] mb-6 py-1 border-b border-[var(--black-5)] px-4 -mx-4 sm:mx-0 sm:p-0 xl:border-0 xl:min-h-[auto]">
+    <h1 class="text-[24px] m-0 xl:text-[40px] pr-3 relative" style="font-family:'DIN Pro Black','DIN Pro Bold Fallback',sans-serif;text-transform:uppercase;line-height:1.2;letter-spacing:-0.01em;">
+      Личный кабинет
+      <svg class="h-[10px] w-[10px] inline rotate-90 xl:hidden absolute top-0 bottom-0 right-[-4px] my-auto"><use href="#arr-right-bold"></use></svg>
+    </h1>
+    <div class="ml-auto flex items-center gap-3 flex-wrap">
+      <a href="{% url 'users:balance' %}" class="tc-btn btn-dark btn-xs hidden xl:inline-flex hover:scale-105 duration-200" style="text-decoration:none; color:#fff !important;">
+        <span>Пополнить</span>
+      </a>
+      <div class="text-[24px] xl:text-[40px] font-din-black uppercase leading-[1.2] md:tracking-[0.01em] text-right whitespace-nowrap">
+        <span class="text-[var(--black-50)]">Баланс </span>
+        {{ user.balance|default:0 }}&nbsp;<span class="rub">₽</span>
+      </div>
+    </div>
+  </div>
+
+  {# === GRID: sidebar + content === #}
+  <div class="grid grid-cols-12 gap-6 gap-y-4 xl:pt-2">
+
+    {# SIDEBAR #}
+    <div class="col-span-12 xl:col-span-2 2xl:col-span-3 -mt-4 xl:mt-0">
+      <ul class="mob-account-nav w-full space-y-4 list-none m-0 p-0">
+        <li><a href="{% url 'users:statistics' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'statistics' %} font-din-black{% endif %}" style="text-decoration:none;{% if section == 'statistics' %}font-size:24px!important;letter-spacing:0.02em!important;{% endif %}">Статистика</a></li>
+        <li><a href="{% url 'users:orders' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'orders' %} font-din-black{% endif %}" style="text-decoration:none;{% if section == 'orders' %}font-size:24px!important;letter-spacing:0.02em!important;{% endif %}">Заказы</a></li>
+        <li><a href="{% url 'users:notifications' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'notifications' %} font-din-black{% endif %}" style="text-decoration:none;{% if section == 'notifications' %}font-size:24px!important;letter-spacing:0.02em!important;{% endif %}">Уведомления</a></li>
+        <li><a href="{% url 'users:community_profile' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'community' %} font-din-black{% endif %}" style="text-decoration:none;{% if section == 'community' %}font-size:24px!important;letter-spacing:0.02em!important;{% endif %}">Профиль в сообществе</a></li>
+        <li><a href="{% url 'users:profile' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'profile' %} font-din-black{% endif %}" style="text-decoration:none;{% if section == 'profile' %}font-size:24px!important;letter-spacing:0.02em!important;{% endif %}">Мои данные</a></li>
+        <li class="flex items-center"><a href="{% url 'users:achievements' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'achievements' %} font-din-black{% endif %}" style="text-decoration:none;{% if section == 'achievements' %}font-size:24px!important;letter-spacing:0.02em!important;{% endif %}">Мои достижения</a></li>
+        <li><a href="{% url 'users:discount' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'discount' %} font-din-black{% endif %}" style="text-decoration:none;{% if section == 'discount' %}font-size:24px!important;letter-spacing:0.02em!important;{% endif %}">Мои скидки</a></li>
+        <li><a href="{% url 'users:balance' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'balance' %} font-din-black{% endif %}" style="text-decoration:none;{% if section == 'balance' %}font-size:24px!important;letter-spacing:0.02em!important;{% endif %}">Внутренний счёт</a></li>
+        <li><a href="{% url 'users:blog_history' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'blog' %} font-din-black{% endif %}" style="text-decoration:none;{% if section == 'blog' %}font-size:24px!important;letter-spacing:0.02em!important;{% endif %}">Читаю в Журнале</a></li>
+        <li><a href="{% url 'users:blacklist' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'blacklist' %} font-din-black{% endif %}" style="text-decoration:none;{% if section == 'blacklist' %}font-size:24px!important;letter-spacing:0.02em!important;{% endif %}">Чёрный список</a></li>
+      </ul>
+      <hr class="mt-2.5 -mx-4 sm:mx-0 xl:hidden">
+    </div>
+
+    {# MAIN CONTENT #}
+    <div class="col-span-12 xl:col-span-10 2xl:col-span-9 space-y-12 md:space-y-[148px]">
+      {% block account_content %}{% endblock %}
+    </div>
+
+  </div>
+</div>
+</main>
+
+<svg style="display:none;" xmlns="http://www.w3.org/2000/svg"><defs>
+  <symbol id="arr-right-bold" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="icons--photo" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 8h.01M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17l5-5 4 4 3-3 6 6"/></symbol>
+  <symbol id="icons--pin" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle fill="currentColor" cx="12" cy="10" r="3"/></symbol>
+  <symbol id="icons--plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="icons--x-light" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></symbol>
+  <symbol id="icons--arr-bottom" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9l6 6 6-6"/></symbol>
+</defs></svg>
+{% endblock %}
+
+{% block body_modal %}{% block account_modal %}{% endblock %}{% endblock %}

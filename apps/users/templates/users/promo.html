@@ -1,0 +1,45 @@
+{% extends "users/base_account.html" %}{% load static %}{% block account_content %}
+<h2 style="font-family:'DIN Pro Black',sans-serif;font-size:24px;text-transform:uppercase;margin:0 0 8px;">Рекламные материалы</h2>
+<p style="color:rgba(0,0,0,0.5);font-size:14px;margin:0 0 24px;">Промо-материалы и реферальная ссылка. Расскажите друзьям о Aspect Coffee.</p>
+
+<div style="background:linear-gradient(135deg,#7c2d12 0%,#ea580c 100%);color:white;border-radius:1.5rem;padding:2rem;margin-bottom:24px;">
+  <div style="font-size:11px;color:rgba(255,255,255,0.7);font-weight:900;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Ваша реферальная ссылка</div>
+  <div style="display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.2);border-radius:0.75rem;padding:12px 16px;margin-bottom:12px;">
+    <input type="text" readonly value="https://aspectcoffee.ru/?ref={{ user.id }}" id="ref-link" style="flex:1;background:transparent;border:none;color:white;font-size:14px;font-weight:700;font-family:monospace;outline:none;">
+    <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('ref-link').value); this.textContent='Скопировано!'; setTimeout(() => this.textContent='Копировать', 1500);" style="background:white;color:#7c2d12;border:none;padding:6px 12px;border-radius:0.5rem;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;">Копировать</button>
+  </div>
+  <div style="font-size:12px;color:rgba(255,255,255,0.8);">За каждого друга, который сделает заказ от 1 500 ₽, вы получите <strong>500 бонусных баллов</strong>, а друг — <strong>скидку 5%</strong> на первый заказ.</div>
+</div>
+
+<h3 style="font-family:'DIN Pro Black',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(0,0,0,0.5);margin:0 0 16px;">Поделиться в соцсетях</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px;">
+  <a href="https://t.me/share/url?url=https%3A%2F%2Faspectcoffee.ru%2F%3Fref%3D{{ user.id }}&text=Попробуй%20кофе%20от%20Aspect%20Coffee" target="_blank" rel="noopener" style="background:#229ED9;color:white;border-radius:1.25rem;padding:1.25rem;text-decoration:none;display:flex;align-items:center;gap:12px;">
+    <svg style="width:24px;height:24px;flex-shrink:0;" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/></svg>
+    <div><div style="font-weight:900;font-size:13px;">Telegram</div><div style="font-size:11px;opacity:0.8;">Поделиться</div></div>
+  </a>
+  <a href="https://vk.com/share.php?url=https%3A%2F%2Faspectcoffee.ru%2F%3Fref%3D{{ user.id }}" target="_blank" rel="noopener" style="background:#0077FF;color:white;border-radius:1.25rem;padding:1.25rem;text-decoration:none;display:flex;align-items:center;gap:12px;">
+    <svg style="width:24px;height:24px;flex-shrink:0;" fill="currentColor" viewBox="0 0 24 24"><path d="M12.785 16.241s.288-.032.435-.193c.135-.148.131-.425.131-.425s-.019-1.297.582-1.488c.593-.188 1.354 1.252 2.161 1.806.61.418 1.073.327 1.073.327l2.157-.03s1.128-.069.594-.953c-.044-.073-.312-.652-1.602-1.85-1.351-1.253-1.171-1.05.457-3.218.992-1.323 1.389-2.13 1.265-2.477-.119-.331-.85-.244-.85-.244l-2.434.015s-.18-.025-.314.055c-.13.079-.214.262-.214.262s-.385 1.024-.899 1.896c-1.084 1.842-1.518 1.94-1.696 1.825-.414-.266-.31-1.07-.31-1.642 0-1.785.27-2.527-.527-2.72-.265-.064-.46-.107-1.137-.114-.869-.009-1.604.003-2.021.207-.277.135-.491.437-.361.455.16.022.522.098.715.36.249.339.241 1.099.241 1.099s.143 2.092-.334 2.352c-.328.179-.778-.186-1.747-1.857-.496-.852-.87-1.795-.87-1.795s-.072-.176-.2-.27c-.156-.115-.374-.151-.374-.151l-2.313.015s-.347.01-.475.161c-.114.135-.009.413-.009.413s1.812 4.241 3.864 6.378c1.882 1.962 4.018 1.833 4.018 1.833h.967z"/></svg>
+    <div><div style="font-weight:900;font-size:13px;">ВКонтакте</div><div style="font-size:11px;opacity:0.8;">Поделиться</div></div>
+  </a>
+  <a href="https://api.whatsapp.com/send?text=Попробуй%20кофе%20от%20Aspect%20Coffee%20https%3A%2F%2Faspectcoffee.ru%2F%3Fref%3D{{ user.id }}" target="_blank" rel="noopener" style="background:#25D366;color:white;border-radius:1.25rem;padding:1.25rem;text-decoration:none;display:flex;align-items:center;gap:12px;">
+    <svg style="width:24px;height:24px;flex-shrink:0;" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+    <div><div style="font-weight:900;font-size:13px;">WhatsApp</div><div style="font-size:11px;opacity:0.8;">Отправить</div></div>
+  </a>
+</div>
+
+<h3 style="font-family:'DIN Pro Black',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(0,0,0,0.5);margin:0 0 16px;">Текущие акции</h3>
+<div style="background:#f0fdf4;border-radius:1.25rem;padding:1.5rem;border:1px solid #bbf7d0;margin-bottom:12px;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+    <span style="background:#16a34a;color:white;padding:3px 8px;border-radius:0.5rem;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;">Активна</span>
+    <div style="font-weight:900;font-size:14px;">−15% на первый заказ</div>
+  </div>
+  <div style="font-size:12px;color:rgba(0,0,0,0.6);">Промокод <strong style="font-family:monospace;background:#fff;padding:2px 6px;border-radius:4px;">WELCOME15</strong> действует на первый заказ от 1 500 ₽.</div>
+</div>
+<div style="background:#fef3c7;border-radius:1.25rem;padding:1.5rem;border:1px solid #fde68a;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+    <span style="background:#d97706;color:white;padding:3px 8px;border-radius:0.5rem;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;">Бесплатная доставка</span>
+    <div style="font-weight:900;font-size:14px;">от 2 500 ₽</div>
+  </div>
+  <div style="font-size:12px;color:rgba(0,0,0,0.6);">При заказе от 2 500 ₽ доставка по Москве бесплатно.</div>
+</div>
+{% endblock %}

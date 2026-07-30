@@ -1,0 +1,38 @@
+{% extends "users/base_account.html" %}{% load static %}{% block account_content %}
+<div class="space-y-8">
+  <h2 class="text-[24px] font-din-black uppercase leading-[1.2] m-0">Уведомления</h2>
+
+  {% if notifications %}
+  <div class="space-y-2">
+    {% for n in notifications %}
+    <div class="bg-[var(--white)] rounded-xl p-4 flex items-start gap-3 {% if not n.is_read %}border-l-4 border-l-[var(--black)]{% endif %}">
+      <div class="w-10 h-10 rounded-full bg-[var(--black-4)] flex items-center justify-center shrink-0 mt-0.5">
+        {% if n.icon %}
+        <img src="{{ n.icon }}" class="w-full h-full object-cover rounded-full">
+        {% else %}
+        <svg class="w-5 h-5 text-[var(--black-50)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+        {% endif %}
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-start justify-between gap-2">
+          <div class="font-medium text-[14px]">{{ n.title }}</div>
+          <div class="text-[10px] text-[var(--black-50)] whitespace-nowrap">{{ n.created_at|timesince }}</div>
+        </div>
+        {% if n.text %}
+        <p class="text-[12px] text-[var(--black-50)] m-0 mt-1">{{ n.text }}</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="col-span-12 pt-16 text-center flex flex-col items-center">
+    <div class="w-20 h-20 bg-[var(--white)] rounded-full flex items-center justify-center mb-6">
+      <svg class="w-10 h-10 text-[var(--black-16)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+    </div>
+    <p class="text-[24px] font-din-black uppercase leading-[1.2] mb-2 m-0">Нет уведомлений</p>
+    <p class="text-[14px] text-[var(--black-50)] mb-6 m-0">Уведомления о заказах, скидках и новостях будут приходить сюда</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

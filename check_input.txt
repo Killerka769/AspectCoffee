@@ -1,0 +1,4 @@
+from apps.catalog.models import Review
+rs = Review.objects.filter(is_approved=True)[:10]
+for r in rs:
+    print(r.id, r.user, repr(r.author_name), r.user.first_name if r.user else None)

@@ -1,0 +1,39 @@
+{% extends "users/base_account.html" %}{% load static %}{% block account_content %}
+<div class="space-y-8">
+  <h2 class="text-[24px] font-din-black uppercase leading-[1.2] m-0">Чёрный список</h2>
+
+  {% if blocked_users %}
+  <div class="space-y-3">
+    {% for bu in blocked_users %}
+    <div class="bg-[var(--white)] rounded-2xl p-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-[var(--black-4)] rounded-full flex items-center justify-center overflow-hidden">
+          {% if bu.avatar %}
+          <img src="{{ bu.avatar.url }}" class="w-full h-full object-cover">
+          {% else %}
+          <svg class="w-6 h-6 text-[var(--black-30)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          {% endif %}
+        </div>
+        <div>
+          <div class="font-din-black text-[16px] leading-[1.2]">{{ bu.username }}</div>
+          <div class="text-[12px] text-[var(--black-50)]">{{ bu.blocked_at|date:"d.m.Y" }}</div>
+        </div>
+      </div>
+      <form method="post" action="{% url 'users:unblock_user' bu.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="px-4 py-2 rounded-xl text-[11px] font-din-black uppercase tracking-[0.04em] bg-[var(--black-4)] hover:bg-[var(--black-5)]">Разблокировать</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="col-span-12 pt-16 text-center flex flex-col items-center">
+    <div class="w-20 h-20 bg-[var(--white)] rounded-full flex items-center justify-center mb-6">
+      <svg class="w-10 h-10 text-[var(--black-16)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+    </div>
+    <p class="text-[24px] font-din-black uppercase leading-[1.2] mb-2 m-0">Нет в чёрном списке</p>
+    <p class="text-[14px] text-[var(--black-50)] mb-6 m-0">Заблокированные пользователи не смогут писать вам в сообществе.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

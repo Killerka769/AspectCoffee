@@ -1,0 +1,16 @@
+{% load static %}
+<div class="flex items-center relative" hx-get="{% url 'orders:cart_badge' %}" hx-trigger="cartUpdated from:body" id="header-cart-badge">
+    <svg class="h-[32px] w-[32px] min-w-[32px]">
+        <use href="{% static 'asset/images/sprite.svg' %}#icons--shop"></use>
+    </svg>
+    <div class="pl-2 pt-1 -my-0.5 text-[12px] medium text-left max-xs:hidden">
+        <div class="w-full flex items-center">
+            <span class="block group-[.open-menu]:max-w-50px] max-w-[76px] whitespace-nowrap overflow-hidden text-ellipsis mr-1 text-[var(--black)]">{% if cart %}{{ cart.subtotal|floatformat:0 }}{% else %}{{ cart_total|default:"0"|floatformat:0 }}{% endif %}</span>
+            <span class="rub">₽</span>
+        </div>
+        <div class="w-full flex items-center text-[var(--black-50)] group-[.open-menu]:max-w-[48px] max-w-[76px] relative -top-0.5">
+            <span class="block max-w-[80px] whitespace-nowrap overflow-hidden text-ellipsis mr-1">{% if cart %}{{ cart.total_items|default:"0" }}{% else %}{{ cart_total_items|default:"0" }}{% endif %}</span> шт
+        </div>
+    </div>
+    <span class="header-mobile-cart-count{% if cart and cart.total_items or not cart and cart_total_items %} has-items{% endif %}" id="header-mobile-cart-count">{% if cart %}{{ cart.total_items|default:"0" }}{% else %}{{ cart_total_items|default:"0" }}{% endif %}</span>
+</div>

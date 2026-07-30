@@ -1,0 +1,116 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Система скидок — Накопительные скидки{% endblock %}
+{% block meta_description %}Накопительная система скидок до 15%, промокоды и специальные предложения от Aspect Coffee. Экономьте на любимом кофе.{% endblock %}
+
+{% block content %}
+<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
+  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
+    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
+      <a href="/" class="hover:text-black transition-colors">Главная</a>
+      <span class="text-black/20">/</span>
+      <span class="text-black font-medium">Система скидок</span>
+    </nav>
+    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-4">Система скидок</h1>
+    <p class="text-[16px] text-black/50 max-w-2xl mb-10">Мы ценим наших клиентов и предлагаем выгодную систему накопительных скидок, промокоды и специальные предложения.</p>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
+      <div class="flex items-center gap-4 mb-8">
+        <svg class="w-10 h-10 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--gift"></use></svg>
+        <h2 class="text-[24px] font-din-black uppercase">Накопительные скидки</h2>
+      </div>
+      <p class="text-[14px] text-black/60 mb-8">Скидка начисляется автоматически на все последующие заказы после того, как сумма ваших покупок достигает определённого порога.</p>
+      <div class="space-y-4">
+        <div class="flex items-center p-5 bg-gray-50 rounded-2xl">
+          <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center font-din-black text-[18px] shrink-0">3%</div>
+          <div class="ml-5">
+            <p class="font-bold text-[15px]">При сумме заказов от 3 000 ₽</p>
+            <p class="text-[13px] text-black/60">Базовая скидка для всех постоянных клиентов</p>
+          </div>
+        </div>
+        <div class="flex items-center p-5 bg-gray-50 rounded-2xl">
+          <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center font-din-black text-[18px] shrink-0">5%</div>
+          <div class="ml-5">
+            <p class="font-bold text-[15px]">При сумме заказов от 10 000 ₽</p>
+            <p class="text-[13px] text-black/60">Повышенная скидка для активных покупателей</p>
+          </div>
+        </div>
+        <div class="flex items-center p-5 bg-gray-50 rounded-2xl">
+          <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center font-din-black text-[18px] shrink-0">7%</div>
+          <div class="ml-5">
+            <p class="font-bold text-[15px]">При сумме заказов от 20 000 ₽</p>
+            <p class="text-[13px] text-black/60">Скидка для ценителей кофе</p>
+          </div>
+        </div>
+        <div class="flex items-center p-5 bg-gray-50 rounded-2xl">
+          <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center font-din-black text-[18px] shrink-0">10%</div>
+          <div class="ml-5">
+            <p class="font-bold text-[15px]">При сумме заказов от 50 000 ₽</p>
+            <p class="text-[13px] text-black/60">Премиальная скидка для настоящих кофеманов</p>
+          </div>
+        </div>
+        <div class="flex items-center p-5 bg-gray-50 rounded-2xl">
+          <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center font-din-black text-[18px] shrink-0">15%</div>
+          <div class="ml-5">
+            <p class="font-bold text-[15px]">При сумме заказов от 100 000 ₽</p>
+            <p class="text-[13px] text-black/60">Максимальная скидка для лучших клиентов</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
+      <div class="flex items-center gap-4 mb-6">
+        <svg class="w-10 h-10 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--ticket"></use></svg>
+        <h2 class="text-[24px] font-din-black uppercase">Промокоды</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="p-5 bg-gray-50 rounded-2xl">
+          <h3 class="font-bold text-[15px] mb-2">Приветственный промокод</h3>
+          <p class="text-[13px] text-black/60">Скидка 10% на первый заказ для новых клиентов. Промокод приходит на e-mail после регистрации.</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl">
+          <h3 class="font-bold text-[15px] mb-2">Сезонные акции</h3>
+          <p class="text-[13px] text-black/60">Подписывайтесь на рассылку, чтобы первыми узнавать о сезонных промокодах и специальных предложениях.</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl">
+          <h3 class="font-bold text-[15px] mb-2">День рождения</h3>
+          <p class="text-[13px] text-black/60">В день рождения мы дарим персональный промокод на скидку 15% — просто укажите дату в личном кабинете.</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl">
+          <h3 class="font-bold text-[15px] mb-2">Реферальная программа</h3>
+          <p class="text-[13px] text-black/60">Порекомендуйте нас друзьям и получите промокод на 300 ₽ после первого заказа друга.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
+      <div class="flex items-center gap-4 mb-6">
+        <svg class="w-10 h-10 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--star"></use></svg>
+        <h2 class="text-[24px] font-din-black uppercase">Специальные предложения</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="p-5 bg-gray-50 rounded-2xl">
+          <h3 class="font-bold text-[15px] mb-2">При покупке 6 пачек — подарок</h3>
+          <p class="text-[13px] text-black/60">При покупке 6 пачек кофе по 250 г дарим одну пачку бесплатно или чай в подарок.</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl">
+          <h3 class="font-bold text-[15px] mb-2">Бесплатная доставка</h3>
+          <p class="text-[13px] text-black/60">При заказе от 1500 ₽ доставка бесплатно в любой регион России.</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl">
+          <h3 class="font-bold text-[15px] mb-2">Дарим подарки</h3>
+          <p class="text-[13px] text-black/60">Регулярные розыгрыши среди подписчиков и акции с бесплатными подарками к заказу.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-black text-white rounded-[24px] p-6 md:p-10 text-center">
+      <h2 class="text-[24px] font-din-black uppercase mb-4">Начните экономить уже сегодня</h2>
+      <p class="text-[14px] text-white/60 mb-6 max-w-lg mx-auto">Зарегистрируйтесь в личном кабинете, и накопительная скидка будет начисляться автоматически с первого заказа.</p>
+      <a href="/catalog/" class="inline-block bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-[14px]">Перейти в каталог →</a>
+    </div>
+  </div>
+</main>
+{% endblock %}

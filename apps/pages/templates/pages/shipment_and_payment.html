@@ -1,0 +1,116 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Доставка и оплата{% endblock %}
+{% block meta_description %}Условия доставки и способы оплаты интернет-магазина Aspect Coffee. Бесплатная доставка от 1500 ₽ по всей России.{% endblock %}
+
+{% block content %}
+<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
+  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
+    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
+      <a href="/" class="hover:text-black transition-colors">Главная</a>
+      <span class="text-black/20">/</span>
+      <span class="text-black font-medium">Доставка и оплата</span>
+    </nav>
+    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-10">Доставка и оплата</h1>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
+      <div class="flex items-center gap-4 mb-6">
+        <svg class="w-10 h-10 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--delivery"></use></svg>
+        <h2 class="text-[24px] font-din-black uppercase">Доставка</h2>
+      </div>
+      <div class="bg-green-50 border border-green-200 rounded-2xl p-6 mb-8">
+        <p class="font-bold text-[17px] text-green-800">Бесплатная доставка при заказе от 1500 ₽</p>
+        <p class="text-[14px] text-green-700/70 mt-1">Для всех регионов России</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div class="p-5 bg-gray-50 rounded-2xl">
+          <h3 class="font-bold text-[15px] mb-2">Курьерская доставка</h3>
+          <p class="text-[13px] text-black/60">Доставка курьером до двери в Москве, Санкт-Петербурге и крупных городах России. Срок: 1-5 дней.</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl">
+          <h3 class="font-bold text-[15px] mb-2">Пункты выдачи</h3>
+          <p class="text-[13px] text-black/60">Более 10 000 пунктов выдачи заказов по всей России. Удобный самовывоз в вашем городе.</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl">
+          <h3 class="font-bold text-[15px] mb-2">Почта России</h3>
+          <p class="text-[13px] text-black/60">Доставка в отдалённые регионы и населённые пункты. Срок: 7-14 дней. Отслеживание по трек-номеру.</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl">
+          <h3 class="font-bold text-[15px] mb-2">Самовывоз</h3>
+          <p class="text-[13px] text-black/60">Вы можете забрать заказ самостоятельно из нашего магазина по адресу: г. Москва, ул. Примерная, д. 10.</p>
+        </div>
+      </div>
+      <div>
+        <h3 class="font-bold text-[15px] mb-4">Сроки доставки по регионам</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b-2 border-black">
+                <th class="py-3 px-3 font-din-black uppercase text-[12px] tracking-wider">Регион</th>
+                <th class="py-3 px-3 font-din-black uppercase text-[12px] tracking-wider">Курьер</th>
+                <th class="py-3 px-3 font-din-black uppercase text-[12px] tracking-wider">Пункт выдачи</th>
+                <th class="py-3 px-3 font-din-black uppercase text-[12px] tracking-wider">Почта</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-gray-100">
+                <td class="py-3 px-3 font-bold">Москва и МО</td>
+                <td class="py-3 px-3">1 день</td>
+                <td class="py-3 px-3">1-2 дня</td>
+                <td class="py-3 px-3">3-5 дней</td>
+              </tr>
+              <tr class="border-b border-gray-100">
+                <td class="py-3 px-3 font-bold">Санкт-Петербург</td>
+                <td class="py-3 px-3">1-2 дня</td>
+                <td class="py-3 px-3">2 дня</td>
+                <td class="py-3 px-3">3-6 дней</td>
+              </tr>
+              <tr class="border-b border-gray-100">
+                <td class="py-3 px-3 font-bold">Крупные города РФ</td>
+                <td class="py-3 px-3">2-4 дня</td>
+                <td class="py-3 px-3">2-5 дней</td>
+                <td class="py-3 px-3">5-10 дней</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-3 font-bold">Отдалённые регионы</td>
+                <td class="py-3 px-3">—</td>
+                <td class="py-3 px-3">5-7 дней</td>
+                <td class="py-3 px-3">7-14 дней</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm">
+      <div class="flex items-center gap-4 mb-6">
+        <svg class="w-10 h-10 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--card"></use></svg>
+        <h2 class="text-[24px] font-din-black uppercase">Оплата</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="p-6 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-10 h-10 mx-auto mb-3 text-black/40"><use href="{% static 'asset/images/sprite.svg' %}#icons--card"></use></svg>
+          <h3 class="font-bold text-[15px] mb-2">Банковская карта</h3>
+          <p class="text-[13px] text-black/60">Visa, Mastercard, МИР. Онлайн-оплата на сайте через защищённый шлюз.</p>
+        </div>
+        <div class="p-6 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-10 h-10 mx-auto mb-3 text-black/40"><use href="{% static 'asset/images/sprite.svg' %}#icons--wallet"></use></svg>
+          <h3 class="font-bold text-[15px] mb-2">Наличные</h3>
+          <p class="text-[13px] text-black/60">Оплата наличными курьеру при получении заказа.</p>
+        </div>
+        <div class="p-6 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-10 h-10 mx-auto mb-3 text-black/40"><use href="{% static 'asset/images/sprite.svg' %}#icons--smartphone"></use></svg>
+          <h3 class="font-bold text-[15px] mb-2">Apple Pay / Google Pay</h3>
+          <p class="text-[13px] text-black/60">Оплата в один клик через мобильные платёжные системы.</p>
+        </div>
+      </div>
+      <div class="mt-8 p-5 bg-gray-50 rounded-2xl">
+        <h3 class="font-bold text-[15px] mb-2">Безналичный расчёт для юридических лиц</h3>
+        <p class="text-[13px] text-black/60">Мы предоставляем все необходимые закрывающие документы: счёт, акт, накладную. Для оформления свяжитесь с нашим отделом продаж.</p>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

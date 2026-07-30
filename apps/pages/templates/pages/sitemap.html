@@ -1,0 +1,64 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Карта сайта{% endblock %}
+{% block meta_description %}Карта сайта интернет-магазина Aspect Coffee. Все страницы и категории магазина.{% endblock %}
+
+{% block content %}
+<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
+  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
+    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
+      <a href="/" class="hover:text-black transition-colors">Главная</a>
+      <span class="text-black/20">/</span>
+      <span class="text-black font-medium">Карта сайта</span>
+    </nav>
+    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-10">Карта сайта</h1>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      <div class="bg-white rounded-[24px] p-6 md:p-8 border border-gray-100 shadow-sm">
+        <h2 class="text-[18px] font-din-black uppercase mb-5">Страницы</h2>
+        <ul class="space-y-3">
+          {% for name, url in pages_list %}
+            <li>
+              <a href="{{ url }}" class="flex items-center gap-2 text-[14px] text-black/60 hover:text-black transition-colors py-1.5">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                {{ name }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-[24px] p-6 md:p-8 border border-gray-100 shadow-sm">
+        <h2 class="text-[18px] font-din-black uppercase mb-5">Категории товаров</h2>
+        {% if categories %}
+          <ul class="space-y-3">
+            {% for category in categories %}
+              <li>
+                <a href="/catalog/?category={{ category.slug }}" class="flex items-center gap-2 text-[14px] text-black/60 hover:text-black transition-colors py-1.5">
+                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                  {{ category.name }}
+                </a>
+                {% if category.children.all %}
+                  <ul class="ml-6 mt-2 space-y-2">
+                    {% for child in category.children.all %}
+                      <li>
+                        <a href="/catalog/?category={{ child.slug }}" class="flex items-center gap-2 text-[13px] text-black/40 hover:text-black transition-colors py-1">
+                          <svg class="w-3 h-3 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-right-sm"></use></svg>
+                          {{ child.name }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-[14px] text-black/40">Категории не найдены.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

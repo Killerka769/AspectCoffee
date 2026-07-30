@@ -1,0 +1,249 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render, get_object_or_404
+from django.http import HttpResponse, JsonResponse
+from django.urls import reverse
+from django.views.decorators.http import require_POST
+from apps.catalog.models import Product, Category, Review
+from .forms import CommunityPostForm
+from .models import CommunityPost
+
+
+def _static_page(request, template, extra=None):
+    ctx = extra or {}
+    return render(request, f"pages/{template}.html", ctx)
+
+
+def legal_document(request, slug):
+    """Render admin-managed legal document (public offer, privacy, etc.).
+
+    Falls back to 404 if the slug is not registered in LegalDocument.
+    """
+    from django.shortcuts import get_object_or_404
+    from .models import LegalDocument
+
+    doc = get_object_or_404(LegalDocument, slug=slug, is_active=True)
+    context = {
+        "doc": doc,
+        "page_title": doc.title,
+        "meta_description": doc.meta_description,
+    }
+    return render(request, "pages/legal_document.html", context)
+
+
+def about(request):
+    return _static_page(request, "about")
+
+
+def faq(request):
+    return _static_page(request, "faq")
+
+
+def how_to_choose_coffee(request):
+    return _static_page(request, "how_to_choose_coffee")
+
+
+def grind_converter(request):
+    return _static_page(request, "grind_converter")
+
+
+def shipment_and_payment(request):
+    return _static_page(request, "shipment_and_payment")
+
+
+def discount_system(request):
+    return _static_page(request, "discount_system")
+
+
+def return_money(request):
+    return _static_page(request, "return_money")
+
+
+def coffee_in_office(request):
+    return _static_page(request, "coffee_in_office")
+
+
+def disabled(request):
+    products = Product.objects.filter(is_active=False).select_related("category")[:50]
+    return render(request, "pages/disabled.html", {"products": products})
+
+
+def contact_us(request):
+    return _static_page(request, "contact_us")
+
+
+def partners(request):
+    return _static_page(request, "partners")
+
+
+def privacy(request):
+    return _static_page(request, "privacy")
+
+
+def user_agreement(request):
+    return _static_page(request, "user_agreement")
+
+
+def public_offer(request):
+    return _static_page(request, "public_offer")
+
+
+def sitemap_page(request):
+    categories = Category.objects.filter(is_active=True, parent__isnull=True).order_by("order")
+    pages_list = [
+        ("Главная", "/"),
+        ("Каталог", "/catalog/"),
+        ("Чай", "/tea/"),
+        ("Шоколад и сиропы", "/chocolate/"),
+        ("Аксессуары", "/accessories/"),
+        ("Подарочные наборы", "/giftbox/"),
+        ("Подписки", "/account/subscriptions/"),
+        ("Отзывы", "/reviews/"),
+        ("Блог", "/blog/"),
+        ("Сообщество", "/community/"),
+        ("FAQ", "/faq/"),
+        ("Как выбрать кофе", "/how-to-choose-coffee/"),
+        ("Калькулятор помола", "/grind-converter/"),
+        ("Доставка и оплата", "/shipment-and-payment/"),
+        ("Система скидок", "/discount-system/"),
+        ("Возврат денег", "/return-money/"),
+        ("Кофе в офис", "/coffee-in-office/"),
+        ("Контакты", "/contact-us/"),
+        ("Партнёрам", "/partners/"),
+        ("Политика конфиденциальности", "/privacy/"),
+        ("Пользовательское соглашение", "/user-agreement/"),
+        ("Публичная оферта", "/public-offer/"),
+    ]
+    return render(request, "pages/sitemap.html", {"categories": categories, "pages_list": pages_list})
+
+
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Disallow: /admin/",
+        "Disallow: /account/",
+        "Disallow: /api/",
+        "Disallow: /warehouse/",
+        "",
+        f"Sitemap: {request.scheme}://{request.get_host()}/sitemap.xml",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
+
+
+def sitemap_xml(request):
+    from django.contrib.sitemaps import Sitemap
+    from django.contrib.sites.shortcuts import get_current_site
+
+    pages = [
+        (1.0, "weekly", request.build_absolute_uri("/")),
+        (0.9, "daily", request.build_absolute_uri("/catalog/")),
+        (0.8, "weekly", request.build_absolute_uri("/tea/")),
+        (0.8, "weekly", request.build_absolute_uri("/chocolate/")),
+        (0.8, "weekly", request.build_absolute_uri("/accessories/")),
+        (0.8, "weekly", request.build_absolute_uri("/giftbox/")),
+        (0.7, "monthly", request.build_absolute_uri("/account/subscriptions/")),
+        (0.7, "weekly", request.build_absolute_uri("/blog/")),
+        (0.6, "monthly", request.build_absolute_uri("/faq/")),
+        (0.6, "monthly", request.build_absolute_uri("/how-to-choose-coffee/")),
+        (0.6, "monthly", request.build_absolute_uri("/grind-converter/")),
+        (0.6, "monthly", request.build_absolute_uri("/reviews/")),
+        (0.6, "monthly", request.build_absolute_uri("/community/")),
+        (0.5, "monthly", request.build_absolute_uri("/shipment-and-payment/")),
+        (0.5, "monthly", request.build_absolute_uri("/discount-system/")),
+        (0.5, "monthly", request.build_absolute_uri("/return-money/")),
+        (0.5, "monthly", request.build_absolute_uri("/coffee-in-office/")),
+        (0.5, "monthly", request.build_absolute_uri("/contact-us/")),
+        (0.5, "monthly", request.build_absolute_uri("/partners/")),
+        (0.4, "monthly", request.build_absolute_uri("/privacy/")),
+        (0.4, "monthly", request.build_absolute_uri("/user-agreement/")),
+        (0.4, "monthly", request.build_absolute_uri("/public-offer/")),
+    ]
+
+    products = Product.objects.filter(is_active=True)
+    blog_posts = []
+    try:
+        from apps.blog.models import BlogPost
+        blog_posts = BlogPost.objects.filter(is_published=True)
+    except Exception:
+        pass
+
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+
+    for priority, changefreq, loc in pages:
+        xml += f"  <url>\n    <loc>{loc}</loc>\n    <changefreq>{changefreq}</changefreq>\n    <priority>{priority}</priority>\n  </url>\n"
+
+    for product in products:
+        xml += f"  <url>\n    <loc>{request.build_absolute_uri(product.get_absolute_url())}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n"
+
+    for post in blog_posts:
+        xml += f"  <url>\n    <loc>{request.build_absolute_uri(post.get_absolute_url())}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n"
+
+    xml += "</urlset>"
+    return HttpResponse(xml, content_type="application/xml")
+
+
+def subscription(request):
+    return _static_page(request, "subscription")
+
+
+def reviews_page(request):
+    reviews = Review.objects.filter(is_approved=True).select_related("user", "product").order_by("-created_at")[:50]
+    return render(request, "pages/reviews.html", {"reviews": reviews})
+
+
+def community(request):
+    form = CommunityPostForm()
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            messages.error(request, "Войдите в аккаунт, чтобы добавить запись.")
+            return redirect("account_login")
+        form = CommunityPostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user
+            post.save()
+            messages.success(request, "Запись опубликована в сообществе.")
+            return redirect("pages:community")
+
+    posts = (
+        CommunityPost.objects.filter(is_published=True)
+        .select_related("user")
+        .order_by("-created_at")[:12]
+    )
+    return render(
+        request,
+        "pages/community.html",
+        {"form": form, "community_posts": posts},
+    )
+
+
+def community_rules(request):
+    return _static_page(request, "community_rules")
+
+
+@login_required
+@require_POST
+def community_post_delete(request, pk):
+    """Delete a community post owned by the current user."""
+    post = get_object_or_404(CommunityPost, pk=pk, user=request.user)
+    post.delete()
+    if request.headers.get("HX-Request"):
+        return HttpResponse("")
+    messages.success(request, "Запись удалена")
+    return redirect(request.META.get("HTTP_REFERER", "users:community_profile"))
+
+
+@login_required
+def community_post_edit(request, pk):
+    """Edit a community post owned by the current user."""
+    post = get_object_or_404(CommunityPost, pk=pk, user=request.user)
+    if request.method == "POST":
+        form = CommunityPostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Запись обновлена")
+            return redirect("users:community_profile")
+    else:
+        form = CommunityPostForm(instance=post)
+    return render(request, "pages/community_edit.html", {"form": form, "post": post})

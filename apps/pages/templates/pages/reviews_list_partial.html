@@ -1,0 +1,30 @@
+{% if reviews %}
+{% for review in reviews %}
+<article class="review-card" id="review-{{ review.pk }}" data-review-card="{{ review.pk }}">
+  <header class="review-header">
+    <div class="review-avatar">
+      {% if review.user and review.user.avatar %}<img src="{{ review.user.avatar.url }}" alt="" loading="lazy">
+      {% else %}<span>{% if review.user %}{{ review.user.first_name|first|default:review.user.email|first|upper }}{% else %}{{ review.author_name|first|default:"?"|upper }}{% endif %}</span>{% endif %}
+    </div>
+    <div class="review-meta">
+      <div class="review-author-block"><strong>{% if review.user %}{{ review.user.first_name|default:review.user.email }}{% else %}{{ review.author_name|default:"Аноним" }}{% endif %}</strong>
+        {% if review.user %}<div>{% with level=review.user.get_level %}<span class="review-level" style="color:{{ level.color }}">{{ level.name }}</span>{% endwith %}{% with city=review.user.get_city %}{% if city %}<span class="review-city">г. {{ city }}</span>{% endif %}{% endwith %}</div>{% endif %}
+      </div>
+      <time>{{ review.created_at|timesince }} назад</time>
+    </div>
+    <button class="review-menu" type="button" aria-label="Меню">⋮</button>
+  </header>
+  <div class="review-body">
+    {% if review.product %}<p class="review-product-label">Товар: <a href="{{ review.product.get_absolute_url }}">{{ review.product.name }}</a></p>{% endif %}
+    <div class="review-rating-line"><strong>Магазин</strong><span class="review-stars">{% for i in "12345" %}<b class="{% if forloop.counter <= review.rating %}filled{% endif %}">★</b>{% endfor %}</span></div>
+    <p class="review-text">{{ review.text }}</p>
+    {% if review.delivery_rating or review.delivery_operator or review.delivery_text %}
+    <div class="review-rating-line review-delivery"><strong>Доставка{% if review.delivery_operator %} {{ review.delivery_operator }}{% endif %}</strong>{% if review.delivery_rating %}<span class="review-stars">{% for i in "12345" %}<b class="{% if forloop.counter <= review.delivery_rating %}filled{% endif %}">★</b>{% endfor %}</span>{% endif %}</div>
+    {% if review.delivery_text %}<p class="review-text">{{ review.delivery_text }}</p>{% endif %}
+    {% endif %}
+    <div class="review-comments">{% for comment in review.top_comments %}<div class="review-comment-thread" id="review-comment-{{ comment.pk }}" data-comment="{{ comment.pk }}"><div class="review-comment-row"><div class="review-comment-avatar">{% if comment.user.avatar %}<img src="{{ comment.user.avatar.url }}" alt="">{% else %}{{ comment.user.first_name|first|default:comment.user.email|first|upper }}{% endif %}</div><div class="review-comment-content"><div class="review-comment-head"><div><strong>{{ comment.user.get_full_name }}</strong><span style="color:{{ comment.author_level.color }}">{{ comment.author_level.name }}{% if comment.author_city %}, г. {{ comment.author_city }}{% endif %}</span></div><time>{{ comment.created_at|timesince }} назад</time></div><p>{{ comment.text }}</p><button type="button" class="review-reply-btn" data-reply="{{ comment.pk }}" data-target-user="{{ comment.user_id }}" data-name="{{ comment.user.get_full_name }}">Ответить</button></div></div>{% for reply in comment.thread_replies %}<div class="review-comment-row review-comment-reply" id="review-comment-{{ reply.pk }}"><div class="review-comment-avatar">{% if reply.user.avatar %}<img src="{{ reply.user.avatar.url }}" alt="">{% else %}{{ reply.user.first_name|first|default:reply.user.email|first|upper }}{% endif %}</div><div class="review-comment-content"><div class="review-comment-head"><div><strong>{{ reply.user.get_full_name }}</strong><span style="color:{{ reply.author_level.color }}">{{ reply.author_level.name }}{% if reply.author_city %}, г. {{ reply.author_city }}{% endif %}</span></div><time>{{ reply.created_at|timesince }} назад</time></div><p>{{ reply.text }}</p><button type="button" class="review-reply-btn" data-reply="{{ comment.pk }}" data-target-user="{{ reply.user_id }}" data-name="{{ reply.user.get_full_name }}">Ответить</button></div></div>{% endfor %}</div>{% endfor %}</div>
+    <form class="review-comment-form" data-review="{{ review.pk }}"><input type="hidden" name="parent_id" value=""><input type="hidden" name="reply_to_user_id" value=""><input name="text" maxlength="1000" placeholder="Написать комментарий" autocomplete="off"><button type="submit" aria-label="Отправить">↑</button></form>
+  </div>
+</article>
+{% endfor %}
+{% else %}<div class="review-card review-empty"><strong>Отзывов пока нет</strong><span>Будьте первым, кто оставит отзыв о нашем кофе.</span></div>{% endif %}

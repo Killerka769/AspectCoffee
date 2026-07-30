@@ -1,0 +1,85 @@
+﻿{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Правила сообщества{% endblock %}
+{% block meta_description %}Правила поведения в сообществе Aspect Coffee. Уважение, взаимопомощь и любовь к кофе — наши главные принципы.{% endblock %}
+
+{% block content %}
+<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
+  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
+    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
+      <a href="/" class="hover:text-black transition-colors">Главная</a>
+      <span class="text-black/20">/</span>
+      <span class="text-black font-medium">Правила сообщества</span>
+    </nav>
+    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-8">Правила сообщества</h1>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
+      <p class="text-[15px] leading-relaxed text-black/70 mb-8">Наше сообщество создано для людей, которые любят кофе и хотят делиться этой любовью с другими. Чтобы всем было комфортно, мы просим соблюдать несколько простых правил.</p>
+
+      <div class="space-y-6">
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Уважайте друг друга</h3>
+            <p class="text-[13px] text-black/60">Относитесь к другим участникам с уважением. Оскорбления, унижения и агрессия запрещены. Помните, что за каждым сообщением стоит живой человек.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Без спама и рекламы</h3>
+            <p class="text-[13px] text-black/60">Запрещена реклама сторонних ресурсов, товаров и услуг без согласования с администрацией. Спам-рассылки и накрутка также запрещены.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">По делу</h3>
+            <p class="text-[13px] text-black/60">Старайтесь писать по теме сообщества — кофе, чай, способы заваривания, аксессуары. Для офтопа есть специальный раздел.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Делитесь опытом</h3>
+            <p class="text-[13px] text-black/60">Мы поощряем полезные посты: обзоры сортов, рецепты заваривания, обзоры оборудования. Чем подробнее — тем лучше!</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Не нарушайте закон</h3>
+            <p class="text-[13px] text-black/60">Запрещено размещение материалов, противоречащих законодательству РФ: экстремизм, пропаганда наркотиков, призывы к насилию.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Слушайте модераторов</h3>
+            <p class="text-[13px] text-black/60">Модераторы следят за соблюдением правил. Их решения обязательны к исполнению. Если вы не согласны — обжалуйте в личных сообщениях.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-black text-white rounded-[24px] p-6 md:p-10 text-center">
+      <h2 class="text-[22px] font-din-black uppercase mb-4">Спасибо, что делаете наше сообщество лучше</h2>
+      <p class="text-[14px] text-white/60 mb-6">Вместе мы создаём уютное место для всех, кто любит кофе.</p>
+      <a href="/community/" class="inline-block bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-[14px]">Вернуться в сообщество →</a>
+    </div>
+  </div>
+</main>
+{% endblock %}

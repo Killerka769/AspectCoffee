@@ -1,0 +1,6 @@
+from apps.users.models import User
+u = User.objects.get(email='direct39@yandex.ru')
+print('username:', u.username)
+print('first_name:', repr(u.first_name))
+print('avatar:', u.avatar if hasattr(u, 'avatar') else 'NO FIELD')
+print('has file:', bool(u.avatar) if hasattr(u, 'avatar') else False)

@@ -1,0 +1,106 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Остатки на складе{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 pt-8 pb-12">
+    <div class="container mx-auto px-4 max-w-[1200px]">
+        
+        <div class="flex flex-col md:flex-row gap-8">
+            
+            <!-- Sidebar Navigation -->
+            <aside class="w-full md:w-64 shrink-0">
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 sticky top-24">
+                    <h2 class="font-din-black uppercase text-sm tracking-widest text-black/40 mb-6">Складский терминал</h2>
+                    <nav class="space-y-1">
+                        <a href="{% url 'warehouse:queue' %}" class="flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all {% if request.resolver_match.url_name == 'queue' %}bg-black text-white shadow-lg shadow-black/10{% else %}text-black/60 hover:bg-gray-50{% endif %}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                            <span>Очередь сборки</span>
+                        </a>
+                        <a href="{% url 'warehouse:stock' %}" class="flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all {% if request.resolver_match.url_name == 'stock' %}bg-black text-white shadow-lg shadow-black/10{% else %}text-black/60 hover:bg-gray-50{% endif %}">
+                            <svg class="w-5 h-5"><use href="{% static 'asset/images/sprite.svg' %}#icons--comparison"></use></svg>
+                            <span>Остатки</span>
+                        </a>
+                    </nav>
+
+                    <div class="mt-8 pt-8 border-t border-gray-100">
+                        <div class="flex items-center gap-3 px-4 text-xs text-black/40">
+                            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                            Оператор: {{ request.user.get_full_name|default:request.user.username }}
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1">
+                <div class="flex items-center justify-between mb-8">
+                    <h1 class="text-3xl font-din-black uppercase">Остатки на складе</h1>
+                    <div class="text-sm text-black/40">{{ items.count }} позиций отслеживается</div>
+                </div>
+
+                <div class="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-100">
+                                <th class="px-6 py-4 font-din-black uppercase text-[11px] tracking-wider text-black/40">Товар / Вариант</th>
+                                <th class="px-6 py-4 font-din-black uppercase text-[11px] tracking-wider text-black/40 text-center">SKU</th>
+                                <th class="px-6 py-4 font-din-black uppercase text-[11px] tracking-wider text-black/40 text-center">Остаток</th>
+                                <th class="px-6 py-4 font-din-black uppercase text-[11px] tracking-wider text-black/40 text-right">Действие</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            {% for item in items %}
+                            <tr class="{% if item.is_low %}bg-red-50/50{% endif %} transition-colors hover:bg-gray-50/80">
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 rounded-xl bg-white border border-gray-100 p-1 shrink-0 overflow-hidden">
+                                            {% if item.variant.product.main_image %}
+                                            <img src="{{ item.variant.product.main_image.url }}" class="w-full h-full object-contain">
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-sm leading-tight mb-1">{{ item.variant.product.name }}</p>
+                                            <p class="text-xs text-black/40">{{ item.variant.weight }}г, {{ item.variant.get_grind_display }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-center">
+                                    <span class="font-mono text-[11px] bg-gray-100 px-2 py-1 rounded border border-gray-200">{{ item.variant.sku|default:"-" }}</span>
+                                </td>
+                                <td class="px-6 py-5 text-center">
+                                    <div class="inline-flex flex-col items-center">
+                                        <span class="text-base font-bold {% if item.is_low %}text-red-600{% endif %}">{{ item.qty }}</span>
+                                        <span class="text-[10px] text-black/30">мин: {{ item.min_qty }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-right">
+                                    <form action="{% url 'warehouse:stock' %}" method="POST" class="inline-flex items-center gap-2">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="number" name="qty" value="{{ item.qty }}" 
+                                               class="w-20 px-3 py-1.5 rounded-xl border border-gray-200 focus:outline-none focus:border-black text-sm text-center">
+                                        <button type="submit" class="p-2 rounded-xl bg-black text-white hover:bg-gray-800 transition-all shadow-lg shadow-black/5">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="px-6 py-20 text-center text-black/40">
+                                    <p>Товары не найдены.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </main>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

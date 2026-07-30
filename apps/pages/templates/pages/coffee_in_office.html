@@ -1,0 +1,140 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Кофе в офис — Подписка для бизнеса{% endblock %}
+{% block meta_description %}Кофе в офис с бесплатной доставкой. Бизнес-подписка на свежеобжаренный specialty кофе для вашей компании. Выгодные тарифы.{% endblock %}
+
+{% block content %}
+<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
+  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
+    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
+      <a href="/" class="hover:text-black transition-colors">Главная</a>
+      <span class="text-black/20">/</span>
+      <span class="text-black font-medium">Кофе в офис</span>
+    </nav>
+    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-4">Кофе в офис</h1>
+    <p class="text-[16px] text-black/50 max-w-2xl mb-10">Обеспечьте свою команду качественным свежеобжаренным кофе. Индивидуальные условия для бизнеса.</p>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
+      <h2 class="text-[24px] font-din-black uppercase mb-8">Преимущества для вашего офиса</h2>
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="p-5 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-10 h-10 mx-auto mb-3"><use href="{% static 'asset/images/sprite.svg' %}#icons--delivery"></use></svg>
+          <h3 class="font-bold text-[14px] mb-1">Бесплатная доставка</h3>
+          <p class="text-[12px] text-black/60">При заказе от 1500 ₽</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-10 h-10 mx-auto mb-3"><use href="{% static 'asset/images/sprite.svg' %}#icons--coffee"></use></svg>
+          <h3 class="font-bold text-[14px] mb-1">Свежий кофе</h3>
+          <p class="text-[12px] text-black/60">Обжарка под ваш заказ</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-10 h-10 mx-auto mb-3"><use href="{% static 'asset/images/sprite.svg' %}#icons--discount"></use></svg>
+          <h3 class="font-bold text-[14px] mb-1">Скидка до 20%</h3>
+          <p class="text-[12px] text-black/60">При оптовых заказах</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-10 h-10 mx-auto mb-3"><use href="{% static 'asset/images/sprite.svg' %}#icons--card"></use></svg>
+          <h3 class="font-bold text-[14px] mb-1">Документы для юрлиц</h3>
+          <p class="text-[12px] text-black/60">Счета, акты, накладные</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="text-[24px] font-din-black uppercase mb-6">Тарифы для бизнеса</h2>
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-[24px] p-6 md:p-8 border border-gray-100 shadow-sm flex flex-col">
+        <h3 class="font-din-black uppercase text-[18px] mb-1">Старт</h3>
+        <p class="text-[13px] text-black/50 mb-6">Для небольших отделов</p>
+        <p class="text-[36px] font-din-black mb-6">от 5 000 ₽<span class="text-[16px] text-black/40 font-normal">/мес</span></p>
+        <ul class="space-y-3 mb-8 flex-1">
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>До 3 кг кофе в месяц</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Скидка 5%</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Помол под любой метод</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Бесплатная доставка</span>
+          </li>
+        </ul>
+        <a href="/catalog/" class="block w-full text-center bg-black text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors text-[14px]">Выбрать кофе →</a>
+      </div>
+      <div class="bg-white rounded-[24px] p-6 md:p-8 border-2 border-black shadow-sm flex flex-col relative">
+        <span class="absolute -top-3 left-6 bg-black text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Популярный</span>
+        <h3 class="font-din-black uppercase text-[18px] mb-1">Оптима</h3>
+        <p class="text-[13px] text-black/50 mb-6">Для средних компаний</p>
+        <p class="text-[36px] font-din-black mb-6">от 12 000 ₽<span class="text-[16px] text-black/40 font-normal">/мес</span></p>
+        <ul class="space-y-3 mb-8 flex-1">
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>До 8 кг кофе в месяц</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Скидка 10%</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Бесплатный пробный набор</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Персональный менеджер</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Оборудование в аренду</span>
+          </li>
+        </ul>
+        <a href="/catalog/" class="block w-full text-center bg-black text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors text-[14px]">Выбрать кофе →</a>
+      </div>
+      <div class="bg-white rounded-[24px] p-6 md:p-8 border border-gray-100 shadow-sm flex flex-col">
+        <h3 class="font-din-black uppercase text-[18px] mb-1">Премиум</h3>
+        <p class="text-[13px] text-black/50 mb-6">Для крупных компаний</p>
+        <p class="text-[36px] font-din-black mb-6">от 30 000 ₽<span class="text-[16px] text-black/40 font-normal">/мес</span></p>
+        <ul class="space-y-3 mb-8 flex-1">
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Любой объём кофе</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Скидка 15-20%</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Бесплатное оборудование</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Обучение бариста</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>VIP-поддержка 24/7</span>
+          </li>
+        </ul>
+        <a href="/catalog/" class="block w-full text-center bg-black text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors text-[14px]">Выбрать кофе →</a>
+      </div>
+    </div>
+
+    <div class="bg-black text-white rounded-[24px] p-6 md:p-10">
+      <div class="flex flex-col md:flex-row items-center gap-6">
+        <div class="flex-1">
+          <h2 class="text-[24px] font-din-black uppercase mb-3">Хотите обсудить условия?</h2>
+          <p class="text-[14px] text-white/60">Оставьте заявку, и наш менеджер свяжется с вами, чтобы подобрать оптимальный тариф для вашего офиса.</p>
+        </div>
+        <a href="/partners/" class="shrink-0 inline-block bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-[14px]">Связаться с нами →</a>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

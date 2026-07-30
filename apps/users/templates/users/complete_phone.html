@@ -1,0 +1,103 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Подтверждение телефона — Aspect Coffee{% endblock %}
+{% block body_extra_class %} grey-theme{% endblock %}
+
+{% block content %}
+<main class="tc-phone-completion-page">
+  <div
+    class="tc-phone-completion-wrap"
+    x-data="{
+      phoneCode: '{{ phone_code|escapejs }}',
+      phoneLength: 10,
+      phoneCodeOpen: false,
+      get phoneCodes() { return TCPhone.codes; },
+      selectPhoneCode(code) {
+        TCPhone.selectCode(code, this);
+        this.$nextTick(() => TCPhone.applyCountry(this.$refs.phoneGroup, code));
+      }
+    }"
+    x-init="selectPhoneCode(phoneCode)"
+  >
+    <section class="tc-phone-completion-card" aria-labelledby="phone-completion-title">
+      <div class="tc-phone-completion-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M8.5 3.5h7A1.5 1.5 0 0 1 17 5v14a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 19V5a1.5 1.5 0 0 1 1.5-1.5Z" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M10 6h4M11 18h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <header class="tc-phone-completion-head">
+        <h1 id="phone-completion-title">Подтвердите телефон</h1>
+        <p>
+          В вашей учётной записи нет номера телефона — {{ provider_label }}
+          не передал его при OAuth-входе. Номер нужен для оформления заказов
+          и получения важных уведомлений.
+        </p>
+      </header>
+
+      {% if messages %}
+      <div class="tc-phone-completion-messages" role="status">
+        {% for message in messages %}
+        <div class="tc-phone-completion-message {% if message.tags == 'error' %}is-error{% else %}is-success{% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="post" class="tc-phone-completion-form" data-tc-phone-group x-ref="phoneGroup">
+        {% csrf_token %}
+        <input type="hidden" name="phone_code" :value="phoneCode" data-tc-phone-code>
+
+        <div class="tc-phone-completion-field">
+          <label class="tc-input__label" for="phone-primary">Номер телефона</label>
+          <div class="tc-phone__field items-stretch">
+            <div @click.outside="phoneCodeOpen = false" class="tc-select phone-select flex-none relative min-w-[82px]">
+              <div class="tc-select__field">
+                <button type="button" @click="phoneCodeOpen = !phoneCodeOpen" class="tc-select__field--select cursor-pointer w-full"
+                        aria-label="Выбрать код страны" :aria-expanded="phoneCodeOpen.toString()">
+                  <span class="select-text" x-text="phoneCode" data-tc-phone-code-label>+7</span>
+                  <span class="tc-select__field--arr"></span>
+                </button>
+              </div>
+              <div x-cloak x-show="phoneCodeOpen" x-transition
+                   class="absolute left-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 w-[220px] max-h-[240px] overflow-y-auto z-[100] py-1">
+                <template x-for="c in phoneCodes" :key="c.code">
+                  <button type="button" @click="selectPhoneCode(c.code)"
+                          :class="phoneCode === c.code ? 'bg-gray-100 font-bold' : ''"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
+                    <span class="font-mono text-gray-500 w-10" x-text="c.code"></span>
+                    <span x-text="c.country"></span>
+                  </button>
+                </template>
+              </div>
+            </div>
+            <input id="phone-primary" type="tel" name="phone" value="{{ phone_value }}" required
+                   autocomplete="tel" inputmode="tel" placeholder="(900) 000-00-00"
+                   class="tc-input__field--input w-full" data-tc-phone-input
+                   :data-phone-code="phoneCode" :data-phone-length="phoneLength">
+          </div>
+        </div>
+
+        <div class="tc-phone-completion-field">
+          <label class="tc-input__label" for="phone-repeat">Повторите номер</label>
+          <input id="phone-repeat" type="tel" name="phone_repeat" value="{{ phone_repeat }}" required
+                 autocomplete="off" inputmode="tel" placeholder="(900) 000-00-00"
+                 class="tc-input__field--input w-full" data-tc-phone-input
+                 :data-phone-code="phoneCode" :data-phone-length="phoneLength">
+        </div>
+
+        <p class="tc-phone-completion-hint">
+          Введите один и тот же номер в оба поля — это защитит учётную запись
+          от случайной ошибки.
+        </p>
+
+        <button type="submit" class="tc-btn btn-dark tc-phone-completion-submit">
+          <span class="text-primary duration-200">Подтвердить и продолжить</span>
+        </button>
+      </form>
+    </section>
+  </div>
+</main>
+{% endblock %}

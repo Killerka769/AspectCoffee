@@ -1,0 +1,1457 @@
+{% extends 'catalog/base.html' %}
+{% load static catalog_extras %}
+
+{% block title %}{% if current_category_obj %}{% if current_category_obj.seo_title %}{{ current_category_obj.seo_title }}{% elif current_category_obj.h1 %}{{ current_category_obj.h1 }}{% else %}{{ current_category_obj.name }}{% endif %}{% else %}Каталог кофе{% endif %}{% endblock %}
+{% block meta_description %}Интернет-магазин свежеобжаренного кофе в зернах, молотого с доставкой на дом. Кофе от производителя по самым низким ценам.{% endblock %}
+
+{% block content %}
+<main class="tc-catalog-page{% if current_category %} in-category{% endif %}{% if not show_coffee_controls %} non-coffee-section{% endif %}" id="catalog-main" style="opacity:0;transition:opacity .15s">
+  <div class="tc-container">
+
+    <div class="tc-catalog-header">
+      <div class="tc-catalog-header__left">
+        <h1 class="tc-catalog-h1">
+          {% if current_category_obj %}{% if current_category_obj.h1 %}{{ current_category_obj.h1 }}{% else %}{{ current_category_obj.name }}{% endif %}
+          {% elif current_category %}
+            {% for cat in categories %}{% if cat.slug == current_category %}{{ cat.name }}{% endif %}{% endfor %}
+          {% else %}Каталог кофе{% endif %}
+        </h1>
+        {% if current_category_obj and current_category_obj.description %}
+        <p class="tc-catalog-description">{{ current_category_obj.description }}</p>
+        {% endif %}
+      </div>
+      <div class="tc-catalog-header__right tc-mobile-only">
+        {% if has_any_filters %}
+        <a href="{{ section_reset_url }}"
+           class="tc-catalog-header-reset"
+           data-testid="mobile-catalog-reset"
+           hx-get="{{ section_reset_url }}"
+           hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true">
+          Сбросить фильтры
+        </a>
+        {% endif %}
+        <button type="button" class="tc-icon-btn{% if not show_coffee_controls %} hidden{% endif %}" id="mobile-filter-btn" aria-label="Фильтры" aria-controls="sidebar-filters" aria-expanded="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 21V14M4 10V3M12 21V12M12 8V3M20 21V16M20 12V3M1 14h6M9 8h6M17 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    {% if show_coffee_controls and not is_child_category %}
+    <div class="tc-type-cards-wrap">
+      <div class="tc-type-cards">
+        <div class="tc-type-card-item">
+          <label class="tc-type-card {% if 'espresso' in current_methods %}tc-type-card--active{% endif %}">
+            <input type="checkbox" name="methods" value="espresso" data-filter="methods" class="tc-type-card__checkbox" {% if 'espresso' in current_methods %}checked{% endif %}>
+            <video class="tc-type-card__img" width="1" height="1" preload="none" playsinline muted loop poster="https://coffee-static.storage.yandexcloud.net/filters/coffee/1b.jpg" src="https://coffee-static.storage.yandexcloud.net/files/shares/home/espresso.mp4"></video>
+            <span class="tc-type-card__name"><span>Кофе</span> для эспрессо</span>
+          </label>
+          <div class="tc-type-card__tooltip">
+            <div class="tc-type-card__tooltip-arrow"></div>
+            <svg class="tc-type-card__tooltip-icon"><use href="{% static 'asset/images/sprite.svg' %}#icons-category--icon-1b"></use></svg>
+            <p>Кофе для автоматической и рожковой кофемашины, эспрессо, турки и гейзерной кофеварки</p>
+          </div>
+        </div>
+
+        <div class="tc-type-card-item">
+          <label class="tc-type-card {% if 'filter' in current_methods %}tc-type-card--active{% endif %}">
+            <input type="checkbox" name="methods" value="filter" data-filter="methods" class="tc-type-card__checkbox" {% if 'filter' in current_methods %}checked{% endif %}>
+            <video class="tc-type-card__img" width="1" height="1" playsinline muted loop poster="https://coffee-static.storage.yandexcloud.net/filters/coffee/3b.jpg" src="https://coffee-static.storage.yandexcloud.net/files/shares/home/filter.mp4"></video>
+            <span class="tc-type-card__name"><span>Кофе</span> для фильтра</span>
+          </label>
+          <div class="tc-type-card__tooltip">
+            <div class="tc-type-card__tooltip-arrow"></div>
+            <svg class="tc-type-card__tooltip-icon"><use href="{% static 'asset/images/sprite.svg' %}#icons-category--icon-3b"></use></svg>
+            <p>Кофе для капельной кофеварки, турки, френч-пресса, пуровера, аэропресса или чашки</p>
+          </div>
+        </div>
+
+        <div class="tc-type-card-item">
+          <label class="tc-type-card {% if 'capsules' in current_methods %}tc-type-card--active{% endif %}">
+            <input type="checkbox" name="methods" value="capsules" data-filter="methods" class="tc-type-card__checkbox" {% if 'capsules' in current_methods %}checked{% endif %}>
+            <video class="tc-type-card__img" width="1" height="1" playsinline muted loop poster="https://coffee-static.storage.yandexcloud.net/filters/coffee/5a.jpg" src="https://coffee-static.storage.yandexcloud.net/files/shares/home/capsules.mp4"></video>
+            <span class="tc-type-card__name">Капсулы</span>
+          </label>
+          <div class="tc-type-card__tooltip">
+            <div class="tc-type-card__tooltip-arrow"></div>
+            <svg class="tc-type-card__tooltip-icon"><use href="{% static 'asset/images/sprite.svg' %}#icons-category--icon-5a"></use></svg>
+            <p>Капсулы из сезонного кофе, обжаренного специально для формата Nespresso</p>
+          </div>
+        </div>
+
+        <div class="tc-type-card-item">
+          <label class="tc-type-card {% if 'drip' in current_methods %}tc-type-card--active{% endif %}">
+            <input type="checkbox" name="methods" value="drip" data-filter="methods" class="tc-type-card__checkbox" {% if 'drip' in current_methods %}checked{% endif %}>
+            <video class="tc-type-card__img" width="1" height="1" playsinline muted loop poster="https://coffee-static.storage.yandexcloud.net/filters/coffee/6a.jpg" src="https://coffee-static.storage.yandexcloud.net/files/shares/home/drip.mp4"></video>
+            <span class="tc-type-card__name">Дрип-пакеты</span>
+          </label>
+          <div class="tc-type-card__tooltip">
+            <div class="tc-type-card__tooltip-arrow"></div>
+            <svg class="tc-type-card__tooltip-icon"><use href="{% static 'asset/images/sprite.svg' %}#icons-category--icon-6a"></use></svg>
+            <p>Дрип-пакеты из сезонного кофе для заваривания в чашке</p>
+          </div>
+        </div>
+
+        <div class="tc-type-card-item">
+          <label class="tc-type-card {% if 'canned' in current_methods %}tc-type-card--active{% endif %}">
+            <input type="checkbox" name="methods" value="canned" data-filter="methods" class="tc-type-card__checkbox" {% if 'canned' in current_methods %}checked{% endif %}>
+            <video class="tc-type-card__img" width="1" height="1" playsinline muted loop poster="https://coffee-static.storage.yandexcloud.net/filters/coffee/7a.jpg" src="https://coffee-static.storage.yandexcloud.net/files/shares/home/jar.mp4"></video>
+            <span class="tc-type-card__name">Напитки в банках</span>
+          </label>
+          <div class="tc-type-card__tooltip">
+            <div class="tc-type-card__tooltip-arrow"></div>
+            <svg class="tc-type-card__tooltip-icon"><use href="{% static 'asset/images/sprite.svg' %}#icons-category--icon-7a"></use></svg>
+            <p>Готовые напитки, которые удобно брать с собой</p>
+          </div>
+        </div>
+
+        <div class="tc-type-card-item">
+          <label class="tc-type-card {% if 'concentrate' in current_methods %}tc-type-card--active{% endif %}">
+            <input type="checkbox" name="methods" value="concentrate" data-filter="methods" class="tc-type-card__checkbox" {% if 'concentrate' in current_methods %}checked{% endif %}>
+            <video class="tc-type-card__img" width="1" height="1" playsinline muted loop poster="https://coffee-static.storage.yandexcloud.net/filters/coffee/9a.jpg" src="https://coffee-static.storage.yandexcloud.net/files/shares/home/concentrate.mp4"></video>
+            <span class="tc-type-card__name">Кофейный концентрат</span>
+          </label>
+          <div class="tc-type-card__tooltip">
+            <div class="tc-type-card__tooltip-arrow"></div>
+            <svg class="tc-type-card__tooltip-icon"><use href="{% static 'asset/images/sprite.svg' %}#icons-category--icon-9a"></use></svg>
+            <p>Уже приготовленный кофейный концентрат для приготовления кофе и коктейлей</p>
+          </div>
+        </div>
+
+        <div class="tc-type-card-item">
+          <label class="tc-type-card {% if 'instant' in current_methods %}tc-type-card--active{% endif %}">
+            <input type="checkbox" name="methods" value="instant" data-filter="methods" class="tc-type-card__checkbox" {% if 'instant' in current_methods %}checked{% endif %}>
+            <video class="tc-type-card__img" width="1" height="1" playsinline muted loop poster="https://coffee-static.storage.yandexcloud.net/filters/coffee/10a.jpg" src="https://coffee-static.storage.yandexcloud.net/files/shares/home/instant.mp4"></video>
+            <span class="tc-type-card__name">Растворимый спешелти</span>
+          </label>
+          <div class="tc-type-card__tooltip">
+            <div class="tc-type-card__tooltip-arrow"></div>
+            <svg class="tc-type-card__tooltip-icon"><use href="{% static 'asset/images/sprite.svg' %}#icons-category--icon-10a"></use></svg>
+            <p>Растворимый спешелти кофе, который удобно готовить в любых условиях</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% elif show_coffee_controls %}
+    {# Дочерняя категория — вместо плиток показываем только разделитель #}
+    <hr class="tc-category-divider" style="border:none;border-top:1px solid var(--black-10);margin:16px 0;">
+    {% endif %}
+
+    {% if show_coffee_controls %}
+    <div class="tc-coffee-hashtags" x-data="{ hashtagOpen: false }">
+    <ul class="flex items-center min-w-[100%] max-xl:overflow-auto -mx-4 px-4 sm:mx-0 sm:px-0 xl:order-3 xl:col-span-12 mb-2 xl:mb-6 xl:flex-wrap max-xl:space-x-2 scrollbar-touch-hide list-none p-0 m-0">
+      <li class="xl:mr-2 mb-2 show-quiz">
+        <button type="button" class="tc-btn btn-gradient-tag text-nowrap scale-1" onclick="quizOpen()">
+          <svg class="ic-left" width="12" height="12"><use href="{% static 'asset/images/sprite.svg' %}#icons--asterisks"></use></svg>
+          <span class="text-primary duration-200">Выбрать кофе за минуту</span>
+        </button>
+      </li>
+      {% for cat in featured_hashtag_categories %}
+      <li class="xl:mr-2 mb-2">
+        {% if compatible_cat_ids and cat.id not in compatible_cat_ids and current_category != cat.slug %}
+        <span class="tc-tag tag-white opacity-40 cursor-not-allowed" title="Нет товаров для этой комбинации фильтров">
+          <span class="tc-tag__hashtag">#</span>
+          <span class="whitespace-nowrap text-ellipsis overflow-hidden tc-tag__text">{{ cat.name }}</span>
+        </span>
+        {% else %}
+        <a href="{{ cat.get_absolute_url }}"
+           hx-get="{{ cat.get_absolute_url }}"
+           hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+           class="tc-tag tag-white {% if current_category == cat.slug %}active{% endif %}">
+          <span class="tc-tag__hashtag">#</span>
+          <span class="whitespace-nowrap text-ellipsis overflow-hidden tc-tag__text">{{ cat.name }}</span>
+        </a>
+        {% endif %}
+      </li>
+      {% endfor %}
+      {% if hidden_hashtag_categories %}
+      <li class="xl:mr-2 mb-2">
+        <button type="button" class="tc-btn btn-white !px-[9px] hover:!scale-100 hover:!bg-[var(--black-5)] hover:!text-[var(--black)] hover:!border-[var(--black-5)] !duration-0" @click="hashtagOpen = !hashtagOpen">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="transition:transform .2s;" :style="hashtagOpen ? 'transform:rotate(180deg)' : ''"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </li>
+      {% endif %}
+    </ul>
+    {% if hidden_hashtag_categories %}
+    <ul x-show="hashtagOpen" x-cloak x-transition class="flex items-center min-w-[100%] max-xl:overflow-auto -mx-4 px-4 sm:mx-0 sm:px-0 xl:order-3 xl:col-span-12 mb-2 xl:mb-6 xl:flex-wrap max-xl:space-x-2 scrollbar-touch-hide list-none p-0 m-0">
+      {% for cat in hidden_hashtag_categories %}
+      <li class="xl:mr-2 mb-2">
+        {% if compatible_cat_ids and cat.id not in compatible_cat_ids and current_category != cat.slug %}
+        <span class="tc-tag tag-white opacity-40 cursor-not-allowed" title="Нет товаров для этой комбинации фильтров">
+          <span class="tc-tag__hashtag">#</span>
+          <span class="whitespace-nowrap text-ellipsis overflow-hidden tc-tag__text">{{ cat.name }}</span>
+        </span>
+        {% else %}
+        <a href="{{ cat.get_absolute_url }}"
+           hx-get="{{ cat.get_absolute_url }}"
+           hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+           class="tc-tag tag-white {% if current_category == cat.slug %}active{% endif %}">
+          <span class="tc-tag__hashtag">#</span>
+          <span class="whitespace-nowrap text-ellipsis overflow-hidden tc-tag__text">{{ cat.name }}</span>
+        </a>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="tc-nav-tabs" style="overflow:visible;position:relative;">
+      <ul class="tc-nav-tabs-list{% if not show_coffee_controls %} hidden{% endif %}" style="overflow:auto;min-width:0;">
+        <li>
+          <a href="?{% if current_category %}category={{ current_category }}&{% endif %}"
+             hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}"
+             hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+             class="tc-nav-tab {% if not current_qfilter and not current_methods %}active{% endif %}">Все</a>
+        </li>
+        <li>
+          <a href="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=recommended"
+             hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=recommended"
+             hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+             class="tc-nav-tab {% if current_qfilter == 'recommended' %}active{% endif %}">Рекомендуем</a>
+        </li>
+        <li>
+          <a href="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=popular"
+             hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=popular"
+             hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+             class="tc-nav-tab {% if current_qfilter == 'popular' %}active{% endif %}">Популярные</a>
+        </li>
+        <li class="tc-desktop-qfilter-only">
+          <a href="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=new"
+             hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=new"
+             hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+             class="tc-nav-tab {% if current_qfilter == 'new' %}active{% endif %}">Новый</a>
+        </li>
+        <li class="tc-desktop-qfilter-only">
+          <a href="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=week"
+             hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=week"
+             hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+             class="tc-nav-tab {% if current_qfilter == 'week' %}active{% endif %}">Сорт недели</a>
+        </li>
+        <li class="tc-desktop-qfilter-only">
+          <a href="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=ending"
+             hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=ending"
+             hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+             class="tc-nav-tab {% if current_qfilter == 'ending' %}active{% endif %}">Заканчивается</a>
+        </li>
+        <li class="tc-desktop-qfilter-only">
+          <a href="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=bestseller"
+             hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=bestseller"
+             hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+             class="tc-nav-tab {% if current_qfilter == 'bestseller' %}active{% endif %}">Хит продаж</a>
+        </li>
+        <li class="tc-desktop-qfilter-only">
+          <a href="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=micro"
+             hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}qfilter=micro"
+             hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+             class="tc-nav-tab {% if current_qfilter == 'micro' %}active{% endif %}">Микролот</a>
+        </li>
+        <li class="tc-mobile-sort-only">
+          <a href="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_qfilter %}qfilter={{ current_qfilter }}&{% endif %}sort=-created_at"
+             hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_qfilter %}qfilter={{ current_qfilter }}&{% endif %}sort=-created_at"
+             hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+             class="tc-nav-tab {% if current_params.sort == '-created_at' %}active{% endif %}">Сначала новые</a>
+        </li>
+        <li class="tc-mobile-sort-only">
+          <a href="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_qfilter %}qfilter={{ current_qfilter }}&{% endif %}sort=-rating_avg"
+             hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_qfilter %}qfilter={{ current_qfilter }}&{% endif %}sort=-rating_avg"
+             hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+             class="tc-nav-tab {% if current_params.sort == '-rating_avg' %}active{% endif %}">С высоким рейтингом</a>
+        </li>
+        <li class="tc-mobile-sort-only">
+          <a href="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_qfilter %}qfilter={{ current_qfilter }}&{% endif %}sort=variants__price"
+             hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_qfilter %}qfilter={{ current_qfilter }}&{% endif %}sort=variants__price"
+             hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+             class="tc-nav-tab {% if current_params.sort == 'variants__price' %}active{% endif %}">Сначала дешевле</a>
+        </li>
+        <li class="tc-mobile-sort-only">
+          <a href="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_qfilter %}qfilter={{ current_qfilter }}&{% endif %}sort=-variants__price"
+             hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_qfilter %}qfilter={{ current_qfilter }}&{% endif %}sort=-variants__price"
+             hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true"
+             class="tc-nav-tab {% if current_params.sort == '-variants__price' %}active{% endif %}">Сначала дороже</a>
+        </li>
+      </ul>
+      <div class="tc-nav-tabs-sort" style="display:flex;align-items:center;flex-shrink:0;margin-left:4px;position:relative;z-index:20;overflow:visible;">
+        <div class="tc-select select-white" x-data="{ open: false }" :class="{ 'open': open }" style="position:relative;">
+          <div class="tc-select__field">
+            <div class="tc-select__field--select" @click="open = !open" style="cursor:pointer;">
+              <span class="select-text" x-text="document.querySelector('.tc-sort-option.active')?.textContent || 'Сначала новые'">Сначала новые</span>
+              <span class="tc-select__field--arr"></span>
+            </div>
+            <div class="tc-select__field--dropdown" x-show="open" @click.outside="open = false" x-transition x-cloak style="position:absolute; top:100%; right:0; margin-top:4px; z-index:100; min-width:180px; background:#fff; border-radius:12px; box-shadow:0 4px 24px rgba(0,0,0,0.12); overflow:hidden;">
+              <ul class="dropdown-list">
+                <li class="tc-sort-option {% if current_sort == '-created_at' %}active{% endif %}"
+                    hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_qfilter %}qfilter={{ current_qfilter }}&{% endif %}sort=-created_at"
+                    hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true">Сначала новые</li>
+                <li class="tc-sort-option {% if current_sort == '-rating_avg' %}active{% endif %}"
+                    hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_qfilter %}qfilter={{ current_qfilter }}&{% endif %}sort=-rating_avg"
+                    hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true">С высоким рейтингом</li>
+                <li class="tc-sort-option {% if current_sort == 'variants__price' %}active{% endif %}"
+                    hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_qfilter %}qfilter={{ current_qfilter }}&{% endif %}sort=variants__price"
+                    hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true">Сначала дешевле</li>
+                <li class="tc-sort-option {% if current_sort == '-variants__price' %}active{% endif %}"
+                    hx-get="?{% if current_category %}category={{ current_category }}&{% endif %}{% if current_qfilter %}qfilter={{ current_qfilter }}&{% endif %}sort=-variants__price"
+                    hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true">Сначала дороже</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tc-catalog-layout" id="catalog-layout">
+
+      <aside class="tc-sidebar" id="sidebar-filters">
+        <div class="tc-filter-mobile-header">
+          <span class="tc-filter-mobile-title">ФИЛЬТРЫ</span>
+          <div class="tc-filter-mobile-actions">
+            {% if has_any_filters %}
+            <a href="{{ section_reset_url }}"
+               class="tc-filter-mobile-reset"
+               hx-get="{{ section_reset_url }}"
+               hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true">
+              Сбросить фильтры
+            </a>
+            {% endif %}
+            <button type="button" class="tc-filter-mobile-close" id="mobile-filter-close" aria-label="Закрыть фильтры">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="tc-sidebar__inner">
+
+          <div class="w-full mb-4">
+            <p class="text-[var(--black-50)] mb-4 leading-8">
+              {% with cnt=filtered_count|default:paginator.count total=total_count|default:paginator.count %}{{ cnt }} {{ cnt|ru_plural:"сорт,сорта,сортов" }} из {{ total }}{% endwith %}
+            </p>
+          </div>
+
+          {# 1.4.5/1.4.6 — фасеты строятся из реальных товаров раздела/категории. #}
+          {# Группа рендерится только если в ней есть опции (иначе фильтр дал бы 0). #}
+
+          {% if facets.acidity %}
+          <div class="tc-filter-group">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="tc-filter-group__title mb-0">Кислотность</h4>
+              {% if has_any_filters %}
+              <a href="{{ section_reset_url }}"
+                 class="tc-reset-filters-btn-inline"
+                 style="color:#000!important"
+                 hx-get="{{ section_reset_url }}"
+                 hx-target="#catalog-main" hx-select="#catalog-main" hx-swap="outerHTML" hx-push-url="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                <span style="color:#000!important">Сбросить фильтры</span>
+              </a>
+              {% endif %}
+            </div>
+            <div class="tc-filter-checks">
+              {% for opt in facets.acidity %}
+              <label class="tc-checkbox">
+                <input type="checkbox" name="acidity" value="{{ opt.value }}" data-filter="acidity"
+                       {% if opt.value in current_acidity %}checked{% endif %}>
+                <span class="tc-checkbox__text">{{ opt.name }} <span class="tc-checkbox__count">{{ opt.count }}</span></span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if facets.body %}
+          <div class="tc-filter-group">
+            <h4 class="tc-filter-group__title">Плотность</h4>
+            <div class="tc-filter-checks">
+              {% for opt in facets.body %}
+              <label class="tc-checkbox">
+                <input type="checkbox" name="body" value="{{ opt.value }}" data-filter="body"
+                       {% if opt.value in current_body %}checked{% endif %}>
+                <span class="tc-checkbox__text">{{ opt.name }} <span class="tc-checkbox__count">{{ opt.count }}</span></span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if facets.roast %}
+          <div class="tc-filter-group">
+            <h4 class="tc-filter-group__title">Степень обжарки</h4>
+            <div class="tc-filter-checks">
+              {% for opt in facets.roast %}
+              <label class="tc-checkbox">
+                <input type="checkbox" name="roast" value="{{ opt.value }}" data-filter="roast"
+                       {% if opt.value in current_roast %}checked{% endif %}>
+                <span class="tc-checkbox__text">{{ opt.name }} <span class="tc-checkbox__count">{{ opt.count }}</span></span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if facets.flavor %}
+          <div class="tc-filter-group">
+            <h4 class="tc-filter-group__title">Вкус кофе</h4>
+            <div class="tc-filter-checks">
+              {% for opt in facets.flavor %}
+              <label class="tc-checkbox">
+                <input type="checkbox" name="flavor" value="{{ opt.slug }}" data-filter="flavor"
+                       {% if opt.slug in current_flavor %}checked{% endif %}>
+                <span class="tc-checkbox__text">{{ opt.name }} <span class="tc-checkbox__count">{{ opt.count }}</span></span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if facets.processing %}
+          <div class="tc-filter-group">
+            <h4 class="tc-filter-group__title">Способ обработки</h4>
+            <div class="tc-filter-checks">
+              {% for opt in facets.processing %}
+              <label class="tc-checkbox">
+                <input type="checkbox" name="processing" value="{{ opt.value }}" data-filter="processing"
+                       {% if opt.value in current_processing %}checked{% endif %}>
+                <span class="tc-checkbox__text">{{ opt.name }} <span class="tc-checkbox__count">{{ opt.count }}</span></span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if facets.country %}
+          <div class="tc-filter-group">
+            <h4 class="tc-filter-group__title">Страна произрастания</h4>
+            <div class="tc-filter-checks">
+              {% for opt in facets.country %}
+              <label class="tc-checkbox">
+                <input type="checkbox" name="country" value="{{ opt.value }}" data-filter="country"
+                       {% if opt.value in current_country %}checked{% endif %}>
+                <span class="tc-checkbox__text">{{ opt.name }} <span class="tc-checkbox__count">{{ opt.count }}</span></span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if facets.features %}
+          <div class="tc-filter-group">
+            <h4 class="tc-filter-group__title">Особенность кофе</h4>
+            <div class="tc-filter-checks">
+              {% for opt in facets.features %}
+              <label class="tc-checkbox">
+                <input type="checkbox" name="features" value="{{ opt.value }}" data-filter="features"
+                       {% if opt.value in current_features %}checked{% endif %}>
+                <span class="tc-checkbox__text">{{ opt.name }} <span class="tc-checkbox__count">{{ opt.count }}</span></span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if not user.is_authenticated %}
+          <div class="w-full bg-white rounded-3xl h-full p-6 flex flex-col justify-between mb-6">
+            <div class="flex-1 flex flex-col justify-between">
+              <div>
+                <p class="text-[24px] font-din-black uppercase leading-[1.2] mb-1">Войдите, <span class="font-din">и станет дешевле</span></p>
+                <p class="text-black/50 text-[14px]">В аккаунте больше скидок</p>
+              </div>
+              <div class="mt-6 flex flex-col gap-2">
+                <a href="/login/" class="bg-black text-white font-bold px-6 py-3 rounded-xl text-[14px] hover:opacity-80 transition-opacity text-center block uppercase">Войти</a>
+                <a href="/register/" class="bg-gray-100 text-black font-bold px-6 py-3 rounded-xl text-[14px] hover:bg-gray-200 transition-colors text-center block uppercase">Регистрация</a>
+                <ul class="aspect-oauth-list list-none p-0 m-0 mt-1">
+                  <li><a href="/accounts/yandex/login/" class="aspect-oauth-button" title="Войти через Яндекс" aria-label="Войти через Яндекс"><img src="https://yastatic.net/s3/home-static/_/Z/6/nfVezDRqofwQZ5e669DSK84Tw.svg" width="28" height="28" alt="Яндекс"></a></li>
+                  <li><a href="/accounts/vk/login/" class="aspect-oauth-button" title="Войти через VK" aria-label="Войти через VK"><svg width="28" height="28" viewBox="0 0 101 100" fill="none"><path d="M0.5 48C0.5 25.3726 0.5 14.0589 7.52944 7.02944C14.5589 0 25.8726 0 48.5 0H52.5C75.1274 0 86.4411 0 93.4706 7.02944C100.5 14.0589 100.5 25.3726 100.5 48V52C100.5 74.6274 100.5 85.9411 93.4706 92.9706C86.4411 100 75.1274 100 52.5 100H48.5C25.8726 100 14.5589 100 7.52944 92.9706C0.5 85.9411 0.5 74.6274 0.5 52V48Z" fill="#0077FF"/><path d="M53.7085 72.042C30.9168 72.042 17.9169 56.417 17.3752 30.417H28.7919C29.1669 49.5003 37.5834 57.5836 44.25 59.2503V30.417H55.0004V46.8752C61.5837 46.1669 68.4995 38.667 70.8329 30.417H81.5832C79.7915 40.5837 72.2915 48.0836 66.9582 51.1669C72.2915 53.6669 80.8336 60.2086 84.0836 72.042H72.2499C69.7082 64.1253 63.3754 58.0003 55.0004 57.1669V72.042H53.7085Z" fill="white"/></svg></a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          {% if active_promo %}
+          <div class="tc-sidebar-discount-card">
+            <p class="tc-sidebar-discount__title">СКИДКА {{ active_promo.discount_value }}{% if active_promo.discount_type == 'percent' %}%{% else %}₽{% endif %}</p>
+            <p class="tc-sidebar-discount__subtitle">НА ПЕРВЫЙ ЗАКАЗ</p>
+            <div class="tc-sidebar-discount__code">
+              <span>{{ active_promo.code }}</span>
+              <button type="button" class="tc-sidebar-discount__copy" data-copy-promo="{{ active_promo.code }}" onclick="tcCopyPromo(this)" title="Копировать" aria-label="Скопировать промокод">
+                <svg data-copy-icon width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2"/></svg>
+                <svg data-copy-check class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+            {% if cart_promo_code == active_promo.code %}
+            <button type="button" class="tc-sidebar-discount__btn-profile tc-promo-applied-button" disabled>ПРИМЕНЁН ({{ cart_promo_code }})</button>
+            {% else %}
+            <form method="POST" action="{% url 'orders:apply_promo' %}">
+              {% csrf_token %}
+              <input type="hidden" name="code" value="{{ active_promo.code }}">
+              <input type="hidden" name="next" value="{{ request.path }}">
+              <button type="submit" class="tc-sidebar-discount__btn-profile" style="cursor:pointer;">ПРИМЕНИТЬ</button>
+            </form>
+            {% endif %}
+            <a href="/profile/" class="tc-sidebar-discount__btn-fav">ПЕРЕЙТИ В ПРОФИЛЬ</a>
+          </div>
+          {% endif %}
+          {% endif %}
+
+
+        </div>
+      </aside>
+
+      <div class="tc-catalog-products" id="catalog-content">
+        {% include "catalog/partials/product_list.html" %}
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<style>
+
+/* Gradient "Выбрать кофе за минуту" pill (matches original) */
+.btn-gradient-tag {
+  background: linear-gradient(95deg, #c4f0e5 0%, #d4b8ff 38%, #ffb3d9 65%, #ffd29c 100%);
+  color: #1a1a1a;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  gap: 3px;
+  padding: 3px 8px 3px 4px;
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: opacity .2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-gradient-tag:hover { opacity: .92; }
+.btn-gradient-tag .ic-left { flex-shrink: 0; width: 12px; height: 12px; fill: currentColor; }
+.btn-gradient-tag .text-primary { transition: color .2s; }
+.show-quiz { list-style: none; }
+.tc-hashtag-tag--more {
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  min-width: 32px;
+}
+.tc-hashtag-tag--more:hover { background: var(--black-5, #ededed); }
+
+/* Reset filters button */
+
+/* Povodyr (helper card) */
+.tc-povodyr {
+  position: relative;
+  background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  border: 1px solid #fde68a;
+}
+.tc-povodyr__icon { flex-shrink: 0; }
+.tc-povodyr__title { font-family: 'DIN Pro Black', sans-serif; font-size: 18px; margin: 0 0 4px; line-height: 1.2; text-transform: uppercase; }
+.tc-povodyr__text { font-size: 14px; color: rgba(0,0,0,0.6); margin: 0 0 12px; line-height: 1.4; }
+.tc-povodyr__close { position: absolute; top: 12px; right: 12px; background: none; border: none; cursor: pointer; color: rgba(0,0,0,0.4); }
+.tc-povodyr__close:hover { color: #000; }
+.tc-povodyr__btn { display: inline-block; background: #000; color: #fff; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; text-transform: uppercase; }
+
+</style>
+
+<style>
+
+.tc-catalog-page { background: var(--black-4, #f5f5f5); min-height: 100vh; padding-bottom: 80px; }
+.tc-container { max-width: 1440px; margin: 0 auto; padding: 0 50px; }
+@media (max-width: 1099px) { .tc-container { padding: 0 16px; } }
+/* 1.5 — Category description below H1 */
+.tc-catalog-description { font-size: 15px; color: rgba(0,0,0,0.55); margin: 6px 0 0; line-height: 1.5; max-width: 720px; }
+@media (max-width: 1099px) { .tc-catalog-description { font-size: 14px; } }
+
+
+.tc-catalog-header { display: flex; align-items: center; justify-content: space-between; padding: 32px 0 18px; border-bottom: 1px solid var(--black-5, #ededed); margin-bottom: 0; }
+@media (min-width: 1100px) { .tc-catalog-header { padding: 32px 0 18px; } }
+.tc-catalog-h1 { font-family: 'DIN Pro Black', 'DIN Pro Bold Fallback', sans-serif; font-size: 24px; line-height: 1.2; text-transform: uppercase; margin: 0; }
+@media (min-width: 1100px) { .tc-catalog-h1 { font-size: 40px; } }
+.tc-catalog-header__right { display: flex; align-items: center; gap: 8px; }
+.tc-catalog-header-reset {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 4px;
+  color: rgba(0,0,0,0.62);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: right;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+.tc-catalog-header-reset:active { color: #000; }
+.tc-icon-btn { background: none; border: none; cursor: pointer; padding: 4px; }
+.tc-mobile-only { display: flex; }
+@media (min-width: 1100px) { .tc-mobile-only { display: none; } }
+
+
+.tc-type-cards-wrap { overflow: visible; margin: 20px 0 16px; padding: 5px 0; scrollbar-width: none; }
+.tc-type-cards-wrap::-webkit-scrollbar { display: none; }
+@media (max-width: 1099px) { .tc-type-cards-wrap { overflow-x: auto; margin: 20px -16px 16px; padding: 5px 16px; } }
+.tc-type-cards { display: grid; grid-template-columns: repeat(7, 1fr); gap: 16px; width: 100%; max-width: 100%; }
+@media (max-width: 1439px) { .tc-type-cards { gap: 8px; } }
+@media (max-width: 1099px) { .tc-type-cards { display: flex; gap: 0; width: max-content; max-width: none; } }
+.tc-type-card-item { position: relative; min-width: 0; }
+@media (max-width: 1099px) { .tc-type-card-item { min-width: 164px; margin-right: 8px; flex-shrink: 0; } .tc-type-card-item:last-child { margin-right: 0; } }
+.tc-type-card { position: relative; border-radius: 16px; overflow: hidden; cursor: pointer; padding-top: 145px; background: #000; text-decoration: none; display: block; }
+.tc-type-card__checkbox { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+@media (max-width: 1099px) { .tc-type-card { padding-top: 145px; } }
+.tc-type-card__img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; opacity: 0.7; transition: opacity 0.3s; display: block; max-width: 100%; max-height: 100%; }
+.tc-type-card:hover .tc-type-card__img { opacity: 0.85; }
+.tc-type-card__name { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #fff; font-family: 'DIN Pro Black', 'DIN Pro Bold Fallback', sans-serif; font-size: 24px; text-transform: uppercase; letter-spacing: 0.02em; padding: 12px; z-index: 2; line-height: 1.2; }
+@media (min-width: 1100px) { .tc-type-card__name { font-size: 20px; padding: 8px; } }
+@media (min-width: 1440px) { .tc-type-card__name { font-size: 24px; padding: 12px; } }
+.tc-type-card--active { outline: 2px solid #000; outline-offset: 5px; border-radius: 21px; }
+
+
+.tc-type-card-item .tc-type-card { margin: 0; }
+.tc-type-card__tooltip { display: none; position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); min-width: 330px; background: #000; color: #fff; border-radius: 16px; padding: 16px 20px; z-index: 50; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.2; }
+.tc-type-card__tooltip p { margin: 0; }
+.tc-type-card__tooltip-arrow { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid #000; }
+.tc-type-card__tooltip-icon { width: 32px; height: 32px; min-width: 32px; flex-shrink: 0; fill: currentColor; }
+@media (min-width: 1100px) {
+  .tc-type-card-item:hover .tc-type-card__tooltip { display: flex; }
+}
+@media (max-width: 1099px) {
+  .tc-type-card__tooltip { display: none !important; }
+  .tc-type-card-item { min-width: 164px; margin-right: 8px; }
+  .tc-type-card-item:last-child { margin-right: 0; }
+}
+
+
+.tc-hashtag-row { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding: 0 0 16px; margin: 0 -16px; padding-left: 16px; padding-right: 16px; scrollbar-width: none; }
+.tc-hashtag-row::-webkit-scrollbar { display: none; }
+@media (min-width: 576px) { .tc-hashtag-row { margin: 0; padding-left: 0; padding-right: 0; } }
+.tc-hashtag-tag { display: inline-flex; align-items: center; background: #fff; border-radius: 12px; padding: 4px 12px; min-height: 40px; font-size: 14px; color: #000; text-decoration: none; white-space: nowrap; transition: 0.3s; }
+/* Kategoriya sahifasida type cards active holatini olib tashlash */
+.in-category .tc-type-card--active { background: none !important; border-color: transparent !important; }
+
+
+.tc-nav-tabs { display: flex; align-items: center; overflow: visible; margin: 0 -16px 16px; padding: 0 16px; scrollbar-width: none; position: relative; z-index: 20; }
+.tc-nav-tabs::-webkit-scrollbar { display: none; }
+@media (min-width: 576px) { .tc-nav-tabs { margin: 0 0 16px; padding: 0; } }
+.tc-nav-tabs-list { display: inline-flex; align-items: center; background: rgba(0,0,0,0.04); border-radius: 12px; padding: 4px; list-style: none; margin: 0; white-space: nowrap; overflow: auto; min-width: 0; }
+.tc-nav-tab { display: flex; align-items: center; border-radius: 9px; color: rgba(0,0,0,0.5); font-family: 'DIN Pro Medium', 'DIN Pro Medium Fallback', sans-serif; letter-spacing: 0.06em; line-height: 19px; padding: 6px 12px; text-decoration: none; text-transform: uppercase; transition: 0.3s; white-space: nowrap; font-size: 14px; }
+.tc-mobile-sort-only { display: none; }
+@media (min-width: 758px) { .tc-nav-tab { padding: 8px 16px; } }
+.tc-nav-tab:hover { background: rgba(0,0,0,0.04); }
+.tc-nav-tab.active { background: #fff; color: #000; }
+
+/* 4.1 — Force sort selector to EXACTLY match nav tabs (size, color, font) */
+.tc-nav-tabs-sort .tc-select__field--select,
+.tc-nav-tabs-sort .select-text {
+  font-size: 14px !important;
+  line-height: 19px !important;
+  letter-spacing: 0.84px !important;
+  font-family: 'DIN Pro Medium', 'DIN Pro Medium Fallback', sans-serif !important;
+  font-weight: 400 !important;
+  color: #0a0a0a !important;
+  text-transform: uppercase !important;
+}
+.tc-nav-tabs-sort .tc-select__field--select { padding: 8px 36px 8px 16px !important; }
+.tc-nav-tabs-sort .select-text { padding-top: 0 !important; }
+
+
+.tc-sort-row { display: none; margin-bottom: 14px; }
+@media (min-width: 1100px) { .tc-sort-row { display: flex; } }
+
+/* Sort select inside nav-tabs row — matches tab font/size/height exactly */
+.tc-nav-tabs-sort {
+  background: rgba(0,0,0,0.04);
+  border-radius: 12px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+.tc-nav-tabs-sort .tc-select { position: relative; }
+.tc-nav-tabs-sort .tc-select__field--select {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  height: auto;
+  padding: 6px 32px 6px 12px;
+  font-family: 'DIN Pro Medium', 'DIN Pro Medium Fallback', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 19px;
+  color: rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+  white-space: nowrap;
+}
+@media (min-width: 758px) {
+  .tc-nav-tabs-sort .tc-select__field--select { padding: 8px 36px 8px 16px; }
+}
+.tc-nav-tabs-sort .tc-select__field--select:hover { background: rgba(0,0,0,0.04); }
+.tc-nav-tabs-sort .tc-select.open .tc-select__field--select,
+.tc-nav-tabs-sort .tc-select__field--select:focus { background: #fff; color: #000; }
+.tc-nav-tabs-sort .tc-select__field--arr {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 13px;
+  height: 13px;
+  background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='15' fill='none'%3E%3Cmask id='a' width='13' height='15' x='0' y='0' maskUnits='userSpaceOnUse'%3E%3Cpath fill='%23d9d9d9' d='M13 .5v14H0V.5z'/%3E%3C/mask%3E%3Cg mask='url(%23a)'%3E%3Cpath fill='%23000' d='m2 6.254.799-.754L6.5 8.993 10.201 5.5l.799.754L6.5 10.5z'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.tc-nav-tabs-sort .tc-select__field--dropdown {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  min-width: 190px;
+  z-index: 100;
+  overflow: hidden;
+}
+.tc-nav-tabs-sort .dropdown-list { padding: 6px 0; list-style: none; margin: 0; }
+.tc-nav-tabs-sort .dropdown-list li {
+  padding: 9px 16px;
+  cursor: pointer;
+  font-family: 'DIN Pro Medium', 'DIN Pro Medium Fallback', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.7);
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.tc-nav-tabs-sort .dropdown-list li:hover { background: rgba(0,0,0,0.04); }
+.tc-nav-tabs-sort .dropdown-list li.active { color: #000; font-weight: 700; background: rgba(0,0,0,0.04); }
+
+.tc-catalog-layout { display: flex; flex-direction: column; gap: 16px; }
+@media (min-width: 1100px) { .tc-catalog-layout { display: grid; grid-template-columns: 260px 1fr; gap: 24px; } }
+
+
+.tc-sidebar { display: none; }
+@media (min-width: 1100px) { .tc-sidebar { display: block; width: 260px; min-width: 260px; scrollbar-width: none; } .tc-sidebar::-webkit-scrollbar { display: none; } }
+.tc-sidebar.is-fixed { position: fixed; top: 100px; max-height: calc(100vh - 120px); overflow-y: auto; z-index: 10; }
+
+
+.tc-catalog-products { min-width: 0; }
+.tc-sidebar__inner { }
+.tc-sidebar__count { color: rgba(0,0,0,0.5); font-size: 14px; margin-bottom: 24px; }
+.tc-sidebar__count-num { color: #000; }
+
+
+.tc-filter-group { margin-bottom: 24px; }
+@media (min-width: 1100px) { .tc-filter-group { margin-bottom: 40px; } }
+.tc-filter-group__title { font-size: 14px; line-height: 18px; font-family: 'Gotham Pro Medium', sans-serif; margin-bottom: 8px; }
+.tc-filter-checks { display: flex; flex-direction: column; gap: 8px; }
+
+
+.tc-checkbox { display: flex; align-items: center; cursor: pointer; }
+.tc-checkbox input[type="checkbox"] { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; min-width: 24px; border-radius: 4px; background: var(--black-4, #f0f0f0); border: 1px solid rgba(0,0,0,0.08); margin-right: 8px; position: relative; transition: 0.3s; cursor: pointer; }
+.tc-checkbox input[type="checkbox"]:checked { background: var(--black-4, #f0f0f0); }
+.tc-checkbox input[type="checkbox"]:checked::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.06) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='14' fill='none'%3E%3Cpath stroke='%23000' stroke-width='3' d='M1.703 6.5 6.37 11l9.333-9'/%3E%3C/svg%3E") center/14px no-repeat; border-radius: inherit; }
+.tc-checkbox input[type="checkbox"]:hover { background: rgba(0,0,0,0.08); }
+.tc-checkbox__text { font-size: 14px; line-height: 20px; }
+.tc-checkbox__count { color: rgba(0,0,0,0.35); font-size: 12px; margin-left: 2px; }
+
+
+.tc-catalog-products { flex: 1; min-width: 0; }
+#catalog-main.non-coffee-section .tc-sidebar,
+#catalog-main.non-coffee-section .tc-nav-tabs { display: none !important; }
+#catalog-main.non-coffee-section .tc-catalog-layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+#catalog-main.non-coffee-section .tc-catalog-products {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+}
+#catalog-main.non-coffee-section .tc-product-grid {
+  width: 100% !important;
+}
+
+
+.tc-product-list-head { margin-bottom: 16px; }
+
+
+.tc-product-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 758px) {
+  .tc-product-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+}
+@media (min-width: 1100px) {
+  .tc-product-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+}
+
+
+[hx-target="#catalog-main"].htmx-request { opacity: 0.6; pointer-events: none; }
+#catalog-content.htmx-request { opacity: 0.5; transition: opacity 0.2s; }
+#catalog-main { opacity: 1 !important; }
+
+
+/* Шапка «ФИЛЬТРЫ» видна только в мобильном сайдбаре когда он открыт */
+.tc-filter-mobile-header { display: none; }
+.tc-filter-mobile-actions { display: flex; align-items: center; gap: 8px; }
+.tc-filter-mobile-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.04);
+  color: #000;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+html.tc-filter-scroll-lock,
+body.tc-filter-scroll-lock {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+@media (max-width: 1099px) {
+  .tc-sidebar.is-open {
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    z-index: 195;
+    width: min(100%, 476px);
+    height: 100dvh;
+    min-height: 0;
+    max-height: 100dvh;
+    box-sizing: border-box;
+    flex-direction: column;
+    padding: 0 20px;
+    overflow: hidden;
+    overscroll-behavior: none;
+    background: #fff;
+    border-radius: 24px 0 0 24px;
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.08);
+    isolation: isolate;
+  }
+  .tc-sidebar.is-open .tc-filter-mobile-header {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 0 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    margin: 0;
+    position: relative;
+    background: #fff;
+    z-index: 5;
+  }
+  .tc-sidebar.is-open .tc-sidebar__inner {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    padding: 16px 0 24px;
+  }
+  .tc-sidebar.is-open .tc-sidebar__inner > :last-child {
+    margin-bottom: 0;
+  }
+  .tc-sidebar.is-open .tc-reset-filters-btn-inline {
+    display: none !important;
+  }
+  .tc-filter-mobile-title {
+    font-family: 'DIN Pro Black', 'DIN Pro Bold Fallback', sans-serif;
+    font-size: 24px;
+    line-height: 1.2;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .tc-filter-mobile-close {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.04);
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 757px) {
+  #catalog-main.tc-filter-host-open {
+    animation: none !important;
+    transform: none !important;
+  }
+  #catalog-main.tc-filter-host-open .tc-container > :not(.tc-catalog-layout),
+  #catalog-main.tc-filter-host-open .tc-catalog-products {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+  .tc-catalog-header__right {
+    position: relative;
+    z-index: 30;
+    gap: 4px;
+  }
+  .tc-icon-btn {
+    position: relative;
+    z-index: 1;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    touch-action: manipulation;
+  }
+  .tc-icon-btn:active { background: rgba(0,0,0,0.06); }
+  .tc-nav-tabs {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    margin: 0 -16px 16px;
+    padding: 0 16px;
+    scroll-padding-inline: 16px;
+    z-index: 1;
+  }
+  .tc-nav-tabs-list {
+    flex: none;
+    gap: 8px;
+    overflow: visible !important;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+  }
+  .tc-nav-tabs-list > li { flex: 0 0 auto; }
+  .tc-nav-tab {
+    min-height: 40px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: #fff;
+  }
+  .tc-nav-tab.active {
+    background: #fff;
+    color: #000;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .tc-mobile-sort-only { display: block; }
+  .tc-desktop-qfilter-only,
+  .tc-nav-tabs-sort { display: none !important; }
+  .tc-sidebar.is-open {
+    top: 76px;
+    bottom: 64px;
+    height: calc(100dvh - 140px);
+    max-height: calc(100dvh - 140px);
+    width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+
+
+.tc-sidebar-auth-card { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+.tc-sidebar-auth__title { font-family: 'DIN Pro Black', sans-serif; font-size: 20px; text-transform: uppercase; margin: 0; line-height: 1.2; }
+.tc-sidebar-auth__subtitle { font-family: 'DIN Pro Black', sans-serif; font-size: 16px; text-transform: uppercase; margin: 0 0 8px; line-height: 1.2; }
+.tc-sidebar-auth__text { font-size: 14px; color: rgba(0,0,0,0.5); margin: 0 0 16px; }
+.tc-sidebar-auth__btn-login { display: block; width: 100%; text-align: center; background: #000; color: #fff; border-radius: 12px; padding: 12px; font-family: 'DIN Pro Medium', sans-serif; font-size: 14px; text-transform: uppercase; text-decoration: none; margin-bottom: 12px; transition: 0.3s; }
+.tc-sidebar-auth__btn-login:hover { background: rgba(0,0,0,0.8); }
+.tc-sidebar-auth__btn-register { display: block; width: 100%; text-align: center; color: #000; font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
+
+
+.tc-sidebar-discount-card { background: var(--black-4, #f5f5f5); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+.tc-sidebar-discount__title { font-family: 'DIN Pro Black', sans-serif; font-size: 22px; text-transform: uppercase; margin: 0; line-height: 1.2; font-weight: 900; }
+.tc-sidebar-discount__subtitle { font-size: 18px; margin: 0 0 16px; line-height: 1.2; }
+.tc-sidebar-discount__code { display: flex; align-items: center; justify-content: space-between; background: #fff; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; }
+.tc-sidebar-discount__code span { font-family: 'DIN Pro Medium', sans-serif; font-size: 18px; letter-spacing: 0.05em; }
+.tc-sidebar-discount__copy { background: none; border: none; cursor: pointer; padding: 4px; color: #000; }
+.tc-sidebar-discount__btn-profile { display: block; width: 100%; text-align: center; background: #000; color: #fff; border-radius: 12px; padding: 14px; font-family: 'DIN Pro Medium', sans-serif; font-size: 14px; text-transform: uppercase; text-decoration: none; margin-bottom: 10px; letter-spacing: 0.05em; transition: 0.3s; }
+.tc-sidebar-discount__btn-profile:hover { background: rgba(0,0,0,0.8); }
+.tc-sidebar-discount__btn-fav { display: block; width: 100%; text-align: center; background: rgba(0,0,0,0.08); color: #000; border-radius: 12px; padding: 14px; font-family: 'DIN Pro Medium', sans-serif; font-size: 14px; text-transform: uppercase; text-decoration: none; letter-spacing: 0.05em; transition: 0.3s; }
+.tc-sidebar-discount__btn-fav:hover { background: rgba(0,0,0,0.12); }
+</style>
+
+<script>
+// Mobile catalog controls. Delegated listeners survive HTMX replacement of #catalog-main.
+(function initCatalogMobileUi() {
+  if (!window.tcMobileFiltersBound) {
+    window.tcMobileFiltersBound = true;
+    var filterScrollY = 0;
+
+    function getFilterSidebar() {
+      return document.getElementById('sidebar-filters');
+    }
+
+    function openMobileFilters() {
+      var sidebar = getFilterSidebar();
+      if (!sidebar) return;
+      filterScrollY = window.scrollY || window.pageYOffset || 0;
+      sidebar.classList.add('is-open');
+      var host = document.getElementById('catalog-main');
+      if (host) host.classList.add('tc-filter-host-open');
+      document.documentElement.classList.add('tc-filter-scroll-lock');
+      document.body.classList.add('tc-filter-scroll-lock');
+      var trigger = document.getElementById('mobile-filter-btn');
+      if (trigger) trigger.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeMobileFilters() {
+      var sidebar = getFilterSidebar();
+      if (sidebar) sidebar.classList.remove('is-open');
+      var host = document.getElementById('catalog-main');
+      if (host) host.classList.remove('tc-filter-host-open');
+      var wasLocked = document.body.classList.contains('tc-filter-scroll-lock');
+      document.documentElement.classList.remove('tc-filter-scroll-lock');
+      document.body.classList.remove('tc-filter-scroll-lock');
+      var trigger = document.getElementById('mobile-filter-btn');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      if (wasLocked && Math.abs((window.scrollY || 0) - filterScrollY) > 1) {
+        window.scrollTo(0, filterScrollY);
+      }
+    }
+
+    document.addEventListener('click', function(event) {
+      if (event.target.closest('#mobile-filter-btn')) {
+        event.preventDefault();
+        var sidebar = getFilterSidebar();
+        if (sidebar && sidebar.classList.contains('is-open')) {
+          closeMobileFilters();
+        } else {
+          openMobileFilters();
+        }
+        return;
+      }
+      if (event.target.closest('#mobile-filter-close')) {
+        event.preventDefault();
+        closeMobileFilters();
+      }
+    });
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') closeMobileFilters();
+    });
+
+    window.addEventListener('resize', function() {
+      if (window.innerWidth >= 1100) closeMobileFilters();
+    });
+
+    document.body.addEventListener('htmx:beforeSwap', function(event) {
+      if (event.detail && event.detail.target && event.detail.target.id === 'catalog-main') {
+        closeMobileFilters();
+      }
+    });
+  }
+
+  function bindTypeCardVideos(root) {
+    root.querySelectorAll('.tc-type-card-item').forEach(function(item) {
+      if (item.dataset.tcVideoBound === 'true') return;
+      var video = item.querySelector('video.tc-type-card__img');
+      if (!video) return;
+      item.dataset.tcVideoBound = 'true';
+      item.addEventListener('mouseenter', function() {
+        video.play().catch(function(){});
+      });
+      item.addEventListener('mouseleave', function() {
+        video.pause();
+        video.currentTime = 0;
+      });
+    });
+  }
+
+  bindTypeCardVideos(document);
+  if (!window.tcTypeCardHtmxBound) {
+    window.tcTypeCardHtmxBound = true;
+    document.body.addEventListener('htmx:afterSettle', function(event) {
+      bindTypeCardVideos(event.detail && event.detail.elt ? event.detail.elt : document);
+    });
+  }
+})();
+</script>
+
+<script>
+// Multi-select sidebar filters
+(function() {
+  function applySidebarFilters() {
+    var params = new URLSearchParams(window.location.search);
+    var filterNames = ['methods', 'acidity', 'body', 'roast', 'flavor', 'processing', 'country', 'features'];
+    // Clear existing filter params
+    filterNames.forEach(function(name) { params.delete(name); });
+    // Collect checked values per filter group
+    filterNames.forEach(function(name) {
+      var checked = document.querySelectorAll('input[data-filter="' + name + '"]:checked');
+      if (checked.length > 0) {
+        var values = Array.from(checked).map(function(cb) { return cb.value; });
+        if (name === 'processing') {
+          values.forEach(function(value) { params.append(name, value); });
+        } else {
+          params.set(name, values.join(','));
+        }
+      }
+    });
+    var url = window.location.pathname + '?' + params.toString();
+    htmx.ajax('GET', url, {target:'#catalog-main', select:'#catalog-main', swap:'outerHTML'});
+    window.history.pushState({}, '', url);
+  }
+  // Bind to all sidebar filter checkboxes
+  document.querySelectorAll('input[data-filter]').forEach(function(cb) {
+    cb.addEventListener('change', applySidebarFilters);
+  });
+  // Also re-bind after HTMX swaps (since sidebar is inside #catalog-main)
+  document.body.addEventListener('htmx:afterSettle', function() {
+    document.querySelectorAll('input[data-filter]').forEach(function(cb) {
+      if (!cb.dataset.bound) {
+        cb.dataset.bound = '1';
+        cb.addEventListener('change', applySidebarFilters);
+      }
+    });
+  });
+})();
+</script>
+
+<style>
+/* ===== QUIZ WIZARD v2 ===== */
+#quiz-overlay-v2 {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.72);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: quizFadeIn .18s ease;
+}
+@keyframes quizFadeIn { from { opacity:0; } to { opacity:1; } }
+#quiz-overlay-v2 .qz-box {
+  background: #fff;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 860px;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 40px 48px;
+  position: relative;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.28);
+}
+@media (max-width:640px) {
+  #quiz-overlay-v2 .qz-box { padding: 28px 20px; border-radius: 18px; }
+}
+#quiz-overlay-v2 .qz-close {
+  position: absolute;
+  top: 18px; right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  color: rgba(0,0,0,0.35);
+  line-height: 1;
+  padding: 4px 8px;
+  transition: color .15s;
+}
+#quiz-overlay-v2 .qz-close:hover { color: #000; }
+#quiz-overlay-v2 .qz-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 12px;
+}
+#quiz-overlay-v2 .qz-title {
+  font-family: 'DIN Pro Black', 'Arial Black', sans-serif;
+  font-size: clamp(22px, 4vw, 38px);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  margin: 0;
+  color: #000;
+}
+#quiz-overlay-v2 .qz-counter {
+  font-family: 'DIN Pro Black', 'Arial Black', sans-serif;
+  font-size: clamp(20px, 3vw, 32px);
+  font-weight: 900;
+  white-space: nowrap;
+  color: #000;
+  flex-shrink: 0;
+}
+#quiz-overlay-v2 .qz-counter span { color: rgba(0,0,0,0.2); }
+/* Step 1: wide vertical cards */
+#quiz-overlay-v2 .qz-cards-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#quiz-overlay-v2 .qz-card-wide {
+  width: 100%;
+  padding: 18px 24px;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 500;
+  text-align: left;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+  color: #111;
+  letter-spacing: 0.01em;
+}
+#quiz-overlay-v2 .qz-card-wide:hover {
+  border-color: #111;
+  background: #f8f8f8;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+/* Step 2: icon grid cards */
+#quiz-overlay-v2 .qz-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+@media (max-width: 500px) {
+  #quiz-overlay-v2 .qz-grid { grid-template-columns: repeat(2, 1fr); }
+}
+#quiz-overlay-v2 .qz-card-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+  color: #111;
+  min-height: 56px;
+}
+#quiz-overlay-v2 .qz-card-icon:hover {
+  border-color: #111;
+  background: #f8f8f8;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+#quiz-overlay-v2 .qz-card-icon .qz-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: #555;
+}
+#quiz-overlay-v2 .qz-card-icon .qz-icon svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+/* Step 3: taste tag buttons */
+#quiz-overlay-v2 .qz-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+#quiz-overlay-v2 .qz-tag {
+  padding: 12px 22px;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 50px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: border-color .15s, background .15s;
+  color: #111;
+}
+#quiz-overlay-v2 .qz-tag:hover {
+  border-color: #111;
+  background: #f5f5f5;
+}
+/* Back button */
+#quiz-overlay-v2 .qz-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 24px;
+  padding: 10px 20px;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #111;
+  transition: border-color .15s, background .15s;
+}
+#quiz-overlay-v2 .qz-back:hover { border-color: #111; background: #f5f5f5; }
+#quiz-overlay-v2 button:disabled { display: none !important; pointer-events: none; }
+</style>
+
+<!-- QUIZ WIZARD v2 -->
+<div id="quiz-overlay-v2" onclick="if(event.target===this)quizClose()">
+  <div class="qz-box">
+    <button type="button" class="qz-close" onclick="quizClose()" aria-label="Закрыть">✕</button>
+
+    <!-- STEP 1: Черный / С молоком / Оба варианта -->
+    <div id="qz-step-1">
+      <div class="qz-header">
+        <p class="qz-title">Какой кофе вы<br>обычно пьёте?</p>
+        <div class="qz-counter">1<span>/3</span></div>
+      </div>
+      <div class="qz-cards-col">
+        <button class="qz-card-wide" onclick="qzNext(1,'black')">Черный</button>
+        <button class="qz-card-wide" onclick="qzNext(1,'milk')">С молоком или сливками</button>
+        <button class="qz-card-wide" onclick="qzNext(1,'both')">Оба варианта</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Brewing method grid with icons -->
+    <div id="qz-step-2" style="display:none;">
+      <div class="qz-header">
+        <p class="qz-title">Как вы готовите кофе?</p>
+        <div class="qz-counter">2<span>/3</span></div>
+      </div>
+      <div class="qz-grid">
+        <button class="qz-card-icon" onclick="qzNext(2,'french-press')"><span class="qz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10v2H7zM6 5h12l-1.5 13H7.5z"/><path d="M4 10h3M17 10h3"/></svg></span>Френч пресс</button>
+        <button class="qz-card-icon" onclick="qzNext(2,'espresso')"><span class="qz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18"/><circle cx="12" cy="14" r="2"/></svg></span>Автоматическая кофемашина</button>
+        <button class="qz-card-icon" onclick="qzNext(2,'espresso')"><span class="qz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v4H6zM6 8l-2 12h16L18 8"/><path d="M10 13v4M14 13v4"/></svg></span>Рожковая кофеварка</button>
+        <button class="qz-card-icon" onclick="qzNext(2,'filter')"><span class="qz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v2l-6 7v6l-4-2v-4L4 6z"/></svg></span>Дрип-пакеты</button>
+        <button class="qz-card-icon" onclick="qzNext(2,'filter')"><span class="qz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v14H6z"/><path d="M9 17v2a3 3 0 0 0 6 0v-2"/><path d="M18 8h2a2 2 0 0 1 0 4h-2"/></svg></span>Капельная кофеварка</button>
+        <button class="qz-card-icon" onclick="qzNext(2,'espresso')"><span class="qz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="17" rx="6" ry="3"/><path d="M6 17V9a6 6 0 0 1 12 0v8"/><path d="M9 6.5C9 5 10 4 12 4s3 1 3 2.5"/></svg></span>Гейзерная кофеварка</button>
+        <button class="qz-card-icon" onclick="qzNext(2,'turka')"><span class="qz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20h8l1-10H7z"/><path d="M10 10V6a2 2 0 0 1 4 0v4"/><path d="M16 13h2a1 1 0 0 1 0 2h-2"/></svg></span>Турка</button>
+        <button class="qz-card-icon" onclick="qzNext(2,'capsules')"><span class="qz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M4 10h16"/><circle cx="9" cy="15" r="1.5"/><circle cx="15" cy="15" r="1.5"/></svg></span>Капсульная кофемашина</button>
+        <button class="qz-card-icon" onclick="qzNext(2,'filter')"><span class="qz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l-4 9h-4z"/><path d="M10 12v6a2 2 0 0 0 4 0v-6"/></svg></span>Пуровер/воронка</button>
+        <button class="qz-card-icon" onclick="qzNext(2,'black-cup')"><span class="qz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12l-1 14H7z"/><path d="M4 18h16"/><path d="M18 7h2a2 2 0 0 1 0 4h-2"/></svg></span>В чашке</button>
+        <button class="qz-card-icon" onclick="qzNext(2,'filter')"><span class="qz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="3"/></svg></span>Аэропресс</button>
+      </div>
+      <button class="qz-back" onclick="qzBack(1)">← Назад</button>
+    </div>
+
+    <!-- STEP 3: Taste / body -->
+    <div id="qz-step-3" style="display:none;">
+      <div class="qz-header">
+        <p class="qz-title">Какой вкус вам ближе?</p>
+        <div class="qz-counter">3<span>/3</span></div>
+      </div>
+      <div class="qz-tags">
+        <button class="qz-tag" onclick="qzFinish('sweet')">Сладкий</button>
+        <button class="qz-tag" onclick="qzFinish('sour')">Кислый</button>
+        <button class="qz-tag" onclick="qzFinish('bitter')">Горький</button>
+        <button class="qz-tag" onclick="qzFinish('balanced')">Сбалансированный</button>
+        <button class="qz-tag" onclick="qzFinish('rich')">Насыщенный</button>
+      </div>
+      <button class="qz-back" onclick="qzBack(2)">← Назад</button>
+    </div>
+
+  </div>
+</div>
+{{ quiz_availability|json_script:"quiz-availability-data" }}
+<script>
+var qzAnswers = {};
+var qzAvailability = JSON.parse(document.getElementById('quiz-availability-data').textContent || '{}');
+var qzMethodMap = {
+  'espresso': 'espresso',
+  'capsules': 'capsules',
+  'turka': 'turka',
+  'filter': 'filter',
+  'french-press': 'filter',
+  'black-cup': 'filter'
+};
+
+function quizOpen() {
+  qzReset();
+  document.getElementById('quiz-overlay-v2').style.display = 'flex';
+}
+
+function qzSyncOptions(methodKey) {
+  document.querySelectorAll('#qz-step-2 .qz-card-icon').forEach(function(button) {
+    var match = (button.getAttribute('onclick') || '').match(/qzNext\(2,'([^']+)'\)/);
+    var mapped = match ? qzMethodMap[match[1]] : '';
+    button.disabled = Boolean(mapped && qzAvailability[mapped] && !qzAvailability[mapped].available);
+  });
+  var mappedMethod = qzMethodMap[methodKey] || methodKey;
+  var tastes = (qzAvailability[mappedMethod] || {}).tastes || {};
+  document.querySelectorAll('#qz-step-3 .qz-tag').forEach(function(button) {
+    var match = (button.getAttribute('onclick') || '').match(/qzFinish\('([^']+)'\)/);
+    button.disabled = Boolean(match && tastes[match[1]] === false);
+  });
+}
+
+function quizClose() {
+  document.getElementById('quiz-overlay-v2').style.display = 'none';
+  qzReset();
+}
+
+function qzReset() {
+  qzAnswers = {};
+  document.getElementById('qz-step-1').style.display = 'block';
+  document.getElementById('qz-step-2').style.display = 'none';
+  document.getElementById('qz-step-3').style.display = 'none';
+  qzSyncOptions('');
+}
+
+function qzNext(step, value) {
+  qzAnswers['step' + step] = value;
+  if (step === 2) qzSyncOptions(value);
+  document.getElementById('qz-step-' + step).style.display = 'none';
+  document.getElementById('qz-step-' + (step + 1)).style.display = 'block';
+}
+
+function qzBack(toStep) {
+  var fromStep = toStep + 1;
+  document.getElementById('qz-step-' + fromStep).style.display = 'none';
+  document.getElementById('qz-step-' + toStep).style.display = 'block';
+}
+
+function qzFinish(taste) {
+  qzAnswers.step3 = taste;
+
+  var params = new URLSearchParams();
+
+  /* Step 2 → brewing method */
+  var methods_map = {
+    'espresso': 'espresso',
+    'capsules': 'capsules',
+    'turka': 'turka',
+    'filter': 'filter',
+    'french-press': 'filter',
+    'black-cup': 'filter'
+  };
+  if (qzAnswers.step2 && methods_map[qzAnswers.step2]) {
+    params.set('methods', methods_map[qzAnswers.step2]);
+  }
+
+  /* Step 3 → taste params */
+  if (taste === 'sour')      { params.set('acidity', 'high'); params.set('roast', 'light'); }
+  else if (taste === 'bitter')    { params.set('acidity', 'low');  params.set('roast', 'dark'); }
+  else if (taste === 'sweet')     { params.set('roast', 'medium'); }
+  else if (taste === 'balanced')  { params.set('acidity', 'medium'); params.set('roast', 'medium'); }
+  else if (taste === 'rich')      { params.set('body', 'high'); params.set('roast', 'dark'); }
+
+  /* Step 1 → milk preference (can add tag filter if backend supports it) */
+  /* qzAnswers.step1: 'black' | 'milk' | 'both' */
+
+  var filterUrl = '{% url "catalog:catalog" %}?' + params.toString();
+  quizClose();
+  window.location.href = filterUrl;
+}
+</script>
+{% endblock %}

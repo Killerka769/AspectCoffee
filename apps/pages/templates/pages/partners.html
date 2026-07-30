@@ -1,0 +1,94 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Партнёрам — Оптовые поставки кофе{% endblock %}
+{% block meta_description %}Оптовые поставки свежеобжаренного specialty кофе. Станьте партнёром Aspect Coffee: выгодные условия, поддержка и обучение.{% endblock %}
+
+{% block content %}
+<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
+  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
+    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
+      <a href="/" class="hover:text-black transition-colors">Главная</a>
+      <span class="text-black/20">/</span>
+      <span class="text-black font-medium">Партнёрам</span>
+    </nav>
+    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-4">Партнёрам</h1>
+    <p class="text-[16px] text-black/50 max-w-2xl mb-10">Предлагаем выгодные условия сотрудничества для кофеен, ресторанов, отелей и розничных магазинов.</p>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
+      <h2 class="text-[24px] font-din-black uppercase mb-8">Почему стоит работать с нами</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="p-6 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-12 h-12 mx-auto mb-4"><use href="{% static 'asset/images/sprite.svg' %}#icons--coffee"></use></svg>
+          <h3 class="font-bold text-[16px] mb-2">Спешелти качество</h3>
+          <p class="text-[13px] text-black/60">Только отборный specialty кофе с оценкой Q-grade выше 80 баллов. Ежедневная обжарка.</p>
+        </div>
+        <div class="p-6 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-12 h-12 mx-auto mb-4"><use href="{% static 'asset/images/sprite.svg' %}#icons--discount"></use></svg>
+          <h3 class="font-bold text-[16px] mb-2">Гибкие цены</h3>
+          <p class="text-[13px] text-black/60">Индивидуальные скидки в зависимости от объёма заказа. От 5% до 25% от розничной цены.</p>
+        </div>
+        <div class="p-6 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-12 h-12 mx-auto mb-4"><use href="{% static 'asset/images/sprite.svg' %}#icons--education"></use></svg>
+          <h3 class="font-bold text-[16px] mb-2">Обучение и поддержка</h3>
+          <p class="text-[13px] text-black/60">Проводим обучение для бариста, предоставляем рецептуры и методики заваривания.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
+      <h2 class="text-[24px] font-din-black uppercase mb-6">Условия партнёрства</h2>
+      <div class="space-y-4">
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-din-black shrink-0">1</div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Минимальный заказ</h3>
+            <p class="text-[13px] text-black/60">От 5 кг кофе в месяц для юридических лиц и ИП.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-din-black shrink-0">2</div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Условия оплаты</h3>
+            <p class="text-[13px] text-black/60">Отсрочка платежа до 30 дней для постоянных партнёров после проверки.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-din-black shrink-0">3</div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Маркетинговая поддержка</h3>
+            <p class="text-[13px] text-black/60">Предоставляем POS-материалы, фирменные меню, фото и видео контент для вашего заведения.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
+          <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-din-black shrink-0">4</div>
+          <div>
+            <h3 class="font-bold text-[15px] mb-1">Бесплатная доставка</h3>
+            <p class="text-[13px] text-black/60">Доставка бесплатна при заказе от 10 кг в пределах РФ.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-black text-white rounded-[24px] p-6 md:p-10">
+      <div class="flex flex-col md:flex-row items-center gap-6">
+        <div class="flex-1">
+          <h2 class="text-[24px] font-din-black uppercase mb-3">Станьте нашим партнёром</h2>
+          <p class="text-[14px] text-white/60">Заполните заявку, и наш менеджер свяжется с вами для обсуждения условий сотрудничества.</p>
+          <div class="mt-4 space-y-2">
+            <p class="text-[13px] text-white/40 flex items-center gap-2">
+              <svg class="w-4 h-4"><use href="{% static 'asset/images/sprite.svg' %}#icons--mail"></use></svg>
+              partners@aspectcoffee.ru
+            </p>
+            <p class="text-[13px] text-white/40 flex items-center gap-2">
+              <svg class="w-4 h-4"><use href="{% static 'asset/images/sprite.svg' %}#icons--phone"></use></svg>
+              8 (800) 123-45-67
+            </p>
+          </div>
+        </div>
+        <a href="/contact-us/" class="shrink-0 inline-block bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-[14px]">Оставить заявку →</a>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

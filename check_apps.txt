@@ -1,0 +1,3 @@
+import importlib
+for name in sorted([m for m in dir(importlib.import_module('apps')) if not m.startswith('_')]):
+    print(name)

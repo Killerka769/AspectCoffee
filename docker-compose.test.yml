@@ -1,0 +1,71 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    image: aspectcoffee-test-web
+    restart: unless-stopped
+    env_file: .env.test
+    volumes:
+      - ./runtime/media:/app/media
+      - ./runtime/db.sqlite3:/app/data/db.sqlite3
+      - ./runtime/staticfiles:/app/staticfiles
+    depends_on:
+      redis:
+        condition: service_healthy
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/', timeout=5)"
+      interval: 15s
+      timeout: 7s
+      retries: 10
+      start_period: 30s
+
+  worker:
+    image: aspectcoffee-test-web
+    restart: unless-stopped
+    env_file: .env.test
+    volumes:
+      - ./runtime/media:/app/media
+      - ./runtime/db.sqlite3:/app/data/db.sqlite3
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: ["celery", "-A", "config", "worker", "-l", "info", "--concurrency=1"]
+
+  gateway:
+    image: nginx:1.25-alpine
+    restart: unless-stopped
+    ports:
+      - "10.88.0.1:8080:80"
+      - "10.88.0.1:8444:443"
+      - "10.88.0.1:8445:444"
+    volumes:
+      - ./docker/nginx/test.conf:/etc/nginx/nginx.conf:ro
+      - ./runtime/staticfiles:/app/staticfiles:ro
+      - ./runtime/media:/app/media:ro
+      - certbot_www:/var/www/certbot:ro
+      - certbot_conf:/etc/letsencrypt:ro
+    depends_on:
+      web:
+        condition: service_healthy
+
+volumes:
+  certbot_www:
+    external: true
+    name: aspectcoffee_certbot_www
+  certbot_conf:
+    external: true
+    name: aspectcoffee_certbot_conf

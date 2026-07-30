@@ -1,0 +1,247 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+{% load catalog_extras %}
+
+{% block title %}Сравнение товаров в интернет-магазине{% endblock %}
+{% block meta_description %}Сравнение сортов кофе Aspect Coffee по цене, обжарке, обработке, плотности и кислотности.{% endblock %}
+
+{% block content %}
+<main>
+    <div class="container xl:pt-8 mb-10 md:mb-20"
+         x-data="compareePage({ initialIds: {{ ids|safe }} })"
+         x-init="init()">
+
+        {# Empty state: rehydrate from localStorage if URL has no ids #}
+        {% if not products %}
+        <div class="w-full">
+            <div class="flex items-center min-h-[38px] mb-4 md:mb-6 py-1 border-b border-[var(--black-5)] px-4 -mx-4 sm:mx-0 sm:p-0 xl:border-0 xl:min-h-[auto]">
+                <h1 class="text-[24px] m-0 xl:text-[40px]">Сравнение</h1>
+            </div>
+            <div class="text-center py-16">
+                <p class="text-xl text-[var(--black-50)] mb-6">Нет товаров для сравнения</p>
+                <a href="{% url 'catalog:catalog' %}" class="tc-btn-pay buy-btn inline-block" style="text-decoration:none;">Перейти в каталог</a>
+            </div>
+        </div>
+        <script>
+            (function () {
+                var list = [];
+                try { list = JSON.parse(localStorage.getItem('compare') || '[]'); } catch (e) { list = []; }
+                if (Array.isArray(list) && list.length > 0) {
+                    window.location.replace('?ids=' + list.join(','));
+                }
+            })();
+        </script>
+        {% else %}
+
+        {# ── Header: title + "show only differences" toggle ── #}
+        <div class="w-full">
+            <div class="grid grid-cols-12 gap-6 mb-4 xl:mb-6">
+                <div class="col-span-12 xl:col-span-10 xl:col-start-3">
+                    <div class="flex items-center justify-between min-h-[38px] mb-4 md:mb-6 py-1 border-b border-[var(--black-5)] px-4 -mx-4 sm:mx-0 sm:p-0 xl:border-0 xl:min-h-[auto]">
+                        <h1 class="text-[24px] m-0 xl:text-[40px]">Сравнение</h1>
+                        <button type="button" class="text-[14px] text-[var(--black-50)] hover:text-[var(--black)] transition-colors flex items-center gap-1"
+                                @click="clearAll()">
+                            <svg class="h-[14px] w-[14px]"><use href="{% static 'asset/images/sprite.svg' %}#icons--trash"></use></svg>
+                            Очистить
+                        </button>
+                    </div>
+                    <label class="tc-checkbox cursor-pointer checkbox-white inline-flex items-center select-none">
+                        <input type="checkbox" class="tc-checkbox__input cursor-pointer" x-model="onlyDiff">
+                        <span class="tc-checkbox__text">Показывать только различия</span>
+                    </label>
+                </div>
+            </div>
+
+            {# ── Comparison table ── #}
+            <div class="w-full space-y-7">
+                <div class="grid grid-cols-12 gap-x-6 gap-y-2">
+                    <div class="col-span-12 xl:col-span-10 xl:col-start-3">
+                        <div class="compare-scroll overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                            <table class="compare-table w-full border-collapse">
+                                {# Sticky row with product cards #}
+                                <thead>
+                                    <tr>
+                                        <th class="compare-col-label align-top p-0"></th>
+                                        {% for product in products %}
+                                        <th class="compare-col-product align-top p-2" data-product-id="{{ product.id }}">
+                                            <div class="compare-card relative bg-[var(--black-4)] rounded-2xl p-3 h-full flex flex-col">
+                                                <button type="button"
+                                                        class="compare-card__remove absolute top-2 right-2 z-10 h-7 w-7 rounded-full bg-white flex items-center justify-center text-[var(--black-50)] hover:text-[var(--black)] shadow-sm"
+                                                        title="Убрать из сравнения"
+                                                        @click="removeProduct({{ product.id }})">
+                                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                </button>
+                                                <a href="{{ product.get_absolute_url }}" class="block">
+                                                    <div class="compare-card__img mb-2">
+                                                        {% if product.main_image %}
+                                                        <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="mx-auto h-[120px] w-auto object-contain" loading="lazy">
+                                                        {% else %}
+                                                        <img alt="{{ product.name }}" loading="lazy" class="mx-auto h-[120px] w-auto object-contain"
+                                                             src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22%3E%3Crect width=%22200%22 height=%22200%22 fill=%22%23f5f5f7%22/%3E%3Cellipse cx=%22100%22 cy=%2285%22 rx=%2232%22 ry=%2242%22 stroke=%22%23c8cdd8%22 stroke-width=%223.5%22 fill=%22none%22/%3E%3Cellipse cx=%22100%22 cy=%2285%22 rx=%2211%22 ry=%2215%22 fill=%22%23c8cdd8%22/%3E%3Cpath d=%22M68 134 Q100 112 132 134%22 stroke=%22%23c8cdd8%22 stroke-width=%223.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E">
+                                                        {% endif %}
+                                                    </div>
+                                                    <span class="compare-card__title block text-[15px] leading-tight font-medium text-[var(--black)] line-clamp-2 min-h-[40px]">{{ product.name }}</span>
+                                                </a>
+                                                <div class="mt-auto pt-3">
+                                                    {% with first_variant=product.variants.all|first %}
+                                                    {% if first_variant %}
+                                                    <div x-data="productCard({ id: {{ product.id }}, slug: '{{ product.slug }}', inStock: {{ product.in_stock|yesno:'true,false' }}, price: {{ first_variant.effective_price|default:first_variant.price|floatformat:0 }}, inWishlist: false })">
+                                                        <template x-if="!justAdded">
+                                                            <button type="button" class="tc-btn-pay w-full flex items-center justify-between" :disabled="!inStock || !currentVariant" @click.stop="addToCart()">
+                                                                <span x-show="currentVariant && currentVariant.old_price" x-text="currentVariant ? Math.round(currentVariant.old_price) : ''" style="text-decoration:line-through;color:#7C8074;font-size:14px;font-weight:600;margin-right:4px"></span>
+                                                                <span class="leading-none" x-text="currentPrice + ' ₽'"></span>
+                                                                <svg class="w-5 h-5"><use href="{% static 'asset/images/sprite.svg' %}#icons--shop"></use></svg>
+                                                            </button>
+                                                        </template>
+                                                        <template x-if="justAdded">
+                                                            <button type="button" class="tc-btn-pay tc-btn-pay--added active w-full flex items-center justify-center gap-1" :style="'background: radial-gradient(157.14% 133.98% at -41.6% 65.41%, #f4f1b9 0%, #bff3df 46%, #c8dcff 65.5%, #da8fdd 83%, #f4f1b9 97%); color: #000; box-shadow: none;'">
+                                                                <span class="w-6 h-6 flex m-0 cursor-pointer" @click.stop="decrementCart()"><svg class="w-3 h-3 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="{% static 'asset/images/sprite.svg' %}#icons--minus"></use></svg></span>
+                                                                <span class="text-nowrap" x-text="currentPrice + ' ₽'"></span>
+                                                                <span class="w-6 h-6 flex m-0 cursor-pointer" @click.stop="incrementCart()"><svg class="w-3 h-3 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="{% static 'asset/images/sprite.svg' %}#icons--plus"></use></svg></span>
+                                                            </button>
+                                                        </template>
+                                                    </div>
+                                                    {% else %}
+                                                    <a href="{{ product.get_absolute_url }}" class="tc-btn-pay buy-btn w-full text-center block" style="text-decoration:none;">Подробнее</a>
+                                                    {% endif %}
+                                                    {% endwith %}
+                                                </div>
+                                            </div>
+                                        </th>
+                                        {% endfor %}
+                                        {% if can_add_more %}
+                                        <th class="compare-col-add align-top p-2">
+                                            <a href="{% url 'catalog:catalog' %}"
+                                               class="compare-add-tile flex flex-col items-center justify-center h-full min-h-[260px] rounded-2xl border border-dashed border-[var(--black-16)] text-[var(--black-50)] hover:text-[var(--black)] hover:border-[var(--black-50)] transition-colors no-underline">
+                                                <span class="h-12 w-12 rounded-full bg-[var(--black-4)] flex items-center justify-center mb-2">
+                                                    <svg class="h-5 w-5"><use href="{% static 'asset/images/sprite.svg' %}#icons--plus"></use></svg>
+                                                </span>
+                                                <span class="text-[14px]">Добавить</span>
+                                            </a>
+                                        </th>
+                                        {% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in rows %}
+                                    <tr class="compare-row" :class="{ 'hidden': onlyDiff && !{{ row.differs|yesno:'true,false' }} }">
+                                        <td class="compare-cell-label text-[13px] text-[var(--black-50)] py-3 pr-4 align-middle whitespace-nowrap">{{ row.label }}</td>
+                                        {% for value in row.values %}
+                                        <td class="compare-cell py-3 px-2 align-middle text-[14px] text-[var(--black)] {% if row.differs %}compare-cell--diff{% endif %}">
+                                            {% if row.kind == 'price' %}
+                                                {% if value %}<span class="text-[18px] font-bold">{{ value|floatformat:0 }} ₽</span>{% else %}—{% endif %}
+                                            {% elif row.kind == 'rating' %}
+                                                <span class="inline-flex items-center gap-1">
+                                                    <svg class="w-4 h-4 fill-current text-yellow-400"><use href="{% static 'asset/images/sprite.svg' %}#icons--star"></use></svg>
+                                                    {{ value|floatformat:1 }}
+                                                </span>
+                                            {% elif row.kind == 'scale' %}
+                                                <div class="tc-progress"><span class="tc-progress__object" style="width: {% widthratio value 10 100 %}%"></span></div>
+                                            {% else %}
+                                                {{ value }}
+                                            {% endif %}
+                                        </td>
+                                        {% endfor %}
+                                        {% if can_add_more %}<td class="compare-cell-empty"></td>{% endif %}
+                                    </tr>
+                                    {% endfor %}
+                                    <tr x-show="onlyDiff && !hasAnyDiff" x-cloak>
+                                        <td class="compare-cell-label"></td>
+                                        <td class="py-6 text-[14px] text-[var(--black-50)]" :colspan="{{ products|length }}{% if can_add_more %} + 1{% endif %}">
+                                            Все характеристики совпадают.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</main>
+
+<style>
+    .compare-table { table-layout: fixed; }
+    .compare-col-label { width: 140px; }
+    .compare-col-product,
+    .compare-col-add { min-width: 200px; width: 200px; }
+    .compare-row + .compare-row .compare-cell,
+    .compare-row + .compare-row .compare-cell-label { border-top: 1px solid var(--black-5); }
+    .compare-cell--diff { background: #fff7ed; }
+    @media (max-width: 757px) {
+        .compare-col-product,
+        .compare-col-add { min-width: 150px; width: 150px; }
+        .compare-col-label { width: 96px; }
+    }
+</style>
+
+<script>
+    function compareePage(opts) {
+        return {
+            ids: (opts.initialIds || []).slice(),
+            onlyDiff: false,
+            hasAnyDiff: {{ has_any_diff|yesno:'true,false' }},
+            init() {
+                // Keep localStorage in sync with what is actually shown on the page
+                try {
+                    localStorage.setItem('compare', JSON.stringify(this.ids));
+                    document.body.dispatchEvent(new CustomEvent('compareUpdated', { bubbles: true }));
+                } catch (e) {}
+            },
+            removeProduct(id) {
+                this.ids = this.ids.filter(function (x) { return x !== id; });
+                try {
+                    localStorage.setItem('compare', JSON.stringify(this.ids));
+                    document.body.dispatchEvent(new CustomEvent('compareUpdated', { bubbles: true }));
+                } catch (e) {}
+                if (this.ids.length > 0) {
+                    window.location.href = '?ids=' + this.ids.join(',');
+                } else {
+                    window.location.href = '{% url "catalog:compare" %}';
+                }
+            },
+            clearAll() {
+                try {
+                    localStorage.setItem('compare', '[]');
+                    document.body.dispatchEvent(new CustomEvent('compareUpdated', { bubbles: true }));
+                } catch (e) {}
+                window.location.href = '{% url "catalog:compare" %}';
+            },
+            async addToCart(variantId, ev) {
+                const btn = ev && ev.currentTarget;
+                if (btn && btn.classList.contains('added')) return;
+                try {
+                    const csrftoken = document.cookie.match(/csrftoken=([^;]+)/);
+                    const resp = await fetch('/basket/add/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': csrftoken ? csrftoken[1] : ''
+                        },
+                        body: 'variant_id=' + variantId + '&qty=1'
+                    });
+                    if (resp.ok) {
+                        document.body.dispatchEvent(new CustomEvent('cartUpdated'));
+                        window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Товар добавлен в корзину', type: 'success' } }));
+                        if (btn) {
+                            const priceSpan = btn.querySelector('span:first-child');
+                            const originalHTML = priceSpan ? priceSpan.innerHTML : '';
+                            if (priceSpan) priceSpan.innerHTML = 'Добавлено';
+                            btn.classList.add('added');
+                            setTimeout(function () {
+                                btn.classList.remove('added');
+                                if (priceSpan) priceSpan.innerHTML = originalHTML;
+                            }, 1200);
+                        }
+                    }
+                } catch (e) {
+                    window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Не удалось добавить товар', type: 'error' } }));
+                }
+            }
+        };
+    }
+</script>
+{% endblock %}

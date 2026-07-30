@@ -1,0 +1,136 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Подписка на кофе — Ежемесячная доставка{% endblock %}
+{% block meta_description %}Подписка на свежеобжаренный кофе с ежемесячной доставкой. От 890 ₽ в месяц. Бесплатная доставка, новые сорта каждый месяц, накопительная скидка.{% endblock %}
+
+{% block content %}
+<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
+  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
+    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
+      <a href="/" class="hover:text-black transition-colors">Главная</a>
+      <span class="text-black/20">/</span>
+      <span class="text-black font-medium">Подписка на кофе</span>
+    </nav>
+    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-4">Подписка на кофе</h1>
+    <p class="text-[16px] text-black/50 max-w-2xl mb-10">Каждый месяц — свежий кофе с бесплатной доставкой. Пробуйте новые сорта, экономьте и никогда не оставайтесь без любимого напитка.</p>
+
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-[24px] p-6 md:p-8 border border-gray-100 shadow-sm flex flex-col relative">
+        <h3 class="font-din-black uppercase text-[18px] mb-1">Старт</h3>
+        <p class="text-[13px] text-black/50 mb-6">1 пачка в месяц</p>
+        <p class="text-[36px] font-din-black mb-1">890 ₽<span class="text-[16px] text-black/40 font-normal">/мес</span></p>
+        <p class="text-[12px] text-black/30 mb-8">250 г свежеобжаренного кофе</p>
+        <ul class="space-y-3 mb-8 flex-1">
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>250 г кофе в зёрнах или молотый</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Бесплатная доставка</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Новый сорт каждый месяц</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Отмена в любой момент</span>
+          </li>
+        </ul>
+        <a href="/catalog/?subscription=1" class="block w-full text-center bg-black text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors text-[14px]">Оформить подписку →</a>
+      </div>
+
+      <div class="bg-white rounded-[24px] p-6 md:p-8 border-2 border-black shadow-sm flex flex-col relative">
+        <span class="absolute -top-3 left-6 bg-black text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Выбор редакции</span>
+        <h3 class="font-din-black uppercase text-[18px] mb-1">Оптима</h3>
+        <p class="text-[13px] text-black/50 mb-6">2 пачки в месяц</p>
+        <p class="text-[36px] font-din-black mb-1">1 590 ₽<span class="text-[16px] text-black/40 font-normal">/мес</span></p>
+        <p class="text-[12px] text-black/30 mb-8">500 г — экономия 190 ₽</p>
+        <ul class="space-y-3 mb-8 flex-1">
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>2 × 250 г кофе на выбор</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Бесплатная доставка</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Скидка 5% на все заказы</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Приоритетная поддержка</span>
+          </li>
+        </ul>
+        <a href="/catalog/?subscription=1" class="block w-full text-center bg-black text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors text-[14px]">Оформить подписку →</a>
+      </div>
+
+      <div class="bg-white rounded-[24px] p-6 md:p-8 border border-gray-100 shadow-sm flex flex-col">
+        <h3 class="font-din-black uppercase text-[18px] mb-1">Премиум</h3>
+        <p class="text-[13px] text-black/50 mb-6">4 пачки в месяц</p>
+        <p class="text-[36px] font-din-black mb-1">2 990 ₽<span class="text-[16px] text-black/40 font-normal">/мес</span></p>
+        <p class="text-[12px] text-black/30 mb-8">1 кг — экономия 570 ₽</p>
+        <ul class="space-y-3 mb-8 flex-1">
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>4 × 250 г любых сортов</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Бесплатная доставка</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Скидка 10% на все заказы</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Доступ к эксклюзивным сортам</span>
+          </li>
+          <li class="flex items-start gap-3 text-[14px]">
+            <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>Персональные рекомендации</span>
+          </li>
+        </ul>
+        <a href="/catalog/?subscription=1" class="block w-full text-center bg-black text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-colors text-[14px]">Оформить подписку →</a>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
+      <h2 class="text-[20px] font-din-black uppercase mb-6">Преимущества подписки</h2>
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="p-5 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-8 h-8 mx-auto mb-3"><use href="{% static 'asset/images/sprite.svg' %}#icons--delivery"></use></svg>
+          <h3 class="font-bold text-[14px] mb-1">Бесплатная доставка</h3>
+          <p class="text-[12px] text-black/50">Каждый месяц — без лишних затрат</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-8 h-8 mx-auto mb-3"><use href="{% static 'asset/images/sprite.svg' %}#icons--refresh"></use></svg>
+          <h3 class="font-bold text-[14px] mb-1">Новые сорта</h3>
+          <p class="text-[12px] text-black/50">Каждый месяц разный кофе</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-8 h-8 mx-auto mb-3"><use href="{% static 'asset/images/sprite.svg' %}#icons--discount"></use></svg>
+          <h3 class="font-bold text-[14px] mb-1">Постоянная скидка</h3>
+          <p class="text-[12px] text-black/50">До 10% на все дополнительные заказы</p>
+        </div>
+        <div class="p-5 bg-gray-50 rounded-2xl text-center">
+          <svg class="w-8 h-8 mx-auto mb-3"><use href="{% static 'asset/images/sprite.svg' %}#icons--calendar"></use></svg>
+          <h3 class="font-bold text-[14px] mb-1">Гибкое управление</h3>
+          <p class="text-[12px] text-black/50">Пропустить месяц или отменить</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-black text-white rounded-[24px] p-6 md:p-10 text-center">
+      <h2 class="text-[24px] font-din-black uppercase mb-4">Готовы попробовать?</h2>
+      <p class="text-[14px] text-white/60 mb-6 max-w-lg mx-auto">Оформите подписку и получайте свежий кофе каждый месяц. Первая доставка — уже через 2 дня после заказа.</p>
+      <a href="/catalog/?subscription=1" class="inline-block bg-white text-black font-bold px-10 py-4 rounded-xl hover:bg-gray-100 transition-colors text-[14px]">Оформить подписку →</a>
+    </div>
+  </div>
+</main>
+{% endblock %}

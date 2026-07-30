@@ -1,0 +1,43 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+{% load allauth %}
+
+{% block title %}Завершение регистрации{% endblock %}
+{% block body_extra_class %} grey-theme{% endblock %}
+
+{% block content %}
+<div style="display:flex;justify-content:center;padding:40px 20px;">
+  <div style="width:100%;max-width:488px;">
+    <form method="post" action="{% url 'socialaccount_signup' %}" class="bg-white rounded-3xl p-6 md:p-8">
+    {% csrf_token %}
+
+    <div class="w-full mb-4">
+      <p class="text-[40px] font-din-black uppercase leading-[1.2] md:tracking-[0.01em] mb-0">Почти готово</p>
+      <p class="text-sm text-gray-700 mt-2 mb-0">Вы вошли через {{ account.get_provider.name }}, но не передал адрес электронной почты. Укажите его, чтобы завершить регистрацию.</p>
+    </div>
+
+    <div class="w-full space-y-8">
+      <div class="w-full space-y-4">
+        <div class="tc-input {% if form.email.errors %}error{% endif %} input-white xl:input-secondary">
+          <label class="tc-input__label" for="id_email">Электронная почта</label>
+          <div class="tc-input__field">
+            <input id="id_email" type="email" name="email" autocomplete="email"
+                   value="{{ form.email.value|default:'' }}"
+                   class="tc-input__field--input">
+          </div>
+          {% if form.email.errors %}
+          <span class="error-message m-0 block mt-2 leading-[1.2] text-sm text-[var(--red)]">{{ form.email.errors|join:', ' }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      {{ redirect_field }}
+
+      <button type="submit" class="tc-btn btn-dark w-full">
+        <span class="text-primary duration-200">Зарегистрироваться</span>
+      </button>
+    </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

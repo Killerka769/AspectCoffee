@@ -1,0 +1,208 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Aspect Coffee\n"
+"Language: ru\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Action"
+msgstr "Действие"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "All"
+msgstr "Все"
+
+msgid "All applications"
+msgstr "Все приложения"
+
+msgid "By {}"
+msgstr "По {}"
+
+msgid "Change"
+msgstr "Изменить"
+
+msgid "Change password"
+msgstr "Изменить пароль"
+
+msgid "Clear selection"
+msgstr "Очистить выбор"
+
+msgid "Click here to select the objects across all pages"
+msgstr "Нажмите, чтобы выбрать объекты на всех страницах"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "Date from"
+msgstr "Дата с"
+
+msgid "Date to"
+msgstr "Дата по"
+
+msgid "Date/time"
+msgstr "Дата и время"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Delete multiple objects"
+msgstr "Удалить несколько объектов"
+
+msgid "Delete?"
+msgstr "Удалить?"
+
+msgid "Enter a username and password."
+msgstr "Введите имя пользователя и пароль."
+
+msgid "Filter"
+msgstr "Фильтр"
+
+msgid "Filter navigation items"
+msgstr "Фильтрация пунктов навигации"
+
+msgid "First, enter a username and password. Then, you’ll be able to edit more user options."
+msgstr "Сначала введите имя пользователя и пароль. После этого можно будет изменить дополнительные параметры пользователя."
+
+msgid "Forgotten your password or username?"
+msgstr "Забыли пароль или имя пользователя?"
+
+msgid "From"
+msgstr "От"
+
+msgid "Log in"
+msgstr "Войти"
+
+msgid "Log in again"
+msgstr "Войти снова"
+
+msgid "Log out"
+msgstr "Выйти"
+
+msgid "No, take me back"
+msgstr "Нет, вернуться назад"
+
+msgid "Objects"
+msgstr "Объекты"
+
+msgid "Please correct the error below."
+msgstr "Исправьте ошибку ниже."
+
+msgid "Please correct the errors below."
+msgstr "Исправьте ошибки ниже."
+
+msgid "Please enter your old password, for security’s sake, and then enter your new password twice so we can verify you typed it in correctly."
+msgstr "В целях безопасности введите старый пароль, затем дважды укажите новый пароль."
+
+msgid "Recent actions"
+msgstr "Недавние действия"
+
+msgid "Remove from sorting"
+msgstr "Убрать из сортировки"
+
+msgid "Run"
+msgstr "Выполнить"
+
+msgid "Run the selected action"
+msgstr "Выполнить выбранное действие"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Save and add another"
+msgstr "Сохранить и добавить ещё"
+
+msgid "Save and continue editing"
+msgstr "Сохранить и продолжить редактирование"
+
+msgid "Save and view"
+msgstr "Сохранить и посмотреть"
+
+msgid "Save as new"
+msgstr "Сохранить как новый объект"
+
+msgid "Search"
+msgstr "Поиск"
+
+msgid "Search apps and models..."
+msgstr "Поиск приложений и моделей..."
+
+msgid "Select action"
+msgstr "Выберите действие"
+
+msgid "Select action to run"
+msgstr "Выберите действие для выполнения"
+
+msgid "Select all rows"
+msgstr "Выбрать все строки"
+
+msgid "Select currency"
+msgstr "Выберите валюту"
+
+msgid "Select record"
+msgstr "Выберите запись"
+
+msgid "Select value"
+msgstr "Выберите значение"
+
+msgid "Show all"
+msgstr "Показать все"
+
+msgid "Summary"
+msgstr "Сводка"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Спасибо за работу с сайтом."
+
+msgid "This object doesn’t have a change history. It probably wasn’t added via this admin site."
+msgstr "У этого объекта нет истории изменений. Возможно, он был добавлен не через административную панель."
+
+msgid "Time"
+msgstr "Время"
+
+msgid "To"
+msgstr "До"
+
+msgid "Toggle sorting"
+msgstr "Изменить сортировку"
+
+msgid "Type to search"
+msgstr "Начните вводить для поиска"
+
+msgid "Unknown content"
+msgstr "Неизвестное содержимое"
+
+msgid "User"
+msgstr "Пользователь"
+
+msgid "Value"
+msgstr "Значение"
+
+msgid "View"
+msgstr "Просмотреть"
+
+msgid "View on site"
+msgstr "Открыть на сайте"
+
+msgid "View site"
+msgstr "Открыть сайт"
+
+msgid "Welcome,"
+msgstr "Добро пожаловать,"
+
+msgid "Yes, I’m sure"
+msgstr "Да, уверен"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "У вас нет прав на просмотр или редактирование."
+
+msgid "Your password was changed."
+msgstr "Пароль изменён."
+
+msgid "and"
+msgstr "и"

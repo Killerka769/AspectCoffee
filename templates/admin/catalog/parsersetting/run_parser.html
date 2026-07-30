@@ -1,0 +1,87 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  .parser-form { max-width: 600px; margin: 20px 0; }
+  .parser-form .form-group { margin-bottom: 15px; }
+  .parser-form label { display: block; font-weight: 600; margin-bottom: 5px; }
+  .parser-form select, .parser-form input[type="number"] { width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; }
+  .parser-form .help-text { font-size: 12px; color: #666; margin-top: 3px; }
+  .parser-result { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 16px; margin: 20px 0; }
+  .parser-result h3 { margin-top: 0; }
+  .parser-result .status-success { color: #28a745; }
+  .parser-result .status-failed { color: #dc3545; }
+  .parser-result .status-running { color: #ffc107; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <div class="module">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <a href="{% url 'admin:catalog_parsersetting_changelist' %}" style="text-decoration:none;font-size:16px;">&larr; К настройкам парсера</a>
+      <h1 style="margin:0;">Запуск парсера каталога</h1>
+    </div>
+
+    <div style="padding:20px;background:#fff;border-radius:8px;border:1px solid #eee;">
+      <p style="margin-top:0;">Парсер скачивает товары и изображения с <strong>shop.tastycoffee.ru</strong> и обновляет базу данных.</p>
+
+      <form method="post" class="parser-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="category">Категория</label>
+          <select name="category" id="category">
+            <option value="coffee">Кофе</option>
+            <option value="tea">Чай</option>
+            <option value="accessories">Аксессуары</option>
+            <option value="chocolate">Шоколад</option>
+            <option value="giftbox">Подарочные наборы</option>
+          </select>
+          <div class="help-text">Выберите категорию товаров для парсинга</div>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="update_images" checked>
+            Обновить изображения товаров
+          </label>
+          <div class="help-text">Перезагрузить изображения товаров с сайта-источника</div>
+        </div>
+
+        <div class="form-group">
+          <label for="limit">Лимит товаров (0 = все)</label>
+          <input type="number" name="limit" id="limit" value="0" min="0">
+          <div class="help-text">0 — обработать все товары в категории</div>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" style="padding:10px 24px;background:#1a1a2e;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">
+            Запустить парсер
+          </button>
+        </div>
+      </form>
+    </div>
+
+    {% if parser_result %}
+    <div class="parser-result">
+      <h3>Последний запуск</h3>
+      <table>
+        <tr><td>Статус:</td><td class="status-{{ parser_result.status }}"><strong>{{ parser_result.status }}</strong></td></tr>
+        <tr><td>Запущен:</td><td>{{ parser_result.started_at }}</td></tr>
+        {% if parser_result.finished_at %}<tr><td>Завершён:</td><td>{{ parser_result.finished_at }}</td></tr>{% endif %}
+        <tr><td>Создано:</td><td>{{ parser_result.created_count|default:"0" }}</td></tr>
+        <tr><td>Обновлено:</td><td>{{ parser_result.updated_count|default:"0" }}</td></tr>
+        <tr><td>Всего обработано:</td><td>{{ parser_result.total_products|default:"0" }}</td></tr>
+      </table>
+    </div>
+    {% endif %}
+
+    <div style="margin-top:20px;">
+      <a href="{% url 'admin:catalog_parsersetting_run_parser_result' %}">История запусков</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

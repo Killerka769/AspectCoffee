@@ -1,0 +1,29 @@
+{% load static %}
+{# AJAX append: items go into #product-grid (OOB), load-more trigger replaces itself #}
+<div id="product-grid-append" hx-swap-oob="beforeend:#product-grid">
+    {% for product in products %}
+        <div class="tc-product-cell flex">
+            {% include "catalog/_product_card.html" with product=product %}
+        </div>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_next %}
+<div class="mt-12 flex justify-center" id="load-more-trigger"
+     hx-get="?{% for key, val in current_params.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}"
+     hx-trigger="revealed once"
+     hx-target="#load-more-trigger"
+     hx-swap="outerHTML"
+     hx-vals='{"partial": "items"}'>
+    <button type="button"
+        hx-get="?{% for key, val in current_params.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}"
+        hx-target="#load-more-trigger"
+        hx-swap="outerHTML"
+        hx-vals='{"partial": "items"}'
+        class="flex items-center gap-3 px-8 py-4 bg-black text-white rounded-2xl text-[13px] font-bold uppercase tracking-widest hover:bg-gray-800 transition-all">
+        <span>Показать ещё</span>
+    </button>
+</div>
+{% else %}
+<div class="mt-12 text-center text-black/30 text-sm">Вы посмотрели все товары</div>
+{% endif %}

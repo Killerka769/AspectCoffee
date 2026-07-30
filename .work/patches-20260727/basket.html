@@ -1,0 +1,1302 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+{% load catalog_extras %}
+{% load socialaccount %}
+{% get_providers as socialaccount_providers %}
+
+{% block title %}Оформление заказа{% endblock %}
+{# ═══ Standalone Edit Address Script (independent of Alpine x-data) ═══ #}
+<script>
+(function() {
+    var _editAddrId = "";
+
+    function tcGetCookie(name) {
+        var v = document.cookie.split(";").map(function(c) { return c.trim(); });
+        for (var i = 0; i < v.length; i++) {
+            if (v[i].indexOf(name + "=") === 0) return decodeURIComponent(v[i].substring(name.length + 1));
+        }
+        return "";
+    }
+
+    window.openEditModal = function(id, label, city, street, house, apartment, postalCode, isDefault) {
+        _editAddrId = id;
+        var el;
+        el = document.getElementById("edit-addr-label"); if(el) el.value = label || "";
+        el = document.getElementById("edit-addr-city"); if(el) el.value = city || "";
+        el = document.getElementById("edit-addr-street"); if(el) el.value = street || "";
+        el = document.getElementById("edit-addr-house"); if(el) el.value = house || "";
+        el = document.getElementById("edit-addr-apartment"); if(el) el.value = apartment || "";
+        el = document.getElementById("edit-addr-postal"); if(el) el.value = postalCode || "";
+        el = document.getElementById("edit-addr-default"); if(el) el.checked = !!isDefault;
+        var modal = document.getElementById("edit-address-modal");
+        if (modal) modal.style.display = "flex";
+    };
+
+    window.closeEditModal = function() {
+        var modal = document.getElementById("edit-address-modal");
+        if (modal) modal.style.display = "none";
+        _editAddrId = "";
+    };
+
+    window.saveEditAddress = function() {
+        if (!_editAddrId) return;
+        var body = new URLSearchParams({
+            label: (document.getElementById("edit-addr-label") || {}).value || "",
+            city: (document.getElementById("edit-addr-city") || {}).value || "",
+            street: (document.getElementById("edit-addr-street") || {}).value || "",
+            house: (document.getElementById("edit-addr-house") || {}).value || "",
+            apartment: (document.getElementById("edit-addr-apartment") || {}).value || "",
+            postal_code: (document.getElementById("edit-addr-postal") || {}).value || "",
+            is_default: (document.getElementById("edit-addr-default") || {}).checked ? "true" : "false"
+        });
+        fetch("/basket/address/" + _editAddrId + "/edit/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": tcGetCookie("csrftoken"),
+                "X-Requested-With": "XMLHttpRequest",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: body
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d.ok) window.location.reload();
+        });
+    };
+
+    window.deleteAddress = function() {
+        if (!confirm("\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0430\u0434\u0440\u0435\u0441?")) return;
+        if (!_editAddrId) return;
+        fetch("/basket/address/" + _editAddrId + "/delete/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": tcGetCookie("csrftoken"),
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d.ok) window.location.reload();
+        });
+    };
+})();
+</script>
+
+{% block content %}
+<main class="basket-checkout-page">
+<div class="container xl:pt-8 xl:mb-20">
+        {% if cart and cart.items.all %}
+        <div x-data="{
+            deliveryType: '{{ default_delivery_type|escapejs }}',
+            paymentMethod: 'card',
+            cartBaseTotal: Number('{{ cart.total|escapejs }}') || 0,
+            userBalance: Number('{{ user.balance|default:0|escapejs }}') || 0,
+            newAddressIsDefault: true,
+            get checkoutTotal() {
+                return this.cartBaseTotal + (Number(this.cdekDeliveryCost) || 0);
+            },
+            get internalPaymentAvailable() {
+                return this.userBalance >= this.checkoutTotal;
+            },
+            selectedPvz: null,
+            pvzSearch: '',
+            cdekCityQuery: '',
+            cdekCities: [],
+            cdekSelectedCity: null,
+            cdekOffices: [],
+            cdekOfficeFilter: '',
+            preferredPvzQuery: '',
+            cdekDeliveryCost: null,
+            cdekDeliveryDays: '',
+            cdekLoading: false,
+            cdekCityLoading: false,
+            cdekCalcLoading: false,
+            cartWeight: {{ total_weight|default:'500' }},
+            _cityTimeout: null,
+            async cdekSearchCities() {
+                if (this.cdekCityQuery.length < 2) { this.cdekCities = []; return; }
+                this.cdekCityLoading = true;
+                try {
+                    const r = await fetch('/api/cdek/cities/?q=' + encodeURIComponent(this.cdekCityQuery));
+                    const d = await r.json();
+                    this.cdekCities = d.cities || [];
+                } catch(e) { this.cdekCities = []; }
+                this.cdekCityLoading = false;
+            },
+            cdekCityInput() {
+                clearTimeout(this._cityTimeout);
+                this._cityTimeout = setTimeout(() => this.cdekSearchCities(), 350);
+            },
+            async cdekSelectCity(city) {
+                this.cdekSelectedCity = city;
+                this.cdekCityQuery = city.city + (city.region && city.region !== city.city ? ', ' + city.region : '');
+                this.cdekCities = [];
+                this.selectedPvz = null;
+                this.cdekDeliveryCost = null;
+                this.cdekOfficeFilter = '';
+                const cityFullName = city.city + (city.region && city.region !== city.city ? ', ' + city.region : '');
+                document.querySelectorAll('input[name=city], input[name=city_m]').forEach(function(el) { el.value = cityFullName; });
+                if (this.deliveryType === 'cdek_pvz') {
+                    await this.cdekLoadOffices();
+                }
+                await this.cdekCalcCost();
+            },
+            async cdekLoadOffices() {
+                if (!this.cdekSelectedCity) return;
+                this.cdekLoading = true;
+                try {
+                    const r = await fetch('/api/cdek/offices/?city_code=' + this.cdekSelectedCity.code);
+                    const d = await r.json();
+                    this.cdekOffices = d.offices || [];
+                    if (this.preferredPvzQuery) {
+                        this.cdekOfficeFilter = this.preferredPvzQuery;
+                    }
+                } catch(e) { this.cdekOffices = []; }
+                this.cdekLoading = false;
+            },
+            async cdekCalcCost() {
+                if (!this.cdekSelectedCity) return;
+                this.cdekCalcLoading = true;
+                try {
+                    const r = await fetch('/api/cdek/calc/', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            city_code: this.cdekSelectedCity.code,
+                            delivery_type: this.deliveryType,
+                            weight: this.cartWeight,
+                            street: this.getValue(['street', 'street_m']),
+                            house: this.getValue(['house', 'house_m']),
+                            postal_code: this.getValue(['postal_code', 'postal_code_m'])
+                        })
+                    });
+                    const d = await r.json();
+                    if (d.cost !== undefined) {
+                        this.cdekDeliveryCost = Math.round(d.cost);
+                        this.cdekDeliveryDays = d.period_min === d.period_max ? d.period_min + ' дн.' : d.period_min + '–' + d.period_max + ' дн.';
+                    } else {
+                        this.cdekDeliveryCost = null;
+                        this.cdekDeliveryDays = '';
+                    }
+                } catch(e) { this.cdekDeliveryCost = null; this.cdekDeliveryDays = ''; }
+                this.cdekCalcLoading = false;
+            },
+            cdekSelectOffice(office) {
+                this.selectedPvz = {code: office.code, address: office.address, name: office.name, work_time: office.work_time};
+                this.$nextTick(() => this.checkValidation());
+            },
+            get cdekFilteredOffices() {
+                if (!this.cdekOfficeFilter) return this.cdekOffices;
+                const q = this.cdekOfficeFilter.toLowerCase();
+                return this.cdekOffices.filter(o => (o.address || '').toLowerCase().includes(q) || (o.name || '').toLowerCase().includes(q));
+            },
+            selectAll: false,
+            selectedItems: [],
+            isOrg: false,
+            isOtherRecipient: false,
+            showRegister: false,
+            existingAccount: false,
+            accountConflict: false,
+            accountCheckTimer: null,
+            lastAccountSignature: '',
+            regPassword: '',
+            regPassword2: '',
+            regPwdVisible: false,
+            regPwd2Visible: false,
+            showNewAddress: false,
+                showEditModal: false,
+                editAddress: {id: '', label: '', city: '', street: '', house: '', apartment: '', postal_code: '', is_default: false},
+                hasAddresses: {% if addresses %}true{% else %}false{% endif %},
+                openEditModal(id, label, city, street, house, apartment, postalCode, isDefault) {
+                    this.editAddress = {id, label, city, street, house, apartment, postal_code: postalCode, is_default: isDefault};
+                    this.showEditModal = true;
+                },
+                closeEditModal() { this.showEditModal = false; },
+                saveEditAddress() {
+                    fetch('/basket/address/' + this.editAddress.id + '/edit/', {
+                        method: 'POST',
+                        headers: {'X-CSRFToken': tcGetCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: new URLSearchParams({
+                            label: this.editAddress.label,
+                            city: this.editAddress.city,
+                            street: this.editAddress.street,
+                            house: this.editAddress.house,
+                            apartment: this.editAddress.apartment,
+                            postal_code: this.editAddress.postal_code,
+                            is_default: this.editAddress.is_default
+                        })
+                    }).then(r => r.json()).then(d => { if(d.ok) window.location.reload(); });
+                },
+                deleteAddress() {
+                    if (!confirm('Удалить адрес?')) return;
+                    fetch('/basket/address/' + this.editAddress.id + '/delete/', {
+                        method: 'POST',
+                        headers: {'X-CSRFToken': tcGetCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest'}
+                    }).then(r => r.json()).then(d => { if(d.ok) window.location.reload(); });
+                },
+            agreeTerms: true,
+            canSubmit: true,
+            repeatOn: false,
+            repeatWeeks: 1,
+            get paymentMethodLabel() {
+                return {
+                    card: 'Оплата картой на сайте через ЮKassa',
+                    internal: 'Оплата внутренним счётом',
+                    cod: 'Оплата при получении',
+                    sbp: 'Оплата через СБП'
+                }[this.paymentMethod] || 'Выберите способ оплаты';
+            },
+            selectedAddressId: '',
+            phoneCode: '+7',
+            phoneLength: 10,
+            phoneCodeOpen: false,
+            recipientPhoneCodeOpen: false,
+            errors: { name: '', phone: '', email: '', address: '', password: '', payment: '' },
+            get phoneCodes() { return TCPhone.codes; },
+            selectPhoneCode(code) {
+                TCPhone.selectCode(code, this);
+            },
+            stripPhone() {
+                TCPhone.stripInput(this, 'phone');
+            },
+            scheduleAccountCheck() {
+                {% if user.is_authenticated %}
+                return;
+                {% else %}
+                const email = this.getValue(['email', 'email_m']).toLowerCase();
+                const phone = this.phoneCode + this.getValue(['phone', 'phone_m']).replace(/\D/g, '');
+                const signature = email + '|' + phone;
+                if (signature === this.lastAccountSignature) return;
+                this.lastAccountSignature = signature;
+                clearTimeout(this.accountCheckTimer);
+                this.accountCheckTimer = setTimeout(() => this.checkAccountStatus(email, phone), 400);
+                {% endif %}
+            },
+            async checkAccountStatus(email, phone) {
+                {% if user.is_authenticated %}
+                return;
+                {% else %}
+                if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    this.existingAccount = false;
+                    this.accountConflict = false;
+                    this.checkValidation();
+                    return;
+                }
+                try {
+                    const response = await fetch('{% url "orders:checkout_account_status" %}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': tcGetCookie('csrftoken'),
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({email: email, phone: phone})
+                    });
+                    if (!response.ok) return;
+                    const data = await response.json();
+                    this.existingAccount = Boolean(data.exists);
+                    this.accountConflict = Boolean(data.conflict);
+                    if (this.existingAccount) this.showRegister = true;
+                    this.checkValidation();
+                } catch (error) {
+                    // The checkout POST repeats this check server-side.
+                }
+                {% endif %}
+            },
+            init() {
+                {% for address in addresses %}{% if address.is_default %}this.selectAddress('{{ address.id }}', '{{ address.city|escapejs }}', '{{ address.street|escapejs }}', '{{ address.apartment|escapejs }}', '{{ address.house|escapejs }}', '{{ address.postal_code|escapejs }}');{% endif %}{% endfor %}
+            },
+            selectAddress(id, city, street, apartment, house, postalCode) {
+                this.selectedAddressId = id;
+                this.showNewAddress = false;
+                this.errors.address = '';
+                document.querySelector('input[name=selected_address_id]') && (document.querySelector('input[name=selected_address_id]').value = id);
+                const cityInputs = document.querySelectorAll('input[name=city], input[name=city_m]');
+                const streetInputs = document.querySelectorAll('input[name=street], input[name=street_m]');
+                const aptInputs = document.querySelectorAll('input[name=apartment], input[name=apt_m]');
+                const houseInputs = document.querySelectorAll('input[name=house], input[name=house_m]');
+                const postalInputs = document.querySelectorAll('input[name=postal_code], input[name=postal_code_m]');
+                cityInputs.forEach(i => i.value = city);
+                streetInputs.forEach(i => i.value = street);
+                aptInputs.forEach(i => i.value = apartment);
+                houseInputs.forEach(i => i.value = house || '');
+                postalInputs.forEach(i => i.value = postalCode || '');
+                this.preferredPvzQuery = [street, house].filter(Boolean).join(' ');
+                if (this.deliveryType === 'cdek_pvz') {
+                    this.cdekOfficeFilter = this.preferredPvzQuery;
+                }
+                if ((this.deliveryType === 'cdek_pvz' || this.deliveryType === 'cdek_door') && city) {
+                    if (this.cdekSelectedCity && this.cdekSelectedCity.city === city) {
+                        this.cdekCalcCost();
+                    } else {
+                        this.cdekCityQuery = city;
+                        this.cdekSearchCities().then(() => {
+                            if (this.cdekCities.length > 0) {
+                                const exactMatch = this.cdekCities.find(c => c.city.toLowerCase() === city.toLowerCase());
+                                this.cdekSelectCity(exactMatch || this.cdekCities[0]);
+                            }
+                        });
+                    }
+                }
+            },
+            items: [{% for item in cart.items.all %}'{{ item.variant.id }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            getValue(names) {
+                for (const name of names) {
+                    const els = document.querySelectorAll(`input[name='${name}']`);
+                    for (const el of els) {
+                        if (el.offsetParent !== null) {
+                            const v = el.value.trim();
+                            if (v) return v;
+                        }
+                    }
+                }
+                for (const name of names) {
+                    const v = document.querySelector(`input[name='${name}']`)?.value?.trim();
+                    if (v) return v;
+                }
+                return '';
+            },
+            initCitySync() {
+                const cityInputs = document.querySelectorAll('input[name=city], input[name=city_m]');
+                cityInputs.forEach(input => {
+                    input.addEventListener('input', (e) => {
+                        const val = e.target.value.trim();
+                        if (val.length >= 2 && (!this.cdekSelectedCity || this.cdekSelectedCity.city !== val)) {
+                            this.cdekCityQuery = val;
+                            this.cdekSearchCities().then(() => {
+                                if (this.cdekCities.length > 0) {
+                                    // Auto-select first matching city if it exactly matches or we are confident
+                                    const exactMatch = this.cdekCities.find(c => c.city.toLowerCase() === val.toLowerCase());
+                                    if (exactMatch) {
+                                        this.cdekSelectCity(exactMatch);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+                let _addrTimeout = null;
+                const addrInputs = document.querySelectorAll('input[name=street], input[name=street_m], input[name=house], input[name=house_m], input[name=postal_code], input[name=postal_code_m]');
+                addrInputs.forEach(input => {
+                    input.addEventListener('input', () => {
+                        clearTimeout(_addrTimeout);
+                        _addrTimeout = setTimeout(() => {
+                            if ((this.deliveryType === 'cdek_pvz' || this.deliveryType === 'cdek_door') && this.cdekSelectedCity) {
+                                this.cdekCalcCost();
+                            }
+                        }, 500);
+                    });
+                });
+            },
+            isPasswordStrong(pwd) {
+                if (!pwd || pwd.length < 8) return false;
+                if (!/[a-zA-Zа-яА-Я]/.test(pwd)) return false;
+                if (!/[0-9]/.test(pwd)) return false;
+                if (/^(.)\1+$/.test(pwd)) return false;
+                const weak = ['password', 'password1', '12345678', 'qwertyui', 'qwerty123', '11111111'];
+                if (weak.includes(pwd.toLowerCase())) return false;
+                return true;
+            },
+            checkValidation() {
+                const e = { name: '', phone: '', email: '', address: '', password: '', payment: '' };
+                if (!this.agreeTerms) { this.canSubmit = false; this.errors = e; return; }
+                if ({% if cart and cart.total_items %}{{ cart.total_items }}{% else %}0{% endif %} === 0) { this.canSubmit = false; this.errors = e; return; }
+                const fullName = this.getValue(['full_name', 'full_name_m']);
+                const phone = this.getValue(['phone', 'phone_m']);
+                const email = this.getValue(['email', 'email_m']);
+                const phoneDigits = phone.replace(/\D/g, '');
+                const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+                let valid = true;
+                if (!fullName) { e.name = 'Укажите имя и фамилию'; valid = false; }
+                if (phoneDigits.length < this.phoneLength) { e.phone = 'Укажите полный номер телефона'; valid = false; }
+                if (!emailValid) { e.email = 'Укажите корректный email'; valid = false; }
+                if (this.accountConflict) {
+                    e.password = 'Почта и телефон принадлежат разным аккаунтам. Войдите в аккаунт перед оформлением';
+                    valid = false;
+                } else if (this.existingAccount) {
+                    if (!this.showRegister || !this.regPassword) {
+                        e.password = 'Аккаунт уже существует. Введите пароль от него';
+                        valid = false;
+                    }
+                } else if (this.showRegister) {
+                    if (!this.isPasswordStrong(this.regPassword)) { e.password = 'Сделайте пароль сложнее: минимум 8 символов, буквы и цифры'; valid = false; }
+                    else if (this.regPassword !== this.regPassword2) { e.password = 'Пароли не совпадают'; valid = false; }
+                }
+                if (this.deliveryType !== 'pickup') {
+                    const hasSelectedAddr = this.selectedAddressId !== '' && this.selectedAddressId !== null;
+                    if (this.deliveryType === 'cdek_pvz') {
+                        if (!this.cdekSelectedCity) { e.address = 'Выберите город из списка СДЭК'; valid = false; }
+                        else if (!this.selectedPvz) { e.address = 'Выберите пункт выдачи СДЭК'; valid = false; }
+                    } else if (this.deliveryType === 'cdek_door') {
+                        if (!this.cdekSelectedCity) { e.address = 'Выберите город из списка СДЭК'; valid = false; }
+                        else if (!this.getValue(['street', 'street_m'])) { e.address = 'Укажите улицу'; valid = false; }
+                        else if (!this.getValue(['house', 'house_m'])) { e.address = 'Укажите номер дома'; valid = false; }
+                        else if (!this.getValue(['postal_code', 'postal_code_m'])) { e.address = 'Укажите индекс'; valid = false; }
+                    } else if (!hasSelectedAddr) {
+                        if (!this.getValue(['city', 'city_m'])) { e.address = 'Укажите город'; valid = false; }
+                        else if (!this.getValue(['street', 'street_m'])) { e.address = 'Укажите улицу'; valid = false; }
+                        else if (!this.getValue(['house', 'house_m'])) { e.address = 'Укажите номер дома'; valid = false; }
+                        else if (!this.getValue(['postal_code', 'postal_code_m'])) { e.address = 'Укажите индекс'; valid = false; }
+                    }
+                }
+                if (this.paymentMethod === 'internal' && !this.internalPaymentAvailable) {
+                    e.payment = 'Недостаточно средств на внутреннем счёте';
+                    valid = false;
+                }
+                this.errors = e;
+                this.canSubmit = valid;
+            },
+            showToast(msg, type) {
+                const t = document.createElement('div');
+                t.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 ' + (type === 'error' ? 'bg-red-600 text-white' : 'bg-green-600 text-white');
+                t.textContent = msg;
+                document.body.appendChild(t);
+                setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
+            },
+            handleSubmit(e) {
+                if (e && e.preventDefault) e.preventDefault();
+                this.checkValidation();
+                if (!this.canSubmit) {
+                    const msgs = [];
+                    if (this.errors.name) msgs.push(this.errors.name);
+                    if (this.errors.phone) msgs.push(this.errors.phone);
+                    if (this.errors.email) msgs.push(this.errors.email);
+                    if (this.errors.address) msgs.push(this.errors.address);
+                    if (this.errors.password) msgs.push(this.errors.password);
+                    if (this.errors.payment) msgs.push(this.errors.payment);
+                    this.showToast(msgs.join('. '), 'error');
+                    return;
+                }
+                const btn = document.querySelector('[data-checkout-submit]');
+                if (btn) { btn.disabled = true; btn.textContent = 'Оформляем...'; }
+                const fd = new FormData(document.getElementById('basket-form'));
+                fd.set('action', 'checkout');
+                fd.set('selected_address_id', this.selectedAddressId || '');
+                fd.set('delivery_type', this.deliveryType);
+                fd.set('payment_method', this.paymentMethod);
+                if (this.deliveryType === 'cdek_pvz' || this.deliveryType === 'cdek_door') {
+                    fd.set('cdek_city_code', this.cdekSelectedCity ? this.cdekSelectedCity.code : '');
+                    fd.set('cdek_city_name', this.cdekCityQuery || (this.cdekSelectedCity ? this.cdekSelectedCity.city : ''));
+                    fd.set('cdek_street', this.getValue(['street', 'street_m']));
+                    fd.set('cdek_house', this.getValue(['house', 'house_m']));
+                    fd.set('cdek_apartment', this.getValue(['apartment', 'apt_m']));
+                    fd.set('cdek_postal_code', this.getValue(['postal_code', 'postal_code_m']));
+                }
+                fetch(window.location.pathname, { method: 'POST', body: fd, headers: {'X-Requested-With': 'XMLHttpRequest'} })
+                    .then(r => r.text().then(text => {
+                        let data;
+                        try { data = JSON.parse(text); } catch(err) { data = null; }
+                        if (data && data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                        } else if (data && data.error) {
+                            this.showToast(data.error, 'error');
+                            if (btn) { btn.disabled = false; btn.textContent = 'Оформить заказ'; }
+                        } else {
+                            window.location.reload();
+                        }
+                    }))
+                    .catch(() => {
+                        this.showToast('Ошибка сети', 'error');
+                        if (btn) { btn.disabled = false; btn.textContent = 'Оформить заказ'; }
+                    });
+            }
+        }" @cart-total-updated.window="cartBaseTotal = Number($event.detail.total) || 0; checkValidation()" x-init="initCitySync(); $nextTick(() => { stripPhone(); scheduleAccountCheck(); const checkedAddr = document.querySelector('input[name=address_id]:checked'); if (checkedAddr) { selectAddress(checkedAddr.value, checkedAddr.dataset.city || '', checkedAddr.dataset.street || '', checkedAddr.dataset.apartment || '', checkedAddr.dataset.house || '', checkedAddr.dataset.postal || ''); } }); checkValidation(); setInterval(() => checkValidation(), 500); $watch('deliveryType', async (val) => { if (val === 'cdek_pvz' || val === 'cdek_door') { if (cdekSelectedCity) { if (val === 'cdek_pvz' && cdekOffices.length === 0) await cdekLoadOffices(); await cdekCalcCost(); } else { const cityVal = getValue(['city', 'city_m']); if (cityVal) { cdekCityQuery = cityVal; await cdekSearchCities(); if (cdekCities.length > 0) { const exactMatch = cdekCities.find(c => c.city.toLowerCase() === cityVal.toLowerCase()); await cdekSelectCity(exactMatch || cdekCities[0]); } } } } else { cdekDeliveryCost = null; cdekDeliveryDays = ''; } })">
+        <form @input.debounce.300ms="checkValidation(); scheduleAccountCheck()" @submit.prevent="" id="basket-form">
+            {% csrf_token %}
+            {% if messages %}
+            <div class="mb-4 space-y-2">
+                {% for msg in messages %}
+                <div class="px-4 py-3 rounded-xl text-sm font-bold {% if msg.tags == 'error' %}bg-red-50 text-red-600 border border-red-200{% else %}bg-green-50 text-green-600 border border-green-200{% endif %}">
+                    {{ msg }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {# ═══ LEFT COLUMN ═══ #}
+            <div id="basket-left-col">
+                {# ── Cart Card ── #}
+                <div class="bg-white rounded-2xl xl:rounded-3xl -mx-4 sm:mx-0 py-4 px-4 p-4 xl:p-6 flex flex-col !bg-[transparent] !p-0 !m-0">
+<div class="min-w-[100%] flex items-center min-h-[38px] mb-3 py-1 border-b border-[var(--black-5)] xl:mb-0 md:py-0 xl:border-0 xl:min-h-[auto] xl:bg-white xl:rounded-t-3xl p-4 xl:order-2 xl:px-6 xl:pt-6 xl:pb-4 -mx-4 sm:mx-0 sm:px-0">
+<h1 class="white-box__title mr-auto xl:mr-3.5">Корзина <span class="text-[var(--black-50)]"><span id="korzina-count">{{ cart.items.count }}</span> <span id="korzina-count-word">{{ cart.items.count|ru_plural:"товар,товара,товаров" }}</span></span></h1>
+</div>
+
+                    {# Timeline + Guarantee #}
+                    {# Timeline + Guarantee #}
+                    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+<ul class="ti-list !items-center">
+<li class="ti-list-item">
+<svg class="h-[32px] w-[32px] min-w-[32px]"><use href="{% static 'asset/images/sprite.svg' %}#icons--fire"></use></svg>
+<div class="ti-list__text medium"><p class="text-[var(--black-50)]">Соберём</p><p class="xs:text-nowrap">Сегодня</p></div>
+</li>
+<li class="ti-list-item">
+<svg class="h-[32px] w-[32px] min-w-[32px]"><use href="{% static 'asset/images/sprite.svg' %}#icons--delivery"></use></svg>
+<div class="ti-list__text medium"><p class="text-[var(--black-50)]">Отправим</p><p class="xs:text-nowrap">Завтра</p></div>
+</li>
+<li class="ti-list-item">
+<svg class="h-[32px] w-[32px] min-w-[32px]"><use href="{% static 'asset/images/sprite.svg' %}#icons--pack"></use></svg>
+<div class="ti-list__text medium"> <p class="text-[var(--black-50)]">Доставит</p>
+<p x-text="deliveryType === 'courier' ? 'Курьер' : deliveryType === 'cdek_pvz' ? 'СДЭК ПВЗ' : deliveryType === 'cdek_door' ? 'СДЭК курьер' : 'Самовывоз'">Выберите способ</p>
+<p x-show="deliveryType !== 'pickup'" x-text="deliveryType === 'courier' ? 'Завтра' : (cdekDeliveryDays || '2–5 дней')"></p>
+<p class="xs:text-nowrap cursor-pointer" style="color:var(--blue);" x-show="deliveryType === 'pickup'">Выберите способ</p></div>
+</li>
+</ul>
+<div class="tc-tooltip" style="flex:1;min-width:250px;">
+<div class="tc-tooltip__btn h-full" style="border-bottom:none !important;">
+<div class="button-basket medium text-black no-underline" style="border-bottom:none !important;">
+<svg class="h-[32px] w-[32px] min-w-[32px] mr-2.5"><use href="{% static 'asset/images/sprite.svg' %}#icons--repeat"></use></svg>
+                                    Если кофе не понравится, вернём деньги или заменим на другой
+                                </div>
+</div>
+<div class="tc-tooltip__btn-slot"></div>
+</div>
+</div>
+
+                    {# Cart Items #}
+                    <ul class="bg-white -mx-4 sm:mx-0 max-sm:!w-auto p-4 xl:p-6 pb-0 xl:pb-[18px] xl:order-3 max-xl:rounded-t-2xl last:rounded-b-2xl xl:last:pb-6 w-full xl:space-y-9 space-y-5 flex-1 pb-0.5 -mb-0.5 empty:p-0 empty:!m-0">
+                        {% for item in cart.items.all %}
+                        <li data-variant-id="{{ item.variant.id }}" class="flex items-end flex-wrap xl:flex-nowrap max-xl:pb-5 max-xl:border-b border-[var(--black-4)] last:border-b-0 xl:py-1.5 max-xl:relative">
+<div class="flex xl:items-center w-full xl:max-w-[46%] 2xl:max-w-[56%] mr-auto max-xl:order-1 max-xl:mb-6">
+<a href="{{ item.variant.product.get_absolute_url }}">
+                                    {% if item.variant.product.main_image %}
+                                    <img alt="{{ item.variant.product.name }}" class="w-24 h-24 xl:w-20 xl:h-20 xl:-my-1.5 object-contain" src="{{ item.variant.product.main_image.url }}"/>
+                                    {% else %}
+                                    <div class="w-24 h-24 xl:w-20 xl:h-20 bg-[#f5f5f5] rounded-xl"></div>
+                                    {% endif %}
+                                </a>
+<div class="space-y-2 pl-2 xl:pl-4 max-w-[calc(100%-96px)] xl:max-w-[calc(100%-80px)] w-full max-xl:flex max-xl:flex-col max-xl:pr-10 max-xl:pt-1">
+<a class="text-[24px] text-black font-din-black uppercase leading-[1.2] tracking-[0.4px] m-0" href="{{ item.variant.product.get_absolute_url }}">{{ item.variant.product.name }}</a>
+<div class="tc-tile__option -mb-2 max-xl:flex-wrap xl:space-x-2 flex !items-center basket-options">
+<div class="flex items-center mr-1.5 whitespace-nowrap mb-2 options-measurable">
+<div class="tc-weight active"><span class="tc-weight__text">{{ item.variant.weight }} г</span>{% if item.variant.discount_percent > 0 %}<sup class="tc-weight__sup">-{{ item.variant.discount_percent }}%</sup>{% endif %}</div>
+</div>
+<div class="flex items-center mr-1.5 whitespace-nowrap mb-2">
+<div class="tc-weight active"><span class="tc-weight__text">{{ item.variant.get_grind_display }}</span></div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center xs:space-x-2 xl:ml-4 max-xl:order-3 max-xl:mr-auto max-xl:relative">
+<div class="tc-counter first:max-xl:ml-[104px] first:max-xs:ml-0">
+<button class="tc-counter__btn" {% if item.qty > 1 %}onclick="tcUpdateCart({{ item.variant.id }}, {{ item.qty|add:'-1' }})"{% endif %} type="button"><svg height="50%" width="50%"><use href="{% static 'asset/images/sprite.svg' %}#icons--minus"></use></svg></button>
+<div class="tc-counter__input"><span class="font-bold text-[15px] tc-counter__value">{{ item.qty }}</span></div>
+<button class="tc-counter__btn" onclick="tcUpdateCart({{ item.variant.id }}, {{ item.qty|add:'1' }})" type="button"><svg height="50%" width="50%"><use href="{% static 'asset/images/sprite.svg' %}#icons--plus"></use></svg></button>
+</div>
+</div>
+<div class="space-x-0.5 text-right xl:ml-4 w-[100px] max-xl:order-4">
+                                {% if item.variant.old_price %}<div class="m-0 text-[18px] font-din-medium uppercase leading-[1.2] tracking-[0.05em] text-[var(--opacity-40)] line-through whitespace-nowrap"><div>{{ item.variant.old_price|floatformat:0 }}<span class="rub"> ₽</span></div></div>{% endif %}
+                                <div class="m-0 text-[24px] font-din-black uppercase leading-[1.2] tracking-[0.4px] whitespace-nowrap"><div class="item-total-price">{{ item.total_price|floatformat:0 }}<span class="rub"> ₽</span></div></div>
+</div>
+<button class="tc-btn btn-secondary-sm px-1 xl:ml-6 max-xl:!absolute max-xl:top-0 max-xl:right-0 !min-w-[32px]" onclick="tcRemoveFromCart({{ item.variant.id }})" type="button"><svg class="ic-right"><use href="{% static 'asset/images/sprite.svg' %}#icons--delete"></use></svg></button>
+</li>
+                        {% endfor %}
+                    </ul>
+</div>
+
+                {# Comment #}
+                <div class="white-box">
+<p class="white-box__title">Комментарий</p>
+<div class="tc-textarea secondary-textarea"><textarea class="resize-none overscroll-contain tc-textarea__field max-md:max-h-36" maxlength="300" name="comment" placeholder="Комментарий к заказу" style="height:44px;"></textarea></div>
+</div>
+
+                {# Recipient #}
+                <div class="white-box xl:!space-y-6" id="contact-data">
+<div class="flex items-center"><p class="white-box__title">Получатель</p></div>
+                    {% if not user.is_authenticated %}
+                    {% if socialaccount_providers %}
+                    <div class="w-full space-y-2">
+<p class="text-[14px] leading-[1.3] medium">Войти через:</p>
+<ul class="list-none p-0 m-0 flex flex-wrap overflow-auto items-center gap-2">
+{% for provider in socialaccount_providers %}
+{% if provider.id == "yandex" %}
+<li><a class="block cursor-pointer" href="{% provider_login_url 'yandex' next=request.get_full_path %}"><svg class="text-[var(--black-4)] h-11 w-11"><use href="{% static 'images/sprite.svg' %}#service--yandex-colored"></use></svg></a></li>
+{% elif provider.id == "vk" %}
+<li><a class="block cursor-pointer" href="{% provider_login_url 'vk' next=request.get_full_path %}"><svg class="text-[var(--black-4)] h-11 w-11"><use href="{% static 'images/sprite.svg' %}#service--vk-blue"></use></svg></a></li>
+{% endif %}
+{% endfor %}
+</ul>
+</div>
+                    {% endif %}
+                    {% endif %}
+                    {# Desktop #}
+                    <div class="recipient-desktop">
+<div class="grid grid-cols-12 2xl:grid-cols-[repeat(15,minmax(0,1fr))] gap-x-2 gap-y-4 mb-4 xl:mb-6">
+<div class="col-span-12 2xl:col-span-6">
+<div class="tc-input"><label class="tc-input__label">Имя и фамилия</label><div class="tc-input__field"><input :class="errors.name && 'border-red-500'" @change="checkValidation()" @input="checkValidation()" autocomplete="off" class="tc-input__field--input" name="full_name" type="text" value="{{ user.first_name|default:'' }} {{ user.last_name|default:'' }}"/></div></div>
+<template x-if="errors.name"><p class="text-red-500 text-xs mt-1 px-1" x-text="errors.name"></p></template>
+</div>
+<div class="col-span-12 xl:col-span-6 2xl:col-span-4">
+<div class="tc-phone">
+<label class="tc-phone__label">Телефон</label>
+<div class="relative"><div class="tc-phone__field">
+<div @click.outside="phoneCodeOpen = false" class="tc-select phone-select flex-1"><div class="tc-select__field"><div @click="phoneCodeOpen = !phoneCodeOpen" class="tc-select__field--select cursor-pointer"><span class="select-text" x-text="phoneCode">+7</span><span class="tc-select__field--arr"></span></div></div>
+<div class="absolute left-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 w-[220px] max-h-[240px] overflow-y-auto z-50 py-1" x-cloak="" x-show="phoneCodeOpen" x-transition="">
+<template :key="c.code" x-for="c in phoneCodes">
+<button :class="phoneCode === c.code ? 'bg-gray-100 font-bold' : ''" @click="selectPhoneCode(c.code)" class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2" type="button">
+<span class="font-mono text-gray-500 w-10" x-text="c.code"></span>
+<span x-text="c.country"></span>
+</button>
+</template>
+</div>
+</div>
+<input :value="phoneCode" name="phone_code" type="hidden"/>
+<div class="tc-input" inputmode="tel"><div class="tc-input__field"><input :class="errors.phone && 'border-red-500'" @change="checkValidation()" @input="checkValidation()" autocomplete="tel" class="tc-input__field--input" inputmode="tel" name="phone" oninput="tcPhoneMask(event)" placeholder="(000) 000-00-00" type="tel" value="{{ user.phone|default:'' }}" x-bind:data-phone-length="phoneLength" x-bind:maxlength="phoneLength + 6"/></div></div>
+</div></div>
+<template x-if="errors.phone"><p class="text-red-500 text-xs mt-1 px-1" x-text="errors.phone"></p></template>
+</div>
+</div>
+<div class="col-span-12 xl:col-span-6 2xl:col-span-5">
+<div class="tc-input"><label class="tc-input__label">Электронная почта</label><div class="tc-input__field"><input :class="errors.email && 'border-red-500'" @change="checkValidation()" @input="checkValidation()" class="tc-input__field--input" name="email" type="email" value="{{ user.email|default:'' }}"/></div></div>
+<template x-if="errors.email"><p class="text-red-500 text-xs mt-1 px-1" x-text="errors.email"></p></template>
+</div>
+</div>
+<div class="w-full">
+                            {% if not user.is_authenticated %}
+                            <div class="border-t border-[var(--black-4)] py-4 xl:p-6 xl:-mx-6 last:pb-0 space-y-4">
+<label class="tc-checkbox cursor-pointer"><input class="tc-checkbox__input cursor-pointer" name="register_account" type="checkbox" x-model="showRegister"/><span class="tc-checkbox__text"><span x-text="existingAccount ? 'Войти в существующий аккаунт' : 'Зарегистрироваться'">Зарегистрироваться</span></span></label>
+<p class="text-[13px] leading-[1.4] px-1" x-cloak x-show="existingAccount" :class="accountConflict ? 'text-red-600' : 'text-black/60'" x-text="accountConflict ? 'Почта и телефон принадлежат разным аккаунтам. Войдите в аккаунт перед оформлением.' : 'Аккаунт найден. Введите пароль — заказ будет привязан к нему, а вход выполнится до перехода к оплате.'"></p>
+<div class="space-y-3 pt-3" x-show="showRegister" x-transition="">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div class="tc-input" x-data="{ showPwd: false }">
+<div class="tc-input__field">
+<input :type="showPwd ? 'text' : 'password'" @input="checkValidation()" class="pr-10 tc-input__field--input w-full" name="reg_password" :placeholder="existingAccount ? 'Пароль от аккаунта' : 'Новый пароль'" x-model="regPassword"/>
+<button @click="showPwd = !showPwd" class="tc-input__field--btn-right" type="button">
+<svg class="w-6 h-6" x-show="!showPwd"><use href="{% static 'images/sprite.svg' %}#icons--viewing-close"></use></svg>
+<svg class="w-6 h-6" x-cloak="" x-show="showPwd"><use href="{% static 'images/sprite.svg' %}#icons--viewing-stroke"></use></svg>
+</button>
+</div>
+<template x-if="!existingAccount && regPassword && !isPasswordStrong(regPassword)"><p class="text-red-500 text-xs mt-1 px-1">Пароль слишком простой: минимум 8 символов, буквы и цифры</p></template>
+</div>
+<div class="tc-input" x-data="{ showPwd2: false }" x-show="!existingAccount">
+<div class="tc-input__field">
+<input :type="showPwd2 ? 'text' : 'password'" @input="checkValidation()" class="pr-10 tc-input__field--input w-full" name="reg_password2" placeholder="Повторить" x-model="regPassword2"/>
+<button @click="showPwd2 = !showPwd2" class="tc-input__field--btn-right" type="button">
+<svg class="w-6 h-6" x-show="!showPwd2"><use href="{% static 'images/sprite.svg' %}#icons--viewing-close"></use></svg>
+<svg class="w-6 h-6" x-cloak="" x-show="showPwd2"><use href="{% static 'images/sprite.svg' %}#icons--viewing-stroke"></use></svg>
+</button>
+</div>
+<template x-if="regPassword2 && regPassword !== regPassword2"><p class="text-red-500 text-xs mt-1 px-1">Пароли не совпадают</p></template>
+</div>
+</div>
+<template x-if="errors.password"><p class="text-red-500 text-xs mt-1 px-1" x-text="errors.password"></p></template>
+</div>
+</div>
+                            {% endif %}
+                            <div class="border-t border-[var(--black-4)] py-4 xl:p-6 xl:-mx-6 last:pb-0 space-y-4">
+<label class="tc-checkbox cursor-pointer"><input class="tc-checkbox__input cursor-pointer" name="is_organization" type="checkbox" x-model="isOrg"/><span class="tc-checkbox__text">Заказ на организацию</span></label>
+<div class="space-y-3 pt-3" x-show="isOrg" x-transition=""><input class="tc-input__field--input w-full" name="org_name" placeholder="Название организации" type="text"/><input class="tc-input__field--input w-full" maxlength="12" name="org_inn" oninput="this.value=this.value.replace(/\D/g,'').slice(0,12)" placeholder="ИНН" type="text"/></div>
+</div>
+<div class="border-t border-[var(--black-4)] py-4 xl:p-6 xl:-mx-6 last:pb-0 space-y-4">
+<label class="tc-checkbox cursor-pointer"><input class="tc-checkbox__input cursor-pointer" name="other_recipient" type="checkbox" x-model="isOtherRecipient"/><span class="tc-checkbox__text">Другой получатель</span></label>
+<div class="space-y-3 pt-3" x-show="isOtherRecipient" x-transition=""><input class="tc-input__field--input w-full" name="recipient_name" placeholder="Имя и фамилия получателя" type="text"/>
+<div class="relative"><div class="tc-phone__field">
+<div @click.outside="recipientPhoneCodeOpen = false" class="tc-select phone-select flex-1"><div class="tc-select__field"><div @click="recipientPhoneCodeOpen = !recipientPhoneCodeOpen" class="tc-select__field--select cursor-pointer"><span class="select-text" x-text="phoneCode">+7</span><span class="tc-select__field--arr"></span></div></div>
+<div class="absolute left-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 w-[220px] max-h-[240px] overflow-y-auto z-50 py-1" x-cloak="" x-show="recipientPhoneCodeOpen" x-transition="">
+<template :key="c.code" x-for="c in phoneCodes">
+<button :class="phoneCode === c.code ? 'bg-gray-100 font-bold' : ''" @click="selectPhoneCode(c.code)" class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2" type="button">
+<span class="font-mono text-gray-500 w-10" x-text="c.code"></span>
+<span x-text="c.country"></span>
+</button>
+</template>
+</div>
+</div>
+<input :value="phoneCode" name="recipient_phone_code" type="hidden"/>
+<div class="tc-input" inputmode="tel"><div class="tc-input__field"><input autocomplete="tel" class="tc-input__field--input" inputmode="tel" name="recipient_phone" oninput="tcPhoneMask(event)" placeholder="(000) 000-00-00" type="tel" x-bind:data-phone-length="phoneLength" x-bind:maxlength="phoneLength + 6"/></div></div>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+                    {# Mobile #}
+                    <div class="recipient-mobile space-y-1">
+<input :class="errors.name && 'border-red-500'" @change="checkValidation()" @input="checkValidation()" class="tc-input__field--input w-full" name="full_name_m" placeholder="Имя и фамилия" type="text" value="{{ user.first_name|default:'' }} {{ user.last_name|default:'' }}"/>
+<template x-if="errors.name"><p class="text-red-500 text-xs mt-1 px-1" x-text="errors.name"></p></template>
+<input :class="errors.phone && 'border-red-500'" @change="checkValidation()" @input="checkValidation()" class="tc-input__field--input w-full" name="phone_m" oninput="tcPhoneMask(event)" placeholder="Телефон" type="tel" value="{{ user.phone|default:'' }}" x-bind:data-phone-length="phoneLength" x-bind:maxlength="phoneLength + 6"/>
+<template x-if="errors.phone"><p class="text-red-500 text-xs mt-1 px-1" x-text="errors.phone"></p></template>
+<input :class="errors.email && 'border-red-500'" @change="checkValidation()" @input="checkValidation()" class="tc-input__field--input w-full" name="email_m" placeholder="Email" type="email" value="{{ user.email|default:'' }}"/>
+<template x-if="errors.email"><p class="text-red-500 text-xs mt-1 px-1" x-text="errors.email"></p></template>
+</div>
+<input :value="deliveryType" name="delivery_type" type="hidden"/>
+<input :value="paymentMethod" name="payment_method" type="hidden"/>
+<input name="selected_address_id" type="hidden" value=""/>
+</div>
+
+                {# Delivery #}
+                <div class="white-box xl:!space-y-6" id="delivery-data">
+<div class="flex items-center"><p class="white-box__title">Доставка</p></div>
+<div class="delivery-desktop w-full" x-show="deliveryType !== 'pickup'" x-transition="">
+<div class="w-full xl:space-y-3">
+<p class="xl:bold max-xl:text-[24px] max-xl:font-din-black max-xl:uppercase max-xl:leading-[1.2] xl:text-[18px]">Адрес</p>
+<ul class="list-none grid grid-cols-1 xl:grid-cols-3 xl:gap-2">
+                                {% if user.is_authenticated %}
+                                <li class="group relative max-xl:py-4 max-xl:border-b max-xl:border-[var(--black-4)]">
+<button @click="showNewAddress = !showNewAddress; selectedAddressId = null; document.querySelector('input[name=selected_address_id]') && (document.querySelector('input[name=selected_address_id]').value = '')" class="tc-btn-card min-h-full basket-view-xl" type="button"><svg class="tc-btn-card__ic"><use href="{% static 'asset/images/sprite.svg' %}#icons--plus"></use></svg><span class="tc-btn-card__text bold"><span class="mr-1 last:ml-0">Новый адрес</span></span></button>
+</li>
+                                {% endif %}
+                                {% for address in addresses %}
+                                <li class="group relative">
+<label class="tc-checkbox-card h-full basket-view-xl">
+<span class="flex items-center !mb-auto"><input id="address-{{ address.id }}" type="radio" name="address_id" class="tc-checkbox-card__input !mb-auto not-header-title" value="{{ address.id }}" data-city="{{ address.city }}" data-street="{{ address.street }}" data-apartment="{{ address.apartment }}" data-house="{{ address.house }}" data-postal="{{ address.postal_code }}" @click="selectAddress('{{ address.id }}', '{{ address.city|escapejs }}', '{{ address.street|escapejs }}', '{{ address.apartment|escapejs }}', '{{ address.house|escapejs }}', '{{ address.postal_code|escapejs }}')"/><span class="tc-checkbox-card__header-title bold">{% if address.label %}{{ address.label }}{% endif %}</span></span>
+<span class="tc-checkbox-card__text max-xl:pr-12">{{ address.city }}{% if address.street %}, {{ address.street }}{% endif %}{% if address.house %}, д. {{ address.house }}{% endif %}{% if address.apartment %}, кв./офис {{ address.apartment }}{% endif %}{% if address.postal_code %}, {{ address.postal_code }}{% endif %}</span>
+<span class="border-checked !m-0"></span>
+</label>
+<div class="button-edit-address" onclick="openEditModal('{{ address.id }}', '{{ address.label|escapejs }}', '{{ address.city|escapejs }}', '{{ address.street|escapejs }}', '{{ address.house|escapejs }}', '{{ address.apartment|escapejs }}', '{{ address.postal_code|escapejs }}', {{ address.is_default|yesno:"true,false" }})"><svg class="w-6 h-6"><use href="{% static 'asset/images/sprite.svg' %}#icons--edit"></use></svg></div>
+</li>
+                                {% endfor %}
+</ul>
+<template x-if="errors.address"><p class="text-red-500 text-xs mt-1 px-1" x-text="errors.address"></p></template>
+<div class="mt-4 grid grid-cols-2 xl:grid-cols-3 md:grid-cols-5 xl:gap-2" x-show="showNewAddress || !hasAddresses" x-transition="">
+<input class="tc-input__field--input w-full" name="postal_code" placeholder="Индекс" type="text" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'').substring(0,6)"/>
+<input class="tc-input__field--input w-full" name="city" placeholder="Город" type="text"/>
+<input class="tc-input__field--input w-full" name="street" placeholder="Улица" type="text"/>
+<input class="tc-input__field--input w-full" name="house" placeholder="Дом" type="text"/>
+<input class="tc-input__field--input w-full" name="apartment" placeholder="Квартира / Офис" type="text"/>
+</div>
+<div class="mt-2" x-show="showNewAddress || !hasAddresses" x-transition="">
+{% if user.is_authenticated %}
+<label class="tc-checkbox cursor-pointer"><input class="tc-checkbox__input cursor-pointer" name="is_address_main" type="checkbox" x-model="newAddressIsDefault"/><span class="tc-checkbox__text" x-text="newAddressIsDefault ? 'Основной адрес' : 'Сделать основным адресом'"></span></label>
+{% endif %}
+</div>
+</div>
+</div>
+<div class="delivery-mobile space-y-3" x-show="deliveryType !== 'pickup'" x-transition="">
+                        {% if addresses %}
+                        <div class="flex flex-col gap-2 mb-3">
+                            {% for address in addresses %}
+                            <button :class="selectedAddressId === '{{ address.id }}' ? 'border-black bg-white shadow-md' : 'border-black/5 bg-black/5'" @click="selectAddress('{{ address.id }}', '{{ address.city|escapejs }}', '{{ address.street|escapejs }}', '{{ address.apartment|escapejs }}', '{{ address.house|escapejs }}', '{{ address.postal_code|escapejs }}')" class="w-full text-left p-4 rounded-2xl border-2 transition-all" type="button">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold text-sm mb-0.5">{% if address.label %}{{ address.label }}{% else %}Адрес{% endif %}</p>
+<p class="text-xs text-black/50">{{ address.city }}, {{ address.street }}{% if address.house %}, д. {{ address.house }}{% endif %}{% if address.apartment %}, {{ address.apartment }}{% endif %}{% if address.postal_code %}, {{ address.postal_code }}{% endif %}</p>
+{% if address.is_default %}<span class="text-[10px] font-bold bg-black text-white px-2 py-0.5 rounded-full mt-1.5 inline-block">Основной</span>{% endif %}
+</div>
+<div class="w-6 h-6 bg-black rounded-full flex items-center justify-center flex-shrink-0" x-cloak="" x-show="selectedAddressId === '{{ address.id }}'"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg></div>
+</div>
+</button>
+                            {% endfor %}
+                            {% if addresses %}<button :class="showNewAddress ? 'border-black bg-white shadow-md' : 'border-black/5 bg-black/5'" @click="showNewAddress = !showNewAddress; if(showNewAddress) { selectedAddressId = null; document.querySelector('input[name=selected_address_id]') && (document.querySelector('input[name=selected_address_id]').value = ''); }" class="w-full text-left p-4 rounded-2xl border-2 transition-all" type="button">
+<span class="font-bold text-sm">+ Новый адрес</span>
+</button>{% endif %}
+</div>
+<div class="space-y-3" x-show="showNewAddress || !hasAddresses" x-transition="">
+                        {% endif %}
+                            <input class="tc-input__field--input w-full" name="postal_code_m" placeholder="Индекс" type="text" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'').substring(0,6)"/>
+<input class="tc-input__field--input w-full" name="city_m" placeholder="Город" type="text"/>
+<input class="tc-input__field--input w-full" name="street_m" placeholder="Улица" type="text"/>
+<input class="tc-input__field--input w-full" name="house_m" placeholder="Дом" type="text"/>
+<input class="tc-input__field--input w-full" name="apt_m" placeholder="Квартира / Офис" type="text"/>
+{% if user.is_authenticated %}<label class="tc-checkbox cursor-pointer"><input class="tc-checkbox__input cursor-pointer" name="is_address_main" type="checkbox" x-model="newAddressIsDefault"/><span class="tc-checkbox__text" x-text="newAddressIsDefault ? 'Основной адрес' : 'Сделать основным адресом'"></span></label>{% endif %}
+                        {% if addresses %}
+                        </div>
+                        {% endif %}
+                        <template x-if="errors.address"><p class="text-red-500 text-xs mt-1 px-1" x-text="errors.address"></p></template>
+</div>
+<div class="w-full border-t border-[var(--black-4)] pt-6 mt-6">
+<p class="xl:bold max-xl:text-[24px] max-xl:font-din-black max-xl:uppercase max-xl:leading-[1.2] xl:text-[18px] mb-4">Способ доставки</p>
+<style>
+{% if not site_settings.enable_city_courier %}.delivery-options label:has(input[value="courier"]) { display: none; }{% endif %}
+{% if not site_settings.enable_cdek_pvz %}.delivery-options label:has(input[value="cdek_pvz"]) { display: none; }{% endif %}
+{% if not site_settings.enable_cdek_door %}.delivery-options label:has(input[value="cdek_door"]) { display: none; }{% endif %}
+{% if not site_settings.enable_pickup %}.delivery-options label:has(input[value="pickup"]) { display: none; }{% endif %}
+</style>
+{% if not default_delivery_type %}<p class="text-sm text-red-600">Нет доступных способов доставки. Обратитесь в магазин.</p>{% endif %}
+<div class="delivery-options grid grid-cols-1 md:grid-cols-1 md:grid-cols-2 gap-3">
+<label :class="deliveryType === 'courier' ? 'border-black bg-white shadow-md' : 'border-black/5 bg-black/5 hover:border-black/10'" class="relative flex items-center gap-4 p-5 rounded-2xl border-2 transition-all cursor-pointer"><input class="tc-radio-sq" name="delivery_type_radio" type="radio" value="courier" x-model="deliveryType"/><div class="w-10 h-10 bg-black/5 rounded-xl flex items-center justify-center shrink-0"><img src="/media/icons/delivery-man.png" alt="Курьер" class="w-6 h-6"/></div><div class="leading-tight"><p class="font-bold text-sm text-black">Курьер по городу</p><p class="text-[12px] text-black/55">До двери, в удобное время</p></div></label>
+<label :class="deliveryType === 'cdek_pvz' ? 'border-black bg-white shadow-md' : 'border-black/5 bg-black/5 hover:border-black/10'" class="relative flex items-center gap-4 p-5 rounded-2xl border-2 transition-all cursor-pointer"><input class="tc-radio-sq" name="delivery_type_radio" type="radio" value="cdek_pvz" x-model="deliveryType"/><div class="w-10 h-10 bg-black/5 rounded-xl flex items-center justify-center shrink-0"><svg viewBox="126.006 216 243.994 68" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-8 h-auto"><path clip-rule="evenodd" fill-rule="evenodd" fill="#00b33c" d="m165.138 267.494h-10.539c-16.439 0-4.496-35.058 9.344-35.058h16.651c2.669 0 7.376.493 9.695-6.137l3.583-10.299h-22.833c-12.365 0-21.99 4.373-28.945 11.71-12.014 12.556-16.088 32.166-13.208 41.547 2.74 8.677 10.187 14.39 21.849 14.531l9.063.071h11.171l2.74-8.253c2.037-5.855-2.53-8.112-8.571-8.112zm128.284-14.531 3.443-11.216h-36.743c-6.112 0-8.852 1.693-9.906 5.22l-3.443 11.216h36.744c6.112 0 8.852-1.693 9.905-5.22zm-52.128 19.751-3.443 11.215h36.743c6.042 0 8.852-1.692 9.906-5.219l3.443-11.216h-36.744c-6.041 0-8.781 1.693-9.905 5.22zm60.7-45.428 3.442-11.215h-36.743c-6.112 0-8.852 1.692-9.906 5.219l-3.443 11.216h36.744c6.042 0 8.781-1.693 9.906-5.22zm-55.502 2.258c-1.545-10.44-7.095-13.473-20.584-13.473h-24.589l-14.332 42.112h9.063c5.409 0 8.149.07 11.03-7.689l5.971-18.058h9.133c7.799 0 6.042 9.805 2.108 19.327-3.513 8.395-9.625 15.801-17.002 15.801h-15.245c-6.112 0-8.922 1.693-10.046 5.22l-3.794 11.216h11.17l10.96-.071c9.695-.07 17.634-.775 26.908-9.17 9.835-8.958 21.217-31.954 19.249-45.215zm123.508-13.544h-21.287l-20.023 21.373c-2.318 2.469-4.707 4.938-7.025 7.83h-.211l9.976-29.203h-17.353l-23.394 67.929h17.352l7.447-21.373 7.728-6.56 6.113 19.328c1.896 5.996 3.864 8.605 8.079 8.605h13.278l-13.629-37.95z"/></svg></div><div class="leading-tight"><p class="font-bold text-sm text-black">СДЭК — до пункта выдачи</p><p class="text-[12px] text-black/55">Более 3000 пунктов по всей России</p></div></label>
+<label :class="deliveryType === 'cdek_door' ? 'border-black bg-white shadow-md' : 'border-black/5 bg-black/5 hover:border-black/10'" class="relative flex items-center gap-4 p-5 rounded-2xl border-2 transition-all cursor-pointer"><input class="tc-radio-sq" name="delivery_type_radio" type="radio" value="cdek_door" x-model="deliveryType"/><div class="h-10 px-1.5 bg-black/5 rounded-xl flex items-center gap-1 shrink-0"><svg viewBox="126.006 216 243.994 68" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-7 h-auto"><path clip-rule="evenodd" fill-rule="evenodd" fill="#00b33c" d="m165.138 267.494h-10.539c-16.439 0-4.496-35.058 9.344-35.058h16.651c2.669 0 7.376.493 9.695-6.137l3.583-10.299h-22.833c-12.365 0-21.99 4.373-28.945 11.71-12.014 12.556-16.088 32.166-13.208 41.547 2.74 8.677 10.187 14.39 21.849 14.531l9.063.071h11.171l2.74-8.253c2.037-5.855-2.53-8.112-8.571-8.112zm128.284-14.531 3.443-11.216h-36.743c-6.112 0-8.852 1.693-9.906 5.22l-3.443 11.216h36.744c6.112 0 8.852-1.693 9.905-5.22zm-52.128 19.751-3.443 11.215h36.743c6.042 0 8.852-1.692 9.906-5.219l3.443-11.216h-36.744c-6.041 0-8.781 1.693-9.905 5.22zm60.7-45.428 3.442-11.215h-36.743c-6.112 0-8.852 1.692-9.906 5.219l-3.443 11.216h36.744c6.042 0 8.781-1.693 9.906-5.22zm-55.502 2.258c-1.545-10.44-7.095-13.473-20.584-13.473h-24.589l-14.332 42.112h9.063c5.409 0 8.149.07 11.03-7.689l5.971-18.058h9.133c7.799 0 6.042 9.805 2.108 19.327-3.513 8.395-9.625 15.801-17.002 15.801h-15.245c-6.112 0-8.922 1.693-10.046 5.22l-3.794 11.216h11.17l10.96-.071c9.695-.07 17.634-.775 26.908-9.17 9.835-8.958 21.217-31.954 19.249-45.215zm123.508-13.544h-21.287l-20.023 21.373c-2.318 2.469-4.707 4.938-7.025 7.83h-.211l9.976-29.203h-17.353l-23.394 67.929h17.352l7.447-21.373 7.728-6.56 6.113 19.328c1.896 5.996 3.864 8.605 8.079 8.605h13.278l-13.629-37.95z"/></svg><img src="/media/icons/delivery-man.png" alt="Курьер" class="w-5 h-5"/></div><div class="leading-tight"><p class="font-bold text-sm text-black">СДЭК — курьером до двери</p><p class="text-[12px] text-black/55">Доставка до двери курьером СДЭК</p></div></label>
+<label :class="deliveryType === 'pickup' ? 'border-black bg-white shadow-md' : 'border-black/5 bg-black/5 hover:border-black/10'" class="relative flex items-center gap-4 p-5 rounded-2xl border-2 transition-all cursor-pointer"><input class="tc-radio-sq" name="delivery_type_radio" type="radio" value="pickup" x-model="deliveryType"/><div class="w-10 h-10 bg-black/5 rounded-xl flex items-center justify-center shrink-0"><img src="/media/icons/self-pickup.png" alt="Самовывоз" class="w-6 h-6"/></div><div class="leading-tight"><p class="font-bold text-sm text-black">Самовывоз</p><p class="text-[12px] text-black/55">Ижевск, ул. Баранова, д. 26</p></div></label>
+</div>
+</div>
+                    {# ── CDEK City Search (shown for both cdek_pvz and cdek_door) ── #}
+                    <div class="mt-6 w-full" x-show="deliveryType === 'cdek_pvz' || deliveryType === 'cdek_door'" x-transition="">
+<div class="p-6 rounded-3xl bg-gray-50 border border-gray-100">
+<h3 class="font-bold text-base mb-3 text-black">Город доставки СДЭК</h3>
+<div class="relative mb-1">
+<input @focus="if(cdekCityQuery.length>=2) cdekSearchCities()" @input="cdekCityInput()" autocomplete="off" class="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-black bg-white text-black" placeholder="Начните вводить город..." type="text" x-model="cdekCityQuery"/>
+<div class="absolute right-3 top-1/2 -translate-y-1/2" x-show="cdekCityLoading">
+<svg class="animate-spin h-5 w-5 text-gray-400" fill="none" viewbox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor"></path></svg>
+</div>
+                                {# City dropdown #}
+                                <div @click.outside="cdekCities = []" class="absolute z-50 left-0 right-0 top-full mt-1 bg-white rounded-2xl shadow-xl border border-gray-100 max-h-[240px] overflow-y-auto" x-show="cdekCities.length > 0" x-transition="">
+<template :key="city.code" x-for="city in cdekCities">
+<button @click="cdekSelectCity(city)" class="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0" type="button">
+<span class="font-bold text-sm text-black" x-text="city.city"></span>
+<span class="text-xs text-black/40 ml-1" x-text="city.region && city.region !== city.city ? city.region : ''"></span>
+</button>
+</template>
+</div>
+</div>
+                            {# Selected city + cost display #}
+                            <div class="mt-3" x-show="cdekSelectedCity">
+<div class="flex items-center gap-3 flex-wrap">
+<div class="flex items-center gap-2 bg-white rounded-xl px-3 py-2 border border-black/10">
+<svg class="w-4 h-4 text-green-600 shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+<span class="text-sm font-bold text-black" x-text="cdekSelectedCity ? cdekSelectedCity.city : ''"></span>
+</div>
+<div class="flex items-center gap-2 text-sm text-black/40" x-show="cdekCalcLoading">
+<svg class="animate-spin h-4 w-4" fill="none" viewbox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor"></path></svg>
+                                        Расчёт...
+                                    </div>
+<div class="flex items-center gap-3" x-show="cdekDeliveryCost !== null && !cdekCalcLoading">
+<span class="text-sm font-bold text-black" x-text="cdekDeliveryCost + ' ₽'"></span>
+<span class="text-xs text-black/50" x-text="cdekDeliveryDays"></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+                    {# ── PVZ Picker (only for cdek_pvz) ── #}
+                    <div class="mt-4 p-6 rounded-3xl bg-gray-50 border border-gray-100 w-full" x-show="deliveryType === 'cdek_pvz' && cdekSelectedCity" x-transition="">
+<h3 class="font-bold text-base mb-3 text-black">Выберите пункт выдачи</h3>
+<div class="flex items-center justify-center py-10" x-show="cdekLoading">
+<svg class="animate-spin h-8 w-8 text-black/20" fill="none" viewbox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor"></path></svg>
+</div>
+<div x-show="!cdekLoading">
+<input class="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:border-black bg-white text-black mb-3 text-sm" placeholder="Поиск по адресу..." type="text" x-model="cdekOfficeFilter"/>
+<div class="text-center py-6 text-black/40 text-sm" x-show="cdekOffices.length === 0 && !cdekLoading">
+                                Нет пунктов выдачи в выбранном городе
+                            </div>
+<div class="overflow-y-auto space-y-2 max-h-[350px] cdek-pvz-scroll" x-show="cdekFilteredOffices.length > 0">
+<template :key="office.code" x-for="office in cdekFilteredOffices">
+<div :class="selectedPvz && selectedPvz.code === office.code ? 'border-black bg-white shadow-sm' : 'border-transparent bg-white/60'" @click="cdekSelectOffice(office)" class="p-4 rounded-xl border-2 cursor-pointer transition-all hover:bg-white">
+<div class="flex items-start justify-between gap-2">
+<div class="flex-1 min-w-0">
+<p class="font-bold text-sm mb-1 text-black truncate" x-text="office.name || office.code"></p>
+<p class="text-[12px] text-black/60 leading-relaxed" x-text="office.address"></p>
+<p class="text-[11px] text-black/40 mt-1" x-text="office.work_time"></p>
+</div>
+<div class="w-6 h-6 bg-black rounded-full flex items-center justify-center shrink-0 mt-0.5" x-show="selectedPvz && selectedPvz.code === office.code">
+<svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg>
+</div>
+</div>
+</div>
+</template>
+</div>
+<p class="text-[11px] text-black/30 mt-2 text-center" x-show="cdekFilteredOffices.length > 0" x-text="'Найдено пунктов: ' + cdekFilteredOffices.length"></p>
+</div>
+<input :value="selectedPvz ? selectedPvz.code : ''" name="cdek_pvz_code" type="hidden"/>
+<input :value="selectedPvz ? selectedPvz.address : ''" name="cdek_pvz_address" type="hidden"/>
+                        {# Selected PVZ confirmation #}
+                        <div class="mt-4 p-4 rounded-2xl bg-white border border-black/10 flex items-center gap-4" x-show="selectedPvz">
+<div class="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg></div>
+<div class="leading-tight min-w-0"><p class="text-xs text-black/40 mb-0.5">Выбранный пункт:</p><p class="font-bold text-sm text-black" x-text="selectedPvz ? selectedPvz.address : ''"></p><p class="text-xs text-black/40 mt-0.5" x-text="selectedPvz ? selectedPvz.work_time : ''"></p></div>
+</div>
+</div>
+
+                    {# Hidden input for delivery cost #}
+                    <input :value="cdekDeliveryCost || ''" name="cdek_delivery_cost" type="hidden"/>
+<input :value="cdekSelectedCity ? cdekSelectedCity.code : ''" name="cdek_city_code" type="hidden"/>
+<input :value="cdekCityQuery || (cdekSelectedCity ? cdekSelectedCity.city : '')" name="cdek_city_name" type="hidden"/>
+</div>
+
+                {# Payment #}
+                <div class="white-box xl:!space-y-6" id="payment-data">
+<div class="flex items-center"><p class="white-box__title">Способ оплаты</p></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                        {% if user.is_authenticated and user.balance > 0 %}
+                        <label :class="internalPaymentAvailable ? (paymentMethod === 'internal' ? 'border-black bg-white shadow-md' : 'border-black/5 bg-black/5 hover:border-black/10') : 'border-black/5 bg-black/5 opacity-50 cursor-not-allowed'" class="relative flex flex-col items-center justify-center gap-3 p-5 rounded-2xl border-2 transition-all text-center">
+<input :disabled="!internalPaymentAvailable" class="tc-radio-sq absolute top-3 right-3" name="payment_method_radio" type="radio" value="internal" x-model="paymentMethod"/>
+<div class="w-10 h-10 bg-black/5 rounded-xl flex items-center justify-center">
+<img src="/media/icons/wallet.png" alt="Внутренний счет" class="w-6 h-6"/>
+</div>
+<span class="font-bold text-sm text-black">Внутренний счет</span>
+<span class="text-[10px] text-gray-500 mt-[-8px]">Баланс: {{ user.balance }} ₽</span>
+<span class="text-[10px] text-red-600 mt-[-8px]" x-show="!internalPaymentAvailable">Недостаточно средств</span>
+</label>
+                        {% endif %}
+                        <label :class="paymentMethod === 'card' ? 'border-black bg-white shadow-md' : 'border-black/5 bg-black/5 hover:border-black/10'" class="relative flex flex-col items-center justify-center gap-3 p-5 rounded-2xl border-2 transition-all cursor-pointer text-center"><input class="tc-radio-sq absolute top-3 right-3" name="payment_method_radio" type="radio" value="card" x-model="paymentMethod"/><div class="w-10 h-10 bg-black/5 rounded-xl flex items-center justify-center"><img src="/media/icons/credit-card.png" alt="Картой на сайте" class="w-6 h-6"/></div><span class="font-bold text-sm text-black">Картой на сайте</span></label>
+<label class="relative flex flex-col items-center justify-center gap-3 p-5 rounded-2xl border-2 border-black/5 bg-black/5 opacity-60 cursor-not-allowed text-center"><input class="tc-radio-sq absolute top-3 right-3" name="payment_method_radio" type="radio" value="sbp" disabled/><div class="w-10 h-10 bg-black/5 rounded-xl flex items-center justify-center overflow-hidden"><svg viewBox="0 0 233.296 120" xmlns="http://www.w3.org/2000/svg" class="w-8 h-auto"><path d="M206.665 34.254v29.338h-10.476v-20.58h-10.087v20.58h-10.476v-29.34h31.039z" fill="#000"/><path clip-rule="evenodd" d="M154.11 64.64c9.379 0 16.343-5.75 16.343-14.466 0-8.437-5.138-13.915-13.725-13.915-3.963 0-7.233 1.395-9.696 3.802.588-4.975 4.795-8.607 9.427-8.607 1.069 0 9.117-.017 9.117-.017l4.55-8.71s-10.103.23-14.8.23c-10.732.188-17.981 9.943-17.981 21.79 0 13.804 7.07 19.894 16.766 19.894zm.058-20.667c3.482 0 5.896 2.288 5.896 6.2 0 3.52-2.145 6.422-5.896 6.43-3.588 0-6.002-2.688-6.002-6.37 0-3.913 2.414-6.26 6.002-6.26z" fill="#000" fill-rule="evenodd"/><path d="M128.818 53.77s-2.474 1.426-6.17 1.696c-4.247.126-8.032-2.557-8.032-7.324 0-4.65 3.34-7.315 7.926-7.315 2.812 0 6.532 1.949 6.532 1.949s2.722-4.995 4.132-7.493c-2.582-1.957-6.021-3.03-10.021-3.03-10.095 0-17.914 6.582-17.914 15.83 0 9.366 7.349 15.795 17.914 15.6 2.953-.11 7.027-1.146 9.51-2.741z" fill="#000"/><path d="M0 26.12l14.532 25.975v15.844L.017 93.863z" fill="#5b57a2"/><path d="M55.797 42.643l13.617-8.346 27.868-.026-41.485 25.414z" fill="#d90751"/><path d="M55.72 25.967l.077 34.39-14.566-8.95V0l14.49 25.967z" fill="#fab718"/><path d="M97.282 34.271l-27.869.026-13.693-8.33L41.231 0l56.05 34.271z" fill="#ed6f26"/><path d="M55.797 94.007V77.322l-14.566-8.78.008 51.458z" fill="#63b22f"/><path d="M69.38 85.737L14.531 52.095 0 26.12l97.223 59.583-27.844.034z" fill="#1487c9"/><path d="M41.24 120l14.556-25.993 13.583-8.27 27.843-.034z" fill="#017f36"/><path d="M.017 93.863l41.333-25.32-13.896-8.526-12.922 7.922z" fill="#984995"/><g fill="#000"><path d="M114.619 83.337c-.32.408-.741.716-1.246.924a4.282 4.282 0 0 1-1.632.316 4.63 4.63 0 0 1-1.633-.274 3.623 3.623 0 0 1-1.262-.782 3.539 3.539 0 0 1-.824-1.224 4.173 4.173 0 0 1-.295-1.59c0-.54.093-1.04.286-1.513a3.58 3.58 0 0 1 .79-1.224 3.88 3.88 0 0 1 1.196-.823c.463-.2.968-.308 1.523-.308.598 0 1.153.075 1.658.224.505.15.934.4 1.287.75l-.614 1.04a2.886 2.886 0 0 0-1.027-.6 3.612 3.612 0 0 0-1.12-.174c-.335 0-.655.066-.966.19a2.591 2.591 0 0 0-.825.534 2.438 2.438 0 0 0-.564.832 2.64 2.64 0 0 0-.21 1.08c0 .409.075.775.218 1.09.144.326.337.6.58.833.245.234.53.408.859.525a2.9 2.9 0 0 0 1.044.183c.454 0 .867-.092 1.22-.267a3.05 3.05 0 0 0 .926-.69zm1.733 1.065v-7.405h1.33v5.517l4.325-5.517h1.33v7.406h-1.33v-5.517l-4.325 5.517h-1.33zm15.795-1.065a3.01 3.01 0 0 1-1.245.924 4.291 4.291 0 0 1-1.633.316 4.628 4.628 0 0 1-1.632-.274 3.627 3.627 0 0 1-1.263-.782 3.539 3.539 0 0 1-.824-1.224 4.173 4.173 0 0 1-.295-1.59c0-.54.093-1.04.286-1.513.186-.475.455-.882.79-1.224a3.88 3.88 0 0 1 1.196-.823 3.637 3.637 0 0 1 1.523-.308c.598 0 1.153.075 1.658.224.505.15.934.4 1.288.75l-.615 1.04a2.874 2.874 0 0 0-1.026-.6 3.616 3.616 0 0 0-1.12-.174 2.603 2.603 0 0 0-1.792.724 2.536 2.536 0 0 0-.564.832 2.64 2.64 0 0 0-.21 1.08c0 .409.076.775.219 1.09.143.326.336.6.58.833.244.234.53.408.859.525.328.116.673.183 1.043.183.455 0 .859-.092 1.22-.267a3.05 3.05 0 0 0 .926-.69zm.682-6.34h6.824v1.315h-2.743v6.09h-1.33v-6.09h-2.743v-1.315z"/><path clip-rule="evenodd" d="M145.864 84.328c.505-.158.934-.4 1.304-.732l-.404-1.032c-.244.217-.572.4-.967.55-.396.15-.842.224-1.33.224-.732 0-1.338-.191-1.818-.582-.48-.392-.74-.94-.8-1.64h5.757a4 4 0 0 0 .084-.89 3.35 3.35 0 0 0-.278-1.381 3.277 3.277 0 0 0-.74-1.074 3.295 3.295 0 0 0-1.111-.69 3.692 3.692 0 0 0-1.355-.25c-.623 0-1.17.108-1.65.308a3.637 3.637 0 0 0-1.203.824 3.477 3.477 0 0 0-.748 1.223 4.272 4.272 0 0 0-.261 1.514c0 .583.1 1.115.286 1.59a3.5 3.5 0 0 0 .808 1.223c.345.34.765.599 1.262.782a4.772 4.772 0 0 0 1.658.274 5.04 5.04 0 0 0 1.506-.24zm-3.366-5.7c.412-.374.959-.557 1.649-.557.648 0 1.17.175 1.549.525.379.349.58.832.614 1.447h-4.544a2.26 2.26 0 0 1 .732-1.414z" fill-rule="evenodd"/><path d="M149.499 76.997h1.212l2.878 3.67 2.726-3.67h1.178v7.406h-1.33v-5.4l-2.591 3.436h-.051l-2.692-3.437v5.4h-1.33z"/><path clip-rule="evenodd" d="M161.11 77.022a4.187 4.187 0 0 0-1.143.49l.353 1.05c.303-.15.606-.275.909-.383.303-.11.69-.16 1.153-.16.37 0 .665.06.892.176.227.108.395.275.513.475s.194.449.236.74.059.607.059.949a2.28 2.28 0 0 0-.91-.375 5.229 5.229 0 0 0-.958-.1c-.396 0-.766.059-1.12.158-.353.1-.656.25-.9.45a2.14 2.14 0 0 0-.59.74 2.3 2.3 0 0 0-.218 1.007c0 .724.21 1.29.63 1.69.422.399.977.598 1.667.598.623 0 1.12-.108 1.498-.324.379-.217.682-.466.9-.75v.958h1.246v-4.543c0-.966-.21-1.714-.64-2.24-.42-.523-1.17-.79-2.23-.79-.471 0-.917.067-1.346.184zm2.224 6c-.303.216-.7.315-1.187.315-.43 0-.766-.108-1.001-.316-.236-.216-.354-.5-.354-.85 0-.206.042-.381.135-.54s.219-.282.362-.382a1.6 1.6 0 0 1 .513-.225c.194-.05.387-.075.589-.075.657 0 1.22.158 1.683.49v.94a3.824 3.824 0 0 1-.74.642zm13.733-8.63c.269-.124.52-.332.757-.64l-.724-1.04c-.185.25-.395.424-.631.516a4.007 4.007 0 0 1-.774.216l-.252.045c-.22.038-.454.08-.707.122a5.224 5.224 0 0 0-1.178.366c-.598.258-1.077.607-1.44 1.048s-.647.94-.841 1.49a7.793 7.793 0 0 0-.395 1.722c-.068.6-.101 1.173-.101 1.722 0 .708.092 1.348.277 1.922.186.575.446 1.057.79 1.448.346.4.759.7 1.247.916s1.035.324 1.649.324c.564 0 1.086-.108 1.557-.308a3.758 3.758 0 0 0 1.212-.823c.336-.342.606-.75.79-1.207a3.74 3.74 0 0 0 .287-1.465c0-.557-.084-1.064-.244-1.514a3.271 3.271 0 0 0-.69-1.156 3.072 3.072 0 0 0-1.103-.75 3.827 3.827 0 0 0-1.447-.266c-.32 0-.631.042-.934.125a3.604 3.604 0 0 0-.842.358 3.2 3.2 0 0 0-.698.54c-.202.209-.37.442-.488.708h-.034a8.07 8.07 0 0 1 .143-1.048c.076-.358.185-.7.329-1.024.143-.324.328-.616.555-.882a2.52 2.52 0 0 1 .875-.624 4.646 4.646 0 0 1 1.153-.374l.264-.048c.263-.048.514-.094.754-.144.32-.066.614-.15.884-.274zm-4.68 7.115a4.146 4.146 0 0 1-.184-1.298 2.09 2.09 0 0 1 .303-.707 2.48 2.48 0 0 1 .547-.6 2.773 2.773 0 0 1 1.733-.59c.783 0 1.372.24 1.784.716.413.482.615 1.08.615 1.805 0 .358-.068.683-.185.982a2.36 2.36 0 0 1-1.28 1.323c-.302.133-.631.2-1.001.2s-.707-.075-1.018-.225a2.34 2.34 0 0 1-.8-.624 3.129 3.129 0 0 1-.513-.982zm16.402-4.51h-1.33v7.406h1.33zm-8.281 0h1.33v2.222h1.229c.58 0 1.05.075 1.43.216.379.142.682.333.909.566s.387.508.48.815c.092.308.143.624.143.957s-.051.65-.16.966c-.101.316-.278.59-.514.84-.235.25-.555.45-.96.6-.403.149-.891.232-1.48.232H180.5v-7.414zm1.33 3.46v2.714h.968c.665 0 1.136-.116 1.405-.35.27-.233.404-.565.404-1.006 0-.45-.143-.79-.412-1.024-.278-.233-.741-.35-1.38-.35h-.985z" fill-rule="evenodd"/></g><path d="M197.583 83.337c-.32.408-.741.716-1.246.924a4.286 4.286 0 0 1-1.632.316 4.63 4.63 0 0 1-1.633-.274 3.613 3.613 0 0 1-1.262-.782 3.555 3.555 0 0 1-.825-1.224 4.192 4.192 0 0 1-.294-1.59c0-.54.092-1.04.286-1.513a3.58 3.58 0 0 1 .79-1.224c.338-.35.74-.615 1.196-.823a3.634 3.634 0 0 1 1.523-.308c.597 0 1.153.075 1.658.224.505.15.934.4 1.287.75l-.614 1.04a2.886 2.886 0 0 0-1.027-.6 3.612 3.612 0 0 0-1.12-.174c-.335 0-.655.066-.967.19a2.587 2.587 0 0 0-.824.534 2.52 2.52 0 0 0-.564.832 2.64 2.64 0 0 0-.21 1.08c0 .409.075.775.218 1.09.143.326.337.6.58.833.245.234.53.408.859.525.329.116.674.183 1.044.183a2.76 2.76 0 0 0 1.22-.267 3.05 3.05 0 0 0 .926-.69zm.68-6.34h6.826v1.315h-2.744v6.09h-1.33v-6.09h-2.742v-1.315z"/><path clip-rule="evenodd" d="M207.866 76.998h-1.33v10.7h1.33v-3.636c.269.175.589.3.959.383s.757.124 1.153.124c.589 0 1.119-.108 1.599-.307a3.825 3.825 0 0 0 1.228-.84 3.65 3.65 0 0 0 .79-1.266c.186-.49.279-1.015.279-1.572 0-.55-.084-1.057-.244-1.515a3.524 3.524 0 0 0-.69-1.181 2.996 2.996 0 0 0-1.086-.774 3.49 3.49 0 0 0-1.44-.283c-.52 0-1.008.1-1.471.3s-.825.44-1.077.74zm.926 1.373c.379-.2.79-.3 1.237-.3.387 0 .732.058 1.044.183.303.125.555.3.766.533.21.233.37.5.47.815.11.316.16.658.16 1.032 0 .4-.067.757-.184 1.09a2.4 2.4 0 0 1-.514.849 2.36 2.36 0 0 1-.816.557 2.685 2.685 0 0 1-1.086.208c-.361 0-.698-.041-1.018-.124a3.328 3.328 0 0 1-.984-.45v-3.67c.235-.282.547-.523.925-.723zm15.28-1.374h-1.33v7.406h1.33zm-8.288 0h1.33v2.222h1.228c.58 0 1.052.075 1.43.216.38.142.683.333.91.566s.387.508.479.815c.093.308.143.624.143.957s-.05.65-.16.966c-.1.316-.277.59-.513.84-.235.25-.555.45-.96.6-.403.149-.891.232-1.48.232h-2.415v-7.414zm1.339 3.46v2.714h.968c.664 0 1.136-.116 1.405-.35.269-.233.404-.565.404-1.006 0-.45-.143-.79-.412-1.024-.278-.233-.741-.35-1.38-.35h-.985z" fill-rule="evenodd"/><path d="M230.452 80.567l2.844 3.836h-1.632l-2.197-2.996-2.23 2.996h-1.548l2.827-3.77-2.66-3.636h1.634l2.028 2.796 2.06-2.796h1.55zM113.635 93.556h-4.081v6.174h-1.33v-7.405h6.74v7.405h-1.33zm8.877.083h-2.625l-.085 1.248c-.092 1.057-.218 1.906-.395 2.554-.177.65-.396 1.149-.648 1.498-.252.35-.547.59-.884.708a3.06 3.06 0 0 1-1.085.183l-.101-1.282a1.08 1.08 0 0 0 .496-.108c.186-.083.37-.266.547-.54.177-.284.337-.683.48-1.2.143-.523.236-1.205.286-2.063l.135-2.305h5.209v7.406h-1.33v-6.1z"/><path clip-rule="evenodd" d="M127.427 92.342c-.43.116-.817.282-1.145.49l.354 1.049c.303-.15.606-.275.908-.383.303-.108.69-.158 1.153-.158.37 0 .665.058.892.174.228.109.396.275.514.475.117.2.193.45.235.74.042.292.059.608.059.949a2.277 2.277 0 0 0-.91-.374 5.22 5.22 0 0 0-.958-.1c-.395 0-.766.058-1.12.158-.353.1-.656.25-.9.45a2.14 2.14 0 0 0-.59.74 2.3 2.3 0 0 0-.217 1.007c0 .723.21 1.29.63 1.689.42.399.977.599 1.667.599.623 0 1.119-.108 1.498-.325.378-.216.68-.466.9-.75v.958h1.246v-4.543c0-.965-.211-1.714-.64-2.238-.421-.525-1.17-.79-2.23-.79a5.1 5.1 0 0 0-1.346.182zm2.23 5.998c-.302.217-.698.317-1.186.317-.438 0-.766-.108-1.001-.317-.236-.216-.354-.5-.354-.848 0-.208.042-.383.135-.541.092-.158.219-.283.362-.383s.319-.175.513-.225a2.33 2.33 0 0 1 .589-.074c.656 0 1.22.158 1.683.49v.94a3.83 3.83 0 0 1-.741.64z" fill-rule="evenodd"/><path d="M132.946 92.325h6.825v1.314h-2.744v6.09h-1.33v-6.09h-2.742v-1.314z"/><path clip-rule="evenodd" d="M145.982 99.655c.505-.158.934-.4 1.304-.732l-.404-1.032c-.244.217-.572.4-.968.55-.395.15-.841.224-1.33.224-.731 0-1.337-.191-1.817-.582s-.74-.94-.8-1.64h5.757c.058-.257.084-.55.084-.89 0-.507-.093-.965-.278-1.381a3.264 3.264 0 0 0-.741-1.073 3.28 3.28 0 0 0-1.11-.691 3.696 3.696 0 0 0-1.355-.25c-.623 0-1.17.108-1.65.308a3.618 3.618 0 0 0-1.203.824 3.494 3.494 0 0 0-.75 1.223 4.294 4.294 0 0 0-.26 1.514c0 .583.1 1.115.286 1.59.186.474.463.882.808 1.223s.766.599 1.263.782a4.766 4.766 0 0 0 1.657.275c.497 0 1.002-.084 1.507-.242zm-3.374-5.708c.412-.374.959-.557 1.649-.557.657 0 1.17.183 1.549.524.378.35.58.832.614 1.448h-4.544a2.26 2.26 0 0 1 .732-1.415zm5.848-1.622h1.683l2.566 3.57-2.743 3.835h-1.632l2.877-3.836-2.751-3.57zm4.577 0h1.33v7.405h-1.33zm6.084 7.405l-2.928-3.836 2.735-3.57h-1.65l-2.583 3.57 2.777 3.836zm6.076-.075c.505-.158.934-.4 1.304-.732l-.404-1.032c-.244.217-.572.4-.967.55-.396.15-.842.224-1.33.224-.732 0-1.338-.191-1.818-.582-.48-.391-.74-.94-.8-1.64h5.757c.059-.257.084-.55.084-.89 0-.507-.092-.965-.278-1.381a3.276 3.276 0 0 0-.74-1.073 3.284 3.284 0 0 0-1.111-.691 3.692 3.692 0 0 0-1.355-.25c-.622 0-1.17.108-1.65.308a3.624 3.624 0 0 0-1.202.824 3.465 3.465 0 0 0-.75 1.223 4.272 4.272 0 0 0-.26 1.514c0 .583.1 1.115.286 1.59.185.474.463.882.808 1.223s.765.599 1.262.782a4.772 4.772 0 0 0 1.658.275 5.04 5.04 0 0 0 1.506-.242zm-3.374-5.708c.413-.374.96-.557 1.65-.557.648 0 1.169.183 1.548.524.379.35.58.832.614 1.448h-4.544a2.26 2.26 0 0 1 .732-1.415zm10.595-4.11c-.783 0-1.212-.433-1.28-1.298h-1.253c0 .332.059.632.168.915.11.283.27.524.48.724s.48.358.79.482c.312.125.674.183 1.086.183a2.64 2.64 0 0 0 1.019-.183c.303-.116.555-.282.774-.482a2.1 2.1 0 0 0 .496-.724c.118-.283.177-.583.177-.915h-1.245c-.06.865-.472 1.298-1.212 1.298zm-3.594 2.487v7.406h1.33l4.325-5.517v5.517h1.33v-7.406h-1.33l-4.325 5.517v-5.517z" fill-rule="evenodd"/></svg></div><span class="font-bold text-sm text-black/50">СБП (QR-код)</span><span class="text-[10px] text-gray-500">Скоро на сайте</span></label>
+<label :class="paymentMethod === 'cod' ? 'border-black bg-white shadow-md' : 'border-black/5 bg-black/5 hover:border-black/10'" class="relative flex flex-col items-center justify-center gap-3 p-5 rounded-2xl border-2 transition-all cursor-pointer text-center"><input class="tc-radio-sq absolute top-3 right-3" name="payment_method_radio" type="radio" value="cod" x-model="paymentMethod"/><div class="w-10 h-10 bg-black/5 rounded-xl flex items-center justify-center"><img src="/media/icons/give.png" alt="При получении" class="w-6 h-6"/></div><span class="font-bold text-sm text-black">При получении</span></label>
+
+
+
+
+    </div>
+</div>
+</div>
+
+            {# ═══ RIGHT COLUMN (SIDEBAR) ═══ #}
+            <div id="basket-sidebar">
+<div class="checkout-card">
+<div class="notice">Осталось указать <span>контактные данные</span></div>
+<div class="total-row">
+<div class="total-label">К оплате</div>
+<div class="total-price" id="checkout-total-price" x-text="Math.round(checkoutTotal) + ' ₽'">{{ cart.total|floatformat:0 }} ₽</div>
+</div>
+<div class="price-details">
+<div class="price-row"><div>Товары</div><div class="dots"></div><div id="checkout-items-price">{{ cart.subtotal|floatformat:0 }} ₽</div></div>
+<div class="price-row"><div>Доставка</div><div class="dots"></div><div x-text="cdekDeliveryCost !== null ? cdekDeliveryCost + ' ₽' : deliveryType === 'pickup' ? 'бесплатно' : 'рассчитается'"></div></div>
+                        {% if cart.discount_amount > 0 %}
+                        <div class="price-row"><div>Промокод</div><div class="dots"></div><div>−{{ cart.discount_amount|floatformat:0 }} ₽</div></div>
+                        {% endif %}
+                    </div>
+<div class="input-group">
+                        {% if cart.promo_code %}
+                        <div class="input-field"><input readonly="" type="text" value="{{ cart.promo_code.code }}"/><a class="action-btn" href="{% url 'orders:basket' %}?remove_promo=1">Сбросить</a></div>
+                        {% else %}
+                        <div class="input-field">
+<input id="promo-input" name="code" placeholder="Промокод" type="text"/>
+<button class="action-btn" onclick="document.getElementById('promo-form-input').value=document.getElementById('promo-input').value;document.getElementById('promo-form').submit();" style="color:#fff;" type="button">Применить</button>
+</div>
+                        {% endif %}
+                        <div class="input-field"><input name="gift_code" placeholder="Подарочный сертификат" type="text"/></div>
+</div>
+<div class="info-section"><div class="info-text" x-text="paymentMethodLabel">Оплата картой на сайте через ЮKassa</div></div>
+<button :class="{ 'opacity-40 cursor-not-allowed': !canSubmit }" :disabled="!canSubmit" @click="handleSubmit($event)" class="submit-btn" data-checkout-submit="true" name="action" type="button" value="checkout">Оформить заказ</button>
+<label class="terms-container">
+<input name="agree_terms" type="checkbox" x-model="agreeTerms"/>
+<div class="custom-checkbox"></div>
+<span class="terms-text">Согласен с <a href="{% url 'pages:privacy' %}" style="color:#888;border-bottom:1px dotted #666;" target="_blank">условиями обработки данных</a>, <a href="{% url 'pages:user_agreement' %}" style="color:#888;border-bottom:1px dotted #666;" target="_blank">пользовательского соглашения</a> и <a href="{% url 'pages:public_offer' %}" style="color:#888;border-bottom:1px dotted #666;" target="_blank">оферты</a></span>
+</label>
+</div>
+{% if recurring_payments_enabled %}
+<div class="white-box repeat-order-card bg-white rounded-3xl border border-[#ebebeb] p-5 mt-4">
+<label class="flex items-center gap-3 cursor-pointer"><input class="accent-black w-4 h-4" type="checkbox" x-model="repeatOn" :disabled="paymentMethod !== 'card'"/><span class="text-[13px] font-bold uppercase tracking-wider" :class="paymentMethod === 'card' ? 'text-black' : 'text-black/35'">Повторять заказ автоматически</span></label>
+<input type="hidden" name="repeat_order" :value="repeatOn && paymentMethod === 'card' ? 'on' : ''"/>
+<input type="hidden" name="repeat_weeks" :value="repeatWeeks"/>
+<div x-show="repeatOn && paymentMethod === 'card'"
+     x-transition:enter="transition ease-out duration-250"
+     x-transition:enter-start="opacity-0 -translate-y-2"
+     x-transition:enter-end="opacity-100 translate-y-0"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100 translate-y-0"
+     x-transition:leave-end="opacity-0 -translate-y-2"
+     class="pt-4 mt-4 border-t border-black/5">
+<div class="flex items-center gap-2 text-[14px] mb-3"><span>каждые</span><input class="w-14 text-center bg-[#f5f5f5] border-0 rounded-lg px-2 py-2 font-bold focus:outline-none" max="12" min="1" type="number" x-model.number="repeatWeeks"/><span>нед.</span></div>
+<p class="text-[12px] text-black/55 leading-[1.45]" x-text="'После первой успешной оплаты карта будет безопасно сохранена в ЮKassa. Следующее списание — через ' + (repeatWeeks * 7) + ' дней.'"></p>
+<p class="text-[11px] text-black/40 leading-[1.4] mt-2">Автоплатёж можно отключить в личном кабинете.</p>
+</div>
+</div>
+{% endif %}
+</div>
+</form>
+        {% else %}
+        <div class="text-center py-20">
+<div class="w-[90px] h-[90px] bg-white rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-[#ebebeb]"><svg class="w-10 h-10 text-black/15"><use href="{% static 'asset/images/sprite.svg' %}#icons--shop"></use></svg></div>
+<p class="text-[24px] font-din-black uppercase m-0 mb-2">Корзина пуста</p>
+<p class="text-[14px] text-black/40 m-0 mb-8">Выберите товары в каталоге и возвращайтесь</p>
+<a class="inline-block bg-black text-white px-10 py-4 rounded-[14px] font-bold text-[15px] no-underline hover:bg-black/80 transition-colors" href="{% url 'catalog:catalog' %}">Перейти в каталог</a>
+</div>
+        {% endif %}
+    </div>
+</main>
+
+{# ═══ Edit Address Modal ═══ #}
+<div id="edit-address-modal" onclick="if(event.target===this)closeEditModal()" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;padding:16px;display:none;" >
+<div @click.stop="" style="background:#fff;border-radius:24px;padding:24px 28px;width:100%;max-width:480px;">
+<p style="font-family:'DIN Pro Black',sans-serif;font-size:32px;text-transform:uppercase;line-height:1.2;margin:0 0 24px;">Изменить адрес</p>
+<div style="display:flex;flex-direction:column;gap:16px;">
+<div class="tc-input"><label class="tc-input__label">Название</label><div class="tc-input__field"><input type="text" placeholder="Например, дом или работа" class="tc-input__field--input" id="edit-addr-label"/></div></div>
+<div class="tc-input"><label class="tc-input__label">Город</label><div class="tc-input__field"><input type="text" placeholder="Укажите город" class="tc-input__field--input" id="edit-addr-city"/></div></div>
+<div class="tc-input"><label class="tc-input__label">Улица</label><div class="tc-input__field"><input type="text" placeholder="Улица" class="tc-input__field--input" id="edit-addr-street"/></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+<div class="tc-input"><label class="tc-input__label">Дом</label><div class="tc-input__field"><input type="text" placeholder="Номер" class="tc-input__field--input" id="edit-addr-house"/></div></div>
+<div class="tc-input"><label class="tc-input__label">Квартира / Офис</label><div class="tc-input__field"><input type="text" placeholder="Номер" class="tc-input__field--input" id="edit-addr-apartment"/></div></div>
+</div>
+<div class="tc-input"><label class="tc-input__label">Индекс</label><div class="tc-input__field"><input type="text" placeholder="Индекс" class="tc-input__field--input" id="edit-addr-postal" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'').substring(0,6)"/></div></div>
+</div>
+<label class="tc-checkbox cursor-pointer" style="margin-top:16px;display:flex;align-items:center;gap:8px;cursor:pointer;"><input class="tc-checkbox__input cursor-pointer" type="checkbox" id="edit-addr-default"/><span class="tc-checkbox__text"><span>Сделать основным</span></span></label>
+<div style="margin-top:24px;display:flex;flex-direction:column;gap:8px;">
+<button type="button" class="tc-btn btn-dark w-full" onclick="saveEditAddress()"><span class="text-primary duration-200">Сохранить</span></button>
+<button type="button" class="tc-btn btn-secondary w-full" onclick="closeEditModal()"><span class="text-primary duration-200">Отменить</span></button>
+</div>
+<button type="button" class="tc-btn btn-danger w-full" style="margin-top:8px;" onclick="deleteAddress()"><svg class="ic-left"><use href="{% static 'asset/images/sprite.svg' %}#icons--delete"></use></svg><span class="text-primary duration-200">Удалить</span></button>
+</div>
+</div>
+</main>
+<div id="login-modal-overlay" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;">
+<div onclick="event.stopPropagation()" style="width:100%;max-width:488px;margin:0 16px;">
+<form action="/login/" class="bg-white rounded-3xl p-6 md:p-8" method="post">
+        {% csrf_token %}
+
+        <div class="w-full mb-4">
+<p class="text-[40px] font-din-black uppercase leading-[1.2] md:tracking-[0.01em] mb-0">Войти</p>
+</div>
+<div class="w-full space-y-8">
+<div class="w-full space-y-4">
+<div class="tc-input input-white xl:input-secondary">
+<label class="tc-input__label" for="email-login-modal">Электронная почта</label>
+<div class="tc-input__field">
+<input autocomplete="email" class="tc-input__field--input" id="email-login-modal" name="email" type="email"/>
+</div>
+</div>
+<div class="tc-input input-white xl:input-secondary" x-data="{ showPwd: false }">
+<label class="tc-input__label" for="password-login-modal">Пароль</label>
+<div class="tc-input__field">
+<input :type="showPwd ? 'text' : 'password'" autocomplete="current-password" class="pr-10 tc-input__field--input" id="password-login-modal" name="password" placeholder="Пароль"/>
+<button @click="showPwd = !showPwd" class="tc-input__field--btn-right" type="button">
+<svg class="w-6 h-6" x-show="!showPwd"><use href="{% static 'images/sprite.svg' %}#icons--viewing-close"></use></svg>
+<svg class="w-6 h-6" x-cloak="" x-show="showPwd"><use href="{% static 'images/sprite.svg' %}#icons--viewing-stroke"></use></svg>
+</button>
+</div>
+</div>
+</div>
+<button class="tc-btn btn-dark w-full" type="submit">
+<span class="text-primary duration-200">Войти</span>
+</button>
+{% if socialaccount_providers %}
+<div class="w-full space-y-2">
+<p class="text-[14px] leading-[1.3] medium">Войти через:</p>
+<ul class="list-none p-0 m-0 flex flex-wrap overflow-auto items-center gap-2">
+{% for provider in socialaccount_providers %}
+{% if provider.id == "yandex" %}
+<li>
+<a class="block cursor-pointer" href="{% provider_login_url 'yandex' next=request.get_full_path %}">
+<svg class="max-xl:text-white text-[var(--black-4)] h-11 w-11"><use href="{% static 'images/sprite.svg' %}#service--yandex-colored"></use></svg>
+</a>
+</li>
+{% elif provider.id == "vk" %}
+<li>
+<a class="block cursor-pointer" href="{% provider_login_url 'vk' next=request.get_full_path %}">
+<svg class="max-xl:text-white text-[var(--black-4)] h-11 w-11"><use href="{% static 'images/sprite.svg' %}#service--vk-blue"></use></svg>
+</a>
+</li>
+{% endif %}
+{% endfor %}
+</ul>
+</div>
+{% endif %}
+<button class="tc-btn btn-white xl:btn-secondary w-full" onclick="window.location.href='{% url 'register' %}'" type="button">
+<span class="text-primary duration-200">Регистрация</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+<style>
+.tc-radio-sq{appearance:none!important;-webkit-appearance:none!important;width:20px!important;height:20px!important;border:2px solid rgba(0,0,0,.25)!important;border-radius:6px!important;margin:0!important;cursor:pointer!important;background:#fff!important;flex-shrink:0;transition:border-color .15s ease}
+.tc-radio-sq:hover{border-color:rgba(0,0,0,.4)!important}
+.tc-radio-sq:checked{background:#000!important;background-clip:content-box!important;padding:5px!important;border-color:#000!important}
+.tc-radio-sq:disabled{cursor:not-allowed!important;border-color:rgba(0,0,0,.15)!important;background:rgba(0,0,0,.05)!important}
+.tc-checkbox-card{position:relative;display:block;width:280px;background:#ececec;border:1px solid #1a1a1a;border-radius:20px;padding:20px !important}
+.tc-checkbox-card__input{appearance:none !important;-webkit-appearance:none !important;width:24px !important;height:24px !important;border:2.5px solid #1a1a1a !important;border-radius:6px !important;margin:0 !important;cursor:pointer !important;display:block !important;background:transparent !important;flex-shrink:0}
+.tc-checkbox-card__input:checked{background:#1a1a1a !important;background-clip:content-box !important;padding:6px !important}
+.button-edit-address{position:absolute;top:8px;right:8px;color:#333;cursor:pointer;z-index:100;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.85);border-radius:10px;pointer-events:auto}
+.button-edit-address svg{width:22px;height:22px}
+.tc-checkbox-card__text{display:block;margin-top:12px;font-size:15px;line-height:1.2;color:#1a1a1a !important}
+.tc-checkbox-card__header-title{font-size:14px !important;color:#1a1a1a !important;margin-left:8px}
+.border-checked{position:absolute;inset:0;border-radius:20px;pointer-events:none !important;border:2px solid transparent;transition:border-color .2s;z-index:0}
+.tc-checkbox-card__input:checked~.border-checked{border-color:#1a1a1a}
+.checkout-card{background:#000;color:#fff;width:100%;border-radius:40px;padding:32px 28px}
+.checkout-card .notice{color:#a0a0a5;font-size:15px;margin-bottom:16px}
+.checkout-card .notice span{color:#fff}
+.checkout-card .total-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:30px}
+.checkout-card .total-label{font-family:'DIN Pro Black',sans-serif;font-size:38px;letter-spacing:1px;text-transform:uppercase}
+.checkout-card .total-price{font-family:'DIN Pro Black',sans-serif;font-size:38px}
+.checkout-card .price-details{margin-bottom:24px}
+.checkout-card .price-row{display:flex;justify-content:space-between;font-size:17px;margin-bottom:16px;color:#fff}
+.checkout-card .dots{flex-grow:1;border-bottom:1px dotted #333;margin:0 8px;position:relative;top:-4px}
+.checkout-card .input-group{margin-bottom:24px}
+.checkout-card .input-field{background:#262626;border-radius:14px;padding:16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;height:56px}
+.checkout-card .input-field input{background:transparent;border:none;color:#fff;font-size:16px;width:70%;outline:none}
+.checkout-card .input-field input::placeholder{color:#555}
+.checkout-card .action-btn{color:#555;font-size:16px;cursor:pointer}
+.checkout-card .info-section{margin-bottom:30px}
+.checkout-card .info-text{color:#666;font-size:15px;line-height:1.4;margin-bottom:12px}
+.checkout-card .submit-btn{background:#fff;color:#000;width:100%;border:none;border-radius:14px;padding:16px;font-size:16px;font-weight:700;text-transform:uppercase;cursor:pointer;margin-bottom:20px}
+.checkout-card .terms-container{display:flex;align-items:flex-start;gap:12px;cursor:pointer}
+.checkout-card .terms-container input{display:none}
+.checkout-card .custom-checkbox{width:22px;height:22px;border:2px solid #333;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#1a1a1a;margin-top:2px}
+.checkout-card .terms-container input:checked+.custom-checkbox{background:#333;border-color:#333}
+.checkout-card .custom-checkbox::after{content:"✓";color:#fff;font-size:14px;display:none}
+.checkout-card .terms-container input:checked+.custom-checkbox::after{display:block}
+.checkout-card .terms-text{color:#444;font-size:13px;line-height:1.4}
+[x-cloak]{display:none!important}
+.recipient-desktop{display:none}.recipient-mobile{display:block}
+.delivery-desktop{display:none}.delivery-mobile{display:block}
+@media(min-width:1100px){
+    .recipient-desktop{display:block}.recipient-mobile{display:none}
+    .delivery-desktop{display:block}.delivery-mobile{display:none}
+    #basket-form{display:grid!important;grid-template-columns:2fr 1fr!important;gap:24px!important}
+    #basket-left-col{grid-column:1!important;display:flex;flex-direction:column;gap:20px}
+    #basket-sidebar{grid-column:2!important;position:sticky!important;top:100px!important;align-self:start!important}
+}
+@media(max-width:1099px){
+    #basket-left-col{display:flex;flex-direction:column;gap:12px}
+    #basket-left-col>.white-box{margin:0!important}
+    #basket-left-col>div:first-child ul{margin-left:0!important;margin-right:0!important}
+    #basket-left-col>div:first-child>div:first-child{margin-left:0!important;margin-right:0!important}
+    #basket-left-col .ti-list{display:grid;width:100%;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0}
+    #basket-left-col .ti-list>:not([hidden])~:not([hidden]){margin-left:0;margin-right:0}
+    #basket-left-col .ti-list-item{display:grid;grid-template-rows:32px auto;justify-items:center;align-items:start;text-align:center;min-width:0}
+    #basket-left-col .ti-list-item>svg{align-self:end}
+    #basket-left-col .ti-list__text{padding:6px 0 0;min-width:0}
+    #basket-left-col .ti-list__text p{overflow-wrap:anywhere}
+}
+</style>
+<script>
+function tcGetCookie(name) {
+    const v = document.cookie.split(';').map(c => c.trim());
+    for (const c of v) { if (c.startsWith(name + '=')) return decodeURIComponent(c.substring(name.length + 1)); }
+    return '';
+}
+function tcProductWord(value) {
+    var n = Math.abs(Number(value) || 0);
+    var last2 = n % 100;
+    var last1 = n % 10;
+    if (last2 >= 11 && last2 <= 14) return 'товаров';
+    if (last1 === 1) return 'товар';
+    if (last1 >= 2 && last1 <= 4) return 'товара';
+    return 'товаров';
+}
+function tcUpdateCart(variantId, qty) {
+    fetch('/basket/update/' + variantId + '/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': tcGetCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'qty=' + qty
+    }).then(function(r) { return r.json(); }).then(function(data) {
+        if (!data.ok) return;
+        var itemRow = document.querySelector('[data-variant-id="' + variantId + '"]');
+        var serverQty = data.item_qty !== null && data.item_qty !== undefined ? data.item_qty : qty;
+        if (itemRow) {
+            var counterEl = itemRow.querySelector('.tc-counter__value');
+            if (counterEl) counterEl.textContent = serverQty;
+            var priceEl = itemRow.querySelector('.item-total-price');
+            if (priceEl && data.item_total !== null && data.item_total !== undefined) priceEl.innerHTML = Math.round(Number(data.item_total) || 0) + '<span class="rub"> \u20BD</span>';
+            var btns = itemRow.querySelectorAll('.tc-counter__btn');
+            if (btns[0]) {
+                if (serverQty <= 1) { btns[0].removeAttribute('onclick'); btns[0].style.opacity = '0.3'; }
+                else { btns[0].setAttribute('onclick', 'tcUpdateCart(' + variantId + ',' + (serverQty-1) + ')'); btns[0].style.opacity = '1'; }
+            }
+            if (btns[1]) {
+                btns[1].setAttribute('onclick', 'tcUpdateCart(' + variantId + ',' + (serverQty+1) + ')');
+            }
+        }
+        var totalEl = document.getElementById('checkout-total-price');
+        if (totalEl && data.total) totalEl.textContent = Math.round(Number(data.total) || 0) + ' \u20BD';
+        var itemsEl = document.getElementById('checkout-items-price');
+        if (itemsEl && data.subtotal) itemsEl.textContent = Math.round(Number(data.subtotal) || 0) + ' \u20BD';
+        var badge = document.getElementById('header-cart-badge');
+        if (badge && data.total_items !== undefined) {
+            var spans = badge.querySelectorAll('span.block');
+            if (spans[1]) spans[1].textContent = data.total_items;
+        }
+        document.body.dispatchEvent(new CustomEvent('cartUpdated'));
+        window.dispatchEvent(new CustomEvent('cart-total-updated', {detail:{total:data.total, subtotal:data.subtotal}}));
+    });
+}
+function tcRemoveFromCart(variantId) {
+    var itemRow = document.querySelector('[data-variant-id="' + variantId + '"]');
+    if (itemRow) {
+        itemRow.style.transition = 'opacity 0.3s';
+        itemRow.style.opacity = '0';
+        setTimeout(function() { itemRow.style.maxHeight = '0'; itemRow.style.overflow = 'hidden'; itemRow.style.padding = '0'; itemRow.style.margin = '0'; itemRow.style.border = 'none'; }, 300);
+    }
+    fetch('/basket/remove/' + variantId + '/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': tcGetCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function(r) { return r.json(); }).then(function(data) {
+        setTimeout(function() { if (itemRow) itemRow.remove(); }, 600);
+        // Update korzina count
+        var korzinaEl = document.getElementById('korzina-count');
+        if (korzinaEl && data.unique_count !== undefined) korzinaEl.textContent = data.unique_count;
+        var korzinaWordEl = document.getElementById('korzina-count-word');
+        if (korzinaWordEl && data.unique_count !== undefined) korzinaWordEl.textContent = tcProductWord(data.unique_count);
+        // Update checkout prices
+        var totalEl = document.getElementById('checkout-total-price');
+        if (totalEl && data.total) totalEl.textContent = data.total + ' \u20BD';
+        var itemsEl = document.getElementById('checkout-items-price');
+        if (itemsEl && data.subtotal) itemsEl.textContent = Math.round(Number(data.subtotal) || 0) + ' \u20BD';
+        // Update cart badge
+        var badge = document.getElementById('header-cart-badge');
+        if (badge && data.total_items !== undefined) {
+            var spans = badge.querySelectorAll('span.block');
+            if (spans[1]) spans[1].textContent = data.total_items;
+        }
+        document.body.dispatchEvent(new CustomEvent('cartUpdated'));
+        // Reload if empty
+        if (data.total_items !== undefined && data.total_items === 0) {
+            setTimeout(function() { location.reload(); }, 500);
+        }
+    });
+}
+function tcPhoneMask(e) {
+    var el = e.target;
+    var len = parseInt(el.getAttribute('data-phone-length')) || 10;
+    var raw = el.value.replace(/\D/g, '').slice(0, len);
+    if (!raw) { el.value = ''; return; }
+    var f = '';
+    if (raw.length <= 3) {
+        f = '(' + raw;
+    } else if (raw.length <= 6) {
+        f = '(' + raw.slice(0,3) + ') ' + raw.slice(3);
+    } else if (raw.length <= 8) {
+        f = '(' + raw.slice(0,3) + ') ' + raw.slice(3,6) + '-' + raw.slice(6);
+    } else {
+        f = '(' + raw.slice(0,3) + ') ' + raw.slice(3,6) + '-' + raw.slice(6,8) + '-' + raw.slice(8);
+    }
+    el.value = f;
+}
+</script>
+
+{# ═══ Standalone Edit Address Script (independent of Alpine x-data) ═══ #}
+<script>
+(function() {
+    var _editAddrId = "";
+
+    function tcGetCookie(name) {
+        var v = document.cookie.split(";").map(function(c) { return c.trim(); });
+        for (var i = 0; i < v.length; i++) {
+            if (v[i].indexOf(name + "=") === 0) return decodeURIComponent(v[i].substring(name.length + 1));
+        }
+        return "";
+    }
+
+    window.openEditModal = function(id, label, city, street, house, apartment, postalCode, isDefault) {
+        _editAddrId = id;
+        var el;
+        el = document.getElementById("edit-addr-label"); if(el) el.value = label || "";
+        el = document.getElementById("edit-addr-city"); if(el) el.value = city || "";
+        el = document.getElementById("edit-addr-street"); if(el) el.value = street || "";
+        el = document.getElementById("edit-addr-house"); if(el) el.value = house || "";
+        el = document.getElementById("edit-addr-apartment"); if(el) el.value = apartment || "";
+        el = document.getElementById("edit-addr-postal"); if(el) el.value = postalCode || "";
+        el = document.getElementById("edit-addr-default"); if(el) el.checked = !!isDefault;
+        var modal = document.getElementById("edit-address-modal");
+        if (modal) modal.style.display = "flex";
+    };
+
+    window.closeEditModal = function() {
+        var modal = document.getElementById("edit-address-modal");
+        if (modal) modal.style.display = "none";
+        _editAddrId = "";
+    };
+
+    window.saveEditAddress = function() {
+        if (!_editAddrId) return;
+        var body = new URLSearchParams({
+            label: (document.getElementById("edit-addr-label") || {}).value || "",
+            city: (document.getElementById("edit-addr-city") || {}).value || "",
+            street: (document.getElementById("edit-addr-street") || {}).value || "",
+            house: (document.getElementById("edit-addr-house") || {}).value || "",
+            apartment: (document.getElementById("edit-addr-apartment") || {}).value || "",
+            postal_code: (document.getElementById("edit-addr-postal") || {}).value || "",
+            is_default: (document.getElementById("edit-addr-default") || {}).checked ? "true" : "false"
+        });
+        fetch("/basket/address/" + _editAddrId + "/edit/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": tcGetCookie("csrftoken"),
+                "X-Requested-With": "XMLHttpRequest",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: body
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d.ok) window.location.reload();
+        });
+    };
+
+    window.deleteAddress = function() {
+        if (!confirm("\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0430\u0434\u0440\u0435\u0441?")) return;
+        if (!_editAddrId) return;
+        fetch("/basket/address/" + _editAddrId + "/delete/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": tcGetCookie("csrftoken"),
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d.ok) window.location.reload();
+        });
+    };
+})();
+</script>
+
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Журнал о кофе{% endblock %}
+{% block meta_description %}Читайте статьи о кофе: способы приготовления, обзоры сортов, советы бариста и новинки от Aspect Coffee.{% endblock %}
+
+{% block content %}
+<main class="aspect-journal">
+  <div class="container xl:pt-8 mb-10 md:mb-20">
+    <div class="aspect-journal-layout">
+      <aside class="aspect-journal-sidebar">
+        <h1>Журнал о кофе</h1>
+        <nav class="aspect-journal-nav" aria-label="Темы журнала">
+          <a href="{% url 'blog:index' %}" class="{% if not current_category %}active{% endif %}">Все темы</a>
+          {% for cat in categories %}
+          <a href="{% url 'blog:category' cat.slug %}" class="{% if current_category == cat.slug %}active{% endif %}">
+            <span>{{ cat.name }}</span><small>{{ cat.posts.count }}</small>
+          </a>
+          {% endfor %}
+        </nav>
+        <div class="aspect-journal-tags">
+          <h2>Теги <span>›</span></h2>
+          <div>{% for cat in categories %}<a href="{% url 'blog:category' cat.slug %}"># {{ cat.name }}</a>{% endfor %}</div>
+        </div>
+        {% if journal_series %}
+        <div class="aspect-journal-series">
+          <h2>Серии статей</h2>
+          {% with top=journal_series|first %}
+          <div class="aspect-journal-series-stack layers-{% if journal_series|length > 3 %}3{% else %}{{ journal_series|length }}{% endif %}">
+            <a href="{{ top.card_url }}" class="aspect-journal-series-card">
+              {% if top.image %}<img src="{{ top.image.url }}" alt="{{ top.title }}">{% endif %}
+              <span class="aspect-journal-series-shade"></span>
+              <span class="aspect-journal-series-copy">
+                <strong>{{ top.title }}</strong>
+                {% if top.description %}<small>{{ top.description|truncatechars:220 }}</small>{% endif %}
+                <em>
+                  <span><svg width="20" height="20"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--time-light"></use></svg>{{ top.reading_minutes }}′</span>
+                  <span><svg width="20" height="20"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--note-empty"></use></svg>{{ top.count_label }}</span>
+                </em>
+              </span>
+            </a>
+          </div>
+          {% endwith %}
+          {% if journal_series|length > 1 %}
+          <p class="aspect-journal-series-hint">Ещё {{ journal_series|length|add:"-1" }} в стопке — откроются после прочтения</p>
+          {% endif %}
+        </div>
+        {% endif %}
+      </aside>
+
+      <section class="aspect-journal-feed">
+        <div class="aspect-journal-list-heading">
+          <h2>Все статьи</h2>
+          <form class="aspect-journal-sort" method="get">
+            {% if current_category %}<input type="hidden" name="category" value="{{ current_category }}">{% endif %}
+            <label class="visually-hidden" for="journal-sort">Порядок статей</label>
+            <select id="journal-sort" name="sort" onchange="this.form.submit()">
+              <option value="new" {% if selected_sort == 'new' %}selected{% endif %}>Сначала новые</option>
+              <option value="old" {% if selected_sort == 'old' %}selected{% endif %}>Сначала старые</option>
+            </select>
+          </form><span>{{ posts_count_label }}</span>
+        </div>
+
+        <div class="aspect-journal-grid" id="blog-list">
+          {% for post in posts %}
+          <article class="aspect-journal-card{% if post.is_wide %} aspect-journal-card-wide{% endif %}">
+            <a href="{{ post.get_absolute_url }}" class="aspect-journal-card-image">
+              {% if post.image %}<img src="{{ post.image.url }}" alt="{{ post.title }}">{% else %}<div class="aspect-journal-image-placeholder"></div>{% endif %}
+              {% if post.is_wide %}<span class="aspect-journal-card-overlay"></span>{% endif %}
+            </a>
+            <div class="aspect-journal-card-text">
+              <div class="aspect-journal-meta">
+                {% if post.category %}<a href="{% url 'blog:category' post.category.slug %}">{{ post.category.name }}</a>{% endif %}
+                <span>{{ post.created_at|date:"j E Y" }}</span>
+              </div>
+              <a href="{{ post.get_absolute_url }}" class="aspect-journal-title">{{ post.title }}</a>
+              {% if post.short_description %}<p>{{ post.short_description|truncatechars:150 }}</p>{% endif %}
+              <div class="aspect-journal-actions">
+                <button type="button" class="aspect-journal-pill{% if post.is_liked %} active{% endif %}" data-like-url="{% url 'blog:toggle_like' post.slug %}" aria-label="Нравится">
+                  <svg width="18" height="18"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--like-{% if post.is_liked %}fill{% else %}stroke{% endif %}"></use></svg>
+                  <span data-count>{{ post.likes_count|default:"0" }}</span>
+                </button>
+                <a href="{{ post.get_absolute_url }}#comments" class="aspect-journal-pill" aria-label="Комментарии">
+                  <svg width="18" height="18"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--comments-stroke"></use></svg>
+                  <span>{{ post.comments_count|default:"0" }}</span>
+                </a>
+                <button type="button" class="aspect-journal-pill{% if post.is_bookmarked %} active{% endif %}" data-bookmark-url="{% url 'blog:toggle_bookmark' post.slug %}" aria-label="Закладка">
+                  <svg width="18" height="18"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--bookmark-{% if post.is_bookmarked %}fill{% else %}stroke{% endif %}"></use></svg>
+                </button>
+                <span class="aspect-journal-stat">
+                  <svg width="20" height="20"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--viewing-stroke"></use></svg>{{ post.views_display }}
+                </span>
+                <span class="aspect-journal-stat">
+                  <svg width="20" height="20"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--time-light"></use></svg>{{ post.reading_minutes }}′
+                </span>
+              </div>
+            </div>
+          </article>
+          {% empty %}
+          <div class="aspect-journal-empty">Статьи скоро появятся.</div>
+          {% endfor %}
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <nav class="aspect-journal-pagination" aria-label="Страницы">
+          {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_sort != 'new' %}&sort={{ selected_sort }}{% endif %}">←</a>{% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}<span class="active">{{ num }}</span>{% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}<a href="?page={{ num }}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_sort != 'new' %}&sort={{ selected_sort }}{% endif %}">{{ num }}</a>{% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if selected_sort != 'new' %}&sort={{ selected_sort }}{% endif %}">→</a>{% endif %}
+        </nav>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+
+  <style>
+    .aspect-journal{background:var(--black-4)}.aspect-journal-layout{display:grid;grid-template-columns:316px minmax(0,1fr);gap:64px}.aspect-journal-sidebar h1{font:40px/1.1 'DIN Pro Black','Arial Narrow',sans-serif;text-transform:uppercase;margin:0 0 38px}.aspect-journal-nav{display:flex;flex-direction:column;gap:11px}.aspect-journal-nav a{display:flex;justify-content:space-between;gap:12px;color:var(--black);font:16px/1.25 'DIN Pro Medium',sans-serif;text-decoration:none}.aspect-journal-nav a.active{font-family:'DIN Pro Black','Arial Narrow',sans-serif}.aspect-journal-nav small{color:var(--black-50);font:14px Gotham Pro,Arial,sans-serif}.aspect-journal-feed{min-width:0}
+    .aspect-journal-tags{margin-top:74px}.aspect-journal-tags h2{font:24px/1.1 'DIN Pro Black','Arial Narrow',sans-serif;margin:0 0 17px;text-transform:uppercase}.aspect-journal-tags h2 span{font-size:30px}.aspect-journal-tags>div{display:flex;flex-wrap:wrap;gap:8px}.aspect-journal-tags a{background:#fff;border-radius:9px;color:var(--black-50);font-size:13px;padding:9px 11px;text-decoration:none}
+    .aspect-journal-list-heading{align-items:center;display:flex;justify-content:space-between;margin-bottom:24px}.aspect-journal-list-heading h2{font:24px/1.1 'DIN Pro Black','Arial Narrow',sans-serif;margin:0;text-transform:uppercase}.aspect-journal-list-heading>span:last-child{font-size:14px;margin-left:auto}.aspect-journal-sort{background:#fff;border-radius:10px;margin-left:24px;overflow:hidden}.aspect-journal-sort select{appearance:auto;background:#fff;border:0;color:var(--black);cursor:pointer;font:13px Gotham Pro,Arial,sans-serif;outline:0;padding:10px 32px 10px 13px}
+    .aspect-journal-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:34px 24px}
+    .aspect-journal-card{grid-column:span 4;display:flex;flex-direction:column;position:relative}
+    .aspect-journal-card-image{background:#151515;border-radius:16px;display:block;overflow:hidden;position:relative;aspect-ratio:1.66}
+    .aspect-journal-card img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;transition:transform .35s}
+    .aspect-journal-card-image:hover img{transform:scale(1.035)}
+    .aspect-journal-image-placeholder{width:100%;height:100%;position:absolute;inset:0;background:linear-gradient(135deg,#252525,#555)}
+    .aspect-journal-card-text{display:flex;flex-direction:column;flex:1}
+    .aspect-journal-meta{color:var(--black-50);font-size:14px;line-height:1.2;margin:16px 0 10px}
+    .aspect-journal-meta a{color:var(--black-50);text-decoration:none;margin-right:8px}
+    .aspect-journal-meta span{display:block;padding-top:4px}
+    .aspect-journal-title{display:block;color:var(--black);font:22px/1.17 'DIN Pro Black','Arial Narrow',sans-serif;text-decoration:none;text-transform:uppercase}
+    .aspect-journal-title:hover{text-decoration:underline;text-underline-offset:5px}
+    .aspect-journal-card p{font-size:14px;line-height:1.35;margin:12px 0 0}
+    .aspect-journal-actions{align-items:center;display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:14px;font-size:14px;line-height:1.3}
+    .aspect-journal-pill{align-items:center;background:var(--white);border:0;border-radius:10px;color:var(--black);cursor:pointer;display:inline-flex;font:14px Gotham Pro,Arial,sans-serif;gap:6px;padding:8px 10px;text-decoration:none;transition:background .2s}
+    .aspect-journal-pill:hover{background:var(--black-5)}
+    .aspect-journal-pill.active{background:var(--black);color:var(--white)}
+    .aspect-journal-pill svg{fill:none;stroke:currentColor;color:currentColor}
+    .aspect-journal-stat{align-items:center;color:var(--black);display:inline-flex;gap:5px;padding-left:4px}
+    .aspect-journal-stat svg{color:var(--black)}
+    /* Wide card: copy overlaid on the image, white text — reference card-lg */
+    .aspect-journal-card-wide{grid-column:span 8}
+    .aspect-journal-card-wide .aspect-journal-card-image{aspect-ratio:auto;height:398px;border-radius:16px}
+    .aspect-journal-card-wide .aspect-journal-card-overlay{background:linear-gradient(180deg,transparent 41%,rgba(0,0,0,.76) 100%);border-radius:16px;inset:0;position:absolute;z-index:1}
+    .aspect-journal-card-wide .aspect-journal-card-text{bottom:0;left:0;right:0;padding:24px;position:absolute;z-index:2;flex:none;pointer-events:none}
+    .aspect-journal-card-wide .aspect-journal-card-text a,.aspect-journal-card-wide .aspect-journal-card-text button{pointer-events:auto}
+    .aspect-journal-card-wide .aspect-journal-meta,.aspect-journal-card-wide .aspect-journal-meta a{color:#fff!important}
+    .aspect-journal-card-wide .aspect-journal-meta{margin-top:0}
+    .aspect-journal-card-wide .aspect-journal-title{color:#fff!important;font-size:32px}
+    .aspect-journal-card-wide p{color:#fff!important}
+    .aspect-journal-card-wide .aspect-journal-pill{background:transparent;color:#fff!important;padding:4px 2px}
+    .aspect-journal-card-wide .aspect-journal-pill:hover{background:rgba(255,255,255,.14)}
+    .aspect-journal-card-wide .aspect-journal-pill.active{background:rgba(255,255,255,.24)}
+    .aspect-journal-card-wide .aspect-journal-pill svg{color:#fff}
+    .aspect-journal-card-wide .aspect-journal-stat{color:#fff!important}
+    .aspect-journal-card-wide .aspect-journal-stat svg{color:#fff}
+    .aspect-journal-empty{color:var(--black-50);grid-column:1/-1;padding:50px 0;text-align:center}
+    .aspect-journal-pagination{display:flex;gap:8px;margin-top:42px}.aspect-journal-pagination a,.aspect-journal-pagination span{align-items:center;border-radius:9px;display:flex;height:38px;justify-content:center;min-width:38px;text-decoration:none}.aspect-journal-pagination a{background:var(--white);color:var(--black)}.aspect-journal-pagination .active{background:var(--black);color:var(--white)}
+    @media(max-width:1099px){.aspect-journal,.aspect-journal .container,.aspect-journal-layout,.aspect-journal-sidebar,.aspect-journal-feed,.aspect-journal-grid{min-width:0;max-width:100%;width:100%}.aspect-journal .container{padding-top:18px}.aspect-journal-layout{gap:28px;grid-template-columns:minmax(0,1fr)}.aspect-journal-sidebar h1{font-size:32px;margin-bottom:20px}.aspect-journal-nav{flex-direction:row;flex-wrap:wrap;max-width:100%;overflow:visible;padding-bottom:0;gap:8px}.aspect-journal-nav a{background:var(--white);border:1px solid transparent;border-radius:9px;padding:9px 12px;white-space:nowrap}.aspect-journal-nav a.active{background:var(--white);border-color:var(--black);color:var(--black)}.aspect-journal-nav a.active small{color:var(--black-50)}.aspect-journal-tags{margin-top:30px}.aspect-journal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aspect-journal-card,.aspect-journal-card-wide{grid-column:span 1;min-width:0;max-width:100%}.aspect-journal-card-wide .aspect-journal-card-image{height:auto;aspect-ratio:1.66}}
+    @media(max-width:575px){.aspect-journal-grid{grid-template-columns:minmax(0,1fr);gap:30px}.aspect-journal-card-wide .aspect-journal-card-text{padding:16px}.aspect-journal-card-wide .aspect-journal-title{font-size:24px;line-height:1.12}.aspect-journal-list-heading{display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:20px}.aspect-journal-sort{grid-column:1/-1;grid-row:2;margin-left:0;width:100%}.aspect-journal-sort select{width:100%}.aspect-journal-list-heading>span:last-child{grid-column:2;grid-row:1;margin-left:0;align-self:center}.aspect-journal-card-wide .aspect-journal-card-text{max-width:100%;overflow:hidden}.aspect-journal-card-wide .aspect-journal-card-image{aspect-ratio:1.38}}
+  </style>
+  <style>
+    /* Series stack: each layer is a real admin-created series; the stack shrinks as series are read */
+    .aspect-journal-series{margin-top:62px}.aspect-journal-series h2{font:24px/1.1 'DIN Pro Black','Arial Narrow',sans-serif;margin:0 0 17px;text-transform:uppercase}
+    .aspect-journal-series-stack{margin-bottom:10px;padding-top:18px;position:relative}
+    .aspect-journal-series-stack:before,.aspect-journal-series-stack:after{border-radius:12px 12px 0 0;content:'';height:9px;left:0;margin:auto;position:absolute;right:0}
+    .aspect-journal-series-stack:before{background:#ababac;top:0;width:calc(100% - 60px)}
+    .aspect-journal-series-stack:after{background:#626263;top:9px;width:calc(100% - 24px)}
+    .aspect-journal-series-stack.layers-1{padding-top:0}
+    .aspect-journal-series-stack.layers-1:before,.aspect-journal-series-stack.layers-1:after{display:none}
+    .aspect-journal-series-stack.layers-2:before{display:none}
+    .aspect-journal-series-stack.layers-2:after{top:0}
+    .aspect-journal-series-card{background:#171717;border-radius:12px;color:#fff!important;display:block;min-height:388px;overflow:hidden;position:relative;text-decoration:none}
+    .aspect-journal-series-card img{height:100%;inset:0;object-fit:cover;position:absolute;width:100%;z-index:0}
+    .aspect-journal-series-shade{background:linear-gradient(0deg,transparent,rgba(0,0,0,.9));inset:0;position:absolute;z-index:1}
+    .aspect-journal-series-copy{display:flex;flex-direction:column;gap:8px;left:0;padding:12px;position:absolute;right:0;top:0;z-index:2}
+    .aspect-journal-series-card strong{color:#fff;font:40px/1.2 'DIN Pro Black','Arial Narrow',sans-serif;letter-spacing:.01em;text-transform:uppercase}
+    .aspect-journal-series-card small{color:#fff;font-size:14px;line-height:1.2}
+    .aspect-journal-series-card em{align-items:center;color:#fff;display:flex;font-size:14px;font-style:normal;gap:14px;line-height:1.3}
+    .aspect-journal-series-card em span{align-items:center;display:inline-flex;gap:4px}
+    .aspect-journal-series-card em svg{color:#fff}
+    .aspect-journal-series-hint{color:var(--black-50);font-size:13px;line-height:1.3;margin:8px 0 0}
+    @media(max-width:1099px){.aspect-journal-series{display:none}}
+  </style>
+  <script>
+    (function(){
+      function csrf(){var m=document.cookie.match(/(?:^|; )csrftoken=([^;]+)/);return m?decodeURIComponent(m[1]):''}
+      var SPRITE='/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg';
+      function send(url){return fetch(url,{method:'POST',headers:{'X-CSRFToken':csrf(),'X-Requested-With':'XMLHttpRequest'}}).then(function(r){return r.json()})}
+      function needLogin(d){if(d&&d.error==='login_required'){window.location.href='/login/?next='+encodeURIComponent(window.location.pathname);return true}return false}
+      document.addEventListener('click',function(e){
+        var like=e.target.closest('[data-like-url]');
+        if(like){
+          e.preventDefault();
+          send(like.getAttribute('data-like-url')).then(function(d){
+            if(needLogin(d)||!d.ok)return;
+            like.classList.toggle('active',d.liked);
+            var c=like.querySelector('[data-count]');if(c)c.textContent=d.count;
+            var u=like.querySelector('use');if(u)u.setAttribute('href',SPRITE+(d.liked?'#icons--like-fill':'#icons--like-stroke'));
+          }).catch(function(){});
+          return;
+        }
+        var bm=e.target.closest('[data-bookmark-url]');
+        if(bm&&!bm.hasAttribute('onclick')){
+          e.preventDefault();
+          send(bm.getAttribute('data-bookmark-url')).then(function(d){
+            if(needLogin(d)||!d.ok)return;
+            bm.classList.toggle('active',d.bookmarked);
+            var u=bm.querySelector('use');if(u)u.setAttribute('href',SPRITE+(d.bookmarked?'#icons--bookmark-fill':'#icons--bookmark-stroke'));
+          }).catch(function(){});
+        }
+      });
+      // Back/forward cache: refresh so a read series card leaves the stack immediately
+      window.addEventListener('pageshow',function(e){if(e.persisted){window.location.reload()}});
+    })();
+  </script>
+</main>
+{% endblock %}

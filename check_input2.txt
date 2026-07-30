@@ -1,0 +1,7 @@
+from apps.catalog.models import Review
+from django.db.models import Q, Count
+qs = Review.objects.filter(is_approved=True)
+print('total:', qs.count())
+print('with user:', qs.filter(user__isnull=False).count())
+print('with author_name:', qs.exclude(author_name='').count())
+print('anon:', qs.filter(user__isnull=True, author_name='').count())

@@ -1,0 +1,22 @@
+
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('orders', '0002_initial'),
+    ]
+
+    operations = [
+        migrations.AddField(
+            model_name='cartitem',
+            name='grind',
+            field=models.CharField(choices=[('whole', 'В зёрнах'), ('fine', 'Мелкий'), ('medium', 'Средний'), ('coarse', 'Крупный')], default='whole', max_length=50, verbose_name='Помол'),
+        ),
+        migrations.AddField(
+            model_name='orderitem',
+            name='grind',
+            field=models.CharField(blank=True, max_length=50, verbose_name='Помол'),
+        ),
+    ]

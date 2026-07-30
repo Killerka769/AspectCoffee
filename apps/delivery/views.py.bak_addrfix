@@ -1,0 +1,104 @@
+"""
+CDEK API endpoints for the checkout page.
+
+All views return JSON and are called by the frontend (Alpine.js).
+No authentication required (public checkout).
+"""
+import json
+import logging
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import csrf_exempt
+
+from .cdek import CDEKClient
+
+logger = logging.getLogger(__name__)
+
+
+@require_GET
+def cdek_cities(request):
+    """
+    GET /api/cdek/cities/?q=Моск
+    Returns list of matching cities.
+    """
+    query = (request.GET.get("q") or "").strip()
+    if len(query) < 2:
+        return JsonResponse({"cities": []})
+
+    client = CDEKClient()
+    if not client.configured():
+        return JsonResponse({"error": "СДЭК не настроен"}, status=503)
+
+    cities = client.search_cities(query, limit=10)
+    return JsonResponse({"cities": cities})
+
+
+@require_GET
+def cdek_offices(request):
+    """
+    GET /api/cdek/offices/?city_code=44
+    Returns list of PVZ/offices for a given city.
+    """
+    city_code = request.GET.get("city_code")
+    if not city_code:
+        return JsonResponse({"error": "city_code обязателен"}, status=400)
+
+    try:
+        city_code = int(city_code)
+    except (ValueError, TypeError):
+        return JsonResponse({"error": "city_code должен быть числом"}, status=400)
+
+    client = CDEKClient()
+    if not client.configured():
+        return JsonResponse({"error": "СДЭК не настроен"}, status=503)
+
+    offices = client.get_offices(city_code, pvz_type="PVZ")
+    return JsonResponse({"offices": offices})
+
+
+@csrf_exempt
+@require_POST
+def cdek_calc(request):
+    """
+    POST /api/cdek/calc/
+    Body JSON: {city_code: int, delivery_type: "cdek_pvz"|"cdek_door", weight: int (grams)}
+    Returns delivery cost and days.
+    """
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, ValueError):
+        return JsonResponse({"error": "Некорректный JSON"}, status=400)
+
+    city_code = data.get("city_code")
+    delivery_type = data.get("delivery_type", "cdek_pvz")
+    weight = data.get("weight", 500)  # default 500g
+
+    if not city_code:
+        return JsonResponse({"error": "city_code обязателен"}, status=400)
+
+    try:
+        city_code = int(city_code)
+        weight = max(int(weight), 100)  # minimum 100g
+    except (ValueError, TypeError):
+        return JsonResponse({"error": "Некорректные данные"}, status=400)
+
+    client = CDEKClient()
+    if not client.configured():
+        return JsonResponse({"error": "СДЭК не настроен"}, status=503)
+
+    result = client.calc_delivery_cost(
+        to_city_code=city_code,
+        weight_grams=weight,
+        delivery_type=delivery_type,
+    )
+
+    if "error" in result:
+        return JsonResponse({"error": result["error"]}, status=400)
+
+    return JsonResponse({
+        "cost": float(result["cost"]),
+        "period_min": result["period_min"],
+        "period_max": result["period_max"],
+        "tariff_name": result["tariff_name"],
+    })

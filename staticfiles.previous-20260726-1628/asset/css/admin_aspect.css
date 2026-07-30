@@ -1,0 +1,23 @@
+.django-ckeditor-widget,
+.cke {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.cke_contents {
+    min-height: 360px !important;
+    resize: both;
+    overflow: auto;
+}
+
+.form-row.field-description,
+.form-row.field-storage_description,
+.form-row.field-delivery_description,
+.form-row.field-ingredients {
+    max-width: none !important;
+}
+
+textarea[name="ingredients"] {
+    min-height: 180px;
+    font-family: Consolas, "Courier New", monospace;
+}

@@ -1,0 +1,11 @@
+from apps.orders.models import Order
+from apps.users.models import User
+
+# Check delivery_address field type
+f = Order._meta.get_field('delivery_address')
+print('Field type:', type(f).__name__)
+print('Help text:', f.help_text if hasattr(f, 'help_text') else 'N/A')
+
+# Check some orders
+for o in Order.objects.all()[:5]:
+    print(f'Order {o.id}: delivery_address={o.delivery_address!r}')

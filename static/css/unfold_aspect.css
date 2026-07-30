@@ -1,0 +1,124 @@
+
+html {
+    scroll-behavior: smooth;
+    color-scheme: light !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    html, body, * {
+        color-scheme: light !important;
+    }
+    :root {
+        --bg-primary: #ffffff !important;
+        --bg-secondary: #f9fafb !important;
+        --bg-tertiary: #f3f4f6 !important;
+        --text-primary: #111827 !important;
+        --text-secondary: #6b7280 !important;
+        --border-light: #e5e7eb !important;
+        --border-medium: #d1d5db !important;
+    }
+}
+
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+    outline: 2px solid rgb(26, 26, 26);
+    outline-offset: 2px;
+}
+
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+
+.table {
+    border-collapse: collapse;
+}
+
+.table th {
+    background-color: var(--bg-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr:hover {
+    background-color: var(--bg-tertiary);
+}
+
+
+.button {
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.button:hover {
+    transform: translateY(-1px);
+}
+
+
+.status-new { color: #2563eb; }
+.status-paid { color: #059669; }
+.status-processing { color: #d97706; }
+.status-shipped { color: #7c3aed; }
+.status-delivered { color: #059669; }
+.status-cancelled { color: #dc2626; }
+
+
+.object-list .item {
+    border-radius: 12px;
+    transition: box-shadow 0.2s ease;
+}
+
+.object-list .item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+.form-control {
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    padding: 8px 12px;
+    transition: border-color 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--border-medium);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+
+.search {
+    border-radius: 8px;
+}
+
+
+.filter {
+    border-radius: 8px;
+}
+
+
+/* ── Описание (RichText/CKEditor) — на всю ширину + изменение размера ── */
+.django-ckeditor-widget,
+.cke_chrome,
+.cke_1,
+.cke {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+/* Обычные textarea в админке — 100% ширины + горизонтальный/вертикальный resize */
+.aligned textarea,
+textarea.vLargeTextField,
+.field-box textarea,
+fieldset textarea,
+form textarea {
+    width: 100% !important;
+    resize: both !important;
+    min-height: 140px;
+    box-sizing: border-box;
+}

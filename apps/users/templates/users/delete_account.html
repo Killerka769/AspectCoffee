@@ -1,0 +1,26 @@
+{% extends "users/base_account.html" %}
+
+{% block title %}Удалить аккаунт{% endblock %}
+
+{% block account_content %}
+<div class="space-y-12 max-w-xl">
+    <div>
+        <h2 class="text-3xl font-din-black uppercase tracking-tight text-red-500 mb-2">Удаление аккаунта</h2>
+        <p class="text-black/40 text-sm font-medium">Это действие необратимо. Все ваши данные будут удалены.</p>
+    </div>
+
+    <form method="post" class="space-y-6 bg-red-50 p-6 rounded-3xl border border-red-100">
+        {% csrf_token %}
+        <p class="text-red-600/80 font-bold text-sm">Пожалуйста, подтвердите удаление аккаунта. Это действие нельзя будет отменить.</p>
+        <div class="pt-4 flex items-center gap-4">
+            <button type="submit"
+                    class="bg-red-500 text-white px-8 py-4 rounded-xl font-din-black uppercase tracking-widest transition-all shadow-xl shadow-red-500/20 hover:bg-red-600 flex items-center gap-3">
+                Да, удалить аккаунт
+            </button>
+            <a href="{% url 'users:profile' %}" class="px-6 py-4 rounded-xl border border-gray-100 text-sm font-bold text-black/60 hover:border-black hover:text-black transition-all flex items-center bg-white shadow-sm">
+                Отмена
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

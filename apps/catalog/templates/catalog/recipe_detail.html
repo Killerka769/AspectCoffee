@@ -1,0 +1,47 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}{{ recipe.name }} — рецепт приготовления{% endblock %}
+
+{% block content %}
+<main class="aspect-recipe-page">
+  <div class="container xl:pt-8 mb-10 md:mb-20">
+    <nav class="aspect-recipe-crumbs"><a href="/">Главная</a><span>•</span><a href="{% if recipe.products.first %}{{ recipe.products.first.get_absolute_url }}#recipes{% else %}/catalog/{% endif %}">К товару</a><span>•</span><span>{{ recipe.name }}</span></nav>
+    <div class="aspect-recipe-hero">
+      <div class="aspect-recipe-image">
+        {% if recipe.main_image %}<img src="{{ recipe.main_image.url }}" alt="{{ recipe.name }}">{% else %}<div class="aspect-recipe-image-fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 3h8M9 3v5a3 3 0 006 0V3M6 9h12l-1 11H7L6 9Z" stroke-width="1.5"/></svg></div>{% endif %}
+      </div>
+      <article class="aspect-recipe-intro">
+        <p class="aspect-recipe-eyebrow">Рецепт приготовления{% if recipe.brew_method %} · {{ recipe.brew_method.name }}{% endif %}</p>
+        <h1>{{ recipe.name }}</h1>
+        <div class="aspect-recipe-facts"><span>{{ recipe.time_minutes }} мин</span><span>{{ recipe.get_difficulty_display }}</span>{% if recipe.author %}<span>{{ recipe.author.first_name|default:recipe.author.email }}</span>{% endif %}</div>
+        {% if recipe.description %}<div class="aspect-recipe-description">{{ recipe.description|safe }}</div>{% endif %}
+        {% if recipe.products.all %}<div class="aspect-recipe-products"><strong>Подходит для:</strong>{% for product in recipe.products.all %}<a href="{{ product.get_absolute_url }}">{{ product.name }}</a>{% endfor %}</div>{% endif %}
+      </article>
+    </div>
+
+    <div class="aspect-recipe-content">
+      <section>
+        <h2>Ингредиенты</h2>
+        <ul class="aspect-recipe-ingredients">
+          {% for ingredient in recipe.ingredients %}<li>{{ ingredient }}</li>{% empty %}<li>Ингредиенты будут добавлены автором рецепта.</li>{% endfor %}
+        </ul>
+      </section>
+      <section>
+        <h2>Как приготовить</h2>
+        <ol class="aspect-recipe-steps">
+          {% for step in recipe.steps.all %}
+          <li>
+            <div class="aspect-recipe-step-number">{{ forloop.counter }}</div>
+            <div class="aspect-recipe-step-copy"><div class="aspect-recipe-step-meta">{% if step.time_seconds %}{{ step.time_seconds }} сек{% endif %}{% if step.water_ml %}{% if step.time_seconds %} · {% endif %}{{ step.water_ml }} мл{% endif %}</div><p>{{ step.description }}</p>{% if step.image %}<img src="{{ step.image.url }}" alt="Шаг {{ forloop.counter }}">{% endif %}</div>
+          </li>
+          {% empty %}<li><div class="aspect-recipe-step-number">1</div><div class="aspect-recipe-step-copy"><p>Подробные шаги рецепта будут добавлены в ближайшее время.</p></div></li>{% endfor %}
+        </ol>
+      </section>
+    </div>
+  </div>
+  <style>
+    .aspect-recipe-page{background:var(--black-4)}.aspect-recipe-crumbs{display:flex;flex-wrap:wrap;gap:8px;color:var(--black-50);font-size:14px;margin-bottom:26px}.aspect-recipe-crumbs a{color:inherit;text-decoration:none}.aspect-recipe-crumbs a:hover{color:var(--black)}.aspect-recipe-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,1fr);gap:46px;align-items:start;margin-bottom:78px}.aspect-recipe-image{aspect-ratio:1.18;border-radius:24px;overflow:hidden;background:#1a1a1a}.aspect-recipe-image img{width:100%;height:100%;object-fit:cover}.aspect-recipe-image-fallback{align-items:center;color:#ffffff40;display:flex;height:100%;justify-content:center}.aspect-recipe-image-fallback svg{height:90px;width:90px}.aspect-recipe-intro{padding-top:18px}.aspect-recipe-eyebrow{color:var(--black-50);font:14px/1.2 'DIN Pro Medium',sans-serif;text-transform:uppercase;margin:0 0 17px}.aspect-recipe-intro h1,.aspect-recipe-content h2{font:40px/1.08 'DIN Pro Black','Arial Narrow',sans-serif;margin:0;text-transform:uppercase}.aspect-recipe-facts{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}.aspect-recipe-facts span{background:var(--white);border-radius:8px;font-size:14px;padding:9px 12px}.aspect-recipe-description{color:var(--black);font-size:16px;line-height:1.55}.aspect-recipe-description p{margin:0 0 12px}.aspect-recipe-products{border-top:1px solid var(--black-10);display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:28px;padding-top:20px}.aspect-recipe-products strong{font-size:14px}.aspect-recipe-products a{color:var(--black);font-size:14px;text-decoration:underline;text-underline-offset:4px}.aspect-recipe-content{display:grid;grid-template-columns:minmax(220px,.55fr) minmax(0,1.45fr);gap:58px}.aspect-recipe-content h2{font-size:28px;margin-bottom:22px}.aspect-recipe-ingredients{list-style:none;margin:0;padding:0}.aspect-recipe-ingredients li{border-bottom:1px solid var(--black-10);font-size:15px;line-height:1.35;padding:14px 0}.aspect-recipe-ingredients li:before{content:'—';margin-right:8px}.aspect-recipe-steps{list-style:none;margin:0;padding:0}.aspect-recipe-steps li{display:grid;grid-template-columns:42px minmax(0,1fr);gap:16px;border-top:1px solid var(--black-10);padding:20px 0}.aspect-recipe-step-number{align-items:center;background:var(--black);border-radius:50%;color:var(--white);display:flex;font:18px 'DIN Pro Black',sans-serif;height:34px;justify-content:center;width:34px}.aspect-recipe-step-meta{color:var(--black-50);font-size:13px;margin-bottom:7px}.aspect-recipe-step-copy p{font-size:16px;line-height:1.5;margin:0}.aspect-recipe-step-copy img{border-radius:16px;display:block;max-width:100%;margin-top:16px}@media(max-width:900px){.aspect-recipe-hero,.aspect-recipe-content{grid-template-columns:1fr;gap:30px}.aspect-recipe-hero{margin-bottom:50px}.aspect-recipe-intro{padding-top:0}.aspect-recipe-image{aspect-ratio:1.35}}@media(max-width:575px){.aspect-recipe-intro h1{font-size:32px}.aspect-recipe-content h2{font-size:25px}.aspect-recipe-hero{gap:22px}.aspect-recipe-steps li{gap:12px;grid-template-columns:37px minmax(0,1fr)}}
+  </style>
+</main>
+{% endblock %}

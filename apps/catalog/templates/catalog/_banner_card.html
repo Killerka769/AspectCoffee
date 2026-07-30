@@ -1,0 +1,15 @@
+{# Bug 10.1 — карточка-баннер в блоках главной, управляется из админки (Banner). #}
+<div class="w-full bg-[#f5f5f5] rounded-[24px] p-6 flex flex-col min-h-[300px] overflow-hidden">
+    {% if banner.image %}
+    <img src="{{ banner.image.url }}" alt="{{ banner.title }}"
+         class="w-full h-36 object-cover rounded-2xl mb-4">
+    {% endif %}
+    <h3 class="font-din-black text-[22px] uppercase mb-3">{{ banner.title }}</h3>
+    {% if banner.description %}
+    <p class="text-black/60 text-[14px] mb-2">{{ banner.description }}</p>
+    {% endif %}
+    {% if banner.link_url %}
+    <a href="{{ banner.link_url }}"
+       class="mt-auto bg-black text-white font-bold px-6 py-3 rounded-xl inline-block hover:bg-gray-800 transition-colors text-[14px] no-underline w-fit">{{ banner.button_label|default:"Перейти" }} →</a>
+    {% endif %}
+</div>
