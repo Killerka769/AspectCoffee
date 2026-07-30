@@ -1,3 +1,0 @@
-import django; django.setup()
-from apps.pages.models import Review
-print('Import OK')

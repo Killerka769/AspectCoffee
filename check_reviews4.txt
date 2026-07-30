@@ -1,4 +1,0 @@
-from apps.catalog.models import Review
-print('Import OK, count:', Review.objects.filter(is_approved=True).count())
-for r in Review.objects.filter(is_approved=True):
-    print('Review {}: user_id={}, user={}, author_name={!r}'.format(r.id, r.user_id, r.user, r.author_name))

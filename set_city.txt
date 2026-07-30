@@ -1,9 +1,0 @@
-from django.contrib.auth import get_user_model
-User = get_user_model()
-u = User.objects.filter(first_name__iexact='sda').first()
-if u:
-    u.city = 'Ташкент'
-    u.save(update_fields=['city'])
-    print(f'Updated: {u.email} -> {u.city}')
-else:
-    print('NOT FOUND')

@@ -1,4 +1,0 @@
-from apps.catalog.models import Review
-qs = Review.objects.filter(is_approved=True, user__isnull=False)
-for r in qs:
-    print(r.user, repr(r.user.first_name), r.user.email)

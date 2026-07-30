@@ -1,6 +1,0 @@
-<svg width="60" height="36" viewBox="0 0 60 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="1.5" y="2" width="57" height="32" rx="6" stroke="#111" stroke-width="2"/>
-  <text x="30" y="15" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="800" letter-spacing="1.1" fill="#111">ASPECT</text>
-  <line x1="12" y1="19" x2="48" y2="19" stroke="#111" stroke-width="1.4"/>
-  <text x="30" y="28" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" letter-spacing="1" fill="#111">COFFEE</text>
-</svg>
