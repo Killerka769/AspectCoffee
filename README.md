@@ -12,6 +12,7 @@
 4. [Интеграции и переключение тестовых/боевых API](docs/04_INTEGRATIONS.md)
 5. [Почта, парсер и фоновые службы](docs/05_MAIL_PARSER_AND_JOBS.md)
 6. [Тестовый контур и безопасное влитие](docs/06_TEST_ENVIRONMENT.md)
+7. [Инструкция по деплою на новый сервер под панелью ISPmanager 6](docs/07_DEPLOY_TO_NEW_SERVER_ISP.md)
 
 ## Быстрый запуск для разработки
 
