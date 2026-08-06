@@ -4,7 +4,7 @@
 
 ## Назначение документа
 
-Данный документ содержит регламент передачи продакшн-репозитория и пошаговую инструкцию по развёртыванию приложения **Aspect Coffee** (`aspectcoffee.ru`) на новом VDS/VPS сервере под управлением панели **ISPmanager 6**.
+Данный документ содержит точный регламент передачи продакшн-репозитория и пошаговую инструкцию по развёртыванию приложения **Aspect Coffee** (`aspectcoffee.ru` на **Django 5.2 + Docker Compose**) на новом VDS/VPS сервере под управлением панели **ISPmanager 6**.
 
 ---
 
@@ -33,7 +33,7 @@
    sh install.sh --ispmanager-lite
    ```
 
-3. После завершения откройте веб-панель по адресу:
+3. Перейдите в веб-панель по адресу:
    ```text
    https://<IP_НОВОГО_СЕРВЕРА>:1500/ispmgr
    ```
@@ -42,70 +42,67 @@
 
 ---
 
-## 2. Настройка окружения сервера
+## 2. Настройка окружения сервера и зависимостей
 
-### 2.1 Создание пользователя и веб-сайта
+### 2.1 Установка Docker & Docker Compose
 
-1. В ISPmanager перейдите в **Пользователи → Создать пользователя**:
-   - Логин: `aspect_user`
-   - Права: Стандартный пользователь
-2. В меню **Сайты → Создать сайт**:
-   - Доменное имя: `aspectcoffee.ru`
-   - Владелец: `aspect_user`
-   - Корневая директория: `/var/www/aspect_user/data/www/aspectcoffee.ru`
-3. В разделе **SSL-сертификаты** включите бесплатный сертификат **Let's Encrypt** и автоперенаправление HTTP → HTTPS.
-
-### 2.2 Установка системных зависимостей
+Подключитесь по SSH и установите Docker Engine и плагин Docker Compose:
 
 ```bash
-# Установка Node.js v20 LTS и инструментария сборки
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-apt-get install -y nodejs git build-essential
+# Установка Docker
+curl -fsSL https://get.docker.com | sh
+apt-get install -y docker-compose-plugin git curl
 
-# Установка менеджера процессов PM2
-npm install -g pm2
-
-# Проверка установленных версий
-node -v
-npm -v
-pm2 -v
+# Проверка версий
+docker --version
+docker compose version
 ```
 
-### 2.3 База данных и переменные окружения (`.env`)
+### 2.2 Создание домена и SSL в ISPmanager
 
-1. В ISPmanager перейдите в **Базы данных → Создать базу данных**:
-   - Имя БД: `aspect_db`
-   - Пользователь: `aspect_dbuser`
-   - Пароль: `<НАДЕЖНЫЙ_ПАРОЛЬ>`
-2. Создайте файл `.env` в директории проекта `/var/www/aspect_user/data/www/aspectcoffee.ru/.env`:
-   ```env
-   NODE_ENV=production
-   PORT=3000
-   DATABASE_URL=postgresql://aspect_dbuser:<ПАРОЛЬ>@localhost:5432/aspect_db
-   
-   # Интеграции
-   YOOKASSA_SHOP_ID=<ID_МАГАЗИНА>
-   YOOKASSA_SECRET_KEY=<СЕКРЕТНЫЙ_КЛЮЧ>
-   CDEK_CLIENT_ID=<CDEK_ID>
-   CDEK_CLIENT_SECRET=<CDEK_SECRET>
-   CDEK_TEST_MODE=false
-   
-   # Безопасность
-   JWT_SECRET=<СУПЕР_СЕКРЕТНЫЙ_КЛЮЧ>
-   ```
+1. В ISPmanager перейдите в **Сайты → Создать сайт**:
+   - Доменное имя: `aspectcoffee.ru`
+   - Корневая директория: `/opt/aspectcoffee`
+2. В разделе **SSL-сертификаты** включите бесплатный сертификат **Let's Encrypt** и автоперенаправление HTTP → HTTPS.
+
+### 2.3 Переменные окружения (`.env.prod`)
+
+В директории `/opt/aspectcoffee` скопируйте шаблон и заполните реальные секреты:
+
+```bash
+cp .env.example .env.prod
+nano .env.prod
+```
+
+Обязательные параметры в `.env.prod`:
+```env
+DEBUG=False
+SECRET_KEY=<ДЛИННЫЙ_СЛУЧАЙНЫЙ_КЛЮЧ>
+ALLOWED_HOSTS=aspectcoffee.ru,www.aspectcoffee.ru,10.88.0.1
+
+# База данных SQLite (по умолчанию)
+DATABASE_URL=sqlite:////app/data/db.sqlite3
+
+# Интеграции
+YOOKASSA_SHOP_ID=<ID_МАГАЗИНА>
+YOOKASSA_SECRET_KEY=<СЕКРЕТНЫЙ_КЛЮЧ>
+CDEK_CLIENT_ID=<CDEK_ID>
+CDEK_CLIENT_SECRET=<CDEK_SECRET>
+CDEK_TEST_MODE=false
+```
 
 ---
 
-## 3. Конфигурация репозитория и авто-деплоя (CI/CD)
+## 3. Конфигурация репозитория и деплоя (Docker Compose)
 
 ### 3.1 Схема автоматического развёртывания
 
 ```mermaid
 flowchart LR
-    DEV["Push в ветку main"] -->|"GitHub Actions"| GHA["CI/CD Runner"]
-    GHA -->|"SSH Deploy Key"| SRV["Сервер ISPmanager"]
-    SRV -->|"git pull origin main"| APP["/var/www/.../aspectcoffee.ru"]
-    APP -->|"npm run build & pm2 reload"| PM2["PM2 (Production)"]
+    DEV["Push в ветку main"] -->|"GitVerse / Webhook"| GHA["Deploy Runner"]
+    GHA -->|"SSH Deploy Key"| SRV["Сервер /opt/aspectcoffee"]
+    SRV -->|"docker compose build & migrate"| APP["Django / Gunicorn / Celery"]
+    APP -->|"Static/Media volumes"| NGINX["Nginx Proxy / SSL"]
 ```
 
 ### 3.2 Клонирование репозитория
@@ -115,79 +112,98 @@ flowchart LR
    ssh-keygen -t ed25519 -C "deploy@aspectcoffee.ru" -f /root/.ssh/id_ed25519_deploy -N ""
    cat /root/.ssh/id_ed25519_deploy.pub
    ```
-2. Скопируйте публичный ключ и добавьте его в GitVerse/GitHub в **Settings → Deploy keys** (с правом чтения).
+2. Добавьте публичный ключ в GitVerse/GitHub в **Settings → Deploy keys** (с правом чтения).
 
-3. Выполните первичное клонирование:
+3. Клонируйте репозиторий в `/opt/aspectcoffee`:
    ```bash
-   cd /var/www/aspect_user/data/www/aspectcoffee.ru
-   git clone git@github.com:<ORGA_OR_USER>/aspect-coffee.git .
-   npm install --production
-   npm run build
+   cd /opt
+   git clone git@gitverse.ru:svpromo/AspectCoffee.git aspectcoffee
+   cd aspectcoffee
    ```
 
-### 3.3 Настройка PM2 и Nginx Reverse Proxy
+### 3.3 Сборка и запуск контейнеров Docker Compose
 
-1. Запустите приложение через PM2:
-   ```bash
-   pm2 start npm --name "aspect-coffee" -- start
-   pm2 save
-   pm2 startup
-   ```
+Приложение состоит из 5 сервисов (`web`, `celery`, `celery-beat`, `redis`, `nginx`):
 
-2. В ISPmanager перейдите в **Сайты → aspectcoffee.ru → Конфигурация Nginx** и настройте проксирование:
-   ```nginx
-   location / {
-       proxy_pass http://127.0.0.1:3000;
-       proxy_http_version 1.1;
-       proxy_set_header Upgrade $http_upgrade;
-       proxy_set_header Connection 'upgrade';
-       proxy_set_header Host $host;
-       proxy_set_header X-Real-IP $remote_addr;
-       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-       proxy_set_header X-Forwarded-Proto $scheme;
-       proxy_cache_bypass $http_upgrade;
-   }
-   ```
+```bash
+cd /opt/aspectcoffee
 
-### 3.4 Влитие и авто-деплой через CI/CD (GitHub Actions)
+# 1. Сборка Docker-образов
+docker compose build
 
-Создайте `.github/workflows/deploy.yml` в репозитории:
+# 2. Выполнение миграций базы данных
+docker compose run --rm web python manage.py migrate
 
-```yaml
-name: Deploy Aspect Coffee to New Server
+# 3. Сбор статических файлов
+docker compose run --rm web python manage.py collectstatic --noinput
 
-on:
-  push:
-    branches:
-      - main
+# 4. Запуск всех сервисов в фоновом режиме
+docker compose up -d
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Executing remote SSH commands for deploy
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: root
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            cd /var/www/aspect_user/data/www/aspectcoffee.ru
-            git pull origin main
-            npm install --production
-            npm run build
-            pm2 reload aspect-coffee
+# 5. Проверка статуса процессов
+docker compose ps
 ```
 
 ---
 
-## 4. Контрольный чек-лист ввода в эксплуатацию
+## 4. Настройка Nginx Reverse Proxy в ISPmanager
 
-- [ ] Сервер доступен по протоколу HTTPS (`https://aspectcoffee.ru`).
-- [ ] Процесс `pm2 status` находится в состоянии `online`.
-- [ ] Отсутствуют ошибки в логах `pm2 logs aspect-coffee`.
-- [ ] Интеграции CDEK и ЮKassa успешно работают в боевом режиме.
-- [ ] При выполнении `git push origin main` изменения деплоятся на сервер за 1–2 минуты.
+В ISPmanager перейдите в **Сайты → aspectcoffee.ru → Конфигурация Nginx** и настройте проксирование на Docker Nginx/Web:
+
+```nginx
+location / {
+    proxy_pass http://127.0.0.1:8000;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+location /static/ {
+    alias /opt/aspectcoffee/staticfiles/;
+    expires 30d;
+    add_header Cache-Control "public, no-transform";
+}
+
+location /media/ {
+    alias /opt/aspectcoffee/media/;
+    expires 7d;
+    add_header Cache-Control "public, no-transform";
+}
+```
+
+---
+
+## 5. Скрипт автоматического обновления (Deploy Script)
+
+Для обновления сайта создайте скрипт `/opt/aspectcoffee/deploy.sh`:
+
+```bash
+#!/bin/bash
+set -e
+cd /opt/aspectcoffee
+git pull origin main
+docker compose build web
+docker compose run --rm web python manage.py migrate
+docker compose run --rm web python manage.py collectstatic --noinput
+docker compose up -d
+docker compose ps
+```
+
+Сделайте его исполняемым:
+```bash
+chmod +x /opt/aspectcoffee/deploy.sh
+```
+
+---
+
+## 6. Контрольный чек-лист ввода в эксплуатацию
+
+- [ ] Сервер доступен по HTTPS (`https://aspectcoffee.ru`).
+- [ ] Все контейнеры (`web`, `celery`, `celery-beat`, `redis`, `nginx`) имеют статус `running` (`docker compose ps`).
+- [ ] База данных `db.sqlite3` и статика `/static/` отображаются корректно.
+- [ ] Команда `docker compose exec -T web python manage.py check --deploy` проходит без критических ошибок.
+- [ ] Оплаченная интеграция ЮKassa и СДЭК функционируют в боевом режиме.
