@@ -1,65 +1,83 @@
-# Инструкция по передаче репозитория и деплою Aspect Coffee на новый сервер (ISPmanager 6)
+# 7. Деплой на новый сервер под панелью ISPmanager 6
 
-Данный документ разработан для передачи продакшн-репозитория и полной настройки деплоя приложения **Aspect Coffee** (`aspectcoffee.ru`) на любой новый VDS/VPS сервер под управлением панели **ISPmanager 6**.
+Актуально на 06.08.2026.
+
+## Назначение документа
+
+Данный документ содержит регламент передачи продакшн-репозитория и пошаговую инструкцию по развёртыванию приложения **Aspect Coffee** (`aspectcoffee.ru`) на новом VDS/VPS сервере под управлением панели **ISPmanager 6**.
 
 ---
 
-## 1. Поднятие и первичная настройка сервера с панелью ISPmanager
+## 1. Поднятие сервера с панелью ISPmanager
 
-### 1.1 Требования к серверу (Hardware & OS)
-* **ОС:** Ubuntu 22.04 LTS (x86_64) — чистая система без предустановленного веб-сервера.
-* **Ресурсы:** Минимум 2 CPU, 2–4 ГБ RAM, SSD/NVMe диск от 30 ГБ.
-* **Сетевые порты:** Открытые 80 (HTTP), 443 (HTTPS), 22 (SSH), 1500 (ISPmanager).
+### 1.1 Системные требования
+
+| Параметр | Минимальное значение | Рекомендуемое значение |
+|---|---|---|
+| **Операционная система** | Ubuntu 22.04 LTS (x86_64) | Ubuntu 22.04 LTS (x86_64) |
+| **Процессор (CPU)** | 2 ядра | 4 ядра |
+| **Оперативная память (RAM)** | 2 ГБ | 4 ГБ |
+| **Диск (NVMe/SSD)** | 30 ГБ | 50+ ГБ |
+| **Сетевые порты** | 80 (HTTP), 443 (HTTPS), 22 (SSH), 1500 (ISPmanager) | 80, 443, 22, 1500 |
 
 ### 1.2 Установка панели ISPmanager 6
-1. Подключитесь к чистому серверу по SSH под пользователем `root`:
+
+1. Подключитесь к серверу по SSH под пользователем `root`:
    ```bash
    ssh root@<IP_НОВОГО_СЕРВЕРА>
    ```
-2. Запустите официальный скрипт установки ISPmanager 6:
+
+2. Запустите официальный инсталлятор ISPmanager:
    ```bash
    wget https://download.ispmanager.com/install.sh -O install.sh
    sh install.sh --ispmanager-lite
    ```
-3. После завершения установки перейдите в веб-интерфейс панели:
-   `https://<IP_НОВОГО_СЕРВЕРА>:1500/ispmgr`
-4. Авторизуйтесь под логином `root` и активируйте лицензию.
+
+3. После завершения откройте веб-панель по адресу:
+   ```text
+   https://<IP_НОВОГО_СЕРВЕРА>:1500/ispmgr
+   ```
+
+4. Войдите под `root` и активируйте лицензию ISPmanager.
 
 ---
 
-## 2. Настройка окружения сервера (Environment Setup)
+## 2. Настройка окружения сервера
 
-### 2.1 Создание пользователя и сайта в ISPmanager
-1. В левом меню перейдите в **Пользователи** -> **Создать пользователя** (например, `aspect_user`).
-2. В меню **Сайты** -> **Создать сайт**:
-   * **Доменное имя:** `aspectcoffee.ru` (или поддомен для тестов).
-   * **Владелец:** `aspect_user`.
-   * **Корневая директория:** `/var/www/aspect_user/data/www/aspectcoffee.ru`.
-3. Вкладка **SSL-сертификаты** -> Включить бесплатный SSL-сертификат **Let's Encrypt** и автоматически включить перенаправление HTTP -> HTTPS.
+### 2.1 Создание пользователя и веб-сайта
 
-### 2.2 Установка Runtime зависимостей (Node.js & Process Manager)
-Подключитесь к серверу по SSH и установите рабочее окружение:
+1. В ISPmanager перейдите в **Пользователи → Создать пользователя**:
+   - Логин: `aspect_user`
+   - Права: Стандартный пользователь
+2. В меню **Сайты → Создать сайт**:
+   - Доменное имя: `aspectcoffee.ru`
+   - Владелец: `aspect_user`
+   - Корневая директория: `/var/www/aspect_user/data/www/aspectcoffee.ru`
+3. В разделе **SSL-сертификаты** включите бесплатный сертификат **Let's Encrypt** и автоперенаправление HTTP → HTTPS.
+
+### 2.2 Установка системных зависимостей
 
 ```bash
-# Установка Node.js v20 LTS
+# Установка Node.js v20 LTS и инструментария сборки
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 apt-get install -y nodejs git build-essential
 
-# Установка глобального менеджера процессов PM2
+# Установка менеджера процессов PM2
 npm install -g pm2
 
-# Проверка версий
+# Проверка установленных версий
 node -v
 npm -v
 pm2 -v
 ```
 
-### 2.3 Настройка Базы Данных и Конфигурации (`.env`)
-1. В ISPmanager перейдите в **Базы данных** -> **Создать базу данных**:
-   * **Имя БД:** `aspect_db`
-   * **Пользователь:** `aspect_dbuser`
-   * **Пароль:** `<НАДЕЖНЫЙ_ПАРОЛЬ>`
-2. В директории проекта `/var/www/aspect_user/data/www/aspectcoffee.ru` создайте рабочий файл параметров `.env`:
+### 2.3 База данных и переменные окружения (`.env`)
+
+1. В ISPmanager перейдите в **Базы данных → Создать базу данных**:
+   - Имя БД: `aspect_db`
+   - Пользователь: `aspect_dbuser`
+   - Пароль: `<НАДЕЖНЫЙ_ПАРОЛЬ>`
+2. Создайте файл `.env` в директории проекта `/var/www/aspect_user/data/www/aspectcoffee.ru/.env`:
    ```env
    NODE_ENV=production
    PORT=3000
@@ -72,24 +90,34 @@ pm2 -v
    CDEK_CLIENT_SECRET=<CDEK_SECRET>
    CDEK_TEST_MODE=false
    
-   # JWT & App Keys
+   # Безопасность
    JWT_SECRET=<СУПЕР_СЕКРЕТНЫЙ_КЛЮЧ>
    ```
 
 ---
 
-## 3. Конфигурация в репозитории и на сервере для деплоя (CI/CD Auto-Deploy)
+## 3. Конфигурация репозитория и авто-деплоя (CI/CD)
 
-### 3.1 Передача и клонирование репозитория
-1. **Добавление SSH-ключа деплоя:**
-   На новом сервере сгенерируйте SSH-ключ для чтения репозитория:
+### 3.1 Схема автоматического развёртывания
+
+```mermaid
+flowchart LR
+    DEV["Push в ветку main"] -->|"GitHub Actions"| GHA["CI/CD Runner"]
+    GHA -->|"SSH Deploy Key"| SRV["Сервер ISPmanager"]
+    SRV -->|"git pull origin main"| APP["/var/www/.../aspectcoffee.ru"]
+    APP -->|"npm run build & pm2 reload"| PM2["PM2 (Production)"]
+```
+
+### 3.2 Клонирование репозитория
+
+1. Сгенерируйте SSH Deploy Key на новом сервере:
    ```bash
    ssh-keygen -t ed25519 -C "deploy@aspectcoffee.ru" -f /root/.ssh/id_ed25519_deploy -N ""
    cat /root/.ssh/id_ed25519_deploy.pub
    ```
-   Скопируйте публичный ключ и добавьте его в GitHub/GitLab репозиторий в раздел **Settings -> Deploy keys** (с правом чтения).
+2. Скопируйте публичный ключ и добавьте его в GitVerse/GitHub в **Settings → Deploy keys** (с правом чтения).
 
-2. **Первичное клонирование проекта:**
+3. Выполните первичное клонирование:
    ```bash
    cd /var/www/aspect_user/data/www/aspectcoffee.ru
    git clone git@github.com:<ORGA_OR_USER>/aspect-coffee.git .
@@ -97,14 +125,16 @@ pm2 -v
    npm run build
    ```
 
-### 3.2 Настройка процесса PM2 и Reverse Proxy (Nginx)
+### 3.3 Настройка PM2 и Nginx Reverse Proxy
+
 1. Запустите приложение через PM2:
    ```bash
    pm2 start npm --name "aspect-coffee" -- start
    pm2 save
    pm2 startup
    ```
-2. В ISPmanager перейдите в раздел **Сайты -> aspectcoffee.ru -> Конфигурация Nginx** и настройте проксирование на локальный порт `3000`:
+
+2. В ISPmanager перейдите в **Сайты → aspectcoffee.ru → Конфигурация Nginx** и настройте проксирование:
    ```nginx
    location / {
        proxy_pass http://127.0.0.1:3000;
@@ -119,8 +149,9 @@ pm2 -v
    }
    ```
 
-### 3.3 Настройка Авто-деплоя (GitHub Actions / Git Hook)
-Создайте в вашем GitHub-репозитории файл `.github/workflows/deploy.yml`:
+### 3.4 Влитие и авто-деплой через CI/CD (GitHub Actions)
+
+Создайте `.github/workflows/deploy.yml` в репозитории:
 
 ```yaml
 name: Deploy Aspect Coffee to New Server
@@ -151,15 +182,12 @@ jobs:
             pm2 reload aspect-coffee
 ```
 
-**В GitHub Secrets репозитория (Settings -> Secrets and variables -> Actions) необходимо добавить:**
-* `SERVER_HOST`: IP-адрес нового сервера.
-* `SERVER_SSH_KEY`: Содержимое приватного ключа `/root/.ssh/id_ed25519_deploy`.
-
 ---
 
-### Чек-лист проверки работы после деплоя
-- [ ] Сервер отвечает по HTTPS (`https://aspectcoffee.ru`).
-- [ ] Процесс `pm2 status` отображает статус `online`.
-- [ ] Ошибок в логах `pm2 logs aspect-coffee` нет.
-- [ ] Интеграция CDEK и ЮKassa работают в боевом режиме.
-- [ ] При `git push origin main` новые изменения автоматически деплоятся на сервер за 1-2 минуты.
+## 4. Контрольный чек-лист ввода в эксплуатацию
+
+- [ ] Сервер доступен по протоколу HTTPS (`https://aspectcoffee.ru`).
+- [ ] Процесс `pm2 status` находится в состоянии `online`.
+- [ ] Отсутствуют ошибки в логах `pm2 logs aspect-coffee`.
+- [ ] Интеграции CDEK и ЮKassa успешно работают в боевом режиме.
+- [ ] При выполнении `git push origin main` изменения деплоятся на сервер за 1–2 минуты.
