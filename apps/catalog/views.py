@@ -473,7 +473,7 @@ def catalog(request, forced_category_slug=None):
         .select_related("category")
         .prefetch_related(
             "variants", "variants__grind_type", "variants__roast_type",
-            "packagings", "flavor_notes", "brew_methods", "tags",
+            "packagings", "images", "flavor_notes", "brew_methods", "tags",
         )
     )
 
@@ -964,6 +964,7 @@ def product_detail(request, slug):
 
     context = {
         "product": product,
+        "primary_image": product.primary_image,
         "reviews": reviews,
         "brewing_methods": brewing_methods,
         "recipes": recipes,

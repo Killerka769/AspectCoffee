@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Изображение товара отсутствует">
+  <rect width="200" height="200" rx="24" fill="#f5f5f7"/>
+  <path d="M62 72h76l-7 81H69l-7-81Z" fill="none" stroke="#c8cdd8" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M78 72c0-14 9-25 22-25s22 11 22 25" fill="none" stroke="#c8cdd8" stroke-width="5" stroke-linecap="round"/>
+  <path d="m78 120 15-15 13 13 10-9 17 17" fill="none" stroke="#c8cdd8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

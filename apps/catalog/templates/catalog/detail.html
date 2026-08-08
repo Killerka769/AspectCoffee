@@ -5,7 +5,7 @@
 {% block title %}{% if product.seo_title %}{{ product.seo_title }}{% else %}{{ product.name }}{% endif %}{% endblock %}
 
 {% block extra_meta %}
-{% if product.main_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}">{% endif %}
+{% if primary_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ primary_image.url }}">{% endif %}
 <meta property="og:type" content="product">
 {# SEO: Product schema.org с ценой/наличием/рейтингом #}
 <script type="application/ld+json">
@@ -13,7 +13,7 @@
   "@context": "https://schema.org",
   "@type": "Product",
   "name": "{{ product.name|escapejs }}",
-  {% if product.main_image %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}",{% endif %}
+  {% if primary_image %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ primary_image.url }}",{% endif %}
   "description": "{{ product.short_description|default:product.seo_description|default:product.name|striptags|escapejs }}",
   "sku": "{{ product.slug }}",
   "brand": {"@type": "Brand", "name": "{{ site_settings.site_name|default:'Aspect Coffee' }}"},
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         style="width:100%; aspect-ratio:1; background:white; border:1.5px solid #ebebeb; border-radius:16px; padding:6px; cursor:pointer; transition:border-color 0.2s;"
                         onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='#ebebeb'">
                     <img src="{{ product.main_image.url }}" 
-                         onerror="this.src='{% static 'asset/images/costa-rica-san-san-jose-250.png' %}'"
+                         onerror="this.onerror=null;this.src='{% static 'asset/images/product-placeholder.svg' %}'"
                          style="width:100%; height:100%; object-fit:contain;" alt="">
                 </button>
                 {% endif %}
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         style="width:100%; aspect-ratio:1; background:white; border:1.5px solid #ebebeb; border-radius:16px; padding:6px; cursor:pointer; transition:border-color 0.2s;"
                         onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='#ebebeb'">
                     <img src="{{ img.image.url }}" 
-                         onerror="this.src='{% static 'asset/images/costa-rica-san-san-jose-250.png' %}'"
+                         onerror="this.onerror=null;this.src='{% static 'asset/images/product-placeholder.svg' %}'"
                          style="width:100%; height:100%; object-fit:contain;" alt="">
                 </button>
                 {% endfor %}
@@ -139,15 +139,15 @@ document.addEventListener('DOMContentLoaded', function () {
             {# MIDDLE: Main Image #}
             <div class="product-image-panel">
                 <div style="background:white; border-radius:28px; border:1px solid #ebebeb; aspect-ratio:1; display:flex; align-items:center; justify-content:center; padding:40px; overflow:hidden;">
-                    {% if product.main_image %}
-                        <img src="{{ product.main_image.url }}" id="main-image"
-                             onerror="this.src='{% static 'asset/images/costa-rica-san-san-jose-250.png' %}'"
-                             style="max-height:100%; object-fit:contain; transition:transform 0.5s;"
+                    {% if primary_image %}
+                        <img src="{{ primary_image.url }}" id="main-image"
+                             onerror="this.onerror=null;this.src='{% static 'asset/images/product-placeholder.svg' %}'"
+                             style="display:block; width:100%; height:100%; max-width:100%; max-height:100%; margin:auto; object-fit:contain; object-position:center; transition:transform 0.5s;"
                              onmouseover="this.style.transform='scale(1.05)'"
                              onmouseout="this.style.transform='scale(1)'"
                              alt="{{ product.name }}">
                     {% else %}
-                        <img src="{% static 'asset/images/costa-rica-san-san-jose-250.png' %}" style="max-height:100%; object-fit:contain;" alt="{{ product.name }}">
+                        <img src="{% static 'asset/images/product-placeholder.svg' %}" id="main-image" style="display:block; width:100%; height:100%; max-width:100%; max-height:100%; margin:auto; padding:40px; object-fit:contain; object-position:center;" alt="{{ product.name }}">
                     {% endif %}
                 </div>
                 {% if product.q_score %}<div class="product-q-badge"><span>ОЦЕНКА Q-ГРЕЙДЕРА</span><strong>{{ product.q_score }}</strong><small>LIMITED MICROLOT COFFEE</small></div>{% endif %}

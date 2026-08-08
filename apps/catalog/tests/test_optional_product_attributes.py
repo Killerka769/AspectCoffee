@@ -7,6 +7,7 @@ from apps.catalog.models import (
     Category,
     GrindType,
     Product,
+    ProductImage,
     ProductPackaging,
     ProductVariant,
     RoastType,
@@ -14,6 +15,29 @@ from apps.catalog.models import (
 
 
 class OptionalProductAttributesTests(TestCase):
+    def test_card_uses_first_gallery_image_when_main_image_is_empty(self):
+        category = Category.objects.create(name="Каталог", slug="catalog")
+        product = Product.objects.create(
+            name="Тестовый товар",
+            slug="test-gallery-image",
+            category=category,
+        )
+        ProductImage.objects.create(
+            product=product,
+            image="products/gallery/test-gallery.webp",
+            order=0,
+        )
+
+        html = render_to_string("catalog/_product_card.html", {"product": product})
+
+        self.assertIn("/media/products/gallery/test-gallery.webp", html)
+        self.assertNotIn("costa-rica-san-san-jose-250.png", html)
+
+        response = self.client.get(product.get_absolute_url())
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, "/media/products/gallery/test-gallery.webp")
+        self.assertNotContains(response, "costa-rica-san-san-jose-250.png")
+
     def test_noncoffee_product_without_optional_data_renders_price_only(self):
         category = Category.objects.create(name="Аксессуары", slug="aksessuary")
         product = Product.objects.create(
