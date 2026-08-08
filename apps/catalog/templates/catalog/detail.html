@@ -87,7 +87,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <section class="product-overview-panel" aria-label="Product information">
                 <div class="product-overview-head">
+                    {% if product.roast_level %}
                     <p class="product-overview-meta">для {% if product.roast_level == 'espresso' %}эспрессо{% else %}фильтра{% endif %}</p>
+                    {% endif %}
                     <div class="product-overview-rating">
                         <span>★ {{ product.rating_avg|floatformat:"1u" }}</span>
                         <a href="#tab-reviews" onclick="switchTab('reviews');return false;" style="color:inherit;text-decoration:none;">◌ {{ product.reviews_count }}</a>
@@ -95,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <h1>{{ product.name }}</h1>
                 <div class="product-overview-subline">
-                    <p class="product-overview-meta">{{ product.processing_method|default:"натуральный" }}</p>
+                    {% if product.processing_method %}<p class="product-overview-meta">{{ product.processing_method }}</p>{% endif %}
                     <div class="product-overview-flags">
                         {% if product.is_featured %}<span class="product-overview-week">сорт недели</span>{% endif %}
                         {% if product.is_bestseller %}<span class="product-overview-popular">популярный</span>{% endif %}
@@ -104,10 +106,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="product-overview-flavor">
                     {% if product.flavor_description_html %}{{ product.flavor_description_html|colorize_flavors }}{% else %}{{ product.short_description|default:product.name|safe }}{% endif %}
                 </div>
+                {% if product.has_taste_profile %}
                 <div class="product-overview-scales">
-                    <div><span>Плотность</span><i style="--value:{{ product.body|default:7 }}0%"></i></div>
-                    <div><span>Кислотность</span><i style="--value:{{ product.acidity|default:4 }}0%"></i></div>
+                    {% if product.has_body_profile %}<div><span>Плотность</span><i style="--value:{{ product.body }}0%"></i></div>{% endif %}
+                    {% if product.has_acidity_profile %}<div><span>Кислотность</span><i style="--value:{{ product.acidity }}0%"></i></div>{% endif %}
                 </div>
+                {% endif %}
             </section>
 
             {# LEFT: Vertical Thumbnails #}
@@ -171,11 +175,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 {# Title #}
                 <div>
+                    {% if product.roast_level %}
                     <span style="color:rgba(0,0,0,0.4); font-size:13px; font-weight:500; display:block; margin-bottom:4px;">
                         для {% if product.roast_level == 'espresso' %}эспрессо{% else %}фильтра{% endif %}
                     </span>
+                    {% endif %}
                     <h1 style="font-size:40px; font-weight:900; text-transform:uppercase; line-height:1.1; color:black; margin:0 0 6px 0;">{{ product.name }}</h1>
-                    <span style="color:rgba(0,0,0,0.5); font-size:14px; font-weight:500;">{{ product.processing_method|default:"натуральный" }}</span>
+                    {% if product.processing_method %}<span style="color:rgba(0,0,0,0.5); font-size:14px; font-weight:500;">{{ product.processing_method }}</span>{% endif %}
                 </div>
 
                 {# Flavor description — inline tags #}
@@ -184,28 +190,32 @@ document.addEventListener('DOMContentLoaded', function () {
                         {{ product.flavor_description_html|colorize_flavors }}
                     {% elif product.short_description %}
                         {{ product.short_description|safe }}
-                    {% else %}
-                        <span class="descriptor-badge" style="background:#6c0e53;color:#ffffff">тёмного винограда</span>,
-                        <span class="descriptor-badge" style="background:#c70000;color:#ffffff">красного яблока</span>,
-                        <span class="descriptor-badge" style="background:#5A3A22;color:#ffffff">тёмного шоколада</span>
+                    {% elif product.description %}
+                        {{ product.description|striptags|truncatechars:240 }}
                     {% endif %}
                 </div>
 
                 {# Progress Bars #}
+                {% if product.has_taste_profile %}
                 <div style="display:flex; gap:40px;">
+                    {% if product.has_body_profile %}
                     <div>
                         <div style="font-size:13px; font-weight:500; color:black; margin-bottom:6px;">Плотность</div>
                         <div style="height:2px; width:110px; background:#e0e0e0; border-radius:2px; overflow:hidden;">
-                            <div style="background:black; height:100%; width:{{ product.body|default:7 }}0%;"></div>
+                            <div style="background:black; height:100%; width:{{ product.body }}0%;"></div>
                         </div>
                     </div>
+                    {% endif %}
+                    {% if product.has_acidity_profile %}
                     <div>
                         <div style="font-size:13px; font-weight:500; color:black; margin-bottom:6px;">Кислотность</div>
                         <div style="height:2px; width:110px; background:#e0e0e0; border-radius:2px; overflow:hidden;">
-                            <div style="background:black; height:100%; width:{{ product.acidity|default:4 }}0%;"></div>
+                            <div style="background:black; height:100%; width:{{ product.acidity }}0%;"></div>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
+                {% endif %}
 
                 {# Discount card #}
                 {% if request.user.is_authenticated and active_promo %}
@@ -235,9 +245,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 {% with first_v=product.variants.all.0 %}
                 <div class="product-purchase-panel" x-data="productCard({ id: {{ product.id }}, slug: '{{ product.slug }}', price: {{ first_v.price|default:0|floatformat:0 }}, inStock: {{ product.in_stock|yesno:'true,false'}}, inWishlist: {% if product.id in wishlist_ids %}true{% else %}false{% endif %} })">
                     {# Weight + Grind row #}
+                    {% if product.has_purchase_options %}
                     <div class="product-purchase-options" style="display:flex; align-items:stretch; gap:12px; margin-bottom:16px;">
 
                         {# Weight buttons #}
+                        {% if product.has_packaging_options %}
                         <div style="background:#f0f0f2; border-radius:12px; padding:4px; display:flex; align-items:center; gap:4px; flex-shrink:0;">
                             {% for pkg in product.priced_packagings %}
                             <button class="weight-btn"
@@ -248,8 +260,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             </button>
                             {% endfor %}
                         </div>
+                        {% endif %}
 
                         {# Grind dropdown — Alpine-bound #}
+                        {% if product.has_grind_options %}
                         <div style="position:relative; min-width:180px; flex-shrink:0;" @click.outside="grindOpen = false">
                             <button type="button"
                                     style="width:100%; height:100%; background:#f0f0f2; border:none; border-radius:12px; padding:10px 36px 10px 14px; font-size:14px; font-weight:700; cursor:pointer; color:black; text-align:left; display:flex; align-items:center; justify-content:space-between; gap:8px;"
@@ -269,7 +283,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                 </template>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
+                    {% endif %}
 
                     {# Add to cart + action buttons #}
                     <div class="product-purchase-actions" style="display:flex; align-items:center; gap:10px;">

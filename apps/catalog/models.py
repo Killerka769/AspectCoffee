@@ -152,15 +152,15 @@ class Product(models.Model):
     roaster_machine = models.CharField("Ростер для обжарки", max_length=100, blank=True)
     roaster = models.ForeignKey(Roaster, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Ростер")
     body = models.PositiveIntegerField(
-        "Плотность (Тельце)", default=5,
+        "Плотность (Тельце)", null=True, blank=True, default=None,
         validators=[MinValueValidator(0), MaxValueValidator(10)]
     )
     acidity = models.PositiveIntegerField(
-        "Кислотность", default=5,
+        "Кислотность", null=True, blank=True, default=None,
         validators=[MinValueValidator(0), MaxValueValidator(10)]
     )
     sweetness = models.PositiveIntegerField(
-        "Сладость", default=0,
+        "Сладость", null=True, blank=True, default=None,
         validators=[MinValueValidator(0), MaxValueValidator(10)]
     )
     flavor_description_html = models.TextField("Описание вкуса (HTML с баджами)", blank=True)
@@ -232,9 +232,54 @@ class Product(models.Model):
         каждой показанной фасовки есть комбинации помол×обжарка (нет пустого
         выпадающего списка). Работает с prefetch (packagings, variants).
         """
-        weights_with_variants = {v.weight for v in self.variants.all()}
-        result = [p for p in self.packagings.all() if p.weight in weights_with_variants]
+        weights_with_variants = {v.weight for v in self.variants.all() if v.weight}
+        result = [
+            p for p in self.packagings.all()
+            if p.weight and p.weight in weights_with_variants
+        ]
         return sorted(result, key=lambda p: (p.order, p.weight))
+
+    def belongs_to_section(self, *slugs):
+        """Проверяет раздел товара независимо от глубины дерева категорий."""
+        category = self.category
+        visited = set()
+        while category and category.pk not in visited:
+            visited.add(category.pk)
+            if category.slug in slugs:
+                return True
+            category = category.parent
+        return False
+
+    @property
+    def is_coffee_product(self):
+        return self.belongs_to_section("kofe", "coffee")
+
+    @property
+    def has_body_profile(self):
+        return self.body is not None
+
+    @property
+    def has_acidity_profile(self):
+        return self.acidity is not None
+
+    @property
+    def has_taste_profile(self):
+        return self.has_body_profile or self.has_acidity_profile
+
+    @property
+    def has_packaging_options(self):
+        return bool(self.priced_packagings)
+
+    @property
+    def has_grind_options(self):
+        return any(
+            variant.grind_type_id or variant.roast_type_id
+            for variant in self.variants.all()
+        )
+
+    @property
+    def has_purchase_options(self):
+        return self.has_packaging_options or self.has_grind_options
 
 class GrindType(models.Model):
     """Справочник «помол» (1.7.3). Любое число значений."""
@@ -284,7 +329,10 @@ class ProductPackaging(models.Model):
         Product, on_delete=models.CASCADE,
         related_name="packagings", verbose_name="Товар",
     )
-    weight = models.PositiveIntegerField("Вес (г)")
+    weight = models.PositiveIntegerField(
+        "Вес (г)", null=True, blank=True,
+        help_text="Не заполняйте, если товар продаётся без фасовки по весу.",
+    )
     price = models.DecimalField("Цена", max_digits=10, decimal_places=2)
     old_price = models.DecimalField(
         "Старая цена", max_digits=10, decimal_places=2,
@@ -300,7 +348,9 @@ class ProductPackaging(models.Model):
         ordering = ["order", "weight"]
 
     def __str__(self):
-        return f"{self.product.name} — {self.weight} г"
+        if self.weight:
+            return f"{self.product.name} — {self.weight} г"
+        return f"{self.product.name} — без фасовки"
 
     @property
     def discount_percent(self):
@@ -360,7 +410,9 @@ class ProductVariant(models.Model):
         ordering = ["weight", "grind_type__order", "roast_type__order"]
 
     def __str__(self):
-        bits = [self.product.name, f"{self.weight}г"]
+        bits = [self.product.name]
+        if self.weight:
+            bits.append(f"{self.weight}г")
         if self.grind_type_id:
             bits.append(self.grind_type.name)
         if self.roast_type_id:
@@ -370,7 +422,7 @@ class ProductVariant(models.Model):
     def save(self, *args, **kwargs):
         # Синхронизируем денормализованные цену/вес из фасовки.
         if self.packaging_id:
-            self.weight = self.packaging.weight
+            self.weight = self.packaging.weight or 0
             self.price = self.packaging.price
             self.old_price = self.packaging.old_price
         super().save(*args, **kwargs)

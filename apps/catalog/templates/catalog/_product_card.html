@@ -18,9 +18,11 @@
      :class="{ 'card-popup-open': grindOpen || tooltipOpen }"
      @click="navigateCard($event)">
     <div class="tc-tile__top">
+        {% if product.roast_level %}
         <div class="tc-card-used-for">
             для {% if product.roast_level == 'espresso' %}эспрессо{% else %}фильтра{% endif %}
         </div>
+        {% endif %}
         <div class="tc-card-badges">
             {% if product.sca_score and product.sca_score >= 85 %}
             <span class="tc-badge tc-badge-sca" title="Оценка SCA: {{ product.sca_score }}">{{ product.sca_score }} SCA</span>
@@ -51,6 +53,7 @@
     <div class="tc-tile__title">
         <div class="tc-card-name-wrap" itemprop="name">
             <a class="tc-card-title-link" href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+            {% if product.processing_method %}
             <div class="tc-tooltip tc-card-process" data-no-card-nav
                  role="button" tabindex="0"
                  aria-label="Подсказка: способ обработки"
@@ -61,15 +64,16 @@
                  @mouseenter="if (!('ontouchstart' in window)) tooltipOpen = true"
                  @mouseleave="if (!('ontouchstart' in window)) tooltipOpen = false">
                 <div class="tc-tooltip__btn">
-                    {{ product.processing_method|default:"мытый" }}
+                    {{ product.processing_method }}
                 </div>
                 <div class="tc-tooltip__content" x-show="tooltipOpen" x-transition x-cloak @click.stop>
-                    <p>Обработка: {{ product.processing_method|default:"мытый" }}. Этот способ влияет на вкус — он определяет характер и чистоту профиля чашки.</p>
+                    <p>Обработка: {{ product.processing_method }}. Этот способ влияет на вкус — он определяет характер и чистоту профиля чашки.</p>
                 </div>
             </div>
+            {% endif %}
         </div>
         <div class="tc-card-flags">
-            {% if product.is_featured %}
+            {% if product.is_coffee_product and product.is_featured %}
             <a class="tc-card-week-special" href="{% url 'catalog:catalog' %}">
                 <span class="tc-week-special">сорт</span>
                 <span class="tc-week-special">недели</span>
@@ -105,22 +109,30 @@
         </p>
     </div>
 
+    {% if product.has_taste_profile %}
     <div class="tc-tile__scale">
+        {% if product.has_body_profile %}
         <div>
             <div class="tc-scale-label">Плотность</div>
             <div class="tc-progress">
-                <span class="tc-progress__object" style="width: {% widthratio product.body|default:4 10 100 %}%"></span>
+                <span class="tc-progress__object" style="width: {% widthratio product.body 10 100 %}%"></span>
             </div>
         </div>
+        {% endif %}
+        {% if product.has_acidity_profile %}
         <div>
             <div class="tc-scale-label">Кислотность</div>
             <div class="tc-progress">
-                <span class="tc-progress__object" style="width: {% widthratio product.acidity|default:8 10 100 %}%"></span>
+                <span class="tc-progress__object" style="width: {% widthratio product.acidity 10 100 %}%"></span>
             </div>
         </div>
+        {% endif %}
     </div>
+    {% endif %}
 
+    {% if product.has_purchase_options %}
     <div class="tc-tile__option flex-wrap justify-between items-center gap-y-2" data-no-card-nav>
+        {% if product.has_packaging_options %}
         <div class="tc-card-weights options-measurable">
             {% for pkg in product.priced_packagings|slice:":3" %}
             <button class="tc-weight weight-btn" type="button"
@@ -133,7 +145,9 @@
             </button>
             {% endfor %}
         </div>
+        {% endif %}
 
+        {% if product.has_grind_options %}
         <div class="tc-tile__option--select ml-auto">
             <div class="tc-select sm">
                 <div class="card-product tc-select__field grind-selector-wrap" data-no-card-nav @click.outside="grindOpen = false">
@@ -155,7 +169,9 @@
                 </div>
             </div>
         </div>
+        {% endif %}
     </div>
+    {% endif %}
 
     <div class="tc-variant-msg" x-text="variantMessage"></div>
 

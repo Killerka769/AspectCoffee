@@ -41,18 +41,42 @@ class CategoryAdmin(ModelAdmin):
     )
     def view_on_site(self, obj):
         return obj.get_absolute_url()
+
+
+class ProductAdminForm(forms.ModelForm):
+    """Universal required fields; section-specific product data stays optional."""
+
+    class Meta:
+        model = Product
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["description"].required = True
+        self.fields["main_image"].required = True
+        self.fields["description"].help_text = (
+            "Обязательное общее описание товара для всех разделов каталога."
+        )
+        self.fields["main_image"].help_text = (
+            "Обязательное основное изображение товара для карточки и страницы товара."
+        )
+
+
 class ProductPackagingInline(TabularInline):
     model = ProductPackaging
-    extra = 1
+    extra = 0
     fields = ["weight", "price", "old_price", "order", "is_active"]
     ordering = ["order", "weight"]
 
 
 class ProductVariantInline(TabularInline):
     model = ProductVariant
-    extra = 1
-    # 1.7.4 — вариант = фасовка × помол × обжарка (цена берётся с фасовки).
-    fields = ["packaging", "grind_type", "roast_type", "stock_qty", "sku", "is_preorder"]
+    extra = 0
+    # Для товара без фасовки цена хранится непосредственно в варианте.
+    fields = [
+        "packaging", "price", "old_price", "grind_type", "roast_type",
+        "stock_qty", "sku", "is_preorder",
+    ]
     show_change_link = True
 class ProductImageInline(TabularInline):
     model = ProductImage
@@ -66,6 +90,7 @@ class ProductImageInline(TabularInline):
     image_preview.short_description = "Превью"
 @admin.register(Product)
 class ProductAdmin(ImportExportModelAdmin, ModelAdmin):
+    form = ProductAdminForm
     list_display = ["name", "category", "roast_level", "in_stock", "is_active", "is_featured", "rating_avg"]
     list_editable = ["is_active", "is_featured", "in_stock"]
     list_filter = ["category", "roast_level", "in_stock", "is_active", "is_featured", "is_new", "is_bestseller", "is_microlot"]
@@ -75,18 +100,39 @@ class ProductAdmin(ImportExportModelAdmin, ModelAdmin):
     inlines = [ProductPackagingInline, ProductVariantInline, ProductImageInline]
     readonly_fields = ["rating_avg", "reviews_count", "created_at", "updated_at"]
     fieldsets = (
-        ("Основное", {"fields": ("name", "slug", "category", "description", "short_description", "main_image")}),
-        ("Контентные табы на фронте", {"fields": ("storage_description", "delivery_description")}),
         (
-            "Атрибуты кофе",
-            {"fields": (
-                "roast_level", "processing_method", "origin_country", "region",
-                "altitude", "roaster_machine", "roaster",
-                "q_score", "harvest_year", "variety", "caffeine_content",
-                "composition", "brew_methods", "flavor_notes",
-            )},
+            "Основное",
+            {
+                "fields": ("name", "slug", "category", "description", "short_description", "main_image"),
+                "description": "Общие данные для любого товара: название, описание, категория и изображение.",
+            },
         ),
-        ("Профиль вкуса", {"fields": ("body", "acidity", "sweetness", "flavor_description_html")}),
+        (
+            "Контентные табы на фронте (необязательно)",
+            {
+                "fields": ("storage_description", "delivery_description"),
+                "description": "Пустые вкладки не выводятся на сайте.",
+            },
+        ),
+        (
+            "Атрибуты кофе (необязательно для остальных разделов)",
+            {
+                "fields": (
+                    "roast_level", "processing_method", "origin_country", "region",
+                    "altitude", "roaster_machine", "roaster",
+                    "q_score", "harvest_year", "variety", "caffeine_content",
+                    "composition", "brew_methods", "flavor_notes",
+                ),
+                "description": "Если поле не заполнено, соответствующий элемент не выводится на фронте.",
+            },
+        ),
+        (
+            "Профиль вкуса (необязательно)",
+            {
+                "fields": ("body", "acidity", "sweetness", "flavor_description_html"),
+                "description": "Плотность, кислотность и описание вкуса скрыты на фронте, если не заполнены.",
+            },
+        ),
         ("Флаги", {"fields": ("is_active", "is_featured", "is_new", "is_bestseller", "is_microlot", "in_stock", "tags")}),
         ("Похожие товары", {"fields": ("related_products",)}),
         ("Статистика", {"fields": ("rating_avg", "reviews_count", "created_at", "updated_at"), "classes": ("collapse",)}),

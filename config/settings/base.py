@@ -431,7 +431,6 @@ UNFOLD = {
                     },
                     {
                         "title": _("Настройки парсера"),
-                        "icon": "settings",
                         "link": reverse_lazy("admin:catalog_parsersetting_changelist"),
                     },
                 ],

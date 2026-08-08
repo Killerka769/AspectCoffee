@@ -30,5 +30,7 @@ htmlcov
 *.before-*
 *_backup
 tmp
+# Не включать случайно вложенную серверную копию проекта в Docker-образ.
+aspectcoffee/
 docs/*.pdf
 docs/*.docx
