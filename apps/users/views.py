@@ -403,7 +403,19 @@ def addresses_view(request):
         return redirect(next_url)
     return redirect("users:profile")
 
+def _login_next_url(request):
+    next_url = request.POST.get("next") or request.GET.get("next") or "/"
+    if url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return "/"
+
+
 def login_view(request):
+    next_url = _login_next_url(request)
     if request.method == "POST":
         from django.contrib.auth import authenticate, login
         email = request.POST.get("email", "").strip()
@@ -417,6 +429,7 @@ def login_view(request):
             return render(request, "users/login.html", {
                 "post_data": request.POST,
                 "field_errors": errors,
+                "next_url": next_url,
             })
         user = authenticate(request, username=email, password=password)
         if user is None:
@@ -424,6 +437,7 @@ def login_view(request):
             return render(request, "users/login.html", {
                 "post_data": request.POST,
                 "field_errors": {"password": "Неверный email или пароль"},
+                "next_url": next_url,
             })
         from apps.users.verification import is_email_confirmation_enabled
         if is_email_confirmation_enabled() and not user.email_confirmed:
@@ -432,9 +446,8 @@ def login_view(request):
             messages.error(request, "Подтвердите email перед входом. Код отправлен на почту.")
             return redirect("users:verify_email")
         login(request, user)
-        next_url = request.GET.get("next", "/")
         return redirect(next_url)
-    return render(request, "users/login.html")
+    return render(request, "users/login.html", {"next_url": next_url})
 
 
 def register(request):
