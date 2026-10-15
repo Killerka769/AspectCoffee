@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.utils.translation import gettext_lazy as _
 from unfold.admin import ModelAdmin, TabularInline as UnfoldTabularInline
 from apps.users.models import (
-    User, Address, EmailLog, Achievement, UserAchievement, DiscountLevel,
+    User, Address, EmailLog,
     BonusTransaction, PaymentTransaction, UserNotification, PushSubscription,
 )
 class AddressInline(UnfoldTabularInline):
@@ -177,30 +177,30 @@ class PushSubscriptionAdmin(ModelAdmin):
     def device(self, obj):
         return obj.user_agent[:80] or "—"
 
-@admin.register(Achievement)
-class AchievementAdmin(ModelAdmin):
-    list_display = ["title", "condition_type", "condition_value", "sort_order", "is_active"]
-    list_filter = ["is_active", "condition_type"]
-    search_fields = ["title", "description"]
-    list_editable = ["sort_order", "is_active"]
-    ordering = ["sort_order", "pk"]
+# @admin.register(Achievement)
+# class AchievementAdmin(ModelAdmin):
+#     list_display = ["title", "condition_type", "condition_value", "sort_order", "is_active"]
+#     list_filter = ["is_active", "condition_type"]
+#     search_fields = ["title", "description"]
+#     list_editable = ["sort_order", "is_active"]
+#     ordering = ["sort_order", "pk"]
 
-@admin.register(UserAchievement)
-class UserAchievementAdmin(ModelAdmin):
-    list_display = ["user", "achievement", "earned_at"]
-    list_filter = ["achievement", "earned_at"]
-    search_fields = ["user__email", "achievement__title"]
-    raw_id_fields = ["user", "achievement"]
-    readonly_fields = ["earned_at"]
-    ordering = ["-earned_at"]
+# @admin.register(UserAchievement)
+# class UserAchievementAdmin(ModelAdmin):
+#     list_display = ["user", "achievement", "earned_at"]
+#     list_filter = ["achievement", "earned_at"]
+#     search_fields = ["user__email", "achievement__title"]
+#     raw_id_fields = ["user", "achievement"]
+#     readonly_fields = ["earned_at"]
+#     ordering = ["-earned_at"]
 
-@admin.register(DiscountLevel)
-class DiscountLevelAdmin(ModelAdmin):
-    list_display = ["min_amount", "discount_percent", "sort_order", "is_active"]
-    list_display_links = ["min_amount"]
-    list_filter = ["is_active"]
-    list_editable = ["discount_percent", "sort_order", "is_active"]
-    ordering = ["sort_order", "min_amount"]
+# @admin.register(DiscountLevel)
+# class DiscountLevelAdmin(ModelAdmin):
+#     list_display = ["min_amount", "discount_percent", "sort_order", "is_active"]
+#     list_display_links = ["min_amount"]
+#     list_filter = ["is_active"]
+#     list_editable = ["discount_percent", "sort_order", "is_active"]
+#     ordering = ["sort_order", "min_amount"]
 
 @admin.register(BonusTransaction)
 class BonusTransactionAdmin(ModelAdmin):

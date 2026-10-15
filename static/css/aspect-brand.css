@@ -1,0 +1,156 @@
+/* =====================================================
+   ASPECT COFFEE — BRAND LAYER v3
+   Шрифты, палитра, ключевые элементы. НЕ трогает футер-hover.
+   Подключается ДО aspect-redesign.css.
+   ===================================================== */
+
+   :root {
+    --aspect-green:   #2A4A34;
+    --aspect-green-2: #1E3626;
+    --aspect-gray:    #5A5A5A;
+    --aspect-black:   #000000;
+    --aspect-white:   #FFFFFF;
+    --aspect-bg:      #FFFFFF;
+    --aspect-bg-soft: #F4F6F4;
+    --aspect-border:  #E5E8E5;
+  }
+  
+  /* Open Sans — базовый текст */
+  html body,
+  html body p,
+  html body span,
+  html body div,
+  html body a,
+  html body li,
+  html body label,
+  html body input,
+  html body textarea,
+  html body button,
+  html body select,
+  html body td,
+  html body th {
+    font-family: "Open Sans", "Gotham Pro", Arial, sans-serif;
+  }
+  
+  /* Roboto Condensed — заголовки */
+  html body h1,
+  html body h2,
+  html body h3,
+  html body h4,
+  html body h5,
+  html body h6,
+  html body .font-din,
+  html body .font-din-light,
+  html body .font-din-medium,
+  html body .font-din-black,
+  html body .font-din-bold,
+  html body .section-heading,
+  html body .tc-card-title-link,
+  html body .white-box__title,
+  html body .tc-catalog-title,
+  html body .home-reviews__title,
+  html body .home-reviews__value,
+  html body .tc-reviews-head h2,
+  html body .tc-newsletter-copy h2,
+  html body .tc-auth-head h1,
+  html body .tc-phone-completion-head h1,
+  html body [class*="text-[40px]"],
+  html body [class*="text-[32px]"],
+  html body [class*="text-[64px]"] {
+    font-family: "Roboto Condensed", "Arial Narrow", Arial, sans-serif;
+  }
+  
+  html body .font-din,
+  html body .font-din-light,
+  html body .font-din-medium {
+    font-weight: 400;
+  }
+  html body .font-din-black,
+  html body .font-din-bold,
+  html body h1,
+  html body h2,
+  html body h3 {
+    font-weight: 900;
+    letter-spacing: 0.01em;
+  }
+  
+  /* Кнопки */
+  html body .tc-btn-pay,
+  html body .tc-btn.btn-dark,
+  html body .tc-auth-submit,
+  html body .tc-newsletter-button,
+  html body .button-basket,
+  html body .tc-btn.btn-white-xs {
+    background: var(--aspect-black);
+    color: var(--aspect-white);
+    font-family: "Roboto Condensed", Arial, sans-serif;
+    text-transform: uppercase;
+    border-radius: 12px;
+  }
+  
+  html body .tc-btn-pay:hover,
+  html body .tc-btn.btn-dark:hover,
+  html body .tc-auth-submit:hover,
+  html body .tc-newsletter-button:hover,
+  html body .tc-btn.btn-white-xs:hover {
+    background: var(--aspect-green);
+    color: var(--aspect-white);
+  }
+  
+  html body .tc-btn-pay.active {
+    background: var(--aspect-green);
+    color: var(--aspect-white);
+  }
+  
+  /* Карточка товара */
+  html body .tc-card-title-link {
+    font-family: "Roboto Condensed", Arial, sans-serif;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+  }
+  html body .tc-card-title-link:hover {
+    color: var(--aspect-green);
+  }
+  html body .tc-week-special {
+    background-color: var(--aspect-green);
+    color: var(--aspect-white);
+  }
+  
+  /* Звёзды рейтинга */
+  html body .home-reviews__metric-side svg,
+  html body .home-review-card__stars,
+  html body .tc-tile-rating svg {
+    color: var(--aspect-green);
+    fill: var(--aspect-green);
+  }
+  html body .home-review-card__stars .is-empty {
+    color: #DEDEDE;
+    fill: #DEDEDE;
+  }
+  
+  /* Мягкий зелёный фон для блоков */
+  html body .bg-\[\#f5f5f5\],
+  html body .bg-\[\#F5F5F7\] {
+    background-color: #F4F6F4;
+  }
+  
+  /* Пагинация, чипсы, табы */
+  html body .pagination-btn.active {
+    background: var(--aspect-green);
+    border-color: var(--aspect-green);
+    color: var(--aspect-white);
+  }
+  html body .tc-catalog-chip:hover {
+    background-color: var(--aspect-green);
+    color: var(--aspect-white);
+  }
+  html body .nav-li.active {
+    background-color: var(--aspect-black);
+    color: var(--aspect-white);
+  }
+  
+  /* Адаптив */
+  @media (max-width: 767px) {
+    html body .section-heading { font-size: 26px; }
+    html body .tc-catalog-title { font-size: 28px; }
+  }

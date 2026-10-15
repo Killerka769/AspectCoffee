@@ -24,17 +24,15 @@ from .verification import (
     UNLOCK_RESEND_COOLDOWN_SECONDS,
 )
 
-
-DEFAULT_ACHIEVEMENT_ICONS = {
-    "Первый заказ": "asset/images/achievements/achievement-first-order-transparent.webp",
-    "Кофеман": "asset/images/achievements/achievement-coffee-lover-transparent.webp",
-    "Знаток кофе": "asset/images/achievements/achievement-coffee-expert-transparent.webp",
-    "VIP-клиент": "asset/images/achievements/achievement-vip-client-transparent.webp",
-    "Любитель скидок": "asset/images/achievements/achievement-discount-lover-transparent.webp",
-    "Коллекционер": "asset/images/achievements/achievement-collector-transparent.webp",
-    "Миллионер": "asset/images/achievements/achievement-millionaire-transparent.webp",
-}
-
+# DEFAULT_ACHIEVEMENT_ICONS = {
+#     "Первый заказ": "asset/images/achievements/achievement-first-order-transparent.webp",
+#     "Кофеман": "asset/images/achievements/achievement-coffee-lover-transparent.webp",
+#     "Знаток кофе": "asset/images/achievements/achievement-coffee-expert-transparent.webp",
+#     "VIP-клиент": "asset/images/achievements/achievement-vip-client-transparent.webp",
+#     "Любитель скидок": "asset/images/achievements/achievement-discount-lover-transparent.webp",
+#     "Коллекционер": "asset/images/achievements/achievement-collector-transparent.webp",
+#     "Миллионер": "asset/images/achievements/achievement-millionaire-transparent.webp",
+# }
 
 @login_required
 @never_cache
@@ -313,13 +311,10 @@ def wishlist_view(request):
     })
 
 def my_favorites_view(request):
-    article_bookmarks = []
     if request.user.is_authenticated:
         items = Wishlist.objects.filter(user=request.user).select_related("product").order_by("-added_at")
         notes = ProductNote.objects.filter(user=request.user).select_related("product").order_by("-updated_at")
         notes_dict = {n.product_id: n.text for n in notes}
-        from apps.blog.models import ArticleBookmark
-        article_bookmarks = ArticleBookmark.objects.filter(user=request.user).select_related("post").order_by("-added_at")
     else:
         from types import SimpleNamespace
         from apps.catalog.models import Product
@@ -333,7 +328,6 @@ def my_favorites_view(request):
         "wishlist_items": items,
         "product_notes": notes,
         "product_notes_dict": notes_dict,
-        "article_bookmarks": article_bookmarks,
     })
 
 def mini_wishlist(request):
@@ -743,41 +737,22 @@ def sync_local_storage(request):
 
 
 @login_required
+@login_required
 def discount_view(request):
     from django.db.models import Sum
     from apps.orders.models import Order
-    from apps.users.models import DiscountLevel
     user = request.user
     qs = Order.objects.filter(user=user).exclude(status=Order.STATUS_CANCELLED)
     total_spent = qs.aggregate(t=Sum("total_amount"))["t"] or 0
     orders_count = qs.count()
-    levels = list(DiscountLevel.objects.filter(is_active=True).order_by("sort_order", "min_amount"))
-    loyalty_levels = [(0, 0)] + [(l.min_amount, l.discount_percent) for l in levels if l.min_amount > 0 or l.discount_percent > 0]
-    current_discount = 0
-    next_level_at = None
-    next_level_discount = None
-    progress_percent = 100
-    for i, (need, disc) in enumerate(loyalty_levels):
-        if total_spent >= need:
-            current_discount = disc
-        else:
-            next_level_at = need
-            next_level_discount = disc
-            prev = loyalty_levels[i-1][0] if i > 0 else 0
-            range_size = need - prev
-            progress = total_spent - prev
-            progress_percent = int(min(progress / range_size * 100, 100)) if range_size > 0 else 0
-            break
-    display_levels = [(l.min_amount, l.discount_percent) for l in levels if l.min_amount > 0]
+    # Фиксированная скидка назначается вручную в админке (User.wholesale_discount).
+    # Применяется ко всем заказам пользователя автоматически.
+    current_discount = user.wholesale_discount or 0
     return render(request, "users/discount.html", {
         "section": "discount",
         "current_discount": current_discount,
         "total_spent": total_spent,
-        "next_level_at": next_level_at,
-        "next_level_discount": next_level_discount,
-        "progress_percent": progress_percent,
         "orders_count": orders_count,
-        "levels": display_levels,
     })
 
 
@@ -848,7 +823,7 @@ def statistics_view(request):
         "addresses_count": user.addresses.count(),
         "bonus_points": user.bonus_points,
         "balance": user.balance,
-        "discount_pct": user.wholesale_discount if user.is_wholesale else 0,
+        "discount_pct": user.wholesale_discount or 0,
         "is_wholesale": user.is_wholesale,
     }
     return render(request, "users/statistics.html", {"section": "statistics", "stats": stats})
@@ -947,41 +922,41 @@ def community_profile_view(request):
     })
 
 
-@login_required
-def achievements_view(request):
-    from django.db.models import Sum
-    from apps.orders.models import Order
-    from apps.users.models import Achievement, UserAchievement
-    user = request.user
-    filter_type = request.GET.get("filter", "all")
-    achievements = Achievement.objects.filter(is_active=True)
-    earned_ids = set(UserAchievement.objects.filter(user=user).values_list("achievement_id", flat=True))
-    badges = []
-    for ach in achievements:
-        current_value = ach.check_user(user)
-        if ach.condition_value > 0:
-            progress = min(int(current_value / ach.condition_value * 100), 100)
-        else:
-            progress = 100 if current_value > 0 else 0
-        achieved = ach.id in earned_ids
-        if not achieved and progress >= 100:
-            UserAchievement.objects.get_or_create(user=user, achievement=ach)
-            achieved = True
-        default_icon = DEFAULT_ACHIEVEMENT_ICONS.get(ach.title)
-        badges.append({
-            "icon": ach.icon.url if ach.icon else static(default_icon) if default_icon else None,
-            "title": ach.title,
-            "description": ach.description,
-            "progress": progress,
-            "achieved_at": True if achieved else None,
-        })
-    if filter_type == "earned":
-        badges = [b for b in badges if b["achieved_at"]]
-    return render(request, "users/achievements.html", {
-        "section": "achievements",
-        "badges": badges,
-        "filter": filter_type,
-    })
+# @login_required
+# def achievements_view(request):
+#     from django.db.models import Sum
+#     from apps.orders.models import Order
+#     from apps.users.models import Achievement, UserAchievement
+#     user = request.user
+#     filter_type = request.GET.get("filter", "all")
+#     achievements = Achievement.objects.filter(is_active=True)
+#     earned_ids = set(UserAchievement.objects.filter(user=user).values_list("achievement_id", flat=True))
+#     badges = []
+#     for ach in achievements:
+#         current_value = ach.check_user(user)
+#         if ach.condition_value > 0:
+#             progress = min(int(current_value / ach.condition_value * 100), 100)
+#         else:
+#             progress = 100 if current_value > 0 else 0
+#         achieved = ach.id in earned_ids
+#         if not achieved and progress >= 100:
+#             UserAchievement.objects.get_or_create(user=user, achievement=ach)
+#             achieved = True
+#         default_icon = DEFAULT_ACHIEVEMENT_ICONS.get(ach.title)
+#         badges.append({
+#             "icon": ach.icon.url if ach.icon else static(default_icon) if default_icon else None,
+#             "title": ach.title,
+#             "description": ach.description,
+#             "progress": progress,
+#             "achieved_at": True if achieved else None,
+#         })
+#     if filter_type == "earned":
+#         badges = [b for b in badges if b["achieved_at"]]
+#     return render(request, "users/achievements.html", {
+#         "section": "achievements",
+#         "badges": badges,
+#         "filter": filter_type,
+#     })
 
 
 @login_required
@@ -989,16 +964,16 @@ def subscriptions_view(request):
     return redirect("users:profile")
 
 
-@login_required
-def blog_history_view(request):
-    from apps.blog.models import ArticleReadHistory, ArticleBookmark
-    reads = ArticleReadHistory.objects.filter(user=request.user).select_related("post").order_by("-read_at")
-    bookmarked_ids = set(ArticleBookmark.objects.filter(user=request.user).values_list("post_id", flat=True))
-    return render(request, "users/blog_history.html", {
-        "section": "blog",
-        "reads": reads,
-        "bookmarked_ids": bookmarked_ids,
-    })
+# @login_required
+# def blog_history_view(request):
+#     from apps.blog.models import ArticleReadHistory, ArticleBookmark
+#     reads = ArticleReadHistory.objects.filter(user=request.user).select_related("post").order_by("-read_at")
+#     bookmarked_ids = set(ArticleBookmark.objects.filter(user=request.user).values_list("post_id", flat=True))
+#     return render(request, "users/blog_history.html", {
+#         "section": "blog",
+#         "reads": reads,
+#         "bookmarked_ids": bookmarked_ids,
+#     })
 
 
 @login_required
@@ -1080,17 +1055,17 @@ def unblock_user(request, pk):
     return redirect(request.META.get("HTTP_REFERER", "users:blacklist"))
 
 
-@login_required
-@require_POST
-def unsubscribe_blog(request, pk):
-    from django.http import HttpResponse
-    subs = request.user.blog_subscriptions.filter(pk=pk) if hasattr(request.user, "blog_subscriptions") else []
-    if subs:
-        subs.first().delete() if hasattr(subs.first(), "delete") else None
-        messages.success(request, "Вы отписались от статьи")
-    if request.headers.get("HX-Request"):
-        return HttpResponse("")
-    return redirect(request.META.get("HTTP_REFERER", "users:blog_history"))
+# @login_required
+# @require_POST
+# def unsubscribe_blog(request, pk):
+#     from django.http import HttpResponse
+#     subs = request.user.blog_subscriptions.filter(pk=pk) if hasattr(request.user, "blog_subscriptions") else []
+#     if subs:
+#         subs.first().delete() if hasattr(subs.first(), "delete") else None
+#         messages.success(request, "Вы отписались от статьи")
+#     if request.headers.get("HX-Request"):
+#         return HttpResponse("")
+#     return redirect(request.META.get("HTTP_REFERER", "users:blog_history"))
 
 
 @login_required

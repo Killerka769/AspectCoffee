@@ -1,53 +1,206 @@
 {% extends "catalog/base.html" %}
 {% load static %}
 
-{% block title %}Карта сайта{% endblock %}
-{% block meta_description %}Карта сайта интернет-магазина Aspect Coffee. Все страницы и категории магазина.{% endblock %}
+{% block title %}Карта сайта — Aspect Coffee{% endblock %}
+{% block meta_description %}Карта сайта Aspect Coffee Roasters. Все страницы и категории магазина.{% endblock %}
+
+{% block extra_css %}
+<style>
+.sitemap-page { background: #FFFFFF; padding: 40px 0 80px; min-height: 100vh; }
+.sitemap-page__container { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
+
+.sitemap-page__head {
+  padding-bottom: 32px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid #E5E8E5;
+  position: relative;
+}
+.sitemap-page__head::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -1px;
+  width: 72px; height: 3px;
+  background: #2A4A34;
+}
+.sitemap-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(0,0,0,.5);
+  margin-bottom: 16px;
+}
+.sitemap-breadcrumbs a { color: rgba(0,0,0,.5); text-decoration: none; }
+.sitemap-breadcrumbs a:hover { color: #2A4A34; }
+.sitemap-breadcrumbs span { color: rgba(0,0,0,.3); }
+.sitemap-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(40px, 5vw, 72px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0;
+}
+
+.sitemap-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+@media (max-width: 899px) {
+  .sitemap-grid { grid-template-columns: 1fr; }
+}
+
+.sitemap-card {
+  background: #fff;
+  border: 1px solid #E5E8E5;
+  border-radius: 24px;
+  padding: 32px 36px;
+  transition: border-color .25s ease, box-shadow .25s ease;
+}
+.sitemap-card:hover {
+  border-color: #2A4A34;
+  box-shadow: 0 12px 32px rgba(42,74,52,.06);
+}
+.sitemap-card__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #F0F0F0;
+}
+.sitemap-card__num {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: #2A4A34;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.sitemap-card__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+  color: #000;
+  margin: 0;
+}
+
+.sitemap-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sitemap-list a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: rgba(0,0,0,.7);
+  text-decoration: none;
+  transition: background .15s ease, color .15s ease, padding-left .15s ease;
+}
+.sitemap-list a:hover {
+  background: #F4F6F4;
+  color: #2A4A34;
+  padding-left: 16px;
+}
+.sitemap-list a::before {
+  content: "→";
+  color: #2A4A34;
+  font-weight: 700;
+  opacity: .5;
+  transition: opacity .15s ease, transform .15s ease;
+}
+.sitemap-list a:hover::before {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+.sitemap-sublist {
+  list-style: none;
+  margin: 4px 0 4px 26px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sitemap-sublist a {
+  padding: 6px 10px;
+  font-size: 13px;
+  color: rgba(0,0,0,.55);
+}
+.sitemap-sublist a::before {
+  content: "·";
+  color: rgba(0,0,0,.35);
+  font-weight: 900;
+}
+
+.sitemap-empty {
+  font-size: 14px;
+  color: rgba(0,0,0,.4);
+  padding: 16px 0;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
-  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
-    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
-      <a href="/" class="hover:text-black transition-colors">Главная</a>
-      <span class="text-black/20">/</span>
-      <span class="text-black font-medium">Карта сайта</span>
-    </nav>
-    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-10">Карта сайта</h1>
+<main class="sitemap-page">
+  <div class="sitemap-page__container">
 
-    <div class="grid md:grid-cols-2 gap-8">
-      <div class="bg-white rounded-[24px] p-6 md:p-8 border border-gray-100 shadow-sm">
-        <h2 class="text-[18px] font-din-black uppercase mb-5">Страницы</h2>
-        <ul class="space-y-3">
+    <div class="sitemap-page__head">
+      <nav class="sitemap-breadcrumbs" aria-label="Хлебные крошки">
+        <a href="/">Главная</a>
+        <span>/</span>
+        <span style="color:#000">Карта сайта</span>
+      </nav>
+      <h1 class="sitemap-title">Карта сайта</h1>
+    </div>
+
+    <div class="sitemap-grid">
+
+      {# ---------- СТРАНИЦЫ ---------- #}
+      <div class="sitemap-card">
+        <div class="sitemap-card__head">
+          <div class="sitemap-card__num">01</div>
+          <h2 class="sitemap-card__title">Страницы</h2>
+        </div>
+        <ul class="sitemap-list">
           {% for name, url in pages_list %}
-            <li>
-              <a href="{{ url }}" class="flex items-center gap-2 text-[14px] text-black/60 hover:text-black transition-colors py-1.5">
-                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                {{ name }}
-              </a>
-            </li>
+            <li><a href="{{ url }}">{{ name }}</a></li>
           {% endfor %}
         </ul>
       </div>
 
-      <div class="bg-white rounded-[24px] p-6 md:p-8 border border-gray-100 shadow-sm">
-        <h2 class="text-[18px] font-din-black uppercase mb-5">Категории товаров</h2>
+      {# ---------- КАТЕГОРИИ ---------- #}
+      <div class="sitemap-card">
+        <div class="sitemap-card__head">
+          <div class="sitemap-card__num">02</div>
+          <h2 class="sitemap-card__title">Категории товаров</h2>
+        </div>
+
         {% if categories %}
-          <ul class="space-y-3">
+          <ul class="sitemap-list">
             {% for category in categories %}
               <li>
-                <a href="/catalog/?category={{ category.slug }}" class="flex items-center gap-2 text-[14px] text-black/60 hover:text-black transition-colors py-1.5">
-                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                  {{ category.name }}
-                </a>
+                <a href="/catalog/?category={{ category.slug }}">{{ category.name }}</a>
                 {% if category.children.all %}
-                  <ul class="ml-6 mt-2 space-y-2">
+                  <ul class="sitemap-sublist">
                     {% for child in category.children.all %}
-                      <li>
-                        <a href="/catalog/?category={{ child.slug }}" class="flex items-center gap-2 text-[13px] text-black/40 hover:text-black transition-colors py-1">
-                          <svg class="w-3 h-3 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-right-sm"></use></svg>
-                          {{ child.name }}
-                        </a>
-                      </li>
+                      <li><a href="/catalog/?category={{ child.slug }}">{{ child.name }}</a></li>
                     {% endfor %}
                   </ul>
                 {% endif %}
@@ -55,9 +208,10 @@
             {% endfor %}
           </ul>
         {% else %}
-          <p class="text-[14px] text-black/40">Категории не найдены.</p>
+          <p class="sitemap-empty">Категории не найдены. Добавьте их в админ-панели.</p>
         {% endif %}
       </div>
+
     </div>
   </div>
 </main>

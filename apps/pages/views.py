@@ -10,8 +10,8 @@ from django.views.decorators.http import require_POST
 from apps.catalog.models import Product, Category, Review
 from .forms import CommunityPostForm
 from .models import (
-    CommunityPost, CommunityPostLike, CommunityPostDislike,
-    CommunityPostBookmark, CommunityPostRepost, CommunityPostComment, ReviewComment,
+    CommunityPost, CommunityPostLike,
+    CommunityPostComment, ReviewComment,
 )
 from django.db.models import Count, Exists, OuterRef, Prefetch, Q
 
@@ -22,10 +22,7 @@ def _static_page(request, template, extra=None):
 
 
 def legal_document(request, slug):
-    """Render admin-managed legal document (public offer, privacy, etc.).
-
-    Falls back to 404 if the slug is not registered in LegalDocument.
-    """
+    """Render admin-managed legal document (public offer, privacy, etc.)."""
     from django.shortcuts import get_object_or_404
     from .models import LegalDocument
 
@@ -104,13 +101,11 @@ def sitemap_page(request):
         ("Шоколад и сиропы", "/chocolate/"),
         ("Аксессуары", "/accessories/"),
         ("Подарочные наборы", "/giftbox/"),
-        ("Подписка на кофе", "/subscription/"),
         ("Отзывы", "/reviews/"),
         ("Блог", "/blog/"),
         ("Сообщество", "/community/"),
         ("FAQ", "/faq/"),
         ("Как выбрать кофе", "/how-to-choose-coffee/"),
-        ("Калькулятор помола", "/grind-converter/"),
         ("Доставка и оплата", "/shipment-and-payment/"),
         ("Система скидок", "/discount-system/"),
         ("Возврат денег", "/return-money/"),
@@ -148,11 +143,9 @@ def sitemap_xml(request):
         (0.8, "weekly", request.build_absolute_uri("/chocolate/")),
         (0.8, "weekly", request.build_absolute_uri("/accessories/")),
         (0.8, "weekly", request.build_absolute_uri("/giftbox/")),
-        (0.7, "monthly", request.build_absolute_uri("/subscription/")),
         (0.7, "weekly", request.build_absolute_uri("/blog/")),
         (0.6, "monthly", request.build_absolute_uri("/faq/")),
         (0.6, "monthly", request.build_absolute_uri("/how-to-choose-coffee/")),
-        (0.6, "monthly", request.build_absolute_uri("/grind-converter/")),
         (0.6, "monthly", request.build_absolute_uri("/reviews/")),
         (0.6, "monthly", request.build_absolute_uri("/community/")),
         (0.5, "monthly", request.build_absolute_uri("/shipment-and-payment/")),
@@ -189,11 +182,9 @@ def sitemap_xml(request):
     xml += "</urlset>"
     return HttpResponse(xml, content_type="application/xml")
 
-
 def subscription(request):
     return _static_page(request, "subscription")
-
-
+    
 def reviews_page(request):
     from django.db.models import Avg, Count, Q
     qs = Review.objects.filter(is_approved=True).select_related("user", "product").prefetch_related(
@@ -312,9 +303,6 @@ def community(request, active_tab="best"):
         selected_scope = "all"
     user_id = request.user.id if request.user.is_authenticated else None
     my_like = CommunityPostLike.objects.filter(post_id=OuterRef("pk"), user_id=user_id)
-    my_dislike = CommunityPostDislike.objects.filter(post_id=OuterRef("pk"), user_id=user_id)
-    my_bookmark = CommunityPostBookmark.objects.filter(post_id=OuterRef("pk"), user_id=user_id)
-    my_repost = CommunityPostRepost.objects.filter(post_id=OuterRef("pk"), user_id=user_id)
     posts_qs = CommunityPost.objects.filter(is_published=True).select_related("user").prefetch_related(
         Prefetch(
             "comments",
@@ -337,17 +325,13 @@ def community(request, active_tab="best"):
             posts_qs = posts_qs.filter(content_query)
         else:
             posts_qs = posts_qs.filter(content_query | author_query)
-    if active_tab == "bookmarks":
-        posts_qs = posts_qs.filter(bookmarks__user_id=user_id) if user_id else posts_qs.none()
+
     posts_qs = posts_qs.annotate(
         like_count=Count("likes", distinct=True),
-        dislike_count=Count("dislikes", distinct=True),
         comment_count=Count("comments", filter=Q(comments__is_approved=True), distinct=True),
-        repost_count=Count("reposts", distinct=True),
-        liked_by_me=Exists(my_like), disliked_by_me=Exists(my_dislike),
-        bookmarked_by_me=Exists(my_bookmark), reposted_by_me=Exists(my_repost),
+        liked_by_me=Exists(my_like),
     )
-    posts_qs = posts_qs.order_by("-created_at") if active_tab in ("new", "bookmarks") else posts_qs.order_by("-like_count", "-created_at")
+    posts_qs = posts_qs.order_by("-created_at")
     posts = list(posts_qs[:24])
     for post in posts:
         post.author_level = post.user.get_level()
@@ -362,19 +346,19 @@ def community(request, active_tab="best"):
             comment.thread_replies = by_parent.get(comment.id, [])
         post.top_comments = by_parent.get(None, [])
     context = {
-            "form": form,
-            "community_posts": posts,
-            "active_tab": active_tab,
-            "query": q,
-            "selected_scope": selected_scope,
-            "selected_scope_label": scope_labels[selected_scope],
-            "show_channels": active_tab == "channels",
-            "current_user_level": request.user.get_level() if request.user.is_authenticated else None,
-            "community_channels": [
-                {"title": "Заваривание", "description": "Рецепты, вода и настройки кофейных устройств"},
-                {"title": "Новинки Aspect Coffee", "description": "Обсуждаем свежую обжарку и сезонные сорта"},
-                {"title": "Встречи и дегустации", "description": "Анонсы событий и встречи любителей кофе"},
-            ],
+        "form": form,
+        "community_posts": posts,
+        "active_tab": active_tab,
+        "query": q,
+        "selected_scope": selected_scope,
+        "selected_scope_label": scope_labels[selected_scope],
+        "show_channels": active_tab == "channels",
+        "current_user_level": request.user.get_level() if request.user.is_authenticated else None,
+        "community_channels": [
+            {"title": "Заваривание", "description": "Рецепты, вода и настройки кофейных устройств"},
+            {"title": "Новинки Aspect Coffee", "description": "Обсуждаем свежую обжарку и сезонные сорта"},
+            {"title": "Встречи и дегустации", "description": "Анонсы событий и встречи любителей кофе"},
+        ],
     }
     return render(request, "pages/community_live.html", context)
 
@@ -385,10 +369,6 @@ def community_new(request):
 
 def community_channels(request):
     return community(request, active_tab="channels")
-
-
-def community_bookmarks(request):
-    return community(request, active_tab="bookmarks")
 
 
 def community_rules(request):
@@ -433,59 +413,15 @@ def community_post_like_toggle(request, pk):
     add = request.POST.get("add", "true").lower() in ("true", "1", "yes")
     if add:
         CommunityPostLike.objects.get_or_create(post=post, user=request.user)
-        CommunityPostDislike.objects.filter(post=post, user=request.user).delete()
     else:
         CommunityPostLike.objects.filter(post=post, user=request.user).delete()
     like_count = post.likes.count()
-    return JsonResponse({"ok": True, "post_id": post.pk, "liked": add, "like_count": like_count, "dislike_count": post.dislikes.count()})
+    return JsonResponse({"ok": True, "post_id": post.pk, "liked": add, "like_count": like_count})
 
 
 def _community_action_login_required(request):
     if not request.user.is_authenticated:
         return JsonResponse({"error": "login_required", "redirect": "/login/?next=/community/"}, status=401)
-
-
-@require_POST
-def community_post_dislike_toggle(request, pk):
-    denied = _community_action_login_required(request)
-    if denied:
-        return denied
-    post = get_object_or_404(CommunityPost, pk=pk, is_published=True)
-    if post.user_id == request.user.id:
-        return JsonResponse({"error": "self_vote_forbidden"}, status=403)
-    add = request.POST.get("add", "true").lower() in ("true", "1", "yes")
-    if add:
-        CommunityPostDislike.objects.get_or_create(post=post, user=request.user)
-        CommunityPostLike.objects.filter(post=post, user=request.user).delete()
-    else:
-        CommunityPostDislike.objects.filter(post=post, user=request.user).delete()
-    return JsonResponse({"ok": True, "active": add, "count": post.dislikes.count(), "like_count": post.likes.count()})
-
-
-@require_POST
-def community_post_bookmark_toggle(request, pk):
-    denied = _community_action_login_required(request)
-    if denied:
-        return denied
-    post = get_object_or_404(CommunityPost, pk=pk, is_published=True)
-    bookmark, created = CommunityPostBookmark.objects.get_or_create(post=post, user=request.user)
-    if not created:
-        bookmark.delete()
-    return JsonResponse({"ok": True, "active": created})
-
-
-@require_POST
-def community_post_repost_toggle(request, pk):
-    denied = _community_action_login_required(request)
-    if denied:
-        return denied
-    post = get_object_or_404(CommunityPost, pk=pk, is_published=True)
-    if post.user_id == request.user.id:
-        return JsonResponse({"error": "self_repost_forbidden"}, status=403)
-    repost, created = CommunityPostRepost.objects.get_or_create(post=post, user=request.user)
-    if not created:
-        repost.delete()
-    return JsonResponse({"ok": True, "active": created, "count": post.reposts.count()})
 
 
 @require_POST

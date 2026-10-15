@@ -20,16 +20,23 @@ BODY_RANGES = [
     ("high", "Насыщенное", Q(body__gte=8)),
 ]
 
-# Особенности кофе: id -> (подпись, условие Q).
+
 def _feature_conditions():
+    """Особенности кофе: id -> (подпись, условие Q).
+
+    Тег-фильтры (blend, single-origin и т.п.) удалены вместе с моделью Tag.
+    Условия переписаны на поля, которые реально есть в Product.
+    """
     return [
-        ("blend", "Смесь", Q(tags__slug="blend")),
-        ("decaf", "Без кофеина",
-         Q(caffeine_content__isnull=False, caffeine_content__lt=0.3) | Q(tags__slug="decaf")),
-        ("single_origin", "Моносорт", Q(tags__slug="single-origin")),
         ("micro_lot", "Микролот", Q(is_microlot=True)),
-        ("for_milk", "Для молока", Q(tags__slug="for-milk")),
-        ("limited", "Лимитированный", Q(tags__slug="limited")),
+        ("decaf", "Без кофеина",
+         Q(caffeine_content__isnull=False, caffeine_content__lt=0.3)),
+        ("single_origin", "Моносорт",
+         Q(origin_country__isnull=False) & ~Q(origin_country="")),
+        ("for_milk", "Для молока",
+         Q(roast_level="espresso") | Q(roast_level="dark_for_milk")),
+        ("limited", "Лимитированный",
+         Q(is_microlot=True) | Q(q_score__isnull=False, q_score__gt="")),
     ]
 
 
@@ -69,15 +76,7 @@ def _normalized_text_facet(base_qs, field_name):
 
 
 def build_facets(base_qs):
-    """Вернуть dict фасетов и общее число опций (filters_total).
-
-    base_qs — queryset активных товаров, суженный ТОЛЬКО по разделу/категории
-    (и поиску), но до применения самих фасетных фильтров.
-
-    Возвращает: (facets: dict, filters_total: int)
-    Каждая непустая группа -> список dict {value/slug, label/name, count}.
-    Пустые группы в dict не попадают.
-    """
+    """Вернуть dict фасетов и общее число опций (filters_total)."""
     from apps.catalog.models import BrewMethod, FlavorNote
 
     facets = {}
@@ -119,10 +118,6 @@ def build_facets(base_qs):
         facets["roast"] = roast
 
     # ---- Способ обработки (free-text CharField) ----
-    # The parser historically stored the same value with different casing
-    # (for example ``Смесь`` and ``смесь``).  The catalog filters with
-    # ``iexact``, therefore the facet must use the same normalization or its
-    # displayed count will disagree with the result count.
     processing = _normalized_text_facet(base_qs, "processing_method")
     if processing:
         facets["processing"] = processing

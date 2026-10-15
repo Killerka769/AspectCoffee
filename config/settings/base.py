@@ -5,7 +5,8 @@ from decouple import config, Csv
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-SECRET_KEY = config("SECRET_KEY")
+# SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY", default="django-insecure-build-dummy-key")
 DEBUG = config("DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 SITE_ID = 2
@@ -292,12 +293,12 @@ UNFOLD = {
     "SITE_SYMBOL": "coffee",
     "DISABLE_DARK_MODE": True,
     "SITE_LOGO": {
-        "light": lambda request: f"{STATIC_URL}asset/images/ic-logo-60.svg",
-        "dark": lambda request: f"{STATIC_URL}asset/images/ic-logo-60.svg",
+        "light": lambda request: f"{STATIC_URL}asset/images/logo-aspect.svg",
+        "dark": lambda request: f"{STATIC_URL}asset/images/logo-aspect.svg",
     },
     "SITE_FAVICONS": [
         {
-            "href": lambda request: f"{STATIC_URL}asset/images/favicon.svg",
+            "href": lambda request: f"{STATIC_URL}asset/images/favicon-aspect.svg",
             "rel": "icon",
             "type": "image/svg+xml",
         },
@@ -309,35 +310,35 @@ UNFOLD = {
         lambda request: f"{STATIC_URL}asset/js/admin_ru.js?v=20260722-2",
     ],
     "LOGIN": {
-        "image": lambda request: f"{STATIC_URL}images/bg-video-preview-1.jpg",
+        "image": lambda request: f"{STATIC_URL}asset/images/1b.jpg",
         "redirect_after": lambda request: "/admin/",
     },
     "COLORS": {
         "primary": {
-            "50": "250 251 252",
-            "100": "240 242 245",
-            "200": "224 224 224",
-            "300": "212 212 212",
-            "400": "163 163 163",
-            "500": "115 115 115",
-            "600": "90 90 90",
-            "700": "64 64 64",
-            "800": "38 38 38",
-            "900": "17 17 17",
-            "950": "10 10 10",
+            "50": "244 246 244",
+            "100": "232 238 232",
+            "200": "199 224 204",
+            "300": "143 184 154",
+            "400": "90 138 104",
+            "500": "42 74 52",
+            "600": "30 54 38",
+            "700": "22 40 28",
+            "800": "15 27 20",
+            "900": "10 18 14",
+            "950": "5 9 7",
         },
         "accent": {
-            "50": "250 250 250",
-            "100": "245 245 245",
-            "200": "229 229 229",
-            "300": "212 212 212",
-            "400": "163 163 163",
-            "500": "115 115 115",
-            "600": "82 82 82",
-            "700": "64 64 64",
-            "800": "38 38 38",
-            "900": "23 23 23",
-            "950": "10 10 10",
+            "50": "244 246 244",
+            "100": "232 238 232",
+            "200": "199 224 204",
+            "300": "143 184 154",
+            "400": "90 138 104",
+            "500": "42 74 52",
+            "600": "30 54 38",
+            "700": "22 40 28",
+            "800": "15 27 20",
+            "900": "10 18 14",
+            "950": "5 9 7",
         },
     },
     "SIDEBAR": {

@@ -1,250 +1,422 @@
 {% extends "catalog/base.html" %}
 {% load static %}
 
-{% block title %}FAQ — Часто задаваемые вопросы{% endblock %}
-{% block meta_description %}Ответы на частые вопросы: как сделать заказ, доставка, оплата, возврат. Вся информация о кофе Aspect Coffee.{% endblock %}
+{% block title %}FAQ — Часто задаваемые вопросы — Aspect Coffee Roasters{% endblock %}
+{% block meta_description %}Ответы на частые вопросы о заказе, доставке и оплате кофе Aspect Coffee Roasters. Сроки доставки 3–5 дней, в удалённые регионы — до 10 дней.{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ==========================================================
+   ASPECT FAQ
+   ========================================================== */
+
+.aspect-faq {
+  background: #FFFFFF;
+  padding-bottom: 80px;
+}
+.aspect-faq__container {
+  width: min(880px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+/* ---------- BREADCRUMBS ---------- */
+.aspect-faq__crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 0;
+  font-size: 13px;
+  color: rgba(0,0,0,.5);
+}
+.aspect-faq__crumbs a {
+  color: rgba(0,0,0,.5);
+  text-decoration: none;
+  transition: color .2s ease;
+}
+.aspect-faq__crumbs a:hover { color: #2A4A34; }
+.aspect-faq__crumbs span { color: rgba(0,0,0,.3); }
+
+/* ---------- ЗАГОЛОВОК ---------- */
+.aspect-faq__header {
+  padding: 16px 0 32px;
+  border-bottom: 1px solid #E5E8E5;
+  margin-bottom: 40px;
+  position: relative;
+}
+.aspect-faq__header::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -1px;
+  width: 72px; height: 3px;
+  background: #2A4A34;
+}
+.aspect-faq__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0;
+}
+.aspect-faq__lead {
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(0,0,0,.55);
+  margin: 16px 0 0;
+  max-width: 640px;
+}
+
+/* ---------- СПИСОК РАЗДЕЛОВ ---------- */
+.aspect-faq__list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- РАЗДЕЛ ---------- */
+.aspect-faq__section {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: border-color .2s ease;
+}
+.aspect-faq__section[open] {
+  border-color: #2A4A34;
+}
+
+.aspect-faq__section > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 28px;
+  cursor: pointer;
+  list-style: none;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #000;
+  user-select: none;
+}
+.aspect-faq__section > summary::-webkit-details-marker { display: none; }
+.aspect-faq__section > summary::after {
+  content: "+";
+  font-size: 26px;
+  line-height: 1;
+  color: #2A4A34;
+  font-weight: 400;
+  transition: transform .2s ease;
+}
+.aspect-faq__section[open] > summary::after {
+  content: "−";
+}
+.aspect-faq__section > summary:hover {
+  background: #F4F6F4;
+}
+
+/* ---------- ВОПРОСЫ ---------- */
+.aspect-faq__questions {
+  padding: 0 28px 24px;
+  display: flex;
+  flex-direction: column;
+}
+.aspect-faq__q {
+  border-top: 1px solid #F0F0F0;
+  padding: 0;
+}
+.aspect-faq__q:first-child { border-top: 0; }
+
+.aspect-faq__q > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  cursor: pointer;
+  list-style: none;
+  font-family: "Open Sans", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #000;
+  user-select: none;
+  transition: color .2s ease;
+}
+.aspect-faq__q > summary::-webkit-details-marker { display: none; }
+.aspect-faq__q > summary::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #2A4A34;
+  border-bottom: 2px solid #2A4A34;
+  transform: rotate(45deg);
+  flex-shrink: 0;
+  transition: transform .2s ease;
+}
+.aspect-faq__q[open] > summary::after {
+  transform: rotate(-135deg);
+}
+.aspect-faq__q > summary:hover { color: #2A4A34; }
+
+.aspect-faq__a {
+  padding: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(0,0,0,.65);
+}
+.aspect-faq__a p { margin: 0 0 10px; }
+.aspect-faq__a p:last-child { margin: 0; }
+.aspect-faq__a a {
+  color: #2A4A34;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.aspect-faq__a a:hover { color: #1E3626; }
+
+/* ---------- CTA ---------- */
+.aspect-faq__cta {
+  margin-top: 48px;
+  background: #F4F6F4;
+  border-radius: 22px;
+  padding: 32px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.aspect-faq__cta-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+  color: #000;
+}
+.aspect-faq__cta-text {
+  font-size: 14px;
+  color: rgba(0,0,0,.55);
+  margin: 0;
+}
+.aspect-faq__cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: #2A4A34;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  border-radius: 14px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .2s ease, transform .2s ease;
+  flex-shrink: 0;
+}
+.aspect-faq__cta-btn:hover {
+  background: #1E3626;
+  transform: translateY(-2px);
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  text-decoration: none;
+}
+
+/* ---------- АДАПТИВ ---------- */
+@media (max-width: 757px) {
+  .aspect-faq__crumbs { padding: 16px 0; }
+  .aspect-faq__header { padding: 8px 0 24px; margin-bottom: 28px; }
+  .aspect-faq__section > summary {
+    padding: 18px 20px;
+    font-size: 17px;
+  }
+  .aspect-faq__questions { padding: 0 20px 18px; }
+  .aspect-faq__q > summary { font-size: 14px; }
+  .aspect-faq__cta {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px 20px;
+  }
+  .aspect-faq__cta-btn { width: 100%; justify-content: center; }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
-  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
-    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
-      <a href="/" class="hover:text-black transition-colors">Главная</a>
-      <span class="text-black/20">/</span>
-      <span class="text-black font-medium">FAQ</span>
+<main class="aspect-faq">
+
+  <div class="aspect-faq__container">
+
+    {# ---------- BREADCRUMBS ---------- #}
+    <nav class="aspect-faq__crumbs" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span>/</span>
+      <span style="color:#000">FAQ</span>
     </nav>
-    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-10">Часто задаваемые вопросы</h1>
-    <div x-data="{ activeSection: null, activeQuestion: null }" class="space-y-6">
-      <div class="bg-white rounded-[24px] overflow-hidden border border-gray-100 shadow-sm">
-        <button @click="activeSection = activeSection === 'order' ? null : 'order'; activeQuestion = null" class="w-full px-6 md:px-8 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors">
-          <span class="text-[18px] md:text-[22px] font-din-black uppercase">Как сделать заказ</span>
-          <svg class="w-5 h-5 transition-transform duration-300" :class="activeSection === 'order' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom"></use></svg>
-        </button>
-        <div x-show="activeSection === 'order'" x-collapse x-cloak>
-          <div class="px-6 md:px-8 pb-6 space-y-4">
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'order1' ? null : 'order1'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Как оформить заказ на сайте?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'order1' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'order1'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Добавьте понравившиеся товары в корзину, перейдите в корзину и нажмите «Оформить заказ». Заполните контактные данные, выберите способ доставки и оплаты. После подтверждения заказа вы получите письмо на e-mail с деталями.
-              </div>
+
+    {# ---------- ЗАГОЛОВОК ---------- #}
+    <header class="aspect-faq__header">
+      <h1 class="aspect-faq__title">Частые вопросы</h1>
+      <p class="aspect-faq__lead">Собрали ответы на всё, что чаще всего спрашивают о заказе, доставке и оплате. Если не нашли — напишите нам.</p>
+    </header>
+
+    {# ---------- СПИСОК ---------- #}
+    <div class="aspect-faq__list">
+
+      {# ===================== ЗАКАЗ ===================== #}
+      <details class="aspect-faq__section" open>
+        <summary>Как сделать заказ</summary>
+        <div class="aspect-faq__questions">
+
+          <details class="aspect-faq__q" open>
+            <summary>Как оформить заказ на сайте?</summary>
+            <div class="aspect-faq__a">
+              <p>Добавьте товары в корзину, перейдите в корзину и нажмите «Оформить заказ». Заполните контактные данные, выберите способ доставки и оплаты. После подтверждения заказа на e-mail придёт письмо с деталями.</p>
             </div>
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'order2' ? null : 'order2'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Можно ли изменить или отменить заказ?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'order2' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'order2'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Да, вы можете изменить или отменить заказ до момента его сборки. Свяжитесь с нами по телефону или через форму обратной связи — мы поможем внести изменения.
-              </div>
+          </details>
+
+          <details class="aspect-faq__q">
+            <summary>Можно ли изменить или отменить заказ?</summary>
+            <div class="aspect-faq__a">
+              <p>Да, заказ можно изменить или отменить до момента сборки. Свяжитесь с нами по телефону или через форму обратной связи — поможем внести правки.</p>
             </div>
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'order3' ? null : 'order3'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Как узнать статус заказа?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'order3' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'order3'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                После оформления заказа вы получите письмо с подтверждением. Когда заказ будет передан в доставку, придёт уведомление с трек-номером для отслеживания. Статус также можно проверить в личном кабинете.
-              </div>
+          </details>
+
+          <details class="aspect-faq__q">
+            <summary>Как узнать статус заказа?</summary>
+            <div class="aspect-faq__a">
+              <p>После оформления заказа вы получите письмо с подтверждением. Когда заказ передадим в доставку, придёт уведомление с трек-номером. Статус также доступен в личном кабинете.</p>
             </div>
-            <div>
-              <button @click="activeQuestion = activeQuestion === 'order4' ? null : 'order4'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Работаете ли вы с юридическими лицами?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'order4' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'order4'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Да, мы работаем с юридическими лицами и индивидуальными предпринимателями. Мы предоставляем все закрывающие документы. Для оформления свяжитесь с нашим отделом продаж.
-              </div>
+          </details>
+
+          <details class="aspect-faq__q">
+            <summary>Работаете ли вы с юридическими лицами?</summary>
+            <div class="aspect-faq__a">
+              <p>Да, мы работаем с юридическими лицами и ИП, предоставляем все закрывающие документы. Для оформления свяжитесь с отделом продаж.</p>
             </div>
-          </div>
+          </details>
+
         </div>
-      </div>
-      <div class="bg-white rounded-[24px] overflow-hidden border border-gray-100 shadow-sm">
-        <button @click="activeSection = activeSection === 'delivery' ? null : 'delivery'; activeQuestion = null" class="w-full px-6 md:px-8 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors">
-          <span class="text-[18px] md:text-[22px] font-din-black uppercase">Доставка</span>
-          <svg class="w-5 h-5 transition-transform duration-300" :class="activeSection === 'delivery' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom"></use></svg>
-        </button>
-        <div x-show="activeSection === 'delivery'" x-collapse x-cloak>
-          <div class="px-6 md:px-8 pb-6 space-y-4">
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'del1' ? null : 'del1'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Сколько стоит доставка?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'del1' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'del1'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Доставка бесплатна при заказе от 1500 ₽. При заказе на меньшую сумму стоимость доставки рассчитывается автоматически в корзине и зависит от вашего региона.
-              </div>
+      </details>
+
+      {# ===================== ДОСТАВКА ===================== #}
+      <details class="aspect-faq__section">
+        <summary>Доставка</summary>
+        <div class="aspect-faq__questions">
+
+          <details class="aspect-faq__q">
+            <summary>Какие сроки доставки?</summary>
+            <div class="aspect-faq__a">
+              <p>По Санкт-Петербургу и большинству городов России — <strong>3–5 дней</strong>. В удалённые регионы — <strong>до 10 дней</strong>. Точный срок рассчитывается при оформлении заказа.</p>
             </div>
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'del2' ? null : 'del2'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Какие сроки доставки?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'del2' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'del2'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Сроки доставки зависят от региона: по Москве и Санкт-Петербургу — 1-2 дня, в крупные города России — 3-5 дней, в отдалённые регионы — до 10 дней. Точный срок рассчитывается при оформлении.
-              </div>
+          </details>
+
+          <details class="aspect-faq__q">
+            <summary>В какие города доставляете?</summary>
+            <div class="aspect-faq__a">
+              <p>Доставляем по всей России — курьерскими службами и через пункты выдачи. В крупных городах доступна доставка курьером до двери.</p>
             </div>
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'del3' ? null : 'del3'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                В какие города доставляете?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'del3' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'del3'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Мы доставляем по всей России. Доставка осуществляется курьерскими службами и Почтой России. В крупных городах доступна доставка курьером до двери и пункты выдачи заказов.
-              </div>
+          </details>
+
+          <details class="aspect-faq__q">
+            <summary>Можно ли отследить посылку?</summary>
+            <div class="aspect-faq__a">
+              <p>Да. После отправки заказа мы пришлём трек-номер на e-mail. Отследить посылку можно на сайте транспортной компании.</p>
             </div>
-            <div>
-              <button @click="activeQuestion = activeQuestion === 'del4' ? null : 'del4'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Можно ли отследить посылку?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'del4' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'del4'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Да, после отправки заказа мы пришлём трек-номер на вашу электронную почту и в SMS. Вы сможете отслеживать посылку на сайте транспортной компании.
-              </div>
+          </details>
+
+          <details class="aspect-faq__q">
+            <summary>Как рассчитывается стоимость доставки?</summary>
+            <div class="aspect-faq__a">
+              <p>Стоимость доставки рассчитывается автоматически в корзине и зависит от города, веса и суммы заказа.</p>
             </div>
-          </div>
+          </details>
+
         </div>
-      </div>
-      <div class="bg-white rounded-[24px] overflow-hidden border border-gray-100 shadow-sm">
-        <button @click="activeSection = activeSection === 'payment' ? null : 'payment'; activeQuestion = null" class="w-full px-6 md:px-8 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors">
-          <span class="text-[18px] md:text-[22px] font-din-black uppercase">Оплата</span>
-          <svg class="w-5 h-5 transition-transform duration-300" :class="activeSection === 'payment' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom"></use></svg>
-        </button>
-        <div x-show="activeSection === 'payment'" x-collapse x-cloak>
-          <div class="px-6 md:px-8 pb-6 space-y-4">
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'pay1' ? null : 'pay1'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Какие способы оплаты доступны?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'pay1' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'pay1'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Вы можете оплатить заказ банковской картой (Visa, Mastercard, МИР), наличными курьеру, через Apple Pay или Google Pay, а также по безналичному расчёту для юридических лиц.
-              </div>
+      </details>
+
+      {# ===================== ОПЛАТА ===================== #}
+      <details class="aspect-faq__section">
+        <summary>Оплата</summary>
+        <div class="aspect-faq__questions">
+
+          <details class="aspect-faq__q">
+            <summary>Какие способы оплаты доступны?</summary>
+            <div class="aspect-faq__a">
+              <p>Оплата производится онлайн банковской картой (Visa, Mastercard, МИР), через Apple Pay / Google Pay, а также по безналичному расчёту для юридических лиц. Для заказов по Санкт-Петербургу доступна оплата при получении.</p>
             </div>
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'pay2' ? null : 'pay2'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Безопасно ли платить картой на сайте?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'pay2' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'pay2'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Все платежи на сайте обрабатываются через защищённый канал с использованием SSL-шифрования. Мы не храним данные ваших карт — оплата проходит напрямую через платёжный шлюз.
-              </div>
+          </details>
+
+          <details class="aspect-faq__q">
+            <summary>Безопасно ли платить картой на сайте?</summary>
+            <div class="aspect-faq__a">
+              <p>Да. Все платежи обрабатываются через защищённый канал с SSL-шифрованием. Мы не храним данные карт — оплата проходит напрямую через платёжный шлюз.</p>
             </div>
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'pay3' ? null : 'pay3'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Можно ли оплатить при получении?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'pay3' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'pay3'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Да, при доставке курьером доступна оплата наличными или картой при получении. Для отправок через транспортные компании обычно требуется предоплата.
-              </div>
+          </details>
+
+          <details class="aspect-faq__q">
+            <summary>Нужен ли чек?</summary>
+            <div class="aspect-faq__a">
+              <p>Да, все платежи проходят через онлайн-кассу. Электронный чек приходит на e-mail сразу после оплаты.</p>
             </div>
-            <div>
-              <button @click="activeQuestion = activeQuestion === 'pay4' ? null : 'pay4'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Нужен ли чек?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'pay4' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'pay4'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Да, все платежи проходят через онлайн-кассу. Электронный чек приходит на вашу электронную почту сразу после оплаты.
-              </div>
-            </div>
-          </div>
+          </details>
+
         </div>
-      </div>
-      <div class="bg-white rounded-[24px] overflow-hidden border border-gray-100 shadow-sm">
-        <button @click="activeSection = activeSection === 'return' ? null : 'return'; activeQuestion = null" class="w-full px-6 md:px-8 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors">
-          <span class="text-[18px] md:text-[22px] font-din-black uppercase">Возврат</span>
-          <svg class="w-5 h-5 transition-transform duration-300" :class="activeSection === 'return' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom"></use></svg>
-        </button>
-        <div x-show="activeSection === 'return'" x-collapse x-cloak>
-          <div class="px-6 md:px-8 pb-6 space-y-4">
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'ret1' ? null : 'ret1'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Можно ли вернуть кофе, если не понравился?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'ret1' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'ret1'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Да, если кофе вам не понравился по вкусу — мы вернём деньги или заменим на другой сорт без лишних вопросов. Это наша гарантия качества.
-              </div>
+      </details>
+
+      {# ===================== КОФЕ ===================== #}
+      <details class="aspect-faq__section">
+        <summary>Кофе</summary>
+        <div class="aspect-faq__questions">
+
+          <details class="aspect-faq__q">
+            <summary>Какой кофе вы продаёте?</summary>
+            <div class="aspect-faq__a">
+              <p>Свежеобжаренный спешалти-кофе из лучших регионов: Эфиопия, Кения, Колумбия, Бразилия, Гватемала и другие. В ассортименте моносорта, микролоты и бленды разной степени обжарки.</p>
             </div>
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'ret2' ? null : 'ret2'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                В какие сроки можно вернуть товар?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'ret2' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'ret2'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Вы можете вернуть товар в течение 14 дней с момента получения. Для возврата свяжитесь с нашей службой поддержки.
-              </div>
+          </details>
+
+          <details class="aspect-faq__q">
+            <summary>Как часто обжаривается кофе?</summary>
+            <div class="aspect-faq__a">
+              <p>Обжариваем каждый день. Заказы, оформленные до 14:00, уходят в обжарку в тот же день. Вы получаете кофе не старше 2–3 дней с момента обжарки.</p>
             </div>
-            <div>
-              <button @click="activeQuestion = activeQuestion === 'ret3' ? null : 'ret3'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Как происходит возврат денег?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'ret3' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'ret3'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                После получения возврата и проверки товара мы перечисляем деньги тем же способом, которым была произведена оплата. Срок возврата — до 10 рабочих дней.
-              </div>
+          </details>
+
+          <details class="aspect-faq__q">
+            <summary>Какую степень обжарки выбрать?</summary>
+            <div class="aspect-faq__a">
+              <p>Зависит от способа заваривания и вкуса: светлая обжарка — для фильтра и ярких вкусов, средняя — универсальная, тёмная — для эспрессо и плотного насыщенного вкуса. Если сомневаетесь — воспользуйтесь подбором в каталоге.</p>
             </div>
-          </div>
+          </details>
+
+          <details class="aspect-faq__q">
+            <summary>Как хранить кофе?</summary>
+            <div class="aspect-faq__a">
+              <p>В герметичной ёмкости, в тёмном прохладном месте. Не храните в холодильнике — кофе впитывает посторонние запахи. Лучше употребить в течение 3–4 недель после обжарки.</p>
+            </div>
+          </details>
+
         </div>
-      </div>
-      <div class="bg-white rounded-[24px] overflow-hidden border border-gray-100 shadow-sm">
-        <button @click="activeSection = activeSection === 'coffee' ? null : 'coffee'; activeQuestion = null" class="w-full px-6 md:px-8 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors">
-          <span class="text-[18px] md:text-[22px] font-din-black uppercase">Кофе</span>
-          <svg class="w-5 h-5 transition-transform duration-300" :class="activeSection === 'coffee' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom"></use></svg>
-        </button>
-        <div x-show="activeSection === 'coffee'" x-collapse x-cloak>
-          <div class="px-6 md:px-8 pb-6 space-y-4">
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'cof1' ? null : 'cof1'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Какой кофе вы продаёте?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'cof1' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'cof1'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Мы продаём свежеобжаренный specialty кофе из лучших регионов мира: Эфиопия, Кения, Колумбия, Бразилия, Гватемала и другие. В ассортименте моносорта и бленды разной степени обжарки.
-              </div>
-            </div>
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'cof2' ? null : 'cof2'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Как часто обжаривается кофе?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'cof2' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'cof2'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Мы обжариваем кофе каждый день. Заказы, сделанные до 14:00, отправляются в обжарку в тот же день. Вы получаете максимально свежий кофе — не старше 2-3 дней с момента обжарки.
-              </div>
-            </div>
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'cof3' ? null : 'cof3'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Какую степень обжарки выбрать?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'cof3' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'cof3'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Всё зависит от ваших предпочтений и способа заваривания. Светлая обжарка — для фильтра и ярких вкусов, средняя — универсальная, тёмная — для эспрессо и плотного насыщенного вкуса.
-              </div>
-            </div>
-            <div class="border-b border-gray-100 pb-4">
-              <button @click="activeQuestion = activeQuestion === 'cof4' ? null : 'cof4'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                В каком виде продаётся кофе?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'cof4' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'cof4'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Мы предлагаем кофе в зёрнах и молотый под разные способы заваривания: для эспрессо, фильтра, турки и френч-пресса. Также можно заказать молотый кофе в дрип-пакетах.
-              </div>
-            </div>
-            <div>
-              <button @click="activeQuestion = activeQuestion === 'cof5' ? null : 'cof5'" class="w-full flex items-center justify-between text-left font-bold text-[15px] py-2">
-                Как хранить кофе?
-                <svg class="w-4 h-4 transition-transform duration-300" :class="activeQuestion === 'cof5' ? 'rotate-180' : ''"><use href="{% static 'asset/images/sprite.svg' %}#icons--arr-bottom-sm"></use></svg>
-              </button>
-              <div x-show="activeQuestion === 'cof5'" x-collapse x-cloak class="text-[14px] text-black/60 leading-relaxed mt-2">
-                Храните кофе в герметичной ёмкости в тёмном прохладном месте, избегая попадания прямых солнечных лучей. Не храните в холодильнике — кофе впитывает посторонние запахи. Лучше всего употребить в течение 3-4 недель после обжарки.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      </details>
+
     </div>
+
+    {# ---------- CTA ---------- #}
+    <div class="aspect-faq__cta">
+      <div>
+        <h2 class="aspect-faq__cta-title">Не нашли ответ?</h2>
+        <p class="aspect-faq__cta-text">Напишите нам — ответим в течение рабочего дня.</p>
+      </div>
+      <a href="/contact-us/" class="aspect-faq__cta-btn">Связаться с нами →</a>
+    </div>
+
   </div>
 </main>
 {% endblock %}

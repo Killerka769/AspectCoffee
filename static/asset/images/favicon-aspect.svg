@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Aspect Coffee">
+  <title>Aspect Coffee</title>
+  <rect width="64" height="64" fill="#FFFFFF"/>
+  <g transform="translate(32,32)" fill="none" stroke="#000" stroke-width="2.4">
+    <path d="M 0,-22 L 19,12 L -19,12 Z" stroke-linejoin="round"/>
+    <path d="M 0,9 L -12,-7 L 12,-7 Z" fill="#000" stroke="none"/>
+    <path d="M 0,-22 L 0,-28" stroke-linecap="round"/>
+    <path d="M 19,12 L 24,15" stroke-linecap="round"/>
+    <path d="M -19,12 L -24,15" stroke-linecap="round"/>
+    <path d="M -14,-14 Q 0,-30 14,-14" stroke-linecap="round" opacity="0.5"/>
+  </g>
+</svg>

@@ -18,7 +18,7 @@ from apps.catalog.models import (
 )
 from apps.orders.models import PromoCode
 from apps.blog.models import BlogCategory, BlogPost
-from apps.pages.models import Banner, CommunityPost
+from apps.pages.models import CommunityPost
 from apps.users.models import User
 
 
@@ -122,17 +122,6 @@ class Command(BaseCommand):
                 },
             )
         self._p(f"BlogPosts: {BlogPost.objects.count()}")
-
-        # 8. Home "Сорта недели" banner.
-        Banner.objects.get_or_create(
-            slot="home_weekly", title="Сорта недели со скидкой",
-            defaults={
-                "description": "Свежая обжарка каждый день. Доставка по всей России.",
-                "link_url": "/catalog/", "button_label": "В каталог",
-                "is_active": True, "order": 0,
-            },
-        )
-        self._p(f"Banners: {Banner.objects.count()}")
 
         # 9. A demo community post (needs any user).
         user = User.objects.order_by("id").first()

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 80" role="img" aria-label="Aspect Coffee Roasters">
+  <title>Aspect Coffee Roasters</title>
+
+  <!-- Треугольная мандала (слева) -->
+  <g transform="translate(40,40)" fill="none" stroke="#000" stroke-width="2">
+    <!-- Внешний треугольник: фермер → обжарщик → бариста -->
+    <path d="M 0,-34 L 30,18 L -30,18 Z" stroke-linejoin="round"/>
+    <!-- Внутренний треугольник (перевёрнутый): потребитель -->
+    <path d="M 0,14 L -18,-10 L 18,-10 Z" fill="#000" stroke="none"/>
+    <!-- Лучи от центра: диалог -->
+    <path d="M 0,-34 L 0,-42" stroke-linecap="round"/>
+    <path d="M 30,18 L 37,22" stroke-linecap="round"/>
+    <path d="M -30,18 L -37,22" stroke-linecap="round"/>
+    <!-- Дополнительные дуги вокруг -->
+    <path d="M -22,-22 Q 0,-46 22,-22" stroke-linecap="round" opacity="0.5"/>
+    <path d="M 26,10 Q 40,4 34,-14" stroke-linecap="round" opacity="0.5"/>
+    <path d="M -26,10 Q -40,4 -34,-14" stroke-linecap="round" opacity="0.5"/>
+  </g>
+
+  <!-- Вертикальный разделитель -->
+  <line x1="92" y1="14" x2="92" y2="66" stroke="#000" stroke-width="1.5"/>
+
+  <!-- Надпись ASPECT -->
+  <text x="108" y="40"
+        font-family="'Roboto Condensed','Arial Narrow',Arial,sans-serif"
+        font-size="34"
+        font-weight="700"
+        letter-spacing="3"
+        fill="#000"
+        dominant-baseline="middle">ASPECT</text>
+
+  <!-- Надпись COFFEE ROASTERS -->
+  <text x="108" y="62"
+        font-family="'Roboto Condensed','Arial Narrow',Arial,sans-serif"
+        font-size="14"
+        font-weight="600"
+        letter-spacing="2.5"
+        fill="#5A5A5A"
+        dominant-baseline="middle">COFFEE ROASTERS</text>
+</svg>

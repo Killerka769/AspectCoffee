@@ -1,43 +1,167 @@
 {% extends "catalog/base.html" %}
 {% load static %}
 
-{% block title %}Подтверждение email{% endblock %}
-{% block body_extra_class %} grey-theme{% endblock %}
+{% block title %}Подтверждение email — Aspect Coffee{% endblock %}
+
+{% block extra_css %}
+<style>
+.asp-auth { background: #FFFFFF; padding: 60px 0 80px; min-height: 60vh; }
+.asp-auth__container { width: min(488px, calc(100% - 32px)); margin: 0 auto; }
+.asp-auth__card {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 24px;
+  padding: 40px 44px;
+}
+@media (max-width: 599px) {
+  .asp-auth { padding: 32px 0 60px; }
+  .asp-auth__card { padding: 28px 22px; border-radius: 18px; }
+}
+.asp-auth__icon {
+  width: 72px; height: 72px;
+  margin: 0 auto 24px;
+  background: #E8EEE8;
+  color: #2A4A34;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.asp-auth__icon svg { width: 34px; height: 34px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+.asp-auth__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 10px;
+  text-align: center;
+}
+.asp-auth__sub {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #5A5A5A;
+  margin: 0 0 28px;
+  text-align: center;
+}
+.asp-auth__sub strong { color: #000; }
+
+.asp-auth__messages {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-bottom: 20px;
+}
+.asp-auth__msg {
+  padding: 14px 18px; border-radius: 14px;
+  font-size: 13px; font-weight: 600; line-height: 1.5;
+}
+.asp-auth__msg--error { background: #FEF2F2; color: #B91C1C; border: 1px solid #FCA5A5; }
+.asp-auth__msg--success { background: #E8EEE8; color: #2A4A34; border: 1px solid #8FB89A; }
+.asp-auth__msg--info { background: #F4F6F4; color: #000; border: 1px solid #E5E8E5; }
+
+.asp-auth__form { display: flex; flex-direction: column; gap: 18px; }
+.asp-auth__field { display: flex; flex-direction: column; gap: 6px; }
+.asp-auth__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  padding-left: 4px;
+}
+.asp-auth__input {
+  width: 100%;
+  background: #F4F6F4;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  padding: 20px 18px;
+  font-size: 24px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  letter-spacing: .4em;
+  text-align: center;
+  color: #000;
+  outline: none;
+  transition: background .2s ease, border-color .2s ease;
+  box-sizing: border-box;
+}
+.asp-auth__input:focus { background: #FFFFFF; border-color: #2A4A34; }
+
+.asp-auth__submit {
+  display: block;
+  width: 100%;
+  padding: 16px 24px;
+  border: 0;
+  border-radius: 14px;
+  background: #000000;
+  color: #FFFFFF;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+.asp-auth__submit:hover { background: #2A4A34; transform: translateY(-2px); }
+
+.asp-auth__footer {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #5A5A5A;
+}
+.asp-auth__footer a { color: #2A4A34; text-decoration: underline; text-underline-offset: 3px; }
+.asp-auth__footer a:hover { color: #1E3626; text-decoration: none; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div style="display:flex;justify-content:center;padding:40px 20px;">
-  <div style="width:100%;max-width:488px;">
-    <div class="bg-white rounded-3xl p-6 md:p-8">
-      <div class="w-full mb-4">
-        <p class="text-[40px] font-din-black uppercase leading-[1.2] md:tracking-[0.01em] mb-0">Подтверждение email</p>
+<main class="asp-auth">
+  <div class="asp-auth__container">
+
+    <div class="asp-auth__card">
+
+      <div class="asp-auth__icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
       </div>
 
+      <h1 class="asp-auth__title">Подтверждение email</h1>
+      <p class="asp-auth__sub">
+        Мы отправили 6-значный код{% if email %} на <strong>{{ email }}</strong>{% endif %}.<br>
+        Введите его ниже, чтобы подтвердить аккаунт.
+      </p>
+
       {% if messages %}
-      <div class="space-y-3 mb-8">
+      <div class="asp-auth__messages">
         {% for message in messages %}
-        <div class="p-4 rounded-xl {% if message.tags == 'error' %}bg-red-50 text-red-600 border border-red-100{% elif message.tags == 'success' %}bg-green-50 text-green-600 border border-green-100{% else %}bg-blue-50 text-blue-600 border border-blue-100{% endif %} text-xs font-bold flex items-center gap-2">
+        <div class="asp-auth__msg {% if message.tags == 'error' %}asp-auth__msg--error{% elif message.tags == 'success' %}asp-auth__msg--success{% else %}asp-auth__msg--info{% endif %}">
           {{ message }}
         </div>
         {% endfor %}
       </div>
       {% endif %}
 
-      <form method="post" class="w-full space-y-8">
+      <form method="post" class="asp-auth__form">
         {% csrf_token %}
-        <div class="tc-input input-white xl:input-secondary">
-          <label class="tc-input__label" for="email-code">Код подтверждения</label>
-          <div class="tc-input__field">
-            <input id="email-code" type="text" name="code" required placeholder="000000" maxlength="6" pattern="[0-9]{6}"
-                   autocomplete="one-time-code" inputmode="numeric"
-                   class="tc-input__field--input text-center tracking-[0.3em] text-2xl">
-          </div>
+
+        <div class="asp-auth__field">
+          <label class="asp-auth__label" for="email-code">Код подтверждения</label>
+          <input id="email-code" type="text" name="code" required
+                 placeholder="000000" maxlength="6" pattern="[0-9]{6}"
+                 autocomplete="one-time-code" inputmode="numeric"
+                 class="asp-auth__input">
         </div>
 
-        <button type="submit" class="tc-btn btn-dark w-full">
-          <span class="text-primary duration-200">Подтвердить</span>
-        </button>
+        <button type="submit" class="asp-auth__submit">Подтвердить</button>
+
       </form>
+
+      <div class="asp-auth__footer">
+        Не пришёл код? <a href="{% url 'users:resend_verification' %}">Отправить повторно</a>
+      </div>
+
     </div>
+
   </div>
-</div>
+</main>
 {% endblock %}

@@ -1,131 +1,328 @@
 {% extends "catalog/base.html" %}
 {% load static %}
 
-{% block title %}Калькулятор помола — Гайд по степеням помола кофе{% endblock %}
-{% block meta_description %}Таблица помола кофе для разных методов заваривания. Узнайте, какой помол подходит для эспрессо, фильтра, турки, френч-пресса и аэропресса.{% endblock %}
+{% block title %}Таблица помола{% endblock %}
+{% block meta_description %}Таблица помола кофе для разных методов заваривания: эспрессо, фильтр, турка, френч-пресс, аэропресс.{% endblock %}
+
+{% block extra_css %}
+<style>
+.aspect-grind { background: #FFFFFF; padding-bottom: 80px; }
+.aspect-grind__container { width: min(1100px, calc(100% - 32px)); margin: 0 auto; }
+
+.aspect-grind__crumbs {
+  display: flex; align-items: center; gap: 8px;
+  padding: 24px 0;
+  font-size: 13px; color: #5A5A5A;
+}
+.aspect-grind__crumbs a { color: #5A5A5A; text-decoration: none; transition: color .2s ease; }
+.aspect-grind__crumbs a:hover { color: #2A4A34; }
+.aspect-grind__crumbs span { color: rgba(0,0,0,.3); }
+.aspect-grind__crumbs .current { color: #000; font-weight: 500; }
+
+.aspect-grind__hero {
+  padding: 16px 0 40px;
+  border-bottom: 1px solid #E5E8E5;
+  margin-bottom: 48px;
+  position: relative;
+}
+.aspect-grind__hero::after {
+  content: ""; position: absolute;
+  left: 0; bottom: -1px;
+  width: 72px; height: 3px;
+  background: #2A4A34;
+}
+.aspect-grind__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 16px;
+}
+.aspect-grind__lead {
+  font-size: 16px; line-height: 1.6;
+  color: #5A5A5A;
+  max-width: 720px;
+  margin: 0;
+}
+
+.aspect-grind__card {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 24px;
+  padding: 40px 44px;
+  margin-bottom: 24px;
+}
+@media (max-width: 757px) {
+  .aspect-grind__card { padding: 24px 20px; border-radius: 18px; }
+}
+.aspect-grind__section-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(22px, 2.6vw, 30px);
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #F0F0F0;
+  position: relative;
+}
+.aspect-grind__section-title::after {
+  content: ""; position: absolute;
+  left: 0; bottom: -1px;
+  width: 48px; height: 3px;
+  background: #2A4A34;
+}
+
+.aspect-grind__table-wrap {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid #E5E8E5;
+}
+.aspect-grind__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 720px;
+}
+.aspect-grind__table thead th {
+  text-align: left;
+  padding: 16px 20px;
+  background: #2A4A34;
+  color: #FFFFFF;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border-right: 1px solid rgba(255,255,255,.15);
+}
+.aspect-grind__table thead th:last-child { border-right: 0; }
+.aspect-grind__table tbody tr {
+  border-bottom: 1px solid #F0F0F0;
+  transition: background .15s ease;
+}
+.aspect-grind__table tbody tr:last-child { border-bottom: 0; }
+.aspect-grind__table tbody tr:hover { background: #FAFBF9; }
+.aspect-grind__table tbody td {
+  padding: 14px 20px;
+  color: #5A5A5A;
+  vertical-align: top;
+  line-height: 1.5;
+}
+.aspect-grind__table tbody td:first-child {
+  font-weight: 700; color: #000;
+}
+
+.aspect-grind__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 757px) {
+  .aspect-grind__grid { grid-template-columns: 1fr; }
+}
+.aspect-grind__tip {
+  padding: 22px 24px;
+  background: #F4F6F4;
+  border-radius: 16px;
+}
+.aspect-grind__tip-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 8px;
+}
+.aspect-grind__tip-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #5A5A5A;
+  margin: 0;
+}
+
+.aspect-grind__cta {
+  background: #000000;
+  color: #FFFFFF;
+  border-radius: 24px;
+  padding: 40px 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+}
+.aspect-grind__cta::before {
+  content: "";
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(42,74,52,.6) 0%, rgba(0,0,0,0) 70%);
+  pointer-events: none;
+}
+.aspect-grind__cta-body { position: relative; z-index: 2; flex: 1; min-width: 240px; }
+.aspect-grind__cta-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(22px, 3vw, 30px);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  margin: 0 0 10px;
+}
+.aspect-grind__cta-text {
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(255,255,255,.7);
+  margin: 0;
+}
+.aspect-grind__cta-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 32px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900; font-size: 13px;
+  letter-spacing: .1em; text-transform: uppercase;
+  text-decoration: none;
+  transition: background .2s ease, color .2s ease, transform .2s ease;
+  position: relative; z-index: 2;
+  flex-shrink: 0;
+}
+.aspect-grind__cta-btn:hover {
+  background: #2A4A34;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  transform: translateY(-2px);
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
-  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
-    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
-      <a href="/" class="hover:text-black transition-colors">Главная</a>
-      <span class="text-black/20">/</span>
-      <span class="text-black font-medium">Калькулятор помола</span>
-    </nav>
-    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-4">Калькулятор помола</h1>
-    <p class="text-[16px] text-black/50 max-w-2xl mb-10">Правильный помол — основа вкусного кофе. Разбираемся, какой размер частиц подходит для каждого способа заваривания.</p>
+<main class="aspect-grind">
+  <div class="aspect-grind__container">
 
-    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8 overflow-hidden">
-      <h2 class="text-[24px] font-din-black uppercase mb-6">Таблица помола для разных методов</h2>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+    <nav class="aspect-grind__crumbs" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span>/</span>
+      <span class="current">Таблица помола</span>
+    </nav>
+
+    <header class="aspect-grind__hero">
+      <h1 class="aspect-grind__title">Таблица помола</h1>
+      <p class="aspect-grind__lead">
+        Правильный помол — основа вкусного кофе. Разбираемся, какой размер частиц подходит для каждого способа заваривания.
+      </p>
+    </header>
+
+    <section class="aspect-grind__card">
+      <h2 class="aspect-grind__section-title">Помол для разных методов</h2>
+      <div class="aspect-grind__table-wrap">
+        <table class="aspect-grind__table">
           <thead>
-            <tr class="border-b-2 border-black">
-              <th class="py-4 px-4 font-din-black uppercase text-[13px] tracking-wider">Способ заваривания</th>
-              <th class="py-4 px-4 font-din-black uppercase text-[13px] tracking-wider">Степень помола</th>
-              <th class="py-4 px-4 font-din-black uppercase text-[13px] tracking-wider">Размер частиц</th>
-              <th class="py-4 px-4 font-din-black uppercase text-[13px] tracking-wider">Время заваривания</th>
-              <th class="py-4 px-4 font-din-black uppercase text-[13px] tracking-wider">Температура воды</th>
+            <tr>
+              <th>Способ</th>
+              <th>Степень помола</th>
+              <th>Размер частиц</th>
+              <th>Время</th>
+              <th>Температура</th>
             </tr>
           </thead>
           <tbody>
-            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-              <td class="py-4 px-4 font-bold">Турка</td>
-              <td class="py-4 px-4">Мельчайший (как мука)</td>
-              <td class="py-4 px-4 text-black/60">&lt; 0.1 мм</td>
-              <td class="py-4 px-4">3-5 мин</td>
-              <td class="py-4 px-4">50-60 °C (заливка)</td>
+            <tr>
+              <td>Турка</td>
+              <td>Мельчайший (как мука)</td>
+              <td>&lt; 0.1 мм</td>
+              <td>3–5 мин</td>
+              <td>50–60 °C (заливка)</td>
             </tr>
-            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-              <td class="py-4 px-4 font-bold">Эспрессо</td>
-              <td class="py-4 px-4">Мелкий (мелкий песок)</td>
-              <td class="py-4 px-4">0.2-0.3 мм</td>
-              <td class="py-4 px-4">25-30 сек</td>
-              <td class="py-4 px-4">92-96 °C</td>
+            <tr>
+              <td>Эспрессо</td>
+              <td>Мелкий (мелкий песок)</td>
+              <td>0.2–0.3 мм</td>
+              <td>25–30 сек</td>
+              <td>92–96 °C</td>
             </tr>
-            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-              <td class="py-4 px-4 font-bold">Аэропресс</td>
-              <td class="py-4 px-4">Средне-мелкий</td>
-              <td class="py-4 px-4">0.3-0.5 мм</td>
-              <td class="py-4 px-4">1.5-3 мин</td>
-              <td class="py-4 px-4">80-90 °C</td>
+            <tr>
+              <td>Аэропресс</td>
+              <td>Средне-мелкий</td>
+              <td>0.3–0.5 мм</td>
+              <td>1.5–3 мин</td>
+              <td>80–90 °C</td>
             </tr>
-            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-              <td class="py-4 px-4 font-bold">Пуровер / V60</td>
-              <td class="py-4 px-4">Средний (морская соль)</td>
-              <td class="py-4 px-4">0.5-0.7 мм</td>
-              <td class="py-4 px-4">2.5-4 мин</td>
-              <td class="py-4 px-4">90-96 °C</td>
+            <tr>
+              <td>Пуровер / V60</td>
+              <td>Средний (морская соль)</td>
+              <td>0.5–0.7 мм</td>
+              <td>2.5–4 мин</td>
+              <td>90–96 °C</td>
             </tr>
-            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-              <td class="py-4 px-4 font-bold">Кемекс</td>
-              <td class="py-4 px-4">Средне-крупный</td>
-              <td class="py-4 px-4">0.6-0.9 мм</td>
-              <td class="py-4 px-4">4-6 мин</td>
-              <td class="py-4 px-4">92-96 °C</td>
+            <tr>
+              <td>Кемекс</td>
+              <td>Средне-крупный</td>
+              <td>0.6–0.9 мм</td>
+              <td>4–6 мин</td>
+              <td>92–96 °C</td>
             </tr>
-            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-              <td class="py-4 px-4 font-bold">Френч-пресс</td>
-              <td class="py-4 px-4">Крупный (хлебная крошка)</td>
-              <td class="py-4 px-4">0.9-1.2 мм</td>
-              <td class="py-4 px-4">4-5 мин</td>
-              <td class="py-4 px-4">92-96 °C</td>
+            <tr>
+              <td>Френч-пресс</td>
+              <td>Крупный (хлебная крошка)</td>
+              <td>0.9–1.2 мм</td>
+              <td>4–5 мин</td>
+              <td>92–96 °C</td>
             </tr>
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="py-4 px-4 font-bold">Холодное заваривание (Cold Brew)</td>
-              <td class="py-4 px-4">Грубый (очень крупный)</td>
-              <td class="py-4 px-4">1.2-1.5 мм</td>
-              <td class="py-4 px-4">12-24 часа</td>
-              <td class="py-4 px-4">4-6 °C (холодильник)</td>
+            <tr>
+              <td>Cold Brew</td>
+              <td>Грубый (очень крупный)</td>
+              <td>1.2–1.5 мм</td>
+              <td>12–24 часа</td>
+              <td>4–6 °C</td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
 
-    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
-      <h2 class="text-[24px] font-din-black uppercase mb-6">Общие правила помола</h2>
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="p-5 bg-gray-50 rounded-2xl">
-          <div class="flex items-center gap-3 mb-3">
-            <svg class="w-6 h-6 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <h3 class="font-bold text-[15px]">Чем мельче помол — тем быстрее экстракция</h3>
-          </div>
-          <p class="text-[13px] text-black/60 leading-relaxed">Мелкие частицы быстрее отдают вкус. Если кофе горчит или кажется переэкстрагированным — попробуйте помол крупнее.</p>
+    <section class="aspect-grind__card">
+      <h2 class="aspect-grind__section-title">Общие правила</h2>
+      <div class="aspect-grind__grid">
+        <div class="aspect-grind__tip">
+          <h3 class="aspect-grind__tip-title">Чем мельче — тем быстрее экстракция</h3>
+          <p class="aspect-grind__tip-text">Мелкие частицы быстрее отдают вкус. Если кофе горчит — попробуйте помол крупнее.</p>
         </div>
-        <div class="p-5 bg-gray-50 rounded-2xl">
-          <div class="flex items-center gap-3 mb-3">
-            <svg class="w-6 h-6 text-black/40"><use href="{% static 'asset/images/sprite.svg' %}#icons--water"></use></svg>
-            <h3 class="font-bold text-[15px]">Чем дольше контакт с водой — тем крупнее помол</h3>
-          </div>
-          <p class="text-[13px] text-black/60 leading-relaxed">Для френч-пресса (4-5 мин) нужен крупный помол. Для эспрессо (25-30 сек) — мелкий. Это предотвращает переэкстракцию.</p>
+        <div class="aspect-grind__tip">
+          <h3 class="aspect-grind__tip-title">Чем дольше контакт — тем крупнее помол</h3>
+          <p class="aspect-grind__tip-text">Для френч-пресса нужен крупный помол, для эспрессо — мелкий. Это предотвращает переэкстракцию.</p>
         </div>
-        <div class="p-5 bg-gray-50 rounded-2xl">
-          <div class="flex items-center gap-3 mb-3">
-            <svg class="w-6 h-6 text-black/40"><use href="{% static 'asset/images/sprite.svg' %}#icons--thermometer"></use></svg>
-            <h3 class="font-bold text-[15px]">Температура воды и помол связаны</h3>
-          </div>
-          <p class="text-[13px] text-black/60 leading-relaxed">Для мелкого помола воду можно чуть остудить (85-90 °C), для крупного — использовать почти кипяток (96 °C).</p>
+        <div class="aspect-grind__tip">
+          <h3 class="aspect-grind__tip-title">Температура и помол связаны</h3>
+          <p class="aspect-grind__tip-text">Для мелкого помола воду можно чуть остудить (85–90 °C), для крупного — использовать почти кипяток (96 °C).</p>
         </div>
-        <div class="p-5 bg-gray-50 rounded-2xl">
-          <div class="flex items-center gap-3 mb-3">
-            <svg class="w-6 h-6 text-black/40"><use href="{% static 'asset/images/sprite.svg' %}#icons--coffee"></use></svg>
-            <h3 class="font-bold text-[15px]">Однородность помола — ключ к качеству</h3>
-          </div>
-          <p class="text-[13px] text-black/60 leading-relaxed">Используйте качественную кофемолку с жерновами. Ножевые кофемолки дают неравномерный помол, что ухудшает вкус.</p>
+        <div class="aspect-grind__tip">
+          <h3 class="aspect-grind__tip-title">Однородность — ключ к качеству</h3>
+          <p class="aspect-grind__tip-text">Жерновые кофемолки дают равномерный помол. Ножевые — неравномерный, что ухудшает вкус.</p>
         </div>
       </div>
+    </section>
+
+    <div class="aspect-grind__cta">
+      <div class="aspect-grind__cta-body">
+        <h2 class="aspect-grind__cta-title">Молотый кофе под ваш метод</h2>
+        <p class="aspect-grind__cta-text">При заказе вы можете выбрать помол под любой способ заваривания. Мы свежемолем кофе перед отправкой.</p>
+      </div>
+      <a href="{% url 'catalog:catalog' %}" class="aspect-grind__cta-btn">Выбрать кофе →</a>
     </div>
 
-    <div class="bg-black text-white rounded-[24px] p-6 md:p-10">
-      <div class="flex flex-col md:flex-row items-center gap-6">
-        <div class="flex-1">
-          <h2 class="text-[24px] font-din-black uppercase mb-3">Молотый кофе под ваш метод</h2>
-          <p class="text-[14px] text-white/60">При заказе вы можете выбрать помол под любой способ заваривания. Мы свежемолем кофе перед отправкой.</p>
-        </div>
-        <a href="/catalog/" class="shrink-0 inline-block bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-[14px]">Выбрать кофе →</a>
-      </div>
-    </div>
   </div>
 </main>
 {% endblock %}

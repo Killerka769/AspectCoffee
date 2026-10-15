@@ -4,31 +4,154 @@
 {% block title %}{{ doc.title }}{% endblock %}
 {% block meta_description %}{{ doc.meta_description|default:doc.title }}{% endblock %}
 
+{% block extra_css %}
+<style>
+.aspect-legal { background: #FFFFFF; padding-bottom: 80px; }
+.aspect-legal__container { width: min(1100px, calc(100% - 32px)); margin: 0 auto; }
+
+.aspect-legal__crumbs {
+  display: flex; align-items: center; gap: 8px;
+  padding: 24px 0;
+  font-size: 13px; color: #5A5A5A;
+}
+.aspect-legal__crumbs a { color: #5A5A5A; text-decoration: none; transition: color .2s ease; }
+.aspect-legal__crumbs a:hover { color: #2A4A34; }
+.aspect-legal__crumbs span { color: rgba(0,0,0,.3); }
+.aspect-legal__crumbs .current { color: #000; font-weight: 500; }
+
+.aspect-legal__hero {
+  padding: 16px 0 40px;
+  border-bottom: 1px solid #E5E8E5;
+  margin-bottom: 48px;
+  position: relative;
+}
+.aspect-legal__hero::after {
+  content: ""; position: absolute;
+  left: 0; bottom: -1px;
+  width: 72px; height: 3px;
+  background: #2A4A34;
+}
+.aspect-legal__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 16px;
+}
+.aspect-legal__updated { font-size: 13px; color: #5A5A5A; margin: 0; }
+
+.aspect-legal__card {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 24px;
+  padding: 48px 52px;
+}
+@media (max-width: 757px) {
+  .aspect-legal__card { padding: 28px 22px; border-radius: 18px; }
+}
+
+/* Стили для HTML из LegalDocument.content */
+.aspect-legal__content {
+  font-size: 14px;
+  line-height: 1.75;
+  color: #5A5A5A;
+}
+.aspect-legal__content h2 {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: #000;
+  margin: 32px 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F0F0F0;
+}
+.aspect-legal__content h2:first-child { margin-top: 0; }
+.aspect-legal__content h3 {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  text-transform: uppercase;
+  color: #000;
+  margin: 24px 0 12px;
+}
+.aspect-legal__content p {
+  margin: 0 0 14px;
+  line-height: 1.75;
+}
+.aspect-legal__content p:last-child { margin-bottom: 0; }
+.aspect-legal__content ul,
+.aspect-legal__content ol {
+  margin: 0 0 14px;
+  padding-left: 24px;
+}
+.aspect-legal__content li { margin-bottom: 6px; }
+.aspect-legal__content strong { color: #000; font-weight: 700; }
+.aspect-legal__content em { font-style: italic; }
+.aspect-legal__content a {
+  color: #2A4A34;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.aspect-legal__content a:hover { color: #1E3626; }
+.aspect-legal__content br { line-height: 1.75; }
+
+.aspect-legal__back {
+  margin-top: 32px;
+  text-align: center;
+}
+.aspect-legal__back a {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 22px;
+  border-radius: 12px;
+  background: #F4F6F4;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900; font-size: 12px;
+  letter-spacing: .1em; text-transform: uppercase;
+  text-decoration: none;
+  transition: background .2s ease, color .2s ease;
+}
+.aspect-legal__back a:hover {
+  background: #2A4A34;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
-  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
-    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
-      <a href="/" class="hover:text-black transition-colors">Главная</a>
-      <span class="text-black/20">/</span>
-      <span class="text-black font-medium">{{ doc.title }}</span>
+<main class="aspect-legal">
+  <div class="aspect-legal__container">
+
+    <nav class="aspect-legal__crumbs" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span>/</span>
+      <span class="current">{{ doc.title }}</span>
     </nav>
-    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-8">{{ doc.title }}</h1>
 
-    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm prose prose-sm max-w-none">
+    <header class="aspect-legal__hero">
+      <h1 class="aspect-legal__title">{{ doc.title }}</h1>
       {% if doc.last_updated_label %}
-        <p class="text-[14px] text-black/50 mb-6">{{ doc.last_updated_label }}</p>
+        <p class="aspect-legal__updated">{{ doc.last_updated_label }}</p>
       {% endif %}
+    </header>
 
-      <div class="text-[14px] text-black/70 leading-relaxed legal-doc-content space-y-4 [&_h2]:text-[20px] [&_h2]:font-din-black [&_h2]:uppercase [&_h2]:mt-8 [&_h2]:mb-4 [&_h2]:text-black [&_h3]:text-[16px] [&_h3]:font-bold [&_h3]:mt-6 [&_h3]:mb-3 [&_h3]:text-black [&_p]:mb-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_li]:mb-1 [&_a]:text-black [&_a]:underline">
+    <div class="aspect-legal__card">
+      <div class="aspect-legal__content">
         {{ doc.content|safe }}
       </div>
     </div>
 
-    <div class="mt-8 text-center">
-      <a href="javascript:history.back()" class="inline-block text-[13px] text-black/50 hover:text-black font-bold uppercase tracking-widest transition-colors">
-        ← Вернуться назад
-      </a>
+    <div class="aspect-legal__back">
+      <a href="javascript:history.back()">← Вернуться назад</a>
     </div>
+
   </div>
 </main>
 {% endblock %}

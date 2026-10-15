@@ -1,98 +1,334 @@
 {% extends "catalog/base.html" %}
 {% load static %}
 
-{% block title %}Возврат денег — Гарантия качества{% endblock %}
-{% block meta_description %}Условия возврата товара и денег в интернет-магазине Aspect Coffee. 14 дней на возврат, гарантия качества каждого заказа.{% endblock %}
+{% block title %}Возврат денег{% endblock %}
+{% block meta_description %}Условия возврата товара и денег в интернет-магазине Aspect Coffee. Возврат в течение 14 дней в соответствии с законодательством РФ.{% endblock %}
+
+{% block extra_css %}
+<style>
+.aspect-return { background: #FFFFFF; padding-bottom: 80px; }
+.aspect-return__container { width: min(1100px, calc(100% - 32px)); margin: 0 auto; }
+
+.aspect-return__crumbs {
+  display: flex; align-items: center; gap: 8px;
+  padding: 24px 0;
+  font-size: 13px; color: #5A5A5A;
+}
+.aspect-return__crumbs a { color: #5A5A5A; text-decoration: none; transition: color .2s ease; }
+.aspect-return__crumbs a:hover { color: #2A4A34; }
+.aspect-return__crumbs span { color: rgba(0,0,0,.3); }
+.aspect-return__crumbs .current { color: #000; font-weight: 500; }
+
+.aspect-return__hero {
+  padding: 16px 0 40px;
+  border-bottom: 1px solid #E5E8E5;
+  margin-bottom: 48px;
+  position: relative;
+}
+.aspect-return__hero::after {
+  content: ""; position: absolute;
+  left: 0; bottom: -1px;
+  width: 72px; height: 3px;
+  background: #2A4A34;
+}
+.aspect-return__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 16px;
+}
+.aspect-return__lead {
+  font-size: 16px; line-height: 1.6;
+  color: #5A5A5A;
+  max-width: 720px;
+  margin: 0;
+}
+
+.aspect-return__card {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 24px;
+  padding: 40px 44px;
+  margin-bottom: 24px;
+}
+@media (max-width: 757px) {
+  .aspect-return__card { padding: 24px 20px; border-radius: 18px; }
+}
+.aspect-return__section-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(22px, 2.6vw, 30px);
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #F0F0F0;
+  position: relative;
+  display: flex; align-items: center; gap: 14px;
+}
+.aspect-return__section-title::after {
+  content: ""; position: absolute;
+  left: 0; bottom: -1px;
+  width: 48px; height: 3px;
+  background: #2A4A34;
+}
+.aspect-return__section-title svg {
+  width: 28px; height: 28px;
+  stroke: #2A4A34; fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+  flex-shrink: 0;
+}
+.aspect-return__text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #5A5A5A;
+  margin: 0 0 16px;
+}
+
+.aspect-return__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px 24px;
+  background: #F4F6F4;
+  border-left: 3px solid #2A4A34;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #000;
+}
+.aspect-return__note svg {
+  width: 20px; height: 20px;
+  stroke: #2A4A34; fill: none;
+  flex-shrink: 0; margin-top: 2px;
+}
+.aspect-return__note strong { color: #2A4A34; font-weight: 900; }
+
+.aspect-return__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 757px) {
+  .aspect-return__grid { grid-template-columns: 1fr; }
+}
+.aspect-return__item {
+  padding: 22px 24px;
+  background: #F4F6F4;
+  border-radius: 16px;
+}
+.aspect-return__item-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 8px;
+}
+.aspect-return__item-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #5A5A5A;
+  margin: 0;
+}
+
+/* Шаги */
+.aspect-return__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.aspect-return__step {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.aspect-return__step-num {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: #2A4A34;
+  color: #FFFFFF;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.aspect-return__step-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 17px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 6px;
+}
+.aspect-return__step-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #5A5A5A;
+  margin: 0;
+}
+
+/* CTA */
+.aspect-return__cta {
+  background: #000000;
+  color: #FFFFFF;
+  border-radius: 24px;
+  padding: 48px 44px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.aspect-return__cta::before {
+  content: "";
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(42,74,52,.6) 0%, rgba(0,0,0,0) 70%);
+  pointer-events: none;
+}
+.aspect-return__cta-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  margin: 0 0 12px;
+  position: relative; z-index: 2;
+}
+.aspect-return__cta-text {
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(255,255,255,.7);
+  max-width: 520px;
+  margin: 0 auto 24px;
+  position: relative; z-index: 2;
+}
+.aspect-return__cta-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 32px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900; font-size: 13px;
+  letter-spacing: .1em; text-transform: uppercase;
+  text-decoration: none;
+  transition: background .2s ease, color .2s ease, transform .2s ease;
+  position: relative; z-index: 2;
+}
+.aspect-return__cta-btn:hover {
+  background: #2A4A34;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  transform: translateY(-2px);
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
-  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
-    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
-      <a href="/" class="hover:text-black transition-colors">Главная</a>
-      <span class="text-black/20">/</span>
-      <span class="text-black font-medium">Возврат денег</span>
+<main class="aspect-return">
+  <div class="aspect-return__container">
+
+    <nav class="aspect-return__crumbs" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span>/</span>
+      <span class="current">Возврат денег</span>
     </nav>
-    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-4">Возврат денег</h1>
-    <p class="text-[16px] text-black/50 max-w-2xl mb-10">Мы уверены в качестве нашего кофе. Если по какой-то причине он вам не понравится — мы вернём деньги или заменим на другой сорт.</p>
 
-    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
-      <div class="flex items-center gap-4 mb-6">
-        <svg class="w-10 h-10 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--eco-swap-2"></use></svg>
-        <h2 class="text-[24px] font-din-black uppercase">Наша гарантия</h2>
-      </div>
-      <p class="text-[15px] leading-relaxed mb-6">Если вам не понравился вкус кофе — мы вернём деньги или бесплатно заменим на другой сорт. Никаких лишних вопросов. Это не просто политика возврата, это наша философия.</p>
-      <div class="bg-green-50 border border-green-200 rounded-2xl p-6">
-        <p class="font-bold text-[17px] text-green-800">Мы не хотим, чтобы вы пили кофе, который вам не нравится.</p>
-      </div>
-    </div>
+    <header class="aspect-return__hero">
+      <h1 class="aspect-return__title">Возврат денег</h1>
+      <p class="aspect-return__lead">
+        Возврат товара и денежных средств осуществляется в соответствии с Законом РФ «О защите прав потребителей». Ниже — условия, сроки и порядок.
+      </p>
+    </header>
 
-    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
-      <div class="flex items-center gap-4 mb-6">
-        <svg class="w-10 h-10 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--calendar"></use></svg>
-        <h2 class="text-[24px] font-din-black uppercase">Условия возврата</h2>
-      </div>
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="p-5 bg-gray-50 rounded-2xl">
-          <h3 class="font-bold text-[15px] mb-2">Срок возврата</h3>
-          <p class="text-[13px] text-black/60">Вы можете вернуть товар в течение 14 дней с момента получения заказа.</p>
-        </div>
-        <div class="p-5 bg-gray-50 rounded-2xl">
-          <h3 class="font-bold text-[15px] mb-2">Состояние товара</h3>
-          <p class="text-[13px] text-black/60">Возврат возможен, если товар не был полностью использован. Даже если вы открыли упаковку и попробовали — это не проблема.</p>
-        </div>
-        <div class="p-5 bg-gray-50 rounded-2xl">
-          <h3 class="font-bold text-[15px] mb-2">Возврат денег</h3>
-          <p class="text-[13px] text-black/60">Деньги возвращаются тем же способом, которым была произведена оплата, в течение 10 рабочих дней.</p>
-        </div>
-        <div class="p-5 bg-gray-50 rounded-2xl">
-          <h3 class="font-bold text-[15px] mb-2">Замена на другой сорт</h3>
-          <p class="text-[13px] text-black/60">Вместо возврата денег вы можете выбрать другой сорт кофе — мы отправим его бесплатно.</p>
-        </div>
-      </div>
-    </div>
+    {# ---------- УСЛОВИЯ ---------- #}
+    <section class="aspect-return__card">
+      <h2 class="aspect-return__section-title">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Условия возврата
+      </h2>
 
-    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
-      <div class="flex items-center gap-4 mb-6">
-        <svg class="w-10 h-10 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--list"></use></svg>
-        <h2 class="text-[24px] font-din-black uppercase">Процесс возврата</h2>
+      <div class="aspect-return__grid">
+        <div class="aspect-return__item">
+          <h3 class="aspect-return__item-title">Срок возврата</h3>
+          <p class="aspect-return__item-text">Вы можете отказаться от товара в течение 14 дней с момента получения заказа (ст. 26.1 ЗоЗПП).</p>
+        </div>
+        <div class="aspect-return__item">
+          <h3 class="aspect-return__item-title">Состояние товара</h3>
+          <p class="aspect-return__item-text">Возврат возможен при сохранении потребительских свойств товара, его товарного вида и упаковки.</p>
+        </div>
+        <div class="aspect-return__item">
+          <h3 class="aspect-return__item-title">Возврат денег</h3>
+          <p class="aspect-return__item-text">Деньги возвращаются тем же способом, которым была произведена оплата, в течение 10 рабочих дней с момента получения возврата.</p>
+        </div>
+        <div class="aspect-return__item">
+          <h3 class="aspect-return__item-title">Товар ненадлежащего качества</h3>
+          <p class="aspect-return__item-text">Если товар пришёл с дефектом или повреждён — мы вернём полную стоимость, включая доставку.</p>
+        </div>
       </div>
-      <div class="space-y-6">
-        <div class="flex gap-5">
-          <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-din-black shrink-0">1</div>
+    </section>
+
+    {# ---------- ПРОЦЕСС ---------- #}
+    <section class="aspect-return__card">
+      <h2 class="aspect-return__section-title">
+        <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        Как оформить возврат
+      </h2>
+
+      <div class="aspect-return__steps">
+        <div class="aspect-return__step">
+          <div class="aspect-return__step-num">1</div>
           <div>
-            <h3 class="font-bold text-[15px] mb-1">Свяжитесь с нами</h3>
-            <p class="text-[13px] text-black/60">Напишите нам на почту или через форму обратной связи. Укажите номер заказа и причину возврата.</p>
+            <h3 class="aspect-return__step-title">Свяжитесь с нами</h3>
+            <p class="aspect-return__step-text">Напишите на <a href="mailto:hello@aspectcoffee.ru" style="color:#2A4A34;text-decoration:underline;">hello@aspectcoffee.ru</a> или через форму на странице «Контакты». Укажите номер заказа и причину возврата.</p>
           </div>
         </div>
-        <div class="flex gap-5">
-          <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-din-black shrink-0">2</div>
+        <div class="aspect-return__step">
+          <div class="aspect-return__step-num">2</div>
           <div>
-            <h3 class="font-bold text-[15px] mb-1">Получите инструкции</h3>
-            <p class="text-[13px] text-black/60">Мы пришлём вам адрес для отправки возврата и всю необходимую информацию. Обратную доставку оплачиваем мы.</p>
+            <h3 class="aspect-return__step-title">Получите инструкции</h3>
+            <p class="aspect-return__step-text">Мы пришлём адрес для отправки возврата и всю необходимую информацию.</p>
           </div>
         </div>
-        <div class="flex gap-5">
-          <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-din-black shrink-0">3</div>
+        <div class="aspect-return__step">
+          <div class="aspect-return__step-num">3</div>
           <div>
-            <h3 class="font-bold text-[15px] mb-1">Отправьте товар</h3>
-            <p class="text-[13px] text-black/60">Упакуйте кофе и отправьте любой удобной транспортной компанией. Мы компенсируем стоимость доставки.</p>
+            <h3 class="aspect-return__step-title">Отправьте товар</h3>
+            <p class="aspect-return__step-text">Упакуйте товар и отправьте удобной транспортной компанией.</p>
           </div>
         </div>
-        <div class="flex gap-5">
-          <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-din-black shrink-0">4</div>
+        <div class="aspect-return__step">
+          <div class="aspect-return__step-num">4</div>
           <div>
-            <h3 class="font-bold text-[15px] mb-1">Получите деньги или новый кофе</h3>
-            <p class="text-[13px] text-black/60">После получения возврата мы вернём деньги или отправим новый сорт в течение 2-3 дней.</p>
+            <h3 class="aspect-return__step-title">Получите деньги</h3>
+            <p class="aspect-return__step-text">После получения и проверки возврата мы вернём деньги в течение 10 рабочих дней.</p>
           </div>
         </div>
       </div>
+    </section>
+
+    {# ---------- CTA ---------- #}
+    <div class="aspect-return__cta">
+      <h2 class="aspect-return__cta-title">Остались вопросы?</h2>
+      <p class="aspect-return__cta-text">Свяжитесь с нами — поможем оформить возврат или подскажем по вашему заказу.</p>
+      <a href="/contact-us/" class="aspect-return__cta-btn">Написать нам →</a>
     </div>
 
-    <div class="bg-black text-white rounded-[24px] p-6 md:p-10">
-      <h2 class="text-[24px] font-din-black uppercase mb-4">Остались вопросы?</h2>
-      <p class="text-[14px] text-white/60 mb-6">Свяжитесь с нами — мы всегда готовы помочь.</p>
-      <a href="/contact-us/" class="inline-block bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-[14px]">Написать нам →</a>
-    </div>
   </div>
 </main>
 {% endblock %}

@@ -1,11 +1,15 @@
 {% extends 'catalog/base.html' %}
 {% load static %}
 {% block content %}
-<main>
-  <div class="container xl:pt-8 mb-10 md:mb-20">
+<main class="asp-comm">
+  <div class="asp-comm__container">
+
+    <div class="asp-comm__head">
+      <h1 class="asp-comm__title">Сообщество</h1>
+    </div>
     <div class="max-xl:gap-y-5 grid grid-cols-12 xl:gap-6 gap-5">
       <div class="col-span-12 xl:col-span-4 2xl:col-span-3 sidebar-community">
-        <div class="flex items-center min-h-[38px] mb-6 py-1 border-b border-[var(--black-5)] px-4 -mx-4 sm:mx-0 sm:p-0 xl:border-0 xl:min-h-[auto]"><h1 class="text-[24px] m-0 xl:text-[40px]">Сообщество</h1></div>        {% if user.is_authenticated %}
+        {% if user.is_authenticated %}
         <div class="aspect-community-profile">
           <div class="aspect-profile-head"><div class="aspect-profile-avatar">{% if user.avatar %}<img src="{{ user.avatar.url }}" alt="">{% else %}{{ user.first_name|first|default:user.email|first|upper }}{% endif %}</div><div><strong>{{ user.get_full_name|default:user.email }}</strong><button type="button" class="aspect-status-trigger" data-status-toggle style="color:{{ current_user_level.color }}">{{ current_user_level.name }}</button></div></div>
           <div class="aspect-status-popover" data-status-popover hidden><p>Статусы позволяют выделять ответы и комментарии тех пользователей на сайте, которые имеют разный опыт:</p><p><b>Новичок</b> — с первого дня регистрации на сайте</p><p><b>Любитель</b> — 5+ отзывов/комментариев/постов на сайте, 5+ заказов, 10+ прочитанных статей</p><p><b>Продвинутый</b> — 15+ отзывов/комментариев/постов на сайте, 10+ заказов, 10+ прочитанных статей</p><p><b>Эксперт</b> — 30+ отзывов/комментариев/постов на сайте, 15+ заказов, 30+ прочитанных статей, 20+ опробованных сортов</p></div>
@@ -18,7 +22,6 @@
           <li data-v-0f9c3e8e=""><a data-community-tab data-v-9456c1d1="" href="{% url 'pages:community' %}?scope={{ selected_scope }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}" class="nav-li {% if active_tab == 'best' %}active{% endif %}"><span>Лучшее</span></a></li>
           <li data-v-0f9c3e8e=""><a data-community-tab data-v-9456c1d1="" href="{% url 'pages:community_new' %}?scope={{ selected_scope }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}" class="nav-li {% if active_tab == 'new' %}active{% endif %}"><span>Новое</span></a></li>
           <li data-v-0f9c3e8e=""><a data-community-tab data-v-9456c1d1="" href="{% url 'pages:community_channels' %}?scope={{ selected_scope }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}" class="nav-li {% if active_tab == 'channels' %}active{% endif %}"><span>Каналы</span></a></li>
-          <li data-v-0f9c3e8e=""><a data-community-tab data-v-9456c1d1="" href="{% url 'pages:community_bookmarks' %}?scope={{ selected_scope }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}" class="nav-li {% if active_tab == 'bookmarks' %}active{% endif %}"><span>Закладки</span></a></li>
         </ul></div>
         {% if show_channels %}
         <section class="aspect-community-panel order-2"><h2>Каналы сообщества</h2><div class="aspect-channel-grid">{% for channel in community_channels %}<a class="aspect-channel" href="{% url 'pages:community_new' %}"><h3>{{ channel.title }}</h3><p>{{ channel.description }}</p></a>{% endfor %}</div></section>
@@ -30,18 +33,27 @@
         <div class="space-y-4 order-3 cards-community-post aspect-community-cards" data-v-27020d61="">
           {% for post in community_posts %}
           <article class="aspect-post-card" data-post-card="{{ post.pk }}">
-            <div class="aspect-post-head"><div class="aspect-avatar">{% if post.user.avatar %}<img src="{{ post.user.avatar.url }}" alt="">{% else %}{{ post.user.first_name|first|default:post.user.email|first|upper }}{% endif %}</div><div class="aspect-post-author"><strong>{{ post.user.get_full_name|default:post.user.email }}</strong><div><span class="aspect-user-level" style="color:{{ post.author_level.color }}">{{ post.author_level.name }}</span>{% if post.author_city %}<span class="aspect-user-city">г. {{ post.author_city }}</span>{% endif %}</div></div><time>{{ post.created_at|timesince }} назад</time><button class="aspect-post-menu" type="button" aria-label="Меню">⋮</button></div>
+            <div class="aspect-post-head"><div class="aspect-avatar">{% if post.user.avatar %}<img src="{{ post.user.avatar.url }}" alt="">{% else %}{{ post.user.first_name|first|default:post.user.email|first|upper }}{% endif %}</div><div class="aspect-post-author"><strong>{{ post.user.get_full_name|default:post.user.email }}</strong><div><span class="aspect-user-level" style="color:{{ post.author_level.color }}">{{ post.author_level.name }}</span>{% if post.author_city %}<span class="aspect-user-city">г. {{ post.author_city }}</span>{% endif %}</div></div><time>{{ post.created_at|timesince }} назад</time></div>
             <h3>{{ post.title }}</h3>{% if post.image %}<img class="aspect-post-image" src="{{ post.image.url }}" alt="{{ post.title }}">{% endif %}<p>{{ post.text }}</p>
             <div class="aspect-post-actions">
               <div class="aspect-action-left">
-                <button type="button" class="aspect-action aspect-like {% if post.liked_by_me %}active{% endif %}" data-action="like" data-post="{{ post.pk }}" data-active="{{ post.liked_by_me|yesno:'true,false' }}" {% if user.is_authenticated and post.user == user %}disabled title="Нельзя оценивать свой пост"{% endif %}><svg><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--like-stroke"></use></svg><span>{{ post.like_count }}</span></button>
-                <button type="button" class="aspect-action aspect-dislike {% if post.disliked_by_me %}active{% endif %}" data-action="dislike" data-post="{{ post.pk }}" data-active="{{ post.disliked_by_me|yesno:'true,false' }}" {% if user.is_authenticated and post.user == user %}disabled title="Нельзя оценивать свой пост"{% endif %}><svg><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--dislike-stroke"></use></svg><span>{{ post.dislike_count }}</span></button>
-                <button type="button" class="aspect-action" data-action="comments-toggle"><svg><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--comments-stroke"></use></svg><span data-comment-count>{{ post.comment_count }}</span></button>
+                <button type="button" class="aspect-action aspect-like {% if post.liked_by_me %}active{% endif %}"
+                        data-action="like" data-post="{{ post.pk }}"
+                        data-active="{{ post.liked_by_me|yesno:'true,false' }}"
+                        {% if user.is_authenticated and post.user == user %}disabled title="Нельзя оценивать свой пост"{% endif %}>
+                  <svg><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--like-stroke"></use></svg>
+                  <span>{{ post.like_count }}</span>
+                </button>
+                <button type="button" class="aspect-action" data-action="comments-toggle">
+                  <svg><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--comments-stroke"></use></svg>
+                  <span data-comment-count>{{ post.comment_count }}</span>
+                </button>
               </div>
               <div class="aspect-action-right">
-                <button type="button" class="aspect-action {% if post.reposted_by_me %}active{% endif %}" data-action="repost" data-post="{{ post.pk }}" data-active="{{ post.reposted_by_me|yesno:'true,false' }}" {% if user.is_authenticated and post.user == user %}disabled{% endif %}><svg><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--sort"></use></svg><span>{{ post.repost_count }}</span></button>
-                <button type="button" class="aspect-action" data-action="share" data-url="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}#post-{{ post.pk }}"><svg><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--share"></use></svg></button>
-                <button type="button" class="aspect-action {% if post.bookmarked_by_me %}active{% endif %}" data-action="bookmark" data-post="{{ post.pk }}" data-active="{{ post.bookmarked_by_me|yesno:'true,false' }}"><svg><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--bookmark-stroke"></use></svg></button>
+                <button type="button" class="aspect-action" data-action="share"
+                        data-url="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}#post-{{ post.pk }}">
+                  <svg><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--share"></use></svg>
+                </button>
               </div>
             </div>
             <div class="aspect-comments {% if post.comment_count %}open{% endif %}" id="post-{{ post.pk }}">
@@ -104,21 +116,87 @@
     async function communityAjax(url,push=true){const main=document.querySelector('main');main?.classList.add('community-ajax-loading');try{const r=await fetch(url,{headers:{'X-Requested-With':'XMLHttpRequest','Accept':'text/html'}});if(!r.ok)throw new Error('HTTP '+r.status);const html=await r.text();if(!replaceCommunity(html,r.url||url,push))location.href=url}catch(error){console.error(error);location.href=url}finally{document.querySelector('main')?.classList.remove('community-ajax-loading')}}
     async function aspectPostRequest(url,body=''){const r=await fetch(url,{method:'POST',headers:{'X-CSRFToken':aspectCsrf(),'X-Requested-With':'XMLHttpRequest','Content-Type':'application/x-www-form-urlencoded'},body});if(r.status===401){location.href='/login/?next=/community/';return null}if(!r.ok)return null;return r.json()}
     function bindPostActions(root){
-      root.querySelectorAll('[data-action]:not([data-bound])').forEach(btn=>{btn.dataset.bound='1';btn.addEventListener('click',async()=>{
-        const action=btn.dataset.action;const card=btn.closest('[data-post-card]');
-        if(action==='comments-toggle'){card.querySelector('.aspect-comments')?.classList.toggle('open');return}
-        if(action==='share'){const url=btn.dataset.url||location.href;try{if(navigator.share)await navigator.share({title:card.querySelector('h3')?.textContent||document.title,url});else await navigator.clipboard.writeText(url);btn.classList.add('copied');setTimeout(()=>btn.classList.remove('copied'),1200)}catch(e){}return}
-        if(!btn.dataset.post)return;
-        const current=btn.dataset.active==='true';const body=(action==='like'||action==='dislike')?'add='+encodeURIComponent(!current):'';
-        const data=await aspectPostRequest('/community/post/'+btn.dataset.post+'/'+action+'/',body);if(!data)return;
-        const active=data.liked!==undefined?data.liked:data.active;btn.dataset.active=String(active);btn.classList.toggle('active',active);
-        if(data.count!==undefined&&btn.querySelector('span'))btn.querySelector('span').textContent=data.count;
-        if(data.like_count!==undefined){const like=card.querySelector('[data-action=like]');like.dataset.active=String(action==='like'?active:false);like.classList.toggle('active',action==='like'&&active);like.querySelector('span').textContent=data.like_count}
-        if(data.dislike_count!==undefined){const dislike=card.querySelector('[data-action=dislike]');dislike.dataset.active=String(action==='dislike'?active:false);dislike.classList.toggle('active',action==='dislike'&&active);dislike.querySelector('span').textContent=data.dislike_count}
-      })});
-      root.querySelectorAll('.aspect-comment-form:not([data-bound])').forEach(form=>{form.dataset.bound='1';form.addEventListener('submit',async event=>{event.preventDefault();const input=form.querySelector('input[name=text]');const text=input.value.trim();if(!text)return;const body=new URLSearchParams({text});const parent=form.querySelector('input[name=parent_id]').value;const target=form.querySelector('input[name=reply_to_user_id]').value;if(parent)body.set('parent_id',parent);if(target)body.set('reply_to_user_id',target);const data=await aspectPostRequest('/community/post/'+form.dataset.post+'/comment/',body.toString());if(!data)return;if(data.pending_moderation){input.value='';form.querySelector('input[name=parent_id]').value='';form.querySelector('input[name=reply_to_user_id]').value='';alert(data.message||'Комментарий отправлен на модерацию.');return}await communityAjax(location.href,false)})});
-      root.querySelectorAll('.aspect-reply-btn:not([data-bound])').forEach(btn=>{btn.dataset.bound='1';btn.addEventListener('click',()=>{const card=btn.closest('[data-post-card]');const form=card.querySelector('.aspect-comment-form');form.querySelector('input[name=parent_id]').value=btn.dataset.reply;form.querySelector('input[name=reply_to_user_id]').value=btn.dataset.targetUser;const input=form.querySelector('input[name=text]');input.placeholder='Ответить '+btn.dataset.name;input.focus();form.scrollIntoView({behavior:'smooth',block:'center'})})});
-      root.querySelectorAll('.aspect-replies-toggle:not([data-bound])').forEach(btn=>{btn.dataset.bound='1';btn.addEventListener('click',()=>btn.closest('.aspect-comment-thread').querySelector('.aspect-replies')?.classList.toggle('collapsed'))});
+      root.querySelectorAll('[data-action]:not([data-bound])').forEach(btn=>{
+        btn.dataset.bound='1';
+        btn.addEventListener('click', async()=>{
+          const action = btn.dataset.action;
+          const card = btn.closest('[data-post-card]');
+
+          if (action === 'comments-toggle') {
+            card.querySelector('.aspect-comments')?.classList.toggle('open');
+            return;
+          }
+          if (action === 'share') {
+            const url = btn.dataset.url || location.href;
+            try {
+              if (navigator.share) await navigator.share({ title: card.querySelector('h3')?.textContent || document.title, url });
+              else await navigator.clipboard.writeText(url);
+              btn.classList.add('copied');
+              setTimeout(()=>btn.classList.remove('copied'), 1200);
+            } catch(e){}
+            return;
+          }
+          if (action !== 'like') return;
+          if (!btn.dataset.post) return;
+
+          const current = btn.dataset.active === 'true';
+          const body = 'add=' + encodeURIComponent(!current);
+          const data = await aspectPostRequest('/community/post/' + btn.dataset.post + '/like/', body);
+          if (!data) return;
+          const active = data.liked !== undefined ? data.liked : data.active;
+          btn.dataset.active = String(active);
+          btn.classList.toggle('active', active);
+          if (data.like_count !== undefined && btn.querySelector('span')) {
+            btn.querySelector('span').textContent = data.like_count;
+          }
+        });
+      });
+
+      root.querySelectorAll('.aspect-comment-form:not([data-bound])').forEach(form=>{
+        form.dataset.bound='1';
+        form.addEventListener('submit', async event=>{
+          event.preventDefault();
+          const input = form.querySelector('input[name=text]');
+          const text = input.value.trim();
+          if (!text) return;
+          const body = new URLSearchParams({ text });
+          const parent = form.querySelector('input[name=parent_id]').value;
+          const target = form.querySelector('input[name=reply_to_user_id]').value;
+          if (parent) body.set('parent_id', parent);
+          if (target) body.set('reply_to_user_id', target);
+          const data = await aspectPostRequest('/community/post/' + form.dataset.post + '/comment/', body.toString());
+          if (!data) return;
+          if (data.pending_moderation) {
+            input.value='';
+            form.querySelector('input[name=parent_id]').value='';
+            form.querySelector('input[name=reply_to_user_id]').value='';
+            alert(data.message || 'Комментарий отправлен на модерацию.');
+            return;
+          }
+          await communityAjax(location.href, false);
+        });
+      });
+
+      root.querySelectorAll('.aspect-reply-btn:not([data-bound])').forEach(btn=>{
+        btn.dataset.bound='1';
+        btn.addEventListener('click', ()=>{
+          const card = btn.closest('[data-post-card]');
+          const form = card.querySelector('.aspect-comment-form');
+          form.querySelector('input[name=parent_id]').value = btn.dataset.reply;
+          form.querySelector('input[name=reply_to_user_id]').value = btn.dataset.targetUser;
+          const input = form.querySelector('input[name=text]');
+          input.placeholder = 'Ответить ' + btn.dataset.name;
+          input.focus();
+          form.scrollIntoView({ behavior:'smooth', block:'center' });
+        });
+      });
+
+      root.querySelectorAll('.aspect-replies-toggle:not([data-bound])').forEach(btn=>{
+        btn.dataset.bound='1';
+        btn.addEventListener('click', ()=>{
+          btn.closest('.aspect-comment-thread').querySelector('.aspect-replies')?.classList.toggle('collapsed');
+        });
+      });
     }
     function initAspectCommunity(root=document){
       bindPostActions(root);
@@ -132,6 +210,366 @@
     if(!window.aspectCommunityGlobalBound){window.aspectCommunityGlobalBound=true;document.addEventListener('click',event=>{if(!event.target.closest('.aspect-scope-wrap'))document.querySelectorAll('[data-community-scope-menu]').forEach(menu=>{menu.hidden=true;menu.parentElement.querySelector('[data-community-scope-toggle]')?.setAttribute('aria-expanded','false')});if(!event.target.closest('.aspect-community-profile'))document.querySelectorAll('[data-status-popover]').forEach(pop=>pop.hidden=true)});window.addEventListener('popstate',()=>communityAjax(location.href,false))}
     initAspectCommunity(document);
   </script>
+  <style>
+    /* ==========================================================
+       ASPECT COMMUNITY (новый слой)
+       ========================================================== */
+    .asp-comm { background: #FFFFFF; padding: 40px 0 80px; }
+    .asp-comm__container { width: min(1340px, calc(100% - 32px)); margin: 0 auto; }
+    .asp-comm__head {
+      padding-bottom: 28px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid #E5E8E5;
+      position: relative;
+    }
+    .asp-comm__head::after {
+      content: ""; position: absolute;
+      left: 0; bottom: -1px;
+      width: 72px; height: 3px;
+      background: #2A4A34;
+    }
+    .asp-comm__title {
+      font-family: "Roboto Condensed", Arial, sans-serif;
+      font-weight: 900;
+      font-size: clamp(36px, 5vw, 64px);
+      line-height: 1.02;
+      letter-spacing: -.02em;
+      text-transform: uppercase;
+      color: #000;
+      margin: 0;
+    }
+    
+    /* Табы */
+    .tc-nav-tabs-list {
+      display: inline-flex !important;
+      gap: 4px !important;
+      padding: 5px !important;
+      background: #F4F6F4 !important;
+      border-radius: 14px !important;
+    }
+    .nav-li {
+      padding: 9px 18px !important;
+      border-radius: 10px !important;
+      font-family: "Roboto Condensed", Arial, sans-serif !important;
+      font-weight: 900 !important;
+      font-size: 13px !important;
+      letter-spacing: .08em !important;
+      text-transform: uppercase !important;
+      color: #5A5A5A !important;
+      transition: background .2s ease, color .2s ease !important;
+      text-decoration: none !important;
+    }
+    .nav-li:hover { color: #000 !important; }
+    .nav-li.active {
+      background: #FFFFFF !important;
+      color: #2A4A34 !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06) !important;
+    }
+    
+    /* Карточка поста */
+    .aspect-post-card {
+      background: #FFFFFF !important;
+      border: 1px solid #E5E8E5 !important;
+      border-radius: 20px !important;
+      padding: 22px !important;
+      transition: border-color .2s ease !important;
+    }
+    .aspect-post-card:hover { border-color: #2A4A34 !important; }
+    
+    .aspect-post-head {
+      display: flex !important;
+      gap: 12px !important;
+      align-items: flex-start !important;
+      margin-bottom: 14px !important;
+    }
+    .aspect-avatar,
+    .aspect-post-avatar {
+      width: 44px !important;
+      height: 44px !important;
+      min-width: 44px !important;
+      border-radius: 50% !important;
+      background: #E8EEE8 !important;
+      color: #2A4A34 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-family: "Roboto Condensed", Arial, sans-serif !important;
+      font-weight: 900 !important;
+      font-size: 15px !important;
+      overflow: hidden !important;
+    }
+    .aspect-avatar img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+    
+    .aspect-post-head strong {
+      font-family: "Roboto Condensed", Arial, sans-serif !important;
+      font-weight: 900 !important;
+      font-size: 14px !important;
+      text-transform: uppercase !important;
+      letter-spacing: .02em !important;
+      color: #000 !important;
+      display: block !important;
+    }
+    .aspect-post-head small,
+    .aspect-post-head time {
+      font-size: 11px !important;
+      color: #5A5A5A !important;
+      display: block !important;
+      margin-top: 2px !important;
+    }
+    .aspect-post-head time { margin-left: auto !important; white-space: nowrap !important; }
+    
+    .aspect-post-card h3 {
+      font-family: "Roboto Condensed", Arial, sans-serif !important;
+      font-weight: 900 !important;
+      font-size: 18px !important;
+      line-height: 1.2 !important;
+      text-transform: uppercase !important;
+      color: #000 !important;
+      margin: 0 0 10px !important;
+    }
+    .aspect-post-card > p {
+      font-size: 14px !important;
+      line-height: 1.6 !important;
+      color: #5A5A5A !important;
+      margin: 0 !important;
+      white-space: pre-line !important;
+    }
+    .aspect-post-image {
+      display: block !important;
+      width: 100% !important;
+      max-height: 320px !important;
+      object-fit: cover !important;
+      border-radius: 14px !important;
+      margin: 14px 0 !important;
+    }
+    
+    /* Действия */
+    .aspect-post-actions {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding-top: 14px !important;
+      margin-top: 14px !important;
+      border-top: 1px solid #F0F0F0 !important;
+      gap: 12px !important;
+    }
+    .aspect-action-left,
+    .aspect-action-right { display: flex !important; gap: 8px !important; align-items: center !important; }
+    .aspect-action {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      min-height: 38px !important;
+      padding: 0 14px !important;
+      background: #F4F6F4 !important;
+      color: #5A5A5A !important;
+      border: 0 !important;
+      border-radius: 10px !important;
+      font-family: "Roboto Condensed", Arial, sans-serif !important;
+      font-weight: 900 !important;
+      font-size: 13px !important;
+      letter-spacing: .04em !important;
+      cursor: pointer !important;
+      transition: background .15s ease, color .15s ease !important;
+    }
+    .aspect-action:hover { background: #E8EEE8 !important; color: #2A4A34 !important; }
+    .aspect-action.active {
+      background: #2A4A34 !important;
+      color: #FFFFFF !important;
+    }
+    .aspect-action:disabled { opacity: .35 !important; cursor: not-allowed !important; }
+    .aspect-action svg { width: 16px !important; height: 16px !important; fill: none !important; stroke: currentColor !important; stroke-width: 1.8 !important; }
+    
+    /* Комментарии */
+    .aspect-comments {
+      display: none !important;
+      margin-top: 16px !important;
+    }
+    .aspect-comments.open { display: block !important; }
+    .aspect-comment-list {
+      border-top: 1px solid #F0F0F0 !important;
+      margin: 0 !important;
+    }
+    .aspect-comment-thread {
+      border-bottom: 1px solid #F0F0F0 !important;
+      padding: 16px 0 !important;
+    }
+    .aspect-comment-thread:last-child { border-bottom: 0 !important; }
+    .aspect-comment-row { display: flex !important; gap: 12px !important; }
+    .aspect-comment-avatar {
+      width: 36px !important;
+      height: 36px !important;
+      min-width: 36px !important;
+      border-radius: 50% !important;
+      background: #E8EEE8 !important;
+      color: #2A4A34 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-family: "Roboto Condensed", Arial, sans-serif !important;
+      font-weight: 900 !important;
+      font-size: 13px !important;
+      overflow: hidden !important;
+    }
+    .aspect-comment-avatar img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+    .aspect-comment-content { flex: 1 !important; min-width: 0 !important; }
+    .aspect-comment-head {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: flex-start !important;
+      gap: 10px !important;
+    }
+    .aspect-comment-head strong {
+      font-family: "Roboto Condensed", Arial, sans-serif !important;
+      font-weight: 900 !important;
+      font-size: 13px !important;
+      text-transform: uppercase !important;
+      color: #000 !important;
+    }
+    .aspect-comment-head span { display: block !important; font-size: 11px !important; color: #5A5A5A !important; margin-top: 2px !important; }
+    .aspect-comment-head time { font-size: 11px !important; color: #5A5A5A !important; white-space: nowrap !important; }
+    .aspect-comment-content p { font-size: 13px !important; line-height: 1.55 !important; color: #000 !important; margin: 8px 0 !important; }
+    
+    .aspect-reply-btn {
+      padding: 5px 12px !important;
+      border: 0 !important;
+      border-radius: 8px !important;
+      background: #F4F6F4 !important;
+      color: #5A5A5A !important;
+      font-family: "Roboto Condensed", Arial, sans-serif !important;
+      font-weight: 900 !important;
+      font-size: 11px !important;
+      letter-spacing: .06em !important;
+      text-transform: uppercase !important;
+      cursor: pointer !important;
+      transition: background .15s ease, color .15s ease !important;
+    }
+    .aspect-reply-btn:hover { background: #2A4A34 !important; color: #FFFFFF !important; }
+    .aspect-replies-toggle {
+      background: none !important;
+      border: 0 !important;
+      color: #2A4A34 !important;
+      font-family: "Roboto Condensed", Arial, sans-serif !important;
+      font-weight: 900 !important;
+      font-size: 11px !important;
+      letter-spacing: .06em !important;
+      text-transform: uppercase !important;
+      cursor: pointer !important;
+      margin-left: 10px !important;
+    }
+    .aspect-replies { margin: 14px 0 0 36px !important; }
+    .aspect-replies.collapsed { display: none !important; }
+    .aspect-comment-reply {
+      border-left: 2px solid #E5E8E5 !important;
+      margin-top: 12px !important;
+      padding-left: 12px !important;
+    }
+    
+    .aspect-comment-form {
+      display: flex !important;
+      gap: 10px !important;
+      margin-top: 16px !important;
+    }
+    .aspect-comment-form input[type=hidden] { display: none !important; }
+    .aspect-comment-form input[name=text] {
+      flex: 1 !important;
+      min-width: 0 !important;
+      padding: 12px 16px !important;
+      border: 1px solid #E5E8E5 !important;
+      background: #F4F6F4 !important;
+      border-radius: 12px !important;
+      font-size: 14px !important;
+      outline: none !important;
+      transition: background .15s ease, border-color .15s ease !important;
+    }
+    .aspect-comment-form input[name=text]:focus { background: #FFFFFF !important; border-color: #2A4A34 !important; }
+    .aspect-comment-form button[type=submit] {
+      width: 46px !important;
+      height: 46px !important;
+      border: 0 !important;
+      border-radius: 12px !important;
+      background: #2A4A34 !important;
+      color: #FFFFFF !important;
+      font-size: 20px !important;
+      font-weight: 900 !important;
+      cursor: pointer !important;
+    }
+    .aspect-comment-form button[type=submit]:hover { background: #1E3626 !important; }
+    
+    /* Composer */
+    .aspect-compose {
+      background: #FFFFFF !important;
+      border: 1px solid #E5E8E5 !important;
+      border-radius: 18px !important;
+      padding: 18px !important;
+    }
+    .aspect-compose summary {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      list-style: none !important;
+      cursor: pointer !important;
+      color: #5A5A5A !important;
+      font-size: 14px !important;
+    }
+    .aspect-compose summary::-webkit-details-marker { display: none !important; }
+    .aspect-compose[open] summary { margin-bottom: 16px !important; }
+    .aspect-compose input[type=text],
+    .aspect-compose textarea {
+      display: block !important;
+      width: 100% !important;
+      border: 1px solid #E5E8E5 !important;
+      background: #F4F6F4 !important;
+      border-radius: 12px !important;
+      padding: 12px 14px !important;
+      margin-bottom: 10px !important;
+      font-size: 14px !important;
+      box-sizing: border-box !important;
+    }
+    .aspect-compose textarea { min-height: 100px !important; resize: vertical !important; }
+    .aspect-form-row { display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 12px !important; }
+    .aspect-form-row label { font-size: 12px !important; color: #5A5A5A !important; }
+    .aspect-form-row button {
+      padding: 12px 24px !important;
+      background: #2A4A34 !important;
+      color: #FFFFFF !important;
+      border: 0 !important;
+      border-radius: 12px !important;
+      font-family: "Roboto Condensed", Arial, sans-serif !important;
+      font-weight: 900 !important;
+      font-size: 13px !important;
+      letter-spacing: .1em !important;
+      text-transform: uppercase !important;
+      cursor: pointer !important;
+    }
+    .aspect-form-row button:hover { background: #1E3626 !important; }
+    
+    /* Пусто */
+    .aspect-empty {
+      text-align: center !important;
+      padding: 60px 20px !important;
+      color: #5A5A5A !important;
+      font-size: 14px !important;
+    }
+    
+    @media (max-width: 757px) {
+      .aspect-post-card { padding: 16px !important; }
+      .aspect-post-actions {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+      }
+      .aspect-action-left,
+      .aspect-action-right { display: contents !important; }
+      .aspect-action { width: 100% !important; min-width: 0 !important; padding: 0 6px !important; font-size: 12px !important; }
+      .aspect-comment-head { display: block !important; }
+      .aspect-comment-head time { display: block !important; margin-top: 3px !important; }
+      .aspect-replies { margin-left: 18px !important; }
+    }
+  </style>
+      </div>  
+    </div>  
+  </div>    
 </main>
 
 {% endblock %}

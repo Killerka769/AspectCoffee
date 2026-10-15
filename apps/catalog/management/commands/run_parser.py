@@ -193,10 +193,10 @@ class Command(BaseCommand):
         self.category_filter = options["category"]
         self.update_images = options.get("update_images", False)
 
-        from apps.catalog.models import Product, Category, ProductVariant, FlavorNote, ProductImage, ParserLog
+        from apps.catalog.models import Product, Category, ProductVariant, FlavorNote, ProductImage
         from django.utils import timezone
 
-        log = ParserLog.objects.create(status="running")
+        # log = ParserLog.objects.create(status="running")
         total_created = 0
         total_updated = 0
         total_found = 0
@@ -528,19 +528,11 @@ class Command(BaseCommand):
                 if page > 20: break
 
         except Exception as e:
-            log.status = "failed"
-            log.errors = f"{e}\n{traceback.format_exc()}"
             self.stdout.write(self.style.ERROR(f"Parser MASTER CRASH: {e}"))
+            self.stdout.write(traceback.format_exc())
         finally:
             if client:
                 client.close()
-            log.finished_at = timezone.now()
-            if log.status == "running":
-                log.status = "success"
-            log.created_count = total_created
-            log.updated_count = total_updated
-            log.total_products = total_found
-            log.save()
 
         self.stdout.write(self.style.SUCCESS(f"\nDone. Processed {total_handled} products."))
 

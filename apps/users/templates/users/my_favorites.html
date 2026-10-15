@@ -2,446 +2,365 @@
 {% load static catalog_extras %}
 
 {% block title %}Избранное{% endblock %}
-{% block body_extra_class %} grey-theme{% endblock %}
+{% block meta_description %}Избранные товары и заметки в личном кабинете Aspect Coffee.{% endblock %}
+
+{% block extra_css %}
+<style>
+.asp-fav { background: #FFFFFF; padding: 40px 0 80px; }
+.asp-fav__container { width: min(1340px, calc(100% - 32px)); margin: 0 auto; }
+
+.asp-fav__head {
+  padding-bottom: 28px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid #E5E8E5;
+  position: relative;
+}
+.asp-fav__head::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -1px;
+  width: 72px; height: 3px;
+  background: #2A4A34;
+}
+.asp-fav__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0;
+}
+
+/* Табы */
+.asp-fav__tabs {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: #F4F6F4;
+  border-radius: 14px;
+  margin-bottom: 28px;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.asp-fav__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 0;
+  background: transparent;
+  border-radius: 10px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .2s ease, color .2s ease;
+}
+.asp-fav__tab:hover { color: #000; }
+.asp-fav__tab.is-active {
+  background: #FFFFFF;
+  color: #2A4A34;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.asp-fav__tab-count {
+  font-family: "Open Sans", Arial, sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  color: #5A5A5A;
+  padding: 1px 8px;
+  background: rgba(0,0,0,.05);
+  border-radius: 999px;
+}
+.asp-fav__tab.is-active .asp-fav__tab-count {
+  background: #E8EEE8;
+  color: #2A4A34;
+}
+
+/* Пусто */
+.asp-fav__empty {
+  text-align: center;
+  padding: 80px 24px;
+}
+.asp-fav__empty-icon {
+  width: 96px; height: 96px;
+  margin: 0 auto 24px;
+  background: #F4F6F4;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #2A4A34;
+}
+.asp-fav__empty-icon svg { width: 42px; height: 42px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+.asp-fav__empty-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 26px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 8px;
+}
+.asp-fav__empty-text {
+  font-size: 14px;
+  color: #5A5A5A;
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+.asp-fav__empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: #2A4A34;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  border-radius: 14px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background .2s ease, transform .2s ease;
+}
+.asp-fav__empty-btn:hover { background: #1E3626; transform: translateY(-2px); }
+
+/* Заметки */
+.asp-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.asp-note {
+  padding: 22px 24px;
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color .2s ease;
+}
+.asp-note:hover { border-color: #2A4A34; }
+.asp-note__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  color: #000;
+  text-decoration: none;
+  margin: 0;
+}
+.asp-note__title:hover { color: #2A4A34; }
+.asp-note__text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #5A5A5A;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  flex: 1;
+}
+.asp-note__actions { display: flex; gap: 8px; }
+.asp-note__btn {
+  flex: 1;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 0;
+  transition: background .2s ease, color .2s ease;
+}
+.asp-note__btn--primary { background: #2A4A34; color: #FFFFFF; }
+.asp-note__btn--primary:hover { background: #1E3626; }
+.asp-note__btn--ghost {
+  flex: 0 0 auto;
+  background: #F4F6F4;
+  color: #5A5A5A;
+  padding: 8px 12px;
+}
+.asp-note__btn--ghost:hover { background: #FEF2F2; color: #B91C1C; }
+</style>
+{% endblock %}
 
 {% block content %}
-<style>
-:root {
-  --black: #000;
-  --black-50: rgba(0,0,0,0.5);
-  --black-49: rgba(0,0,0,0.49);
-  --black-30: rgba(0,0,0,0.3);
-  --black-20: rgba(0,0,0,0.2);
-  --black-16: rgba(0,0,0,0.16);
-  --black-5: rgba(0,0,0,0.05);
-  --black-4: rgba(0,0,0,0.04);
-  --black-6: rgba(0,0,0,0.06);
-  --black-80: rgba(0,0,0,0.8);
-  --white: #fff;
-  --opacity-4: rgba(0,0,0,0.04);
-  --opacity-8: rgba(0,0,0,0.08);
-  --opacity-50: rgba(0,0,0,0.5);
-  --ts: all 0.3s ease;
-}
-.font-din-black { font-family: 'DIN Pro Black','DIN Pro Bold Fallback',sans-serif; }
-.font-din-medium { font-family: 'DIN Pro Medium','DIN Pro Medium Fallback',sans-serif; }
-.tc-nav-tabs { display:flex; margin-left:-1rem; margin-right:-1rem; min-width:100%; overflow:auto; padding-left:1rem; padding-right:1rem; }
-@media(min-width:576px){ .tc-nav-tabs { margin-left:0; margin-right:0; padding-left:0; padding-right:0; } }
-.tc-nav-tabs-list { align-items:center; background-color:var(--opacity-4); border-radius:.75rem; display:inline-flex; padding:.25rem; text-wrap:nowrap; }
-.nav-li { align-items:center; border-radius:9px; color:var(--opacity-50); display:flex; font-family:'DIN Pro Medium','DIN Pro Medium Fallback',sans-serif; letter-spacing:.06em; line-height:19px; padding:.375rem .75rem; text-decoration-line:none; text-transform:uppercase; transition-duration:.3s; white-space:nowrap; cursor:pointer; border:none; background:transparent; font-size:14px; }
-@media(min-width:758px){ .nav-li { padding:.5rem 1rem; } }
-.nav-li.active { background-color:var(--white); color:var(--black); }
-.nav-li:hover { background-color:var(--opacity-4); }
-.wishlist-card { background:#f5f5f5; border-radius:28px; padding:8px; display:flex; flex-direction:column; }
-.wishlist-card-inner { background:#fff; border-radius:22px; padding:0; overflow:hidden; flex:1; display:flex; flex-direction:column; }
-</style>
+<main class="asp-fav">
+  <div class="asp-fav__container">
 
-<main>
-<div class="container xl:pt-8 mb-10 md:mb-20">
-  <div class="w-full">
-    <div class="flex items-center min-h-[38px] mb-4 md:mb-6 py-1 border-b border-[var(--black-5)] px-4 -mx-4 sm:mx-0 sm:p-0 xl:border-0 xl:min-h-[auto]">
-      <h1 class="text-[24px] m-0 xl:text-[40px]" style="font-family:'DIN Pro Black','DIN Pro Bold Fallback',sans-serif;text-transform:uppercase;line-height:1.2;">Избранное</h1>
+    <div class="asp-fav__head">
+      <h1 class="asp-fav__title">Избранное</h1>
     </div>
 
-    <div class="w-full" id="my-favorites-page">
-      <div class="tc-nav-tabs scrollbar-touch-hide mb-4">
-        <ul class="tc-nav-tabs-list gap-x-2">
-          <li><button type="button" class="nav-li active" data-tab="fav"><span class="mr-1 last:mr-0">Избранное</span><span id="tab-count-fav">{{ wishlist_items|length }}</span></button></li>
-          <li><button type="button" class="nav-li" data-tab="notes" id="notes-tab-btn"><span class="mr-1 last:mr-0">Заметки</span><span id="tab-count-notes">{{ product_notes|length }}</span></button></li>
-          {% if request.user.is_authenticated %}
-          <li><button type="button" class="nav-li" data-tab="articles"><span class="mr-1 last:mr-0">Статьи</span><span id="tab-count-articles">{{ article_bookmarks|length }}</span></button></li>
-          {% endif %}
-        </ul>
+    <div id="my-favorites-page" x-data="{ tab: 'fav' }">
+
+      <div class="asp-fav__tabs">
+        <button type="button" class="asp-fav__tab" :class="{ 'is-active': tab === 'fav' }" @click="tab = 'fav'">
+          Избранное
+          <span class="asp-fav__tab-count" id="tab-count-fav">{{ wishlist_items|length }}</span>
+        </button>
+        <button type="button" class="asp-fav__tab" :class="{ 'is-active': tab === 'notes' }" @click="tab = 'notes'">
+          Заметки
+          <span class="asp-fav__tab-count" id="tab-count-notes">{{ product_notes|length }}</span>
+        </button>
       </div>
 
-      <div class="tab-panel" data-panel="fav">
+      {# ── ТОВАРЫ ── #}
+      <div x-show="tab === 'fav'" x-cloak>
         {% if wishlist_items %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-6">
-          {% for item in wishlist_items %}
-            {% include "catalog/_product_card.html" with product=item.product %}
-          {% endfor %}
-        </div>
-        {% else %}
-        <div style="text-align:center;padding:80px 20px;display:flex;flex-direction:column;align-items:center;">
-          <div style="width:80px;height:80px;background:#f5f5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:24px;border:2px dashed #ebebeb;">
-            <svg style="width:36px;height:36px;color:rgba(0,0,0,0.15);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-            </svg>
-          </div>
-          <p style="font-size:24px;font-weight:900;text-transform:uppercase;margin:0 0 8px;">В избранном пусто</p>
-          <p style="color:rgba(0,0,0,0.4);font-size:14px;margin:0 0 28px;">Жмите на сердечко на карточке товара — они сохранятся здесь</p>
-          <a href="{% url 'catalog:catalog' %}"
-             style="background:#000;color:#fff;padding:14px 32px;border-radius:14px;font-weight:700;text-decoration:none;font-size:15px;text-transform:uppercase;letter-spacing:0.05em;transition:opacity 0.2s;"
-             onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-            Перейти в каталог
-          </a>
-        </div>
-        {% endif %}
-      </div>
-
-      <div class="tab-panel" data-panel="notes" style="display:none">
-        {% if request.user.is_authenticated %}
-          {% if product_notes %}
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-            {% for note in product_notes %}
-            {% with product=note.product %}
-            <div class="wishlist-card" id="note-card-{{ product.id }}">
-              <div class="wishlist-card-inner" style="padding:16px;">
-                <a href="{{ product.get_absolute_url }}" style="text-decoration:none;color:#000;font-size:15px;font-weight:900;text-transform:uppercase;display:block;margin-bottom:8px;">{{ product.name }}</a>
-                <p style="font-size:13px;color:rgba(0,0,0,0.6);line-height:1.5;margin:0 0 12px;white-space:pre-wrap;">{{ note.text }}</p>
-                <div style="display:flex;gap:8px;">
-                  <button onclick="editNote({{ product.id }})" style="flex:1;background:#000;color:#fff;border:none;border-radius:10px;padding:8px;font-size:12px;font-weight:700;text-transform:uppercase;cursor:pointer;">Редактировать</button>
-                  <button onclick="deleteNote({{ product.id }})" style="background:#f5f5f5;color:#000;border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;">✕</button>
-                </div>
-              </div>
-            </div>
-            {% endwith %}
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-6">
+            {% for item in wishlist_items %}
+              {% include "catalog/_product_card.html" with product=item.product %}
             {% endfor %}
           </div>
-          {% else %}
-          <div style="text-align:center;padding:60px 20px;color:rgba(0,0,0,0.4);">
-            <svg style="width:48px;height:48px;margin:0 auto 16px;opacity:0.2;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-            <p style="font-size:16px;font-weight:700;">Заметок пока нет</p>
-            <p style="font-size:13px;">Оставляйте заметки к понравившимся сортам</p>
-          </div>
-          {% endif %}
         {% else %}
-          <div id="guest-notes-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" style="display:none"></div>
-          <div id="guest-notes-empty" style="text-align:center;padding:60px 20px;color:rgba(0,0,0,0.4);">
-            <svg style="width:48px;height:48px;margin:0 auto 16px;opacity:0.2;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-            <p style="font-size:16px;font-weight:700;">Заметок пока нет</p>
-            <p style="font-size:13px;">Оставляйте заметки к понравившимся сортам</p>
+          <div class="asp-fav__empty">
+            <div class="asp-fav__empty-icon">
+              <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <h2 class="asp-fav__empty-title">В избранном пусто</h2>
+            <p class="asp-fav__empty-text">Нажимайте на сердечко на карточке товара — понравившиеся сорта сохранятся здесь.</p>
+            <a href="{% url 'catalog:catalog' %}" class="asp-fav__empty-btn">Перейти в каталог</a>
           </div>
         {% endif %}
       </div>
 
-      <div class="tab-panel" data-panel="articles" style="display:none">
-        {% if article_bookmarks %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {% for bookmark in article_bookmarks %}
-          <div class="bg-[var(--white)] rounded-3xl overflow-hidden flex flex-col h-full shadow-sm border border-gray-100" id="bookmark-card-{{ bookmark.post.id }}">
-            <a href="{{ bookmark.post.get_absolute_url }}" class="block w-full h-48 relative bg-[var(--black-4)] shrink-0">
-              {% if bookmark.post.image %}
-              <img src="{{ bookmark.post.image.url }}" class="w-full h-full object-cover">
-              {% else %}
-              <div class="w-full h-full flex items-center justify-center">
-                <svg class="w-8 h-8 text-black/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-              </div>
-              {% endif %}
-            </a>
-            <div class="p-5 flex flex-col flex-1">
-              {% if bookmark.post.category %}
-              <span class="text-[10px] font-din-black uppercase tracking-wider text-black/50 mb-2 block">{{ bookmark.post.category.name }}</span>
-              {% endif %}
-              <a href="{{ bookmark.post.get_absolute_url }}" class="font-din-black text-[18px] uppercase leading-[1.2] hover:text-black/70 mb-auto">{{ bookmark.post.title }}</a>
-              <div class="flex items-center justify-between mt-4">
-                <span class="text-[12px] text-[var(--black-50)]">{{ bookmark.post.created_at|date:"d M Y" }}</span>
-                <button type="button"
-                  data-bookmark-url="{% url 'blog:toggle_bookmark' bookmark.post.slug %}"
-                  data-card-id="bookmark-card-{{ bookmark.post.id }}"
-                  onclick="toggleBookmark(this)"
-                  class="text-[12px] font-din-black uppercase bg-black text-white px-4 py-2 rounded-xl hover:bg-black/80 transition">Убрать</button>
-              </div>
+      {# ── ЗАМЕТКИ ── #}
+      <div x-show="tab === 'notes'" x-cloak>
+        {% if request.user.is_authenticated %}
+          {% if product_notes %}
+            <div class="asp-notes-grid">
+              {% for note in product_notes %}
+                {% with product=note.product %}
+                <div class="asp-note" id="note-card-{{ product.id }}">
+                  <a href="{{ product.get_absolute_url }}" class="asp-note__title">{{ product.name }}</a>
+                  <p class="asp-note__text">{{ note.text }}</p>
+                  <div class="asp-note__actions">
+                    <button type="button" class="asp-note__btn asp-note__btn--primary" onclick="editNote({{ product.id }})">Редактировать</button>
+                    <button type="button" class="asp-note__btn asp-note__btn--ghost" onclick="deleteNote({{ product.id }})" aria-label="Удалить">✕</button>
+                  </div>
+                </div>
+                {% endwith %}
+              {% endfor %}
             </div>
-          </div>
-          {% endfor %}
-        </div>
+          {% else %}
+            <div class="asp-fav__empty">
+              <div class="asp-fav__empty-icon">
+                <svg viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-5m-1.414-9.414a2 2 0 1 1 2.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </div>
+              <h2 class="asp-fav__empty-title">Заметок пока нет</h2>
+              <p class="asp-fav__empty-text">Оставляйте заметки к понравившимся сортам, чтобы не забыть впечатления.</p>
+            </div>
+          {% endif %}
         {% else %}
-        <div id="articles-empty-state" style="text-align:center;padding:60px 20px;color:rgba(0,0,0,0.4);">
-          <svg style="width:48px;height:48px;margin:0 auto 16px;opacity:0.2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-          </svg>
-          <p style="font-size:16px;font-weight:700;">Отмеченных статей нет</p>
-          <p style="font-size:13px;">Сохраняйте статьи из журнала для чтения</p>
-        </div>
+          <div id="guest-notes-grid" class="asp-notes-grid" style="display:none"></div>
+          <div id="guest-notes-empty" class="asp-fav__empty">
+            <div class="asp-fav__empty-icon">
+              <svg viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-5m-1.414-9.414a2 2 0 1 1 2.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </div>
+            <h2 class="asp-fav__empty-title">Заметок пока нет</h2>
+            <p class="asp-fav__empty-text">Оставляйте заметки к понравившимся сортам.</p>
+          </div>
         {% endif %}
       </div>
+
     </div>
+
   </div>
-</div>
 </main>
 
 <script>
-document.getElementById('my-favorites-page').addEventListener('click', function(e) {
-    var btn = e.target.closest('[data-tab]');
-    if (!btn) return;
-    var tab = btn.dataset.tab;
-    document.querySelectorAll('#my-favorites-page [data-tab]').forEach(function(b) {
-        b.classList.remove('active');
-    });
-    btn.classList.add('active');
-    document.querySelectorAll('#my-favorites-page .tab-panel').forEach(function(p) {
-        p.style.display = p.dataset.panel === tab ? 'block' : 'none';
-    });
-});
-
-function addNote(productId) {
-    var text = prompt('Добавить заметку:');
-    if (!text || text.trim() === '') return;
-    text = text.trim();
-    var form = new FormData();
-    form.append('text', text);
-    form.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-    fetch('/account/notes/save/' + productId + '/', {
-        method: 'POST',
-        body: new URLSearchParams(form),
-        headers: {'X-Requested-With': 'XMLHttpRequest'}
-    }).then(function(r) { return r.json(); }).then(function(data) {
-        if (data.ok) {
-            window.dispatchEvent(new CustomEvent('notify', {
-                detail: { message: 'Заметка сохранена', type: 'success' }
-            }));
-            location.reload();
-        }
-    }).catch(function() {
-        alert('Ошибка сохранения');
-    });
-}
-
-function toggleBookmark(btn) {
-    if (!confirm('Убрать статью из избранного?')) return;
-    var url = btn.getAttribute('data-bookmark-url');
-    var cardId = btn.getAttribute('data-card-id');
-    var card = document.getElementById(cardId);
-    var csrfToken = document.cookie.split(';').map(c=>c.trim()).filter(c=>c.startsWith('csrftoken=')).map(c=>c.split('=')[1])[0];
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrfToken || '{{ csrf_token }}',
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    }).then(function(r){ return r.json(); }).then(function(data) {
-        if (data.ok) {
-            if (card) { card.remove(); }
-            var countEl = document.getElementById('tab-count-articles');
-            if (countEl) countEl.innerText = data.total;
-            if (data.total === 0) location.reload();
-        }
-    });
-}
-
-function removeFromWishlist(productId, btn) {
-    if (!confirm('Убрать из избранного?')) return;
-    var card = btn.closest('.wishlist-card');
-    var isAuth = document.body.dataset.authenticated === '1';
-    if (!isAuth) {
-        // Guest: items live in localStorage, not the DB. Remove locally.
-        var raw = localStorage.getItem('wishlist');
-        var ids = [];
-        try { ids = JSON.parse(raw) || []; } catch(e) { ids = []; }
-        ids = ids.filter(function(x){ return Number(x) !== Number(productId); });
-        localStorage.setItem('wishlist', JSON.stringify(ids));
-        if (typeof updateWishlistBadge === 'function') updateWishlistBadge(ids.length);
-        card.style.transition = 'opacity 0.3s, transform 0.3s';
-        card.style.opacity = '0';
-        card.style.transform = 'scale(0.95)';
-        setTimeout(function() { card.remove(); checkEmptyState('fav'); }, 300);
-        updateTabCount('fav', -1);
-        return;
-    }
-    fetch('/account/wishlist/remove/' + productId + '/', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    }).then(function(r) {
-        if (r.ok) {
-            // Remove card with animation
-            card.style.transition = 'opacity 0.3s, transform 0.3s';
-            card.style.opacity = '0';
-            card.style.transform = 'scale(0.95)';
-            setTimeout(function() { card.remove(); checkEmptyState('fav'); }, 300);
-            // Update tab count
-            updateTabCount('fav', -1);
-            // Update header wishlist badge
-            var badge = document.getElementById('wishlist-badge');
-            if (badge) {
-                var count = parseInt(badge.textContent) - 1;
-                badge.textContent = count;
-                badge.style.display = count > 0 ? 'flex' : 'none';
-            }
-            window.dispatchEvent(new CustomEvent('wishlistUpdated', { detail: { count: Math.max(0, (parseInt(badge ? badge.textContent : '1') - 1)) } }));
-        }
-    }).catch(function() {
-        alert('Ошибка при удалении');
-    });
-}
-
 function deleteNote(productId) {
-    if (!confirm('Удалить заметку?')) return;
-    var card = document.getElementById('note-card-' + productId);
-    fetch('/account/notes/delete/' + productId + '/', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    }).then(function(r) { return r.json(); }).then(function(data) {
-        if (data.deleted || data.ok) {
-            if (card) {
-                card.style.transition = 'opacity 0.3s';
-                card.style.opacity = '0';
-                setTimeout(function() { card.remove(); checkEmptyState('notes'); }, 300);
-            }
-            updateTabCount('notes', -1);
-        }
-    }).catch(function() {
-        alert('Ошибка при удалении');
-    });
+  if (!confirm('Удалить заметку?')) return;
+  var card = document.getElementById('note-card-' + productId);
+  fetch('/account/notes/delete/' + productId + '/', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': '{{ csrf_token }}', 'X-Requested-With': 'XMLHttpRequest' }
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (data.deleted || data.ok) {
+      if (card) {
+        card.style.transition = 'opacity 0.3s';
+        card.style.opacity = '0';
+        setTimeout(function() { card.remove(); if (!document.querySelectorAll('.asp-note').length) location.reload(); }, 300);
+      }
+    }
+  }).catch(function() { alert('Ошибка при удалении'); });
 }
 
 function editNote(productId) {
-    var card = document.getElementById('note-card-' + productId);
-    if (!card) return;
-    var textEl = card.querySelector('p');
-    var currentText = textEl ? textEl.textContent.trim() : '';
-    var newText = prompt('Редактировать заметку:', currentText);
-    if (newText === null) return;
-    newText = newText.trim();
-    if (newText === '') {
-        deleteNote(productId);
-        return;
+  var card = document.getElementById('note-card-' + productId);
+  if (!card) return;
+  var textEl = card.querySelector('.asp-note__text');
+  var currentText = textEl ? textEl.textContent.trim() : '';
+  var newText = prompt('Редактировать заметку:', currentText);
+  if (newText === null) return;
+  newText = newText.trim();
+  if (newText === '') { deleteNote(productId); return; }
+  var form = new FormData();
+  form.append('text', newText);
+  form.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+  fetch('/account/notes/save/' + productId + '/', {
+    method: 'POST',
+    body: new URLSearchParams(form),
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (data.ok) {
+      if (textEl) textEl.textContent = data.text;
+      window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Заметка обновлена', type: 'success' } }));
     }
-    var form = new FormData();
-    form.append('text', newText);
-    form.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-    fetch('/account/notes/save/' + productId + '/', {
-        method: 'POST',
-        body: new URLSearchParams(form),
-        headers: {'X-Requested-With': 'XMLHttpRequest'}
-    }).then(function(r) { return r.json(); }).then(function(data) {
-        if (data.ok) {
-            if (textEl) textEl.textContent = data.text;
-            window.dispatchEvent(new CustomEvent('notify', {
-                detail: { message: 'Заметка обновлена', type: 'success' }
-            }));
-        }
-    }).catch(function() {
-        alert('Ошибка сохранения');
-    });
+  }).catch(function() { alert('Ошибка сохранения'); });
 }
 
-function updateTabCount(tab, delta) {
-    var btn = document.querySelector('[data-tab="' + tab + '"]');
-    if (!btn) return;
-    var countEl = btn.querySelector('span:last-child');
-    if (countEl) {
-        var newCount = Math.max(0, parseInt(countEl.textContent || '0') + delta);
-        countEl.textContent = newCount;
-    }
-}
-
-function checkEmptyState(tab) {
-    var panel = document.querySelector('[data-panel="' + tab + '"]');
-    if (!panel) return;
-    var cards = panel.querySelectorAll('.wishlist-card');
-    if (cards.length === 0) {
-        location.reload();
-    }
-}
-
-// 4.2 — Guest favorites: load product IDs from localStorage into the page via ?ids=
+/* Guest notes from localStorage */
 (function() {
-    var isAuth = document.body.dataset.authenticated === '1';
-    if (isAuth) return;
-    var raw = localStorage.getItem('wishlist');
-    var ids = [];
-    try { ids = JSON.parse(raw) || []; } catch(e) { ids = []; }
-    ids = ids.filter(function(x){ return x !== null && x !== undefined; });
-    var params = new URLSearchParams(window.location.search);
-    var current = params.get('ids') || '';
-    var wanted = ids.join(',');
-    // Only reload once if URL doesn't already reflect localStorage state
-    if (current !== wanted) {
-        if (wanted) {
-            params.set('ids', wanted);
-            window.location.replace(window.location.pathname + '?' + params.toString());
-        } else if (current) {
-            // localStorage empty but URL had ids → clean up
-            window.location.replace(window.location.pathname);
-        }
-    }
+  var isAuth = document.body.dataset.authenticated === '1';
+  if (isAuth) return;
+  var notes = {};
+  try { notes = JSON.parse(localStorage.getItem('product_notes') || '{}'); } catch(e) {}
+  var keys = Object.keys(notes).filter(function(k){ return notes[k] && notes[k].toString().trim(); });
+
+  var countEl = document.getElementById('tab-count-notes');
+  if (countEl) countEl.textContent = keys.length;
+
+  var grid = document.getElementById('guest-notes-grid');
+  var empty = document.getElementById('guest-notes-empty');
+  if (!grid || !empty) return;
+  if (keys.length === 0) { empty.style.display = ''; grid.style.display = 'none'; return; }
+  empty.style.display = 'none';
+  grid.style.display = '';
+  keys.forEach(function(pid) {
+    var card = document.createElement('div');
+    card.className = 'asp-note';
+    card.id = 'note-card-guest-' + pid;
+    card.innerHTML =
+      '<p style="font-size:12px;color:#5A5A5A;font-weight:700;margin:0;">Товар #' + pid + '</p>' +
+      '<p class="asp-note__text">' + notes[pid].replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</p>' +
+      '<div class="asp-note__actions"><button type="button" class="asp-note__btn asp-note__btn--ghost" onclick="deleteGuestNote(' + pid + ')">Удалить</button></div>';
+    grid.appendChild(card);
+  });
 })();
 
-// 4.3 — Guest notes: load from localStorage and render
-(function() {
-    var isAuth = document.body.dataset.authenticated === '1';
-    if (isAuth) return;
-
-    var notes = {};
-    try { notes = JSON.parse(localStorage.getItem('product_notes') || '{}'); } catch(e) {}
-    var noteKeys = Object.keys(notes).filter(function(k){ return notes[k] && notes[k].toString().trim(); });
-
-    // Update Заметки tab count
-    var countEl = document.getElementById('tab-count-notes');
-    if (countEl) countEl.textContent = noteKeys.length;
-
-    var grid = document.getElementById('guest-notes-grid');
-    var empty = document.getElementById('guest-notes-empty');
-    if (!grid || !empty) return;
-
-    if (noteKeys.length === 0) {
-        empty.style.display = '';
-        grid.style.display = 'none';
-        return;
-    }
-
-    empty.style.display = 'none';
-    grid.style.display = '';
-
-    noteKeys.forEach(function(productId) {
-        var text = notes[productId];
-        var card = document.createElement('div');
-        card.className = 'wishlist-card';
-        card.id = 'note-card-guest-' + productId;
-        card.innerHTML =
-            '<div class="wishlist-card-inner" style="padding:16px;">' +
-            '<p style="font-size:12px;color:rgba(0,0,0,0.4);font-weight:600;margin:0 0 6px;">\u0422\u043e\u0432\u0430\u0440 #' + productId + '</p>' +
-            '<p style="font-size:13px;color:rgba(0,0,0,0.6);line-height:1.5;margin:0 0 12px;white-space:pre-wrap;">' + text.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</p>' +
-            '<button onclick="deleteGuestNote(' + productId + ', this)" style="background:#f5f5f5;color:#000;border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;">\u0423\u0434\u0430\u043b\u0438\u0442\u044c</button>' +
-            '</div>';
-        grid.appendChild(card);
-    });
-})();
-
-// Remove card from DOM when toggled off from wishlist
-document.addEventListener('click', function(e) {
-    var heartBtn = e.target.closest('.tc-tile__bottom--btn');
-    if (!heartBtn) return;
-    if (!heartBtn.closest('[x-data]')) return;
-    var card = heartBtn.closest('.product-card');
-    if (!card) return;
-    setTimeout(function() {
-        card.style.transition = 'opacity 0.3s, transform 0.3s';
-        card.style.opacity = '0';
-        card.style.transform = 'scale(0.95)';
-        setTimeout(function() {
-            card.remove();
-            var countEl = document.getElementById('tab-count-fav');
-            if (countEl) {
-                var newCount = Math.max(0, parseInt(countEl.textContent || '1') - 1);
-                countEl.textContent = newCount;
-            }
-            var favPanel = document.querySelector('[data-panel="fav"]');
-            if (favPanel && favPanel.querySelectorAll('.product-card').length === 0) {
-                location.reload();
-            }
-        }, 300);
-    }, 600);
-});
-
-function deleteGuestNote(productId, btn) {
-    if (!confirm('\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0437\u0430\u043c\u0435\u0442\u043a\u0443?')) return;
-    var notes = {};
-    try { notes = JSON.parse(localStorage.getItem('product_notes') || '{}'); } catch(e) {}
-    delete notes[productId];
-    localStorage.setItem('product_notes', JSON.stringify(notes));
-    var card = document.getElementById('note-card-guest-' + productId);
-    if (card) { card.style.opacity = '0'; card.style.transition = 'opacity 0.3s'; setTimeout(function(){ card.remove(); }, 300); }
-    var countEl = document.getElementById('tab-count-notes');
-    if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent||'0') - 1);
+function deleteGuestNote(productId) {
+  if (!confirm('Удалить заметку?')) return;
+  var notes = {};
+  try { notes = JSON.parse(localStorage.getItem('product_notes') || '{}'); } catch(e) {}
+  delete notes[productId];
+  localStorage.setItem('product_notes', JSON.stringify(notes));
+  var card = document.getElementById('note-card-guest-' + productId);
+  if (card) { card.style.opacity = '0'; card.style.transition = 'opacity 0.3s'; setTimeout(function(){ card.remove(); }, 300); }
+  var countEl = document.getElementById('tab-count-notes');
+  if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent || '0') - 1);
 }
-
 </script>
 {% endblock %}

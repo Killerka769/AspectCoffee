@@ -1,308 +1,754 @@
 {% extends "catalog/base.html" %}
-{% load static %}
+{% load static catalog_extras %}
 
 {% block title %}{{ post.title }}{% endblock %}
 {% block meta_description %}{{ post.short_description|truncatechars:160 }}{% endblock %}
 {% block og_title %}{{ post.title }}{% endblock %}
 
+{% block extra_css %}
+<style>
+/* ==========================================================
+   ASPECT ARTICLE (detail)
+   ========================================================== */
+
+.asp-art { background: #FFFFFF; padding-bottom: 80px; }
+.asp-art__container { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
+
+.asp-art__crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 0;
+  font-size: 13px;
+  color: #5A5A5A;
+}
+.asp-art__crumbs a { color: #5A5A5A; text-decoration: none; transition: color .2s ease; }
+.asp-art__crumbs a:hover { color: #2A4A34; }
+.asp-art__crumbs span { color: rgba(0,0,0,.3); }
+
+.asp-art__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 48px;
+  align-items: start;
+}
+@media (max-width: 1099px) {
+  .asp-art__layout { grid-template-columns: 1fr; gap: 32px; }
+}
+
+/* Header */
+.asp-art__cat {
+  display: inline-block;
+  padding: 5px 12px;
+  background: #F4F6F4;
+  color: #2A4A34;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  margin-bottom: 16px;
+  text-decoration: none;
+}
+.asp-art__cat:hover { background: #E8EEE8; }
+
+.asp-art__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(32px, 4.5vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 20px;
+}
+
+.asp-art__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+  padding-bottom: 24px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid #F0F0F0;
+}
+.asp-art__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #5A5A5A;
+}
+.asp-art__meta-item svg {
+  width: 16px; height: 16px;
+  stroke: currentColor; fill: none; stroke-width: 1.8;
+}
+
+.asp-art__actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.asp-art__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: #F4F6F4;
+  color: #5A5A5A;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s ease, color .15s ease;
+}
+.asp-art__action:hover { background: #E8EEE8; color: #2A4A34; }
+.asp-art__action.is-active { background: #2A4A34; color: #FFFFFF; }
+.asp-art__action svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.asp-art__action:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Cover */
+.asp-art__cover {
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 32px;
+  background: #F4F6F4;
+}
+.asp-art__cover img { width: 100%; height: auto; display: block; }
+
+/* Content */
+.asp-art__content {
+  font-size: 16px;
+  line-height: 1.75;
+  color: #333;
+  max-width: 780px;
+}
+.asp-art__content h2 {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 28px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 40px 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F0F0F0;
+}
+.asp-art__content h3 {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: #000;
+  margin: 32px 0 14px;
+}
+.asp-art__content h4 {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  color: #000;
+  margin: 28px 0 12px;
+}
+.asp-art__content p { margin: 0 0 18px; }
+.asp-art__content ul,
+.asp-art__content ol { margin: 0 0 18px; padding-left: 24px; }
+.asp-art__content li { margin-bottom: 6px; line-height: 1.7; }
+.asp-art__content a {
+  color: #2A4A34;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.asp-art__content a:hover { color: #1E3626; }
+.asp-art__content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 16px;
+  margin: 20px 0;
+}
+.asp-art__content blockquote {
+  margin: 24px 0;
+  padding: 16px 24px;
+  background: #F4F6F4;
+  border-left: 3px solid #2A4A34;
+  border-radius: 12px;
+  font-style: italic;
+  color: #000;
+}
+.asp-art__content code {
+  background: #F4F6F4;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+/* Series */
+.asp-art__series {
+  margin-top: 48px;
+  padding: 28px 32px;
+  background: #F4F6F4;
+  border-radius: 20px;
+}
+.asp-art__series-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  margin: 0 0 6px;
+}
+.asp-art__series-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 20px;
+}
+.asp-art__series-list {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.asp-art__series-item {
+  display: flex;
+  gap: 14px;
+  text-decoration: none;
+  align-items: center;
+  transition: transform .2s ease;
+}
+.asp-art__series-item:hover { transform: translateX(4px); }
+.asp-art__series-thumb {
+  width: 56px; height: 56px;
+  border-radius: 12px;
+  background: #FFFFFF;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2A4A34;
+}
+.asp-art__series-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.asp-art__series-body { flex: 1; min-width: 0; }
+.asp-art__series-name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #000;
+  margin: 0;
+}
+.asp-art__series-item:hover .asp-art__series-name { color: #2A4A34; }
+.asp-art__series-date {
+  font-size: 11px;
+  color: #5A5A5A;
+  margin: 4px 0 0;
+}
+
+/* Comments */
+.asp-art__comments {
+  margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid #F0F0F0;
+}
+.asp-art__comments-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 24px;
+}
+.asp-art__comments-title span { color: #5A5A5A; margin-left: 8px; }
+.asp-art__comments-list {
+  list-style: none;
+  margin: 0 0 24px; padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.asp-art__comment {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.asp-art__comment-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: #E8EEE8;
+  color: #2A4A34;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.asp-art__comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.asp-art__comment-body { flex: 1; min-width: 0; }
+.asp-art__comment-head {
+  font-size: 13px;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 4px;
+}
+.asp-art__comment-head time {
+  font-weight: 400;
+  color: #5A5A5A;
+  margin-left: 8px;
+  font-size: 12px;
+}
+.asp-art__comment-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.asp-art__comment-empty {
+  font-size: 14px;
+  color: #5A5A5A;
+  padding: 20px 0;
+}
+
+.asp-art__comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.asp-art__comment-input {
+  width: 100%;
+  background: #F4F6F4;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 14px;
+  font-family: "Open Sans", Arial, sans-serif;
+  color: #000;
+  outline: none;
+  resize: vertical;
+  min-height: 90px;
+  box-sizing: border-box;
+  transition: background .15s ease, border-color .15s ease;
+}
+.asp-art__comment-input:focus {
+  background: #FFFFFF;
+  border-color: #2A4A34;
+}
+.asp-art__comment-submit {
+  align-self: flex-end;
+  padding: 14px 28px;
+  border: 0;
+  border-radius: 14px;
+  background: #2A4A34;
+  color: #FFFFFF;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+.asp-art__comment-submit:hover:not(:disabled) {
+  background: #1E3626;
+  transform: translateY(-2px);
+}
+.asp-art__comment-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+.asp-art__login-note {
+  font-size: 14px;
+  color: #5A5A5A;
+  margin: 0;
+}
+.asp-art__login-note a {
+  color: #2A4A34;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.asp-art__back {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid #F0F0F0;
+}
+.asp-art__back a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  text-decoration: none;
+  transition: color .2s ease;
+}
+.asp-art__back a:hover { color: #2A4A34; }
+.asp-art__back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* Sidebar */
+.asp-art__sidebar {
+  position: sticky;
+  top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+@media (max-width: 1099px) { .asp-art__sidebar { position: static; } }
+
+.asp-art__side-card {
+  padding: 24px;
+  background: #F4F6F4;
+  border-radius: 18px;
+}
+.asp-art__side-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #E5E8E5;
+}
+.asp-art__side-list {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.asp-art__side-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  text-decoration: none;
+}
+.asp-art__side-thumb {
+  width: 48px; height: 48px;
+  border-radius: 10px;
+  background: #FFFFFF;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2A4A34;
+}
+.asp-art__side-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.asp-art__side-thumb svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+.asp-art__side-name {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #000;
+  margin: 0;
+}
+.asp-art__side-item:hover .asp-art__side-name { color: #2A4A34; }
+.asp-art__side-date {
+  font-size: 11px;
+  color: #5A5A5A;
+  margin: 3px 0 0;
+}
+
+.asp-art__side-cat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #5A5A5A;
+  text-decoration: none;
+  transition: background .15s ease, color .15s ease;
+}
+.asp-art__side-cat:hover { background: #FFFFFF; color: #000; }
+.asp-art__side-cat span:last-child { font-size: 11px; color: rgba(0,0,0,.3); }
+</style>
+{% endblock %}
+
 {% block content %}
-<main>
-  <div class="w-full md:pt-10 pt-2">
-    <div class="container">
-      <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-6">
-        <a href="/" class="hover:text-black transition-colors">Главная</a>
-        <span>/</span>
-        <a href="{% url 'blog:index' %}" class="hover:text-black transition-colors">Блог</a>
-      </nav>
+<main class="asp-art">
+  <div class="asp-art__container">
 
-      <div class="grid grid-cols-12 gap-y-8 gap-x-8">
+    <nav class="asp-art__crumbs" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span>/</span>
+      <a href="{% url 'blog:index' %}">Журнал</a>
+      {% if post.category %}
+      <span>/</span>
+      <a href="{% url 'blog:category' post.category.slug %}">{{ post.category.name }}</a>
+      {% endif %}
+    </nav>
 
-        <div class="col-span-12 2xl:col-span-9">
-          <article>
-            {% if post.category %}
-            <span class="inline-block bg-black/10 text-black text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4">{{ post.category.name }}</span>
-            {% endif %}
+    <div class="asp-art__layout">
 
-            <h1 class="text-[36px] md:text-[48px] font-din-black uppercase leading-[1.1] mb-4">{{ post.title }}</h1>
+      {# ═══ ARTICLE ═══ #}
+      <article>
 
-            <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
-              <div class="flex items-center gap-4 text-black/40 text-[13px] flex-wrap">
-                <span>{{ post.created_at|date:"d.m.y" }}</span>
-                {% if post.show_updated_date %}
-                <span>Обновлено {{ post.updated_at|date:"d.m.y" }}</span>
-                {% endif %}
-                <span class="flex items-center gap-1.5">
-                  <svg width="20" height="20"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--viewing-stroke"></use></svg>{{ post.views_display }}
-                </span>
-                <span class="flex items-center gap-1.5">
-                  <svg width="20" height="20"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--time-light"></use></svg>{{ post.reading_minutes }}′
-                </span>
-              </div>
+        {% if post.category %}
+          <a href="{% url 'blog:category' post.category.slug %}" class="asp-art__cat">{{ post.category.name }}</a>
+        {% endif %}
 
-              <div class="flex items-center gap-2 flex-wrap">
-                <button type="button"
-                        id="article-like-btn"
-                        data-like-url="{% url 'blog:toggle_like' post.slug %}"
-                        onclick="toggleArticleLike(this)"
-                        class="flex items-center gap-2 text-[13px] font-bold px-4 py-2 rounded-xl transition-colors {% if is_liked %}bg-black text-white{% else %}bg-[var(--black-4)] text-black hover:bg-[var(--black-5)]{% endif %}">
-                  <svg width="18" height="18"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--like-{% if is_liked %}fill{% else %}stroke{% endif %}"></use></svg>
-                  <span data-count>{{ post.likes_count|default:"0" }}</span>
-                </button>
-                <a href="#comments" class="flex items-center gap-2 text-[13px] font-bold px-4 py-2 rounded-xl bg-[var(--black-4)] text-black hover:bg-[var(--black-5)] transition-colors no-underline">
-                  <svg width="18" height="18"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--comments-stroke"></use></svg>
-                  <span>{{ post.comments_count|default:"0" }}</span>
-                </a>
-                {% if request.user.is_authenticated %}
-                <button type="button"
-                        id="bookmark-btn"
-                        data-bookmark-url="{% url 'blog:toggle_bookmark' post.slug %}"
-                        onclick="toggleArticleBookmark(this)"
-                        class="flex items-center gap-2 text-[13px] font-bold uppercase px-4 py-2 rounded-xl transition-colors {% if is_bookmarked %}bg-black text-white{% else %}bg-[var(--black-4)] text-black hover:bg-[var(--black-5)]{% endif %}">
-                  <svg class="w-4 h-4" fill="{% if is_bookmarked %}currentColor{% else %}none{% endif %}" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-                  </svg>
-                  <span class="btn-text">{% if is_bookmarked %}В избранном{% else %}В избранное{% endif %}</span>
-                </button>
-                {% endif %}
-              </div>
-            </div>
+        <h1 class="asp-art__title">{{ post.title }}</h1>
 
-            {% if post.image %}
-            <div class="rounded-3xl overflow-hidden mb-10">
-              <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full object-cover">
-            </div>
-            {% endif %}
+        <div class="asp-art__meta">
+          <span class="asp-art__meta-item">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            {{ post.created_at|date:"d.m.Y" }}
+          </span>
+          {% if post.show_updated_date %}
+          <span class="asp-art__meta-item">
+            Обновлено {{ post.updated_at|date:"d.m.Y" }}
+          </span>
+          {% endif %}
+          <span class="asp-art__meta-item">
+            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            {{ post.views_display }}
+          </span>
+          <span class="asp-art__meta-item">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            {{ post.reading_minutes }} мин
+          </span>
 
-            <div class="prose prose-lg max-w-none text-[16px] leading-[1.8] text-black/80">
-              {{ post.content|safe }}
-            </div>
+          <div class="asp-art__actions">
+            <button type="button"
+                    id="article-like-btn"
+                    data-like-url="{% url 'blog:toggle_like' post.slug %}"
+                    onclick="toggleArticleLike(this)"
+                    class="asp-art__action {% if is_liked %}is-active{% endif %}">
+              <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <span data-count>{{ post.likes_count|default:"0" }}</span>
+            </button>
 
-            {% if active_series and series_posts %}
-            <div class="mt-12 bg-[#f5f5f5] rounded-3xl p-6">
-              <p class="text-[12px] uppercase tracking-wider text-black/40 mb-1">Серия статей</p>
-              <h3 class="text-[20px] font-din-black uppercase mb-4">{{ active_series.title }}</h3>
-              <ul class="space-y-3">
-                {% for sp in series_posts %}
-                <li>
-                  <a href="{{ sp.get_absolute_url }}?series={{ active_series.slug }}" class="group flex items-start gap-3">
-                    <div class="w-14 h-14 rounded-xl overflow-hidden bg-[var(--black-4)] flex-shrink-0">
-                      {% if sp.image %}<img src="{{ sp.image.url }}" alt="" class="w-full h-full object-cover">{% endif %}
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-[14px] font-bold leading-[1.3] group-hover:underline underline-offset-2">{{ sp.title }}</p>
-                      <p class="text-[11px] text-black/30 mt-1">{{ sp.created_at|date:"d F Y" }}</p>
-                    </div>
-                  </a>
-                </li>
-                {% endfor %}
-              </ul>
-            </div>
-            {% endif %}
-
-            <div class="mt-12 pt-8 border-t border-gray-100" id="comments">
-              <h3 class="text-[22px] font-din-black uppercase mb-6">Комментарии <span class="text-black/30" id="comments-count">{{ article_comments|length }}</span></h3>
-              <ul class="space-y-5 mb-8" id="comments-list">
-                {% for c in article_comments %}
-                <li class="flex items-start gap-3">
-                  <span class="w-10 h-10 rounded-full bg-[var(--black-4)] flex items-center justify-center flex-shrink-0 overflow-hidden font-bold text-[14px]">
-                    {% if c.user.avatar %}<img src="{{ c.user.avatar.url }}" alt="" class="w-full h-full object-cover">{% else %}{{ c.user.first_name|first|upper|default:c.user.email|first|upper }}{% endif %}
-                  </span>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-[13px] font-bold">{{ c.user.first_name|default:"Пользователь" }} <span class="text-black/30 font-normal ml-2">{{ c.created_at|date:"d.m.Y H:i" }}</span></p>
-                    <p class="text-[14px] leading-[1.5] mt-1">{{ c.text|linebreaksbr }}</p>
-                  </div>
-                </li>
-                {% empty %}
-                <li class="text-black/30 text-[14px]" id="comments-empty">Пока нет комментариев — станьте первым.</li>
-                {% endfor %}
-              </ul>
-              {% if request.user.is_authenticated %}
-              <form id="comment-form" data-comment-url="{% url 'blog:add_comment' post.slug %}" class="flex flex-col gap-3">
-                <textarea name="text" rows="3" maxlength="2000" placeholder="Написать комментарий…" required
-                          class="w-full px-4 py-3 rounded-xl bg-[var(--black-4)] border border-transparent focus:outline-none focus:border-black transition-colors text-[14px]"></textarea>
-                <button type="submit" class="self-end px-6 py-3 rounded-xl bg-black text-white font-bold text-[13px] hover:bg-gray-800 transition-colors">Отправить</button>
-              </form>
-              {% else %}
-              <p class="text-[14px] text-black/50"><a href="/login/?next={{ request.path }}" class="underline">Войдите</a>, чтобы оставить комментарий.</p>
-              {% endif %}
-            </div>
-
-            <div class="mt-12 pt-8 border-t border-gray-100">
-              <a href="{% url 'blog:index' %}" class="inline-flex items-center gap-2 text-[14px] font-bold text-black/40 hover:text-black transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                Назад к блогу
-              </a>
-            </div>
-          </article>
-        </div>
-
-        <div class="col-span-12 2xl:col-span-3">
-          <div class="sticky top-24 space-y-4">
-
-            <div class="bg-[#f5f5f5] rounded-3xl p-6">
-              <h3 class="text-[16px] font-din-black uppercase mb-4">Последние статьи</h3>
-              <ul class="space-y-3">
-                {% for rp in recent_posts %}
-                <li>
-                  <a href="{{ rp.get_absolute_url }}" class="group flex items-start gap-3">
-                    <div class="w-14 h-14 rounded-xl overflow-hidden bg-[var(--black-4)] flex-shrink-0">
-                      {% if rp.image %}
-                      <img src="{{ rp.image.url }}" alt="" class="w-full h-full object-cover">
-                      {% else %}
-                      <div class="w-full h-full flex items-center justify-center">
-                        <svg class="w-5 h-5 text-black/20"><use href="{% static 'asset/images/sprite.svg' %}#icons--coffee"></use></svg>
-                      </div>
-                      {% endif %}
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-[13px] font-bold leading-[1.3] group-hover:underline underline-offset-2">{{ rp.title }}</p>
-                      <p class="text-[11px] text-black/30 mt-1">{{ rp.created_at|date:"d F Y" }}</p>
-                    </div>
-                  </a>
-                </li>
-                {% empty %}
-                <li class="text-black/30 text-[13px]">Нет статей</li>
-                {% endfor %}
-              </ul>
-            </div>
-
-            <div class="bg-[#f5f5f5] rounded-3xl p-6">
-              <h3 class="text-[16px] font-din-black uppercase mb-4">Категории</h3>
-              <ul class="space-y-2">
-                {% for cat in categories %}
-                <li>
-                  <a href="{% url 'blog:category' cat.slug %}" class="flex items-center justify-between px-4 py-2.5 rounded-xl hover:bg-white transition-colors text-[14px] text-black/60 hover:text-black">
-                    <span>{{ cat.name }}</span>
-                    <span class="text-black/20 text-[12px]">{{ cat.posts.count }}</span>
-                  </a>
-                </li>
-                {% empty %}
-                <li class="text-black/30 text-[13px] px-4 py-2">Нет категорий</li>
-                {% endfor %}
-              </ul>
-            </div>
-
-            <div class="bg-[#f5f5f5] rounded-3xl p-6">
-              <h3 class="text-[16px] font-din-black uppercase mb-4">Подписка на новости</h3>
-              <p class="text-black/50 text-[13px] mb-4">Получайте свежие статьи о кофе первыми</p>
-              <form class="flex flex-col gap-3">
-                <input type="email" placeholder="Ваш e-mail" class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 focus:outline-none focus:border-black transition-colors text-[14px]">
-                <button type="submit" class="w-full py-3 rounded-xl bg-black text-white font-bold text-[13px] hover:bg-gray-800 transition-colors">Подписаться</button>
-              </form>
-            </div>
-
+            <a href="#comments" class="asp-art__action">
+              <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+              <span>{{ post.comments_count|default:"0" }}</span>
+            </a>
           </div>
         </div>
 
-      </div>
+        {% if post.image %}
+        <div class="asp-art__cover">
+          <img src="{{ post.image.url }}" alt="{{ post.title }}">
+        </div>
+        {% endif %}
+
+        <div class="asp-art__content">
+          {{ post.content|safe }}
+        </div>
+
+        {# Series #}
+        {% if active_series and series_posts %}
+        <div class="asp-art__series">
+          <p class="asp-art__series-label">Серия статей</p>
+          <h3 class="asp-art__series-title">{{ active_series.title }}</h3>
+          <ul class="asp-art__series-list">
+            {% for sp in series_posts %}
+            <li>
+              <a href="{{ sp.get_absolute_url }}?series={{ active_series.slug }}" class="asp-art__series-item">
+                <div class="asp-art__series-thumb">
+                  {% if sp.image %}<img src="{{ sp.image.url }}" alt="">{% endif %}
+                </div>
+                <div class="asp-art__series-body">
+                  <p class="asp-art__series-name">{{ sp.title }}</p>
+                  <p class="asp-art__series-date">{{ sp.created_at|date:"d F Y" }}</p>
+                </div>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        {# Comments #}
+        <div class="asp-art__comments" id="comments">
+          <h3 class="asp-art__comments-title">
+            Комментарии <span id="comments-count">{{ article_comments|length }}</span>
+          </h3>
+
+          <ul class="asp-art__comments-list" id="comments-list">
+            {% for c in article_comments %}
+            <li class="asp-art__comment">
+              <span class="asp-art__comment-avatar">
+                {% if c.user.avatar %}
+                  <img src="{{ c.user.avatar.url }}" alt="">
+                {% else %}
+                  {{ c.user.first_name|first|upper|default:c.user.email|first|upper }}
+                {% endif %}
+              </span>
+              <div class="asp-art__comment-body">
+                <p class="asp-art__comment-head">
+                  {{ c.user.first_name|default:"Пользователь" }}
+                  <time>{{ c.created_at|date:"d.m.Y H:i" }}</time>
+                </p>
+                <p class="asp-art__comment-text">{{ c.text }}</p>
+              </div>
+            </li>
+            {% empty %}
+            <li class="asp-art__comment-empty" id="comments-empty">Пока нет комментариев — станьте первым.</li>
+            {% endfor %}
+          </ul>
+
+          {% if request.user.is_authenticated %}
+          <form id="comment-form" data-comment-url="{% url 'blog:add_comment' post.slug %}" class="asp-art__comment-form">
+            <textarea name="text" rows="3" maxlength="2000" placeholder="Написать комментарий…" required class="asp-art__comment-input"></textarea>
+            <button type="submit" class="asp-art__comment-submit">Отправить</button>
+          </form>
+          {% else %}
+          <p class="asp-art__login-note">
+            <a href="/login/?next={{ request.path }}">Войдите</a>, чтобы оставить комментарий.
+          </p>
+          {% endif %}
+        </div>
+
+        <div class="asp-art__back">
+          <a href="{% url 'blog:index' %}">
+            <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Назад к журналу
+          </a>
+        </div>
+
+      </article>
+
+      {# ═══ SIDEBAR ═══ #}
+      <aside class="asp-art__sidebar">
+
+        <div class="asp-art__side-card">
+          <h3 class="asp-art__side-title">Последние статьи</h3>
+          <ul class="asp-art__side-list">
+            {% for rp in recent_posts %}
+            <li>
+              <a href="{{ rp.get_absolute_url }}" class="asp-art__side-item">
+                <div class="asp-art__side-thumb">
+                  {% if rp.image %}
+                    <img src="{{ rp.image.url }}" alt="">
+                  {% else %}
+                    <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4zM6 1v3M10 1v3M14 1v3"/></svg>
+                  {% endif %}
+                </div>
+                <div style="flex:1;min-width:0;">
+                  <p class="asp-art__side-name">{{ rp.title }}</p>
+                  <p class="asp-art__side-date">{{ rp.created_at|date:"d F Y" }}</p>
+                </div>
+              </a>
+            </li>
+            {% empty %}
+            <li style="color:#5A5A5A;font-size:13px;">Нет статей</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="asp-art__side-card">
+          <h3 class="asp-art__side-title">Темы</h3>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            {% for cat in categories %}
+            <a href="{% url 'blog:category' cat.slug %}" class="asp-art__side-cat">
+              <span>{{ cat.name }}</span>
+              <span>{{ cat.posts.count }}</span>
+            </a>
+            {% empty %}
+            <p style="color:#5A5A5A;font-size:13px;margin:0;">Нет тем</p>
+            {% endfor %}
+          </div>
+        </div>
+
+      </aside>
+
     </div>
   </div>
 </main>
-<script>
-function toggleArticleBookmark(btn) {
-    var url = btn.getAttribute('data-bookmark-url');
-    var csrfToken = document.cookie.split(';').map(c=>c.trim()).filter(c=>c.startsWith('csrftoken=')).map(c=>c.split('=')[1])[0];
-    btn.disabled = true;
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrfToken || '{{ csrf_token }}',
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    }).then(r => r.json()).then(data => {
-        btn.disabled = false;
-        if (data.ok) {
-            const icon = btn.querySelector('svg');
-            const text = btn.querySelector('.btn-text');
-            if (data.bookmarked) {
-                btn.className = "flex items-center gap-2 text-[13px] font-bold uppercase px-4 py-2 rounded-xl transition-colors bg-black text-white";
-                icon.setAttribute('fill', 'currentColor');
-                text.innerText = "В избранном";
-            } else {
-                btn.className = "flex items-center gap-2 text-[13px] font-bold uppercase px-4 py-2 rounded-xl transition-colors bg-[var(--black-4)] text-black hover:bg-[var(--black-5)]";
-                icon.setAttribute('fill', 'none');
-                text.innerText = "В избранное";
-            }
-        } else if (data.error === 'login_required') {
-            window.location.href = '/login/?next=' + window.location.pathname;
-        }
-    }).catch(function(){
-        btn.disabled = false;
-    });
-}
 
+<script>
 function articleCsrf() {
-    var m = document.cookie.match(/(?:^|; )csrftoken=([^;]+)/);
-    return m ? decodeURIComponent(m[1]) : '{{ csrf_token }}';
+  var m = document.cookie.match(/(?:^|; )csrftoken=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : '{{ csrf_token }}';
 }
 
 function toggleArticleLike(btn) {
-    var SPRITE = '/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg';
-    btn.disabled = true;
-    fetch(btn.getAttribute('data-like-url'), {
-        method: 'POST',
-        headers: { 'X-CSRFToken': articleCsrf(), 'X-Requested-With': 'XMLHttpRequest' }
-    }).then(function(r){ return r.json(); }).then(function(data){
-        btn.disabled = false;
-        if (data.error === 'login_required') {
-            window.location.href = '/login/?next=' + window.location.pathname;
-            return;
-        }
-        if (!data.ok) return;
-        var count = btn.querySelector('[data-count]');
-        if (count) count.textContent = data.count;
-        var use = btn.querySelector('use');
-        if (use) use.setAttribute('href', SPRITE + (data.liked ? '#icons--like-fill' : '#icons--like-stroke'));
-        if (data.liked) {
-            btn.className = 'flex items-center gap-2 text-[13px] font-bold px-4 py-2 rounded-xl transition-colors bg-black text-white';
-        } else {
-            btn.className = 'flex items-center gap-2 text-[13px] font-bold px-4 py-2 rounded-xl transition-colors bg-[var(--black-4)] text-black hover:bg-[var(--black-5)]';
-        }
-    }).catch(function(){ btn.disabled = false; });
+  btn.disabled = true;
+  fetch(btn.getAttribute('data-like-url'), {
+    method: 'POST',
+    headers: { 'X-CSRFToken': articleCsrf(), 'X-Requested-With': 'XMLHttpRequest' }
+  }).then(function(r){ return r.json(); }).then(function(data){
+    btn.disabled = false;
+    if (data.error === 'login_required') {
+      window.location.href = '/login/?next=' + window.location.pathname;
+      return;
+    }
+    if (!data.ok) return;
+    var count = btn.querySelector('[data-count]');
+    if (count) count.textContent = data.count;
+    btn.classList.toggle('is-active', data.liked);
+  }).catch(function(){ btn.disabled = false; });
 }
 
 (function(){
-    var form = document.getElementById('comment-form');
-    if (!form) return;
-    form.addEventListener('submit', function(e){
-        e.preventDefault();
-        var textarea = form.querySelector('textarea[name="text"]');
-        var text = (textarea.value || '').trim();
-        if (!text) return;
-        var btn = form.querySelector('button[type="submit"]');
-        btn.disabled = true;
-        var body = new FormData();
-        body.append('text', text);
-        fetch(form.getAttribute('data-comment-url'), {
-            method: 'POST',
-            headers: { 'X-CSRFToken': articleCsrf(), 'X-Requested-With': 'XMLHttpRequest' },
-            body: body
-        }).then(function(r){ return r.json(); }).then(function(data){
-            btn.disabled = false;
-            if (data.error === 'login_required') {
-                window.location.href = '/login/?next=' + window.location.pathname;
-                return;
-            }
-            if (!data.ok) return;
-            textarea.value = '';
-            var empty = document.getElementById('comments-empty');
-            if (empty) empty.remove();
-            var list = document.getElementById('comments-list');
-            var li = document.createElement('li');
-            li.className = 'flex items-start gap-3';
-            var initial = (data.comment.author || 'П').charAt(0).toUpperCase();
-            li.innerHTML =
-                '<span class="w-10 h-10 rounded-full bg-[var(--black-4)] flex items-center justify-center flex-shrink-0 overflow-hidden font-bold text-[14px]"></span>' +
-                '<div class="flex-1 min-w-0"><p class="text-[13px] font-bold"><span class="c-author"></span> <span class="text-black/30 font-normal ml-2"></span></p><p class="text-[14px] leading-[1.5] mt-1 c-text"></p></div>';
-            li.querySelector('span').textContent = initial;
-            li.querySelector('.c-author').textContent = data.comment.author;
-            li.querySelector('.text-black\\/30').textContent = data.comment.date;
-            li.querySelector('.c-text').textContent = data.comment.text;
-            list.appendChild(li);
-            var counter = document.getElementById('comments-count');
-            if (counter) counter.textContent = data.count;
-        }).catch(function(){ btn.disabled = false; });
-    });
+  var form = document.getElementById('comment-form');
+  if (!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var textarea = form.querySelector('textarea[name="text"]');
+    var text = (textarea.value || '').trim();
+    if (!text) return;
+    var btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    var body = new FormData();
+    body.append('text', text);
+    fetch(form.getAttribute('data-comment-url'), {
+      method: 'POST',
+      headers: { 'X-CSRFToken': articleCsrf(), 'X-Requested-With': 'XMLHttpRequest' },
+      body: body
+    }).then(function(r){ return r.json(); }).then(function(data){
+      btn.disabled = false;
+      if (data.error === 'login_required') {
+        window.location.href = '/login/?next=' + window.location.pathname;
+        return;
+      }
+      if (!data.ok) return;
+      textarea.value = '';
+      var empty = document.getElementById('comments-empty');
+      if (empty) empty.remove();
+      var list = document.getElementById('comments-list');
+      var li = document.createElement('li');
+      li.className = 'asp-art__comment';
+      var initial = (data.comment.author || 'П').charAt(0).toUpperCase();
+      li.innerHTML =
+        '<span class="asp-art__comment-avatar">' + initial + '</span>' +
+        '<div class="asp-art__comment-body">' +
+        '<p class="asp-art__comment-head"><span class="c-author"></span><time></time></p>' +
+        '<p class="asp-art__comment-text c-text"></p>' +
+        '</div>';
+      li.querySelector('.c-author').textContent = data.comment.author;
+      li.querySelector('time').textContent = data.comment.date;
+      li.querySelector('.c-text').textContent = data.comment.text;
+      list.appendChild(li);
+      var counter = document.getElementById('comments-count');
+      if (counter) counter.textContent = data.count;
+    }).catch(function(){ btn.disabled = false; });
+  });
 })();
 </script>
 {% endblock %}

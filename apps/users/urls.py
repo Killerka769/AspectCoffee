@@ -33,16 +33,13 @@ urlpatterns = [
     path("notifications/push/subscribe/", views.push_subscribe, name="push_subscribe"),
     path("notifications/push/unsubscribe/", views.push_unsubscribe, name="push_unsubscribe"),
     path("community-profile/", views.community_profile_view, name="community_profile"),
-    path("achievements/", views.achievements_view, name="achievements"),
-    path("blog-history/", views.blog_history_view, name="blog_history"),
     path("blacklist/", views.blacklist_view, name="blacklist"),
     path("blacklist/unblock/<int:pk>/", views.unblock_user, name="unblock_user"),
-    path("blog-history/unsubscribe/<int:pk>/", views.unsubscribe_blog, name="unsubscribe_blog"),
     path("notice/dismiss/<str:key>/", views.dismiss_notice, name="dismiss_notice"),
     path("wishlist/count/", views.wishlist_count, name="wishlist_count"),
     path("notes/save/<int:product_id>/", views.save_note, name="save_note"),
     path("notes/delete/<int:product_id>/", views.delete_note, name="delete_note"),
-    path('api/payment/yookassa/init/', YookassaPaymentView.as_view(), name='yookassa_init'),
+    path("api/payment/yookassa/init/", YookassaPaymentView.as_view(), name="yookassa_init"),
 ]
 
 urlpatterns += [
@@ -51,5 +48,4 @@ urlpatterns += [
     path("wishlist/mini/", views.mini_wishlist, name="mini_wishlist"),
     path("notifications/mini/", views.mini_notifications, name="mini_notifications"),
     path("sync-local/", views.sync_local_storage, name="sync_local"),
-    path('api/payment/yookassa/init/', YookassaPaymentView.as_view(), name='yookassa_init'),
 ]

@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from apps.catalog.models import (
     Category, Product, ProductVariant, ProductImage,
-    FlavorNote, BrewMethod, Tag, Recipe, Review,
+    FlavorNote, BrewMethod, Review,
 )
 from apps.orders.models import Cart, CartItem, Order, OrderItem, PromoCode
 from apps.users.models import User, Address
@@ -22,10 +22,7 @@ class BrewMethodSerializer(serializers.ModelSerializer):
     class Meta:
         model = BrewMethod
         fields = ["id", "name", "slug"]
-class TagSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tag
-        fields = ["id", "name", "slug"]
+
 class ProductVariantSerializer(serializers.ModelSerializer):
     grind = serializers.CharField(read_only=True)
     grind_display = serializers.CharField(source="get_grind_display", read_only=True)
@@ -65,7 +62,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     flavor_notes = FlavorNoteSerializer(many=True, read_only=True)
     brew_methods = BrewMethodSerializer(many=True, read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
     roast_display = serializers.CharField(source="get_roast_level_display", read_only=True)
     related_products = ProductListSerializer(many=True, read_only=True)
     class Meta:
@@ -76,7 +72,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "roast_level", "roast_display", "origin_country", "composition",
             "processing_method", "flavor_description_html",
             "body", "acidity", "sweetness",
-            "flavor_notes", "brew_methods", "tags",
+            "flavor_notes", "brew_methods",
             "variants", "related_products",
             "is_active", "is_featured", "in_stock",
             "rating_avg", "reviews_count",
@@ -98,16 +94,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         validated_data["user"] = request.user if request.user.is_authenticated else None
         # Отзыв уходит на модерацию (status='new' по умолчанию, is_approved=False).
         return super().create(validated_data)
-class RecipeSerializer(serializers.ModelSerializer):
-    brew_method = BrewMethodSerializer(read_only=True)
-    difficulty_display = serializers.CharField(source="get_difficulty_display", read_only=True)
-    class Meta:
-        model = Recipe
-        fields = [
-            "id", "slug", "name", "brew_method", "difficulty", "difficulty_display",
-            "time_minutes", "description", "ingredients", "main_image", "video_url",
-            "is_published", "created_at",
-        ]
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
     password2 = serializers.CharField(write_only=True)

@@ -2,9 +2,8 @@ from django.contrib import admin
 from django.db.models import Count, Q
 from unfold.admin import ModelAdmin, TabularInline
 from .models import (
-    Banner, CommunityPost, CommunityPostBookmark, CommunityPostComment,
-    CommunityPostDislike, CommunityPostLike, CommunityPostRepost,
-    ReviewComment, LegalDocument, SiteLink,
+    CommunityPost, CommunityPostComment,
+    CommunityPostLike, ReviewComment, LegalDocument,
 )
 
 
@@ -33,20 +32,20 @@ class LegalDocumentAdmin(ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-@admin.register(Banner)
-class BannerAdmin(ModelAdmin):
-    list_display = ("title", "slot", "is_active", "order", "created_at")
-    list_filter = ("slot", "is_active")
-    list_editable = ("is_active", "order")
-    search_fields = ("title", "description", "link_url")
+# @admin.register(Banner)
+# class BannerAdmin(ModelAdmin):
+#     list_display = ("title", "slot", "is_active", "order", "created_at")
+#     list_filter = ("slot", "is_active")
+#     list_editable = ("is_active", "order")
+#     search_fields = ("title", "description", "link_url")
 
 
-@admin.register(SiteLink)
-class SiteLinkAdmin(ModelAdmin):
-    list_display = ("label", "group", "url", "is_active", "order")
-    list_filter = ("group", "is_active", "open_new_tab")
-    list_editable = ("is_active", "order")
-    search_fields = ("label", "url")
+# @admin.register(SiteLink)
+# class SiteLinkAdmin(ModelAdmin):
+#     list_display = ("label", "group", "url", "is_active", "order")
+#     list_filter = ("group", "is_active", "open_new_tab")
+#     list_editable = ("is_active", "order")
+#     search_fields = ("label", "url")
 
 
 class CommunityPostLikeInline(TabularInline):
@@ -202,30 +201,19 @@ class ReviewCommentAdmin(CommentModerationAdminMixin, ModelAdmin):
         return obj.text[:100]
 
 
-class ReadOnlyCommunityActivityAdmin(ModelAdmin):
-    list_filter = ("created_at",)
-    search_fields = ("post__title", "user__email")
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
+# @admin.register(CommunityPostBookmark)
+# class CommunityPostBookmarkAdmin(ReadOnlyCommunityActivityAdmin):
+#     list_display = ("post", "user", "created_at")
+#     readonly_fields = ("post", "user", "created_at")
 
 
-@admin.register(CommunityPostBookmark)
-class CommunityPostBookmarkAdmin(ReadOnlyCommunityActivityAdmin):
-    list_display = ("post", "user", "created_at")
-    readonly_fields = ("post", "user", "created_at")
+# @admin.register(CommunityPostDislike)
+# class CommunityPostDislikeAdmin(ReadOnlyCommunityActivityAdmin):
+#     list_display = ("post", "user", "created_at")
+#     readonly_fields = ("post", "user", "created_at")
 
 
-@admin.register(CommunityPostDislike)
-class CommunityPostDislikeAdmin(ReadOnlyCommunityActivityAdmin):
-    list_display = ("post", "user", "created_at")
-    readonly_fields = ("post", "user", "created_at")
-
-
-@admin.register(CommunityPostRepost)
-class CommunityPostRepostAdmin(ReadOnlyCommunityActivityAdmin):
-    list_display = ("post", "user", "created_at")
-    readonly_fields = ("post", "user", "created_at")
+# @admin.register(CommunityPostRepost)
+# class CommunityPostRepostAdmin(ReadOnlyCommunityActivityAdmin):
+#     list_display = ("post", "user", "created_at")
+#     readonly_fields = ("post", "user", "created_at")

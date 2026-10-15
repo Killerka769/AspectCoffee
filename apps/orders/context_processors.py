@@ -2,26 +2,14 @@ from apps.orders.models import Cart
 
 
 def get_loyalty_discount(user):
-    """Compute loyalty discount % from all non-cancelled orders."""
-    from django.db.models import Sum
-    from apps.orders.models import Order
-    from apps.users.models import DiscountLevel
+    """Return the user's fixed personal discount (assigned in admin).
+
+    The previous cumulative DiscountLevel model was removed. Fixed discount
+    is stored on User.wholesale_discount and applies to every order.
+    """
     if not user.is_authenticated:
         return 0
-    total_spent = (
-        Order.objects.filter(user=user)
-        .exclude(status=Order.STATUS_CANCELLED)
-        .aggregate(t=Sum("total_amount"))["t"]
-        or 0
-    )
-    levels = list(DiscountLevel.objects.filter(is_active=True).order_by("min_amount"))
-    discount = 0
-    for level in levels:
-        if total_spent >= level.min_amount:
-            discount = level.discount_percent
-        else:
-            break
-    return discount
+    return user.wholesale_discount or 0
 
 
 def cart_context(request):
@@ -45,9 +33,6 @@ def cart_context(request):
 
         if cart:
             total_items = cart.total_items
-            # The header shows the value of goods in the cart. Discounts are
-            # displayed separately in the basket and must not silently change
-            # the price next to the cart icon.
             total = cart.subtotal
             if cart.promo_code_id:
                 cart_promo_code = cart.promo_code.code

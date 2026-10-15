@@ -4,102 +4,421 @@
 {% block title %}Контакты{% endblock %}
 {% block meta_description %}Контакты интернет-магазина Aspect Coffee. Телефон, email, адрес, социальные сети. Свяжитесь с нами любым удобным способом.{% endblock %}
 
+{% block extra_css %}
+<style>
+/* ==========================================================
+   ASPECT CONTACT
+   ========================================================== */
+
+.aspect-contact { background: #FFFFFF; padding-bottom: 80px; }
+.aspect-contact__container { width: min(1100px, calc(100% - 32px)); margin: 0 auto; }
+
+/* ---------- BREADCRUMBS ---------- */
+.aspect-contact__crumbs {
+  display: flex; align-items: center; gap: 8px;
+  padding: 24px 0;
+  font-size: 13px; color: #5A5A5A;
+}
+.aspect-contact__crumbs a { color: #5A5A5A; text-decoration: none; transition: color .2s ease; }
+.aspect-contact__crumbs a:hover { color: #2A4A34; }
+.aspect-contact__crumbs span { color: rgba(0,0,0,.3); }
+.aspect-contact__crumbs .current { color: #000; font-weight: 500; }
+
+/* ---------- HERO ---------- */
+.aspect-contact__hero {
+  padding: 16px 0 40px;
+  border-bottom: 1px solid #E5E8E5;
+  margin-bottom: 48px;
+  position: relative;
+}
+.aspect-contact__hero::after {
+  content: ""; position: absolute;
+  left: 0; bottom: -1px;
+  width: 72px; height: 3px;
+  background: #2A4A34;
+}
+.aspect-contact__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0;
+}
+
+/* ---------- LAYOUT ---------- */
+.aspect-contact__layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+@media (max-width: 899px) {
+  .aspect-contact__layout { grid-template-columns: 1fr; }
+}
+
+/* ---------- CARD ---------- */
+.aspect-contact__card {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 24px;
+  padding: 36px 40px;
+}
+@media (max-width: 757px) {
+  .aspect-contact__card { padding: 24px 20px; border-radius: 18px; }
+}
+.aspect-contact__card-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #F0F0F0;
+  position: relative;
+}
+.aspect-contact__card-title::after {
+  content: ""; position: absolute;
+  left: 0; bottom: -1px;
+  width: 48px; height: 3px;
+  background: #2A4A34;
+}
+
+/* ---------- CONTACTS LIST ---------- */
+.aspect-contact__list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.aspect-contact__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.aspect-contact__icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: #F4F6F4;
+  color: #2A4A34;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background .2s ease, color .2s ease;
+}
+.aspect-contact__item:hover .aspect-contact__icon {
+  background: #2A4A34;
+  color: #FFFFFF;
+}
+.aspect-contact__icon svg {
+  width: 20px; height: 20px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.aspect-contact__item-body { min-width: 0; }
+.aspect-contact__item-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  margin: 0 0 4px;
+}
+.aspect-contact__item-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+  text-decoration: none;
+  transition: color .2s ease;
+  display: inline-block;
+  line-height: 1.4;
+}
+.aspect-contact__item-value:hover { color: #2A4A34; }
+.aspect-contact__item-hint {
+  font-size: 12px;
+  color: #5A5A5A;
+  margin: 4px 0 0;
+}
+
+/* ---------- SOCIALS ---------- */
+.aspect-contact__socials {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #F0F0F0;
+}
+.aspect-contact__socials-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  margin: 0 0 12px;
+}
+.aspect-contact__socials-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.aspect-contact__social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px; height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: #F4F6F4;
+  color: #000;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  transition: background .2s ease, color .2s ease, transform .2s ease;
+}
+.aspect-contact__social:hover {
+  background: #2A4A34;
+  color: #FFFFFF;
+  transform: translateY(-2px);
+}
+.aspect-contact__social svg { width: 18px; height: 18px; fill: currentColor; stroke: none; }
+
+/* ---------- FORM ---------- */
+.aspect-contact__form { display: flex; flex-direction: column; gap: 18px; }
+.aspect-contact__field { display: flex; flex-direction: column; gap: 6px; }
+.aspect-contact__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  padding-left: 4px;
+}
+.aspect-contact__input,
+.aspect-contact__textarea {
+  width: 100%;
+  background: #F4F6F4;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: "Open Sans", Arial, sans-serif;
+  color: #000;
+  outline: none;
+  transition: background .2s ease, border-color .2s ease;
+  box-sizing: border-box;
+}
+.aspect-contact__textarea { min-height: 130px; resize: vertical; }
+.aspect-contact__input:focus,
+.aspect-contact__textarea:focus {
+  background: #FFFFFF;
+  border-color: #2A4A34;
+}
+.aspect-contact__input::placeholder,
+.aspect-contact__textarea::placeholder { color: rgba(0,0,0,.35); }
+
+.aspect-contact__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px 24px;
+  border: 0;
+  border-radius: 14px;
+  background: #000000;
+  color: #FFFFFF;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+.aspect-contact__submit:hover:not(:disabled) {
+  background: #2A4A34;
+  transform: translateY(-2px);
+}
+.aspect-contact__submit:disabled { opacity: .5; cursor: not-allowed; }
+.aspect-contact__submit svg { width: 16px; height: 16px; stroke: currentColor; fill: none; }
+
+/* ---------- SPINNER ---------- */
+.aspect-spin { animation: aspect-spin .9s linear infinite; }
+@keyframes aspect-spin { to { transform: rotate(360deg); } }
+
+/* ---------- SUCCESS ---------- */
+.aspect-contact__success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+.aspect-contact__success-icon {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: #E8EEE8;
+  color: #2A4A34;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+}
+.aspect-contact__success-icon svg { width: 36px; height: 36px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+.aspect-contact__success-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+  color: #000;
+}
+.aspect-contact__success-text {
+  font-size: 14px;
+  color: #5A5A5A;
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+.aspect-contact__success-again {
+  background: transparent;
+  border: 0;
+  font-size: 13px;
+  color: #5A5A5A;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.aspect-contact__success-again:hover { color: #2A4A34; }
+</style>
+{% endblock %}
+
 {% block content %}
-<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
-  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
-    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
-      <a href="/" class="hover:text-black transition-colors">Главная</a>
-      <span class="text-black/20">/</span>
-      <span class="text-black font-medium">Контакты</span>
+<main class="aspect-contact">
+  <div class="aspect-contact__container">
+
+    <nav class="aspect-contact__crumbs" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span>/</span>
+      <span class="current">Контакты</span>
     </nav>
-    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-10">Контакты</h1>
 
-    <div class="grid md:grid-cols-2 gap-8 mb-8">
-      <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm">
-        <h2 class="text-[22px] font-din-black uppercase mb-6">Наши контакты</h2>
-        <div class="space-y-6">
-          <div class="flex items-start gap-4">
-            <svg class="w-6 h-6 mt-0.5 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--phone"></use></svg>
-            <div>
-              <p class="font-bold text-[15px] mb-1">Телефон</p>
-              <a href="tel:+78001234567" class="text-[14px] text-black/60 hover:text-black transition-colors">8 (800) 123-45-67</a>
-              <p class="text-[12px] text-black/40 mt-1">Бесплатно по России</p>
+    <header class="aspect-contact__hero">
+      <h1 class="aspect-contact__title">Контакты</h1>
+    </header>
+
+    <div class="aspect-contact__layout">
+
+      {# ---------- ЛЕВАЯ: контакты ---------- #}
+      <section class="aspect-contact__card">
+        <h2 class="aspect-contact__card-title">Наши контакты</h2>
+
+        <div class="aspect-contact__list">
+
+          <div class="aspect-contact__item">
+            <div class="aspect-contact__icon">
+              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div class="aspect-contact__item-body">
+              <p class="aspect-contact__item-label">Телефон</p>
+              <a href="tel:{{ site_settings.contact_phone|default:'+78003334980' }}" class="aspect-contact__item-value">{{ site_settings.contact_phone|default:'8 (800) 333-49-80' }}</a>
+              <p class="aspect-contact__item-hint">Бесплатно по России</p>
             </div>
           </div>
-          <div class="flex items-start gap-4">
-            <svg class="w-6 h-6 mt-0.5 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--mail"></use></svg>
-            <div>
-              <p class="font-bold text-[15px] mb-1">Email</p>
-              <a href="mailto:hello@aspectcoffee.ru" class="text-[14px] text-black/60 hover:text-black transition-colors">hello@aspectcoffee.ru</a>
+
+          <div class="aspect-contact__item">
+            <div class="aspect-contact__icon">
+              <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+            </div>
+            <div class="aspect-contact__item-body">
+              <p class="aspect-contact__item-label">Email</p>
+              <a href="mailto:hello@aspectcoffee.ru" class="aspect-contact__item-value">hello@aspectcoffee.ru</a>
+              <p class="aspect-contact__item-hint">Ответим в течение рабочего дня</p>
             </div>
           </div>
-          <div class="flex items-start gap-4">
-            <svg class="w-6 h-6 mt-0.5 shrink-0"><use href="{% static 'asset/images/sprite.svg' %}#icons--location"></use></svg>
-            <div>
-              <p class="font-bold text-[15px] mb-1">Адрес</p>
-              <p class="text-[14px] text-black/60">г. Москва, ул. Примерная, д. 10, офис 5</p>
+
+          <div class="aspect-contact__item">
+            <div class="aspect-contact__icon">
+              <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="aspect-contact__item-body">
+              <p class="aspect-contact__item-label">Адрес</p>
+              <p class="aspect-contact__item-value" style="font-weight:600;">Ижевск, ул. Баранова, д. 26</p>
+              <p class="aspect-contact__item-hint">Пункт самовывоза</p>
             </div>
           </div>
-          <div class="flex items-start gap-4">
-            <svg class="w-6 h-6 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <div>
-              <p class="font-bold text-[15px] mb-1">Режим работы</p>
-              <p class="text-[14px] text-black/60">Пн-Пт: 9:00 — 20:00</p>
-              <p class="text-[14px] text-black/60">Сб-Вс: 10:00 — 18:00</p>
+
+          <div class="aspect-contact__item">
+            <div class="aspect-contact__icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
             </div>
+            <div class="aspect-contact__item-body">
+              <p class="aspect-contact__item-label">Режим работы</p>
+              <p class="aspect-contact__item-value" style="font-weight:600;">Пн-Пт: 9:00 — 20:00<br>Сб-Вс: 10:00 — 18:00</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="aspect-contact__socials">
+          <p class="aspect-contact__socials-title">Мы в соцсетях</p>
+          <div class="aspect-contact__socials-row">
+            {% if site_settings.contact_telegram %}
+              <a href="{{ site_settings.contact_telegram }}" target="_blank" rel="noopener noreferrer" class="aspect-contact__social">Telegram</a>
+            {% endif %}
+            {% if site_settings.contact_whatsapp %}
+              <a href="{{ site_settings.contact_whatsapp }}" target="_blank" rel="noopener noreferrer" class="aspect-contact__social">WhatsApp</a>
+            {% endif %}
+            <a href="https://vk.com/" target="_blank" rel="noopener noreferrer" class="aspect-contact__social">VK</a>
           </div>
         </div>
-        <div class="mt-8">
-          <h3 class="font-bold text-[15px] mb-4">Мы в соцсетях</h3>
-          <div class="flex gap-3">
-            <a href="{{ site_settings.contact_telegram|default:'/contact-us/' }}" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors" aria-label="Telegram">
-              <svg class="w-5 h-5"><use href="{% static 'asset/images/sprite.svg' %}#icons--telegram"></use></svg>
-            </a>
-            <a href="/contact-us/" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors" aria-label="VK">
-              <svg class="w-5 h-5"><use href="{% static 'asset/images/sprite.svg' %}#icons--vk"></use></svg>
-            </a>
-            <a href="/contact-us/" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors" aria-label="Instagram">
-              <svg class="w-5 h-5"><use href="{% static 'asset/images/sprite.svg' %}#icons--instagram"></use></svg>
-            </a>
-            <a href="/contact-us/" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-colors" aria-label="YouTube">
-              <svg class="w-5 h-5"><use href="{% static 'asset/images/sprite.svg' %}#icons--youtube"></use></svg>
-            </a>
-          </div>
-        </div>
-      </div>
+      </section>
 
-      <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm">
-        <h2 class="text-[22px] font-din-black uppercase mb-6">Напишите нам</h2>
-        <form x-data="{ name: '', email: '', message: '', sent: false, loading: false }" @submit.prevent="loading = true; setTimeout(() => { loading = false; sent = true }, 1500)" class="space-y-5">
-          <div x-show="!sent" x-transition>
-            <div>
-              <label class="text-[13px] font-bold mb-1 block">Ваше имя</label>
-              <input type="text" x-model="name" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-black focus:bg-white transition-all text-[14px]">
+      {# ---------- ПРАВАЯ: форма ---------- #}
+      <section class="aspect-contact__card">
+        <h2 class="aspect-contact__card-title">Напишите нам</h2>
+
+        <form class="aspect-contact__form"
+              x-data="{ name: '', email: '', message: '', sent: false, loading: false }"
+              @submit.prevent="loading = true; setTimeout(() => { loading = false; sent = true }, 1200)">
+
+          <div x-show="!sent" x-transition style="display:flex;flex-direction:column;gap:18px;">
+
+            <div class="aspect-contact__field">
+              <label class="aspect-contact__label">Ваше имя</label>
+              <input type="text" x-model="name" required class="aspect-contact__input" placeholder="Как к вам обращаться"/>
             </div>
-            <div>
-              <label class="text-[13px] font-bold mb-1 block">Email</label>
-              <input type="email" x-model="email" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-black focus:bg-white transition-all text-[14px]">
+
+            <div class="aspect-contact__field">
+              <label class="aspect-contact__label">Email</label>
+              <input type="email" x-model="email" required class="aspect-contact__input" placeholder="email@example.com"/>
             </div>
-            <div>
-              <label class="text-[13px] font-bold mb-1 block">Сообщение</label>
-              <textarea x-model="message" required rows="4" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-black focus:bg-white transition-all text-[14px] resize-none"></textarea>
+
+            <div class="aspect-contact__field">
+              <label class="aspect-contact__label">Сообщение</label>
+              <textarea x-model="message" required class="aspect-contact__textarea" placeholder="Опишите ваш вопрос"></textarea>
             </div>
-            <button type="submit" :disabled="loading" class="w-full py-4 rounded-xl bg-black text-white font-bold text-[14px] hover:bg-gray-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-3">
+
+            <button type="submit" :disabled="loading" class="aspect-contact__submit">
               <template x-if="loading">
-                <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                <svg class="aspect-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" opacity="0.75"/></svg>
               </template>
-              <span x-text="loading ? 'Отправляем...' : 'Отправить'"></span>
+              <span x-text="loading ? 'Отправляем…' : 'Отправить'"></span>
+            </button>
+
+          </div>
+
+          <div x-show="sent" x-cloak x-transition class="aspect-contact__success">
+            <div class="aspect-contact__success-icon">
+              <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3 class="aspect-contact__success-title">Спасибо за обращение!</h3>
+            <p class="aspect-contact__success-text">Мы свяжемся с вами в ближайшее время.</p>
+            <button type="button" class="aspect-contact__success-again" @click="sent = false; name = ''; email = ''; message = ''">
+              Отправить ещё
             </button>
           </div>
-          <div x-show="sent" x-cloak x-transition class="text-center py-8">
-            <svg class="w-12 h-12 mx-auto mb-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <h3 class="font-bold text-[17px] mb-2">Спасибо за обращение!</h3>
-            <p class="text-[14px] text-black/50">Мы свяжемся с вами в ближайшее время.</p>
-            <button @click="sent = false; name = ''; email = ''; message = ''" class="mt-4 text-[13px] text-black/40 underline hover:text-black transition-colors">Отправить ещё</button>
-          </div>
+
         </form>
-      </div>
+      </section>
+
     </div>
+
   </div>
 </main>
 {% endblock %}

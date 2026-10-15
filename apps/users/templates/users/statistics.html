@@ -1,45 +1,189 @@
-{% extends "users/base_account.html" %}{% load static %}{% block account_content %}
-<div class="space-y-8">
-  <h2 class="text-[24px] font-din-black uppercase leading-[1.2] m-0">Статистика</h2>
+{% extends "users/base_account.html" %}
+{% load static %}
 
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <div class="bg-[var(--white)] rounded-2xl p-6 text-center">
-      <div class="text-[11px] text-[var(--black-50)] font-din-black uppercase tracking-[0.1em] mb-2">Общая сумма</div>
-      <div class="text-[42px] font-din-black leading-[1.2]">{{ stats.total_spent|floatformat:0|default:0 }} <span class="rub">₽</span></div>
+{% block title %}Статистика{% endblock %}
+
+{% block extra_css %}
+<style>
+.asp-stat { display: flex; flex-direction: column; gap: 24px; }
+
+.asp-stat__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+  color: #000;
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F0F0F0;
+  position: relative;
+}
+.asp-stat__title::after {
+  content: ""; position: absolute;
+  left: 0; bottom: -1px;
+  width: 40px; height: 3px;
+  background: #2A4A34;
+}
+
+.asp-stat__top {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 757px) { .asp-stat__top { grid-template-columns: 1fr; } }
+
+.asp-stat__tile {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 20px;
+  padding: 24px 26px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .2s ease, transform .2s ease;
+}
+.asp-stat__tile:hover {
+  border-color: #2A4A34;
+  transform: translateY(-2px);
+}
+.asp-stat__tile--accent {
+  background: #2A4A34;
+  border-color: #2A4A34;
+  color: #FFFFFF;
+}
+.asp-stat__tile--accent::before {
+  content: "";
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+.asp-stat__tile-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  margin: 0 0 12px;
+  position: relative;
+  z-index: 2;
+}
+.asp-stat__tile--accent .asp-stat__tile-label { color: rgba(255,255,255,.65); }
+.asp-stat__tile-value {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(38px, 5vw, 52px);
+  line-height: 1;
+  letter-spacing: -.02em;
+  color: #000;
+  margin: 0;
+  position: relative;
+  z-index: 2;
+}
+.asp-stat__tile--accent .asp-stat__tile-value { color: #FFFFFF; }
+.asp-stat__tile-badge {
+  position: absolute;
+  top: 12px; right: 12px;
+  padding: 3px 10px;
+  background: #FEF2F2;
+  color: #B91C1C;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border-radius: 999px;
+}
+
+.asp-stat__extra {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 20px;
+  padding: 24px 28px;
+}
+.asp-stat__extra-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  margin: 0 0 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #F0F0F0;
+}
+.asp-stat__extra-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+}
+@media (max-width: 599px) { .asp-stat__extra-grid { grid-template-columns: 1fr; } }
+
+.asp-stat__extra-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+.asp-stat__extra-row-label { color: #5A5A5A; }
+.asp-stat__extra-row-value {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  color: #000;
+}
+</style>
+{% endblock %}
+
+{% block account_content %}
+<div class="asp-stat">
+
+  <h1 class="asp-stat__title">Статистика</h1>
+
+  {# ═══ TOP TILES ═══ #}
+  <div class="asp-stat__top">
+    <div class="asp-stat__tile asp-stat__tile--accent">
+      <p class="asp-stat__tile-label">Общая сумма</p>
+      <p class="asp-stat__tile-value">{{ stats.total_spent|floatformat:0|default:0 }} ₽</p>
     </div>
-    <div class="bg-[var(--white)] rounded-2xl p-6 text-center">
-      <div class="text-[11px] text-[var(--black-50)] font-din-black uppercase tracking-[0.1em] mb-2">Доставлено</div>
-      <div class="text-[42px] font-din-black leading-[1.2]">{{ stats.orders_completed|default:0 }}</div>
+    <div class="asp-stat__tile">
+      <p class="asp-stat__tile-label">Доставлено</p>
+      <p class="asp-stat__tile-value">{{ stats.orders_completed|default:0 }}</p>
     </div>
-    <div class="bg-[var(--white)] rounded-2xl p-6 text-center relative">
-      <div class="text-[11px] text-[var(--black-50)] font-din-black uppercase tracking-[0.1em] mb-2">Отменено</div>
-      <div class="text-[42px] font-din-black leading-[1.2]">{{ stats.orders_cancelled|default:0 }}</div>
+    <div class="asp-stat__tile">
+      <p class="asp-stat__tile-label">Отменено</p>
+      <p class="asp-stat__tile-value">{{ stats.orders_cancelled|default:0 }}</p>
       {% if stats.orders_cancelled > 0 %}
-      <span class="absolute top-3 right-3 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700">Плашка</span>
+      <span class="asp-stat__tile-badge">есть отмены</span>
       {% endif %}
     </div>
   </div>
 
-  <div class="bg-[var(--white)] rounded-2xl p-6">
-    <div class="text-[11px] text-[var(--black-50)] font-din-black uppercase tracking-[0.1em] mb-4">Дополнительно</div>
-    <div class="account-stats-extra grid grid-cols-2 gap-4 text-[14px]">
-      <div>
-        <span class="text-[var(--black-50)]">Активных заказов:</span>
-        <span class="font-din-black ml-1">{{ stats.orders_active|default:0 }}</span>
+  {# ═══ EXTRA ═══ #}
+  <div class="asp-stat__extra">
+    <p class="asp-stat__extra-title">Дополнительно</p>
+    <div class="asp-stat__extra-grid">
+      <div class="asp-stat__extra-row">
+        <span class="asp-stat__extra-row-label">Активных заказов:</span>
+        <span class="asp-stat__extra-row-value">{{ stats.orders_active|default:0 }}</span>
       </div>
-      <div>
-        <span class="text-[var(--black-50)]">Всего заказов:</span>
-        <span class="font-din-black ml-1">{{ stats.orders_total|default:0 }}</span>
+      <div class="asp-stat__extra-row">
+        <span class="asp-stat__extra-row-label">Всего заказов:</span>
+        <span class="asp-stat__extra-row-value">{{ stats.orders_total|default:0 }}</span>
       </div>
-      <div>
-        <span class="text-[var(--black-50)]">В избранном:</span>
-        <span class="font-din-black ml-1">{{ stats.wishlist_count|default:0 }}</span>
+      <div class="asp-stat__extra-row">
+        <span class="asp-stat__extra-row-label">В избранном:</span>
+        <span class="asp-stat__extra-row-value">{{ stats.wishlist_count|default:0 }}</span>
       </div>
-      <div>
-        <span class="text-[var(--black-50)]">Адресов:</span>
-        <span class="font-din-black ml-1">{{ stats.addresses_count|default:0 }}</span>
+      <div class="asp-stat__extra-row">
+        <span class="asp-stat__extra-row-label">Адресов:</span>
+        <span class="asp-stat__extra-row-value">{{ stats.addresses_count|default:0 }}</span>
       </div>
     </div>
   </div>
+
 </div>
 {% endblock %}

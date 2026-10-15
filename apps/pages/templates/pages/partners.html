@@ -1,94 +1,605 @@
 {% extends "catalog/base.html" %}
 {% load static %}
 
-{% block title %}Партнёрам — Оптовые поставки кофе{% endblock %}
-{% block meta_description %}Оптовые поставки свежеобжаренного specialty кофе. Станьте партнёром Aspect Coffee: выгодные условия, поддержка и обучение.{% endblock %}
+{% block title %}Партнёрам — Оптовые поставки кофе — Aspect Coffee Roasters{% endblock %}
+{% block meta_description %}Партнёрская программа Aspect Coffee Roasters: скидка 30% при заказе от 20 кг в месяц. Договор, прямые поставки, поддержка кофеен и ресторанов.{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ==========================================================
+   ASPECT PARTNERS
+   ========================================================== */
+
+.aspect-partners {
+  background: #FFFFFF;
+  padding-bottom: 80px;
+}
+.aspect-partners__container {
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+/* ---------- BREADCRUMBS ---------- */
+.aspect-partners__crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 0;
+  font-size: 13px;
+  color: rgba(0,0,0,.5);
+}
+.aspect-partners__crumbs a {
+  color: rgba(0,0,0,.5);
+  text-decoration: none;
+  transition: color .2s ease;
+}
+.aspect-partners__crumbs a:hover { color: #2A4A34; }
+.aspect-partners__crumbs span { color: rgba(0,0,0,.3); }
+
+/* ---------- HERO ---------- */
+.aspect-partners__hero {
+  padding: 16px 0 48px;
+  border-bottom: 1px solid #E5E8E5;
+  margin-bottom: 56px;
+  position: relative;
+}
+.aspect-partners__hero::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -1px;
+  width: 72px; height: 3px;
+  background: #2A4A34;
+}
+.aspect-partners__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 5.5vw, 72px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 20px;
+}
+.aspect-partners__title .accent { color: #2A4A34; }
+.aspect-partners__lead {
+  font-size: 17px;
+  line-height: 1.55;
+  color: rgba(0,0,0,.55);
+  max-width: 680px;
+  margin: 0;
+}
+
+/* ---------- СЕКЦИЯ ---------- */
+.aspect-partners__section {
+  margin-bottom: 56px;
+}
+.aspect-partners__section-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.aspect-partners__section-num {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: .14em;
+  color: #2A4A34;
+  padding: 4px 10px;
+  background: #F4F6F4;
+  border-radius: 6px;
+}
+.aspect-partners__section-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0;
+}
+
+/* ---------- ПРЕИМУЩЕСТВА ---------- */
+.aspect-partners__benefits {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.aspect-partners__benefit {
+  background: #F4F6F4;
+  border-radius: 20px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: transform .2s ease, background .2s ease;
+}
+.aspect-partners__benefit:hover {
+  background: #E8EEE8;
+  transform: translateY(-3px);
+}
+.aspect-partners__benefit-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #2A4A34;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aspect-partners__benefit-icon svg { width: 24px; height: 24px; }
+.aspect-partners__benefit-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0;
+}
+.aspect-partners__benefit-text {
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(0,0,0,.6);
+  margin: 0;
+}
+
+/* ---------- УСЛОВИЯ ---------- */
+.aspect-partners__terms {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.aspect-partners__term {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  background: #fff;
+  border: 1px solid #E5E8E5;
+  border-radius: 20px;
+  padding: 24px 28px;
+  transition: border-color .2s ease;
+}
+.aspect-partners__term:hover { border-color: #2A4A34; }
+.aspect-partners__term-num {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 1;
+  color: #2A4A34;
+  padding-top: 4px;
+}
+.aspect-partners__term-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.aspect-partners__term-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0;
+}
+.aspect-partners__term-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(0,0,0,.65);
+  margin: 0;
+}
+.aspect-partners__term-text strong {
+  color: #2A4A34;
+  font-weight: 900;
+}
+
+/* ---------- ДОГОВОР ---------- */
+.aspect-partners__contract {
+  background: #F4F6F4;
+  border-radius: 22px;
+  padding: 32px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 56px;
+}
+.aspect-partners__contract-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.aspect-partners__contract-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0;
+}
+.aspect-partners__contract-desc {
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(0,0,0,.55);
+  margin: 0;
+}
+.aspect-partners__contract-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.aspect-partners__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 26px;
+  border-radius: 14px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease, color .2s ease;
+  white-space: nowrap;
+}
+.aspect-partners__btn--primary {
+  background: #2A4A34;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+.aspect-partners__btn--primary:hover {
+  background: #1E3626;
+  transform: translateY(-2px);
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  text-decoration: none;
+}
+.aspect-partners__btn--ghost {
+  background: #FFFFFF;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  border: 1px solid #E5E8E5;
+}
+.aspect-partners__btn--ghost:hover {
+  border-color: #2A4A34;
+  color: #2A4A34 !important;
+  -webkit-text-fill-color: #2A4A34 !important;
+  text-decoration: none;
+}
+
+/* ---------- CTA ---------- */
+.aspect-partners__cta {
+  background: #000;
+  color: #FFFFFF;
+  border-radius: 26px;
+  padding: 56px 60px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 40px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.aspect-partners__cta::before {
+  content: "";
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(42,74,52,.55) 0%, rgba(0,0,0,0) 70%);
+  pointer-events: none;
+}
+.aspect-partners__cta-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(28px, 3.5vw, 44px);
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+  color: #FFFFFF !important;
+  position: relative;
+  z-index: 2;
+}
+.aspect-partners__cta-title .accent { color: #8FB89A; }
+.aspect-partners__cta-text {
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(255,255,255,.7);
+  margin: 0;
+  max-width: 480px;
+  position: relative;
+  z-index: 2;
+}
+.aspect-partners__cta-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 24px;
+  position: relative;
+  z-index: 2;
+}
+.aspect-partners__cta-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255,255,255,.65);
+  font-size: 14px;
+  text-decoration: none;
+  transition: color .2s ease;
+}
+.aspect-partners__cta-contact:hover { color: #FFFFFF; }
+.aspect-partners__cta-contact svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+}
+.aspect-partners__cta-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 2;
+}
+.aspect-partners__cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 26px;
+  border-radius: 14px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease, transform .2s ease;
+  white-space: nowrap;
+}
+.aspect-partners__cta-btn--primary {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  border: 0;
+}
+.aspect-partners__cta-btn--primary:hover {
+  background: #2A4A34 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+.aspect-partners__cta-btn--ghost {
+  background: transparent !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  border: 1px solid rgba(255,255,255,.35);
+}
+.aspect-partners__cta-btn--ghost:hover {
+  background: rgba(255,255,255,.1) !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  border-color: #FFFFFF;
+  text-decoration: none;
+}
+
+/* ---------- АДАПТИВ ---------- */
+@media (max-width: 1099px) {
+  .aspect-partners__benefits { grid-template-columns: 1fr; }
+  .aspect-partners__cta {
+    grid-template-columns: 1fr;
+    padding: 40px 32px;
+  }
+  .aspect-partners__cta-actions { justify-content: flex-start; }
+  .aspect-partners__contract {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+@media (max-width: 757px) {
+  .aspect-partners__crumbs { padding: 16px 0; }
+  .aspect-partners__hero { padding: 8px 0 32px; margin-bottom: 40px; }
+  .aspect-partners__lead { font-size: 15px; }
+  .aspect-partners__section { margin-bottom: 40px; }
+  .aspect-partners__section-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .aspect-partners__term {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 14px;
+    padding: 20px;
+  }
+  .aspect-partners__term-num { font-size: 20px; }
+  .aspect-partners__contract {
+    padding: 24px 20px;
+    gap: 20px;
+  }
+  .aspect-partners__contract-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  .aspect-partners__btn { width: 100%; }
+  .aspect-partners__cta { padding: 32px 24px; }
+  .aspect-partners__cta-actions { width: 100%; flex-direction: column; }
+  .aspect-partners__cta-btn { width: 100%; }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
-  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
-    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
-      <a href="/" class="hover:text-black transition-colors">Главная</a>
-      <span class="text-black/20">/</span>
-      <span class="text-black font-medium">Партнёрам</span>
+<main class="aspect-partners">
+
+  <div class="aspect-partners__container">
+
+    {# ---------- BREADCRUMBS ---------- #}
+    <nav class="aspect-partners__crumbs" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span>/</span>
+      <span style="color:#000">Партнёрам</span>
     </nav>
-    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-4">Партнёрам</h1>
-    <p class="text-[16px] text-black/50 max-w-2xl mb-10">Предлагаем выгодные условия сотрудничества для кофеен, ресторанов, отелей и розничных магазинов.</p>
 
-    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
-      <h2 class="text-[24px] font-din-black uppercase mb-8">Почему стоит работать с нами</h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        <div class="p-6 bg-gray-50 rounded-2xl text-center">
-          <svg class="w-12 h-12 mx-auto mb-4"><use href="{% static 'asset/images/sprite.svg' %}#icons--coffee"></use></svg>
-          <h3 class="font-bold text-[16px] mb-2">Спешелти качество</h3>
-          <p class="text-[13px] text-black/60">Только отборный specialty кофе с оценкой Q-grade выше 80 баллов. Ежедневная обжарка.</p>
+    {# ---------- HERO ---------- #}
+    <header class="aspect-partners__hero">
+      <h1 class="aspect-partners__title">
+        Партнёрам —<br>
+        <span class="accent">диалог для бизнеса</span>
+      </h1>
+      <p class="aspect-partners__lead">
+        Поставляем свежеобжаренный спешалти-кофе для кофеен, ресторанов, отелей и офисов. Прямые закупки, честные условия и индивидуальный подход к каждому партнёру.
+      </p>
+    </header>
+
+    {# ===================== 01. ПОЧЕМУ МЫ ===================== #}
+    <section class="aspect-partners__section">
+      <div class="aspect-partners__section-head">
+        <span class="aspect-partners__section-num">01</span>
+        <h2 class="aspect-partners__section-title">Почему Aspect</h2>
+      </div>
+
+      <div class="aspect-partners__benefits">
+        <div class="aspect-partners__benefit">
+          <div class="aspect-partners__benefit-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 3h12v14a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/>
+              <path d="M9 21v-4h6v4"/>
+            </svg>
+          </div>
+          <h3 class="aspect-partners__benefit-title">Спешалти-качество</h3>
+          <p class="aspect-partners__benefit-text">Отборный кофе с оценкой Q-grade выше 80 баллов. Ежедневная обжарка — на вашу кухню приезжает зерно не старше 3 дней.</p>
         </div>
-        <div class="p-6 bg-gray-50 rounded-2xl text-center">
-          <svg class="w-12 h-12 mx-auto mb-4"><use href="{% static 'asset/images/sprite.svg' %}#icons--discount"></use></svg>
-          <h3 class="font-bold text-[16px] mb-2">Гибкие цены</h3>
-          <p class="text-[13px] text-black/60">Индивидуальные скидки в зависимости от объёма заказа. От 5% до 25% от розничной цены.</p>
+
+        <div class="aspect-partners__benefit">
+          <div class="aspect-partners__benefit-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19"/>
+            </svg>
+          </div>
+          <h3 class="aspect-partners__benefit-title">Открытое ценообразование</h3>
+          <p class="aspect-partners__benefit-text">Прямые закупки у фермеров, честная наценка. Прозрачная цена на каждом этапе — от зерна до вашей чашки.</p>
         </div>
-        <div class="p-6 bg-gray-50 rounded-2xl text-center">
-          <svg class="w-12 h-12 mx-auto mb-4"><use href="{% static 'asset/images/sprite.svg' %}#icons--education"></use></svg>
-          <h3 class="font-bold text-[16px] mb-2">Обучение и поддержка</h3>
-          <p class="text-[13px] text-black/60">Проводим обучение для бариста, предоставляем рецептуры и методики заваривания.</p>
+
+        <div class="aspect-partners__benefit">
+          <div class="aspect-partners__benefit-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h3 class="aspect-partners__benefit-title">Обучение и поддержка</h3>
+          <p class="aspect-partners__benefit-text">Проводим обучение для бариста, делимся рецептурами и методиками заваривания. Помогаем настроить оборудование.</p>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
-      <h2 class="text-[24px] font-din-black uppercase mb-6">Условия партнёрства</h2>
-      <div class="space-y-4">
-        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
-          <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-din-black shrink-0">1</div>
-          <div>
-            <h3 class="font-bold text-[15px] mb-1">Минимальный заказ</h3>
-            <p class="text-[13px] text-black/60">От 5 кг кофе в месяц для юридических лиц и ИП.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
-          <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-din-black shrink-0">2</div>
-          <div>
-            <h3 class="font-bold text-[15px] mb-1">Условия оплаты</h3>
-            <p class="text-[13px] text-black/60">Отсрочка платежа до 30 дней для постоянных партнёров после проверки.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
-          <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-din-black shrink-0">3</div>
-          <div>
-            <h3 class="font-bold text-[15px] mb-1">Маркетинговая поддержка</h3>
-            <p class="text-[13px] text-black/60">Предоставляем POS-материалы, фирменные меню, фото и видео контент для вашего заведения.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
-          <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-din-black shrink-0">4</div>
-          <div>
-            <h3 class="font-bold text-[15px] mb-1">Бесплатная доставка</h3>
-            <p class="text-[13px] text-black/60">Доставка бесплатна при заказе от 10 кг в пределах РФ.</p>
-          </div>
-        </div>
+    {# ===================== 02. УСЛОВИЯ ===================== #}
+    <section class="aspect-partners__section">
+      <div class="aspect-partners__section-head">
+        <span class="aspect-partners__section-num">02</span>
+        <h2 class="aspect-partners__section-title">Условия партнёрства</h2>
       </div>
-    </div>
 
-    <div class="bg-black text-white rounded-[24px] p-6 md:p-10">
-      <div class="flex flex-col md:flex-row items-center gap-6">
-        <div class="flex-1">
-          <h2 class="text-[24px] font-din-black uppercase mb-3">Станьте нашим партнёром</h2>
-          <p class="text-[14px] text-white/60">Заполните заявку, и наш менеджер свяжется с вами для обсуждения условий сотрудничества.</p>
-          <div class="mt-4 space-y-2">
-            <p class="text-[13px] text-white/40 flex items-center gap-2">
-              <svg class="w-4 h-4"><use href="{% static 'asset/images/sprite.svg' %}#icons--mail"></use></svg>
-              partners@aspectcoffee.ru
+      <div class="aspect-partners__terms">
+
+        <div class="aspect-partners__term">
+          <span class="aspect-partners__term-num">01</span>
+          <div class="aspect-partners__term-body">
+            <h3 class="aspect-partners__term-title">Скидка 30% при 20 кг/мес</h3>
+            <p class="aspect-partners__term-text">
+              При заказе от <strong>20 кг кофе в месяц</strong> действует фиксированная скидка <strong>30%</strong> от розничной цены. Условие распространяется на весь объём — и на моносорта, и на бленды.
             </p>
-            <p class="text-[13px] text-white/40 flex items-center gap-2">
-              <svg class="w-4 h-4"><use href="{% static 'asset/images/sprite.svg' %}#icons--phone"></use></svg>
-              8 (800) 123-45-67
+          </div>
+        </div>
+
+        <div class="aspect-partners__term">
+          <span class="aspect-partners__term-num">02</span>
+          <div class="aspect-partners__term-body">
+            <h3 class="aspect-partners__term-title">Индивидуальный подход</h3>
+            <p class="aspect-partners__term-text">
+              Для партнёров с нестандартными задачами (собственная обжарка, приватные лоты, спец-упаковка) формируем персональные условия и график поставок.
             </p>
           </div>
         </div>
-        <a href="/contact-us/" class="shrink-0 inline-block bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-[14px]">Оставить заявку →</a>
+
+        <div class="aspect-partners__term">
+          <span class="aspect-partners__term-num">03</span>
+          <div class="aspect-partners__term-body">
+            <h3 class="aspect-partners__term-title">Работа по договору</h3>
+            <p class="aspect-partners__term-text">
+              Сотрудничаем официально — юридические лица и ИП. Закрывающие документы, отсрочка платежа и персональный менеджер.
+            </p>
+          </div>
+        </div>
+
+        <div class="aspect-partners__term">
+          <span class="aspect-partners__term-num">04</span>
+          <div class="aspect-partners__term-body">
+            <h3 class="aspect-partners__term-title">Доставка по РФ</h3>
+            <p class="aspect-partners__term-text">
+              Отправляем заказы по всей России. Стоимость доставки рассчитывается индивидуально в зависимости от региона и объёма.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    {# ===================== ДОГОВОР ===================== #}
+    <div class="aspect-partners__contract">
+      <div class="aspect-partners__contract-text">
+        <h3 class="aspect-partners__contract-title">Договор для партнёров</h3>
+        <p class="aspect-partners__contract-desc">Скачайте типовую форму и ознакомьтесь с условиями. Если нужны правки под ваш бизнес — обсудим индивидуально.</p>
+      </div>
+      <div class="aspect-partners__contract-actions">
+        <a href="/static/docs/partner-agreement.pdf" class="aspect-partners__btn aspect-partners__btn--primary" download>
+          Скачать договор
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        </a>
+        <a href="/contact-us/" class="aspect-partners__btn aspect-partners__btn--ghost">Задать вопрос</a>
       </div>
     </div>
+
+    {# ===================== CTA ===================== #}
+    <section class="aspect-partners__cta">
+      <div>
+        <h2 class="aspect-partners__cta-title">
+          Станьте частью<br>
+          <span class="accent">кофейного диалога</span>
+        </h2>
+        <p class="aspect-partners__cta-text">
+          Заполните заявку, и персональный менеджер свяжется с вами в течение рабочего дня. Обсудим условия, объемы и график поставок.
+        </p>
+        <div class="aspect-partners__cta-contacts">
+          <a href="mailto:partners@aspectcoffee.ru" class="aspect-partners__cta-contact">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+            partners@aspectcoffee.ru
+          </a>
+          <a href="tel:+78003334980" class="aspect-partners__cta-contact">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            +7 800 333 49 80
+          </a>
+        </div>
+      </div>
+      <div class="aspect-partners__cta-actions">
+        <a href="/contact-us/" class="aspect-partners__cta-btn aspect-partners__cta-btn--primary">Оставить заявку</a>
+        <a href="{% url 'catalog:catalog' %}" class="aspect-partners__cta-btn aspect-partners__cta-btn--ghost">В каталог</a>
+      </div>
+    </section>
+
   </div>
 </main>
 {% endblock %}

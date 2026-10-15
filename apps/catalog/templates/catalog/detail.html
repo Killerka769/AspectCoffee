@@ -7,7 +7,6 @@
 {% block extra_meta %}
 {% if primary_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ primary_image.url }}">{% endif %}
 <meta property="og:type" content="product">
-{# SEO: Product schema.org с ценой/наличием/рейтингом #}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -29,2010 +28,1563 @@
 </script>
 {% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <style>
-    header#header,
-    header#header.sticky,
-    header#header.header-scrolled {
-        background: #ffffff !important;
-    }
-    .weight-btn--active {
-        background: white;
-        color: black;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .weight-btn--inactive {
-        background: transparent;
-        color: rgba(0,0,0,0.4);
-    }
-    /* Product structure reconstructed from the supplied mobile capture. */
-    .product-main-grid{grid-template-columns:minmax(220px,1fr) 80px minmax(360px,1.5fr) minmax(280px,1fr)!important;gap:28px!important}
-    .product-overview-panel{grid-column:1;grid-row:1;min-width:0;padding-top:7px}
-    .product-thumbnails{grid-column:2;grid-row:1}.product-image-panel{grid-column:3;grid-row:1}.product-info-panel{grid-column:4;grid-row:1}
-    .product-overview-panel h1{color:#000;font:40px/1.1 'DIN Pro Black','Arial Narrow',sans-serif;letter-spacing:.01em;margin:5px 0 7px;text-transform:uppercase}
-    .product-overview-panel .product-overview-meta{color:rgba(0,0,0,.5);font-size:16px;line-height:1.3}
-    .product-overview-panel .product-overview-rating{align-items:center;display:flex;font-size:16px;gap:13px;margin-bottom:20px}
-    .product-overview-head{align-items:flex-start;display:flex;gap:12px;justify-content:space-between}
-    .product-overview-head .product-overview-rating{flex:0 0 auto;margin-bottom:0}
-    .product-overview-head .product-overview-meta{margin:0}
-    .product-overview-panel .product-overview-flavor{font-size:16px;line-height:1.4;margin:26px 0 27px}
-    .product-overview-panel .product-overview-scales{display:grid;gap:18px 24px;grid-template-columns:1fr 1fr;max-width:270px}
-    .product-overview-panel .product-overview-scales div>span{display:block;font-size:14px;margin-bottom:7px}.product-overview-panel .product-overview-scales i{background:#ddd;display:block;height:3px;position:relative}.product-overview-panel .product-overview-scales i:after{background:#000;content:'';height:100%;left:0;position:absolute;top:0;width:var(--value)}
-    .product-info-panel>div:nth-child(1),.product-info-panel>div:nth-child(2),.product-info-panel>.detail-flavor-description,.product-info-panel>div:nth-child(4){display:none!important}
-    .product-image-panel>div:first-child{border:0!important;border-radius:0!important;padding:0!important}.product-image-panel #main-image{height:100%;max-height:none!important;object-fit:contain;width:100%}
-    @media(max-width:1099px){.product-main-grid{grid-template-columns:64px minmax(0,1fr) minmax(280px,1fr)!important}.product-overview-panel{grid-column:1/-1;grid-row:auto}.product-thumbnails{grid-column:1;grid-row:2}.product-image-panel{grid-column:2;grid-row:2}.product-info-panel{grid-column:3;grid-row:2}.product-overview-panel h1{font-size:34px}}
-    @media(max-width:720px){.product-main-grid{display:grid!important;grid-template-columns:1fr!important;gap:20px!important}.product-overview-panel,.product-thumbnails,.product-image-panel,.product-info-panel{grid-column:1;grid-row:auto}.product-thumbnails{display:none!important}.product-overview-panel h1{font-size:30px}.product-overview-panel .product-overview-flavor{margin:18px 0;line-height:1.55}.product-overview-flavor .descriptor-badge,.flavor-badges-container .descriptor-badge{display:inline-block!important;margin:2px 1px!important;line-height:1.35!important;vertical-align:middle!important}.product-image-panel{max-width:480px;width:100%}}
+/* ==========================================================
+   ASPECT PRODUCT DETAIL
+   ========================================================== */
+
+.aspect-pd {
+  background: #FFFFFF;
+  padding-bottom: 80px;
+}
+.aspect-pd__container {
+  width: min(1340px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+/* ---------- BREADCRUMBS ---------- */
+.aspect-pd__crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 0;
+  font-size: 13px;
+  color: rgba(0,0,0,.5);
+}
+.aspect-pd__crumbs a {
+  color: rgba(0,0,0,.5);
+  text-decoration: none;
+  transition: color .2s ease;
+}
+.aspect-pd__crumbs a:hover { color: #2A4A34; }
+.aspect-pd__crumbs span { color: rgba(0,0,0,.3); }
+
+/* ---------- LAYOUT ---------- */
+.aspect-pd__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 64px;
+  align-items: start;
+  margin-bottom: 80px;
+}
+
+/* ---------- ГАЛЕРЕЯ ---------- */
+.aspect-pd__gallery {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 16px;
+  position: sticky;
+  top: 100px;
+}
+.aspect-pd__thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.aspect-pd__thumb {
+  width: 88px;
+  height: 88px;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  background: #FFFFFF;
+  padding: 8px;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+.aspect-pd__thumb:hover,
+.aspect-pd__thumb.is-active { border-color: #2A4A34; background: #F4F6F4; }
+.aspect-pd__thumb img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+}
+.aspect-pd__main {
+  background: #F4F6F4;
+  border-radius: 26px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  overflow: hidden;
+}
+.aspect-pd__main img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  transition: transform .4s ease;
+}
+.aspect-pd__main:hover img { transform: scale(1.04); }
+
+/* ---------- ИНФО ---------- */
+.aspect-pd__info {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 4px;
+}
+.aspect-pd__meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: rgba(0,0,0,.5);
+}
+.aspect-pd__meta-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #F4F6F4;
+  color: #2A4A34;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.aspect-pd__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #000;
+  font-weight: 700;
+  font-size: 14px;
+}
+.aspect-pd__rating svg { width: 16px; height: 16px; color: #2A4A34; }
+
+.aspect-pd__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(32px, 4vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0;
+}
+.aspect-pd__subtitle {
+  font-size: 15px;
+  color: rgba(0,0,0,.55);
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+.aspect-pd__flavor {
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(0,0,0,.75);
+}
+
+/* ---------- ШКАЛЫ ---------- */
+.aspect-pd__scales {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+}
+.aspect-pd__scale-label {
+  font-size: 11px;
+  color: rgba(0,0,0,.5);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.aspect-pd__scale-bar {
+  display: block;
+  height: 3px;
+  background: #E5E8E5;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.aspect-pd__scale-fill {
+  display: block;
+  height: 100%;
+  background: #2A4A34;
+  border-radius: 3px;
+}
+
+/* ---------- ХАРАКТЕРИСТИКИ (обжарка, помол) ---------- */
+.aspect-pd__specs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+  padding: 24px;
+  background: #F4F6F4;
+  border-radius: 20px;
+}
+.aspect-pd__spec {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.aspect-pd__spec-label {
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.5);
+}
+.aspect-pd__spec-value {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  color: #000;
+}
+
+/* ---------- ПОКУПКА ---------- */
+.aspect-pd__purchase {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.aspect-pd__options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.aspect-pd__weights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.aspect-pd__weight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border: 1px solid #E5E8E5;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.aspect-pd__weight:hover { border-color: #2A4A34; }
+.aspect-pd__weight.is-active {
+  background: #2A4A34;
+  border-color: #2A4A34;
+  color: #fff;
+}
+
+.aspect-pd__grind {
+  position: relative;
+}
+.aspect-pd__grind-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #E5E8E5;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.aspect-pd__grind-btn:hover { border-color: #2A4A34; }
+.aspect-pd__grind-btn svg { width: 14px; height: 14px; }
+.aspect-pd__grind-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  box-shadow: 0 12px 36px rgba(0,0,0,.12);
+  padding: 6px;
+  z-index: 50;
+}
+.aspect-pd__grind-item {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  background: transparent;
+  font-size: 14px;
+  color: #000;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.aspect-pd__grind-item:hover { background: #F4F6F4; }
+.aspect-pd__grind-item.is-active { background: #2A4A34; color: #fff; }
+
+.aspect-pd__price-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-top: 8px;
+}
+.aspect-pd__price {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.aspect-pd__price-old {
+  font-size: 14px;
+  color: rgba(0,0,0,.4);
+  text-decoration: line-through;
+}
+.aspect-pd__price-current {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 40px;
+  line-height: 1;
+  color: #000;
+}
+
+.aspect-pd__buy-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.aspect-pd__buy {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 22px;
+  border: 0;
+  border-radius: 14px;
+  background: #000;
+  color: #fff;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+  flex: 1 1 auto;
+  justify-content: center;
+}
+.aspect-pd__buy:hover:not(:disabled) {
+  background: #2A4A34;
+  transform: translateY(-1px);
+}
+.aspect-pd__buy:disabled { opacity: .35; cursor: not-allowed; }
+
+.aspect-pd__counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #2A4A34;
+  border-radius: 14px;
+  padding: 4px;
+  flex: 1 1 auto;
+  justify-content: center;
+}
+.aspect-pd__counter-btn {
+  width: 40px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.aspect-pd__counter-btn:hover { background: rgba(255,255,255,.15); }
+.aspect-pd__counter-val {
+  color: #fff;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  min-width: 32px;
+  text-align: center;
+}
+
+.aspect-pd__action {
+  width: 52px;
+  height: 52px;
+  border: 1px solid #E5E8E5;
+  border-radius: 12px;
+  background: #fff;
+  color: #000;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color .2s, background .2s, color .2s;
+  flex-shrink: 0;
+}
+.aspect-pd__action svg { width: 22px; height: 22px; }
+.aspect-pd__action:hover { border-color: #2A4A34; color: #2A4A34; }
+.aspect-pd__action.is-active {
+  background: #2A4A34;
+  border-color: #2A4A34;
+  color: #fff;
+}
+
+/* ---------- ИНФО-БЛОКИ (аккордеон) ---------- */
+.aspect-pd__blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 80px;
+}
+.aspect-pd__block {
+  background: #fff;
+  border: 1px solid #E5E8E5;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.aspect-pd__block summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 28px;
+  cursor: pointer;
+  list-style: none;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #000;
+}
+.aspect-pd__block summary::-webkit-details-marker { display: none; }
+.aspect-pd__block summary::after {
+  content: "+";
+  font-size: 24px;
+  color: #2A4A34;
+  transition: transform .2s ease;
+}
+.aspect-pd__block[open] summary::after {
+  content: "−";
+}
+.aspect-pd__block-body {
+  padding: 0 28px 28px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(0,0,0,.75);
+}
+.aspect-pd__block-body p { margin: 0 0 12px; }
+.aspect-pd__block-body p:last-child { margin: 0; }
+.aspect-pd__block-body ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+/* ---------- ОТЗЫВЫ ---------- */
+.aspect-pd__reviews {
+  margin-bottom: 80px;
+}
+.aspect-pd__reviews-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #E5E8E5;
+  margin-bottom: 32px;
+  position: relative;
+}
+.aspect-pd__reviews-head::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -1px;
+  width: 56px; height: 3px;
+  background: #2A4A34;
+}
+.aspect-pd__reviews-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 32px;
+  text-transform: uppercase;
+  margin: 0;
+  color: #000;
+}
+.aspect-pd__reviews-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 24px;
+}
+.aspect-pd__reviews-rating svg { width: 24px; height: 24px; color: #2A4A34; }
+
+.aspect-pd__review-form {
+  background: #F4F6F4;
+  border-radius: 20px;
+  padding: 24px 28px;
+  margin-bottom: 32px;
+}
+.aspect-pd__review-form h3 {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+}
+.aspect-pd__stars {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.aspect-pd__star {
+  background: none;
+  border: 0;
+  font-size: 28px;
+  line-height: 1;
+  color: #D1D5DB;
+  cursor: pointer;
+  padding: 0;
+  transition: color .15s;
+}
+.aspect-pd__star.on { color: #2A4A34; }
+
+.aspect-pd__textarea {
+  width: 100%;
+  border: 1.5px solid #E5E8E5;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  resize: none;
+  outline: none;
+  background: #fff;
+  transition: border-color .2s;
+  box-sizing: border-box;
+  font-family: inherit;
+  margin-bottom: 12px;
+}
+.aspect-pd__textarea:focus { border-color: #2A4A34; }
+.aspect-pd__input {
+  width: 100%;
+  border: 1.5px solid #E5E8E5;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  outline: none;
+  background: #fff;
+  transition: border-color .2s;
+  box-sizing: border-box;
+  font-family: inherit;
+  margin-bottom: 8px;
+}
+.aspect-pd__input:focus { border-color: #2A4A34; }
+
+.aspect-pd__submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border: 0;
+  border-radius: 12px;
+  background: #2A4A34;
+  color: #fff;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s;
+}
+.aspect-pd__submit:hover { background: #1E3626; }
+
+.aspect-pd__reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- ПОХОЖИЕ ТОВАРЫ ---------- */
+.aspect-pd__related {
+  margin-bottom: 60px;
+}
+.aspect-pd__related-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #E5E8E5;
+  margin-bottom: 32px;
+  position: relative;
+}
+.aspect-pd__related-head::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -1px;
+  width: 56px; height: 3px;
+  background: #2A4A34;
+}
+.aspect-pd__related-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 32px;
+  text-transform: uppercase;
+  margin: 0;
+  color: #000;
+}
+.aspect-pd__related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+@media (max-width: 1099px) {
+  .aspect-pd__related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 599px) {
+  .aspect-pd__related-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- АДАПТИВ ---------- */
+@media (max-width: 1099px) {
+  .aspect-pd__grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin-bottom: 56px;
+  }
+  .aspect-pd__gallery { position: static; }
+  .aspect-pd__specs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 757px) {
+  .aspect-pd__crumbs { padding: 16px 0; }
+  .aspect-pd__gallery {
+    grid-template-columns: 1fr;
+  }
+  .aspect-pd__thumbs {
+    flex-direction: row;
+    order: 2;
+    overflow-x: auto;
+  }
+  .aspect-pd__thumb { flex: 0 0 72px; width: 72px; height: 72px; }
+  .aspect-pd__main { padding: 20px; }
+  .aspect-pd__title { font-size: 28px; }
+  .aspect-pd__price-current { font-size: 28px; }
+  .aspect-pd__specs { padding: 18px; gap: 14px 18px; }
+  .aspect-pd__buy-row { flex-wrap: wrap; }
+  .aspect-pd__buy { padding: 12px 18px; font-size: 13px; }
+  .aspect-pd__action { width: 46px; height: 46px; }
+  .aspect-pd__block summary { padding: 18px 20px; font-size: 17px; }
+  .aspect-pd__block-body { padding: 0 20px 20px; }
+  .aspect-pd__reviews-title,
+  .aspect-pd__related-title { font-size: 24px; }
+}
+/* ==========================================================
+   PRODUCT CARD — используется и в каталоге, и в detail
+   ========================================================== */
+   .aspect-products {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 22px;
+}
+@media (max-width: 1099px) {
+  .aspect-products { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 599px) {
+  .aspect-products { grid-template-columns: 1fr !important; }
+}
+
+.aspect-card {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 22px;
+  padding: 20px;
+  transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+  cursor: pointer;
+  position: relative;
+  min-height: 520px;
+}
+.aspect-card:hover {
+  border-color: #2A4A34;
+  transform: translateY(-4px);
+  box-shadow: 0 22px 52px rgba(42,74,52,.12);
+}
+.aspect-card.card-popup-open { z-index: 90; }
+
+.aspect-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.aspect-card__cat {
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #2A4A34;
+  font-weight: 700;
+  padding: 4px 10px;
+  background: #F4F6F4;
+  border-radius: 999px;
+}
+.aspect-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #000;
+}
+.aspect-card__rating,
+.aspect-card__comments {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: #000;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 2px 4px;
+}
+.aspect-card__rating svg {
+  width: 14px;
+  height: 14px;
+  color: #2A4A34;
+}
+.aspect-card__comments svg {
+  width: 14px;
+  height: 14px;
+}
+
+.aspect-card__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.aspect-flag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #F4F6F4;
+  color: #000;
+  border: 1px solid #E5E8E5;
+}
+.aspect-flag--sca,
+.aspect-flag--green {
+  background: #2A4A34;
+  color: #fff;
+  border-color: #2A4A34;
+}
+.aspect-flag--dark {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.aspect-card__title-block {
+  margin-bottom: 14px;
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+.aspect-card__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #000 !important;
+  text-decoration: none;
+  transition: color .2s ease;
+}
+.aspect-card__title:hover { color: #2A4A34 !important; }
+.aspect-card__process {
+  font-size: 12px;
+  color: rgba(0,0,0,.5);
+  text-decoration: underline dashed rgba(0,0,0,.2);
+  text-underline-offset: 3px;
+  position: relative;
+  cursor: help;
+}
+.aspect-card__process-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 260px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid #E5E8E5;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #333;
+  box-shadow: 0 12px 36px rgba(0,0,0,.12);
+  z-index: 50;
+  text-align: left;
+  text-decoration: none;
+}
+.aspect-card__process-pop p { margin: 0; }
+
+.aspect-card__media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+  background: #F4F6F4;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+  transition: background .25s ease;
+}
+.aspect-card:hover .aspect-card__media { background: #E8EEE8; }
+.aspect-card__media-link {
+  display: block;
+  width: 100%;
+  max-width: 160px;
+  aspect-ratio: 1 / 1;
+  position: relative;
+}
+.aspect-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform .4s ease;
+}
+.aspect-card:hover .aspect-card__media img { transform: scale(1.06); }
+
+.aspect-card__desc {
+  min-height: 42px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(0,0,0,.65);
+  text-align: left;
+}
+.aspect-card__desc p { margin: 0; }
+.aspect-card__desc .descriptor-badge { background: transparent !important; color: #000 !important; }
+.aspect-card:hover .descriptor-badge {
+  background: #2A4A34 !important;
+  color: #fff !important;
+}
+
+.aspect-card__scales {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.aspect-card__scale {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+.aspect-card__scale-label {
+  font-size: 11px;
+  color: rgba(0,0,0,.5);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.aspect-card__scale-bar {
+  display: block;
+  height: 3px;
+  background: #E5E8E5;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.aspect-card__scale-fill {
+  display: block;
+  height: 100%;
+  background: #2A4A34;
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+
+.aspect-card__options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.aspect-card__weights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.aspect-card__weight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border: 1px solid #E5E8E5;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #000;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, color .2s ease;
+}
+.aspect-card__weight:hover { border-color: #2A4A34; }
+.aspect-card__weight.is-active {
+  background: #2A4A34;
+  border-color: #2A4A34;
+  color: #fff;
+}
+.aspect-card__weight.is-unavail {
+  opacity: .35;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.aspect-card__grind {
+  position: relative;
+}
+.aspect-card__grind-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 100%;
+  padding: 9px 14px;
+  border: 1px solid #E5E8E5;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #000;
+  cursor: pointer;
+  transition: border-color .2s ease;
+}
+.aspect-card__grind-btn:hover { border-color: #2A4A34; }
+.aspect-card__grind-btn svg { width: 12px; height: 12px; }
+.aspect-card__grind-menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  min-width: 200px;
+  background: #fff;
+  border: 1px solid #E5E8E5;
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0,0,0,.12);
+  padding: 6px;
+  z-index: 100;
+}
+.aspect-card__grind-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+  color: #000;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background .15s ease;
+}
+.aspect-card__grind-item:hover { background: #F4F6F4; }
+.aspect-card__grind-item.is-active { background: #2A4A34; color: #fff; }
+
+.aspect-card__variant-msg {
+  font-size: 12px;
+  color: #B91C1C;
+  min-height: 0;
+  margin-bottom: 4px;
+}
+.aspect-card__variant-msg:empty { display: none; }
+
+.aspect-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid #F0F0F0;
+  margin-bottom: 12px;
+}
+.aspect-card__price {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.aspect-card__old {
+  font-size: 12px;
+  color: rgba(0,0,0,.4);
+  text-decoration: line-through;
+}
+.aspect-card__current {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 1;
+  color: #000;
+  white-space: nowrap;
+}
+.aspect-card__buy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: #000;
+  color: #fff;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+  white-space: nowrap;
+}
+.aspect-card__buy:hover:not(:disabled) {
+  background: #2A4A34;
+  transform: translateY(-1px);
+}
+.aspect-card__buy:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+.aspect-card__buy svg { width: 16px; height: 16px; }
+
+.aspect-card__counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #2A4A34;
+  border-radius: 12px;
+  padding: 4px;
+}
+.aspect-card__counter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: background .2s ease;
+}
+.aspect-card__counter-btn:hover { background: rgba(255,255,255,.15); }
+.aspect-card__counter-btn svg { width: 16px; height: 16px; }
+.aspect-card__counter-val {
+  color: #fff;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.aspect-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.aspect-card__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #E5E8E5;
+  border-radius: 10px;
+  background: #fff;
+  color: #000;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, color .2s ease;
+}
+.aspect-card__action svg { width: 18px; height: 18px; }
+.aspect-card__action:hover {
+  border-color: #2A4A34;
+  color: #2A4A34;
+}
+.aspect-card__action.is-active {
+  background: #2A4A34;
+  border-color: #2A4A34;
+  color: #fff;
+}
+.aspect-card__action.is-active:hover { background: #1E3626; }
 </style>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.hash === '#recipes') {
-        window.setTimeout(function () { if (typeof switchTab === 'function') switchTab('recipes'); }, 0);
-    }
-});
-</script>
-<div class="product-detail-root product-detail--{{ product.slug }}" style="background:#ffffff; min-height:100vh; padding-bottom:100px; font-family: 'Gotham Pro', sans-serif;">
-    <div class="container mx-auto px-4 md:px-8" style="max-width:1240px;">
+{% endblock %}
 
-        {# ── Breadcrumbs ── #}
-        <nav class="py-6 flex items-center gap-2 text-[13px] text-[rgba(0,0,0,0.45)]">
-            <a href="/" class="hover:text-black transition-colors">Главная</a>
-            <span class="text-[rgba(0,0,0,0.25)]">/</span>
-            <a href="{% url 'catalog:catalog' %}" class="hover:text-black transition-colors">Кофе</a>
-            <span class="text-[rgba(0,0,0,0.25)]">/</span>
-            <span class="text-black font-medium">{{ product.name }}</span>
-        </nav>
+{% block content %}
+<main class="aspect-pd">
 
-        {# ── Main Layout ── #}
-        <div class="product-main-grid" style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:32px; align-items:start;">
+  <div class="aspect-pd__container">
 
-            <section class="product-overview-panel" aria-label="Product information">
-                <div class="product-overview-head">
-                    {% if product.roast_level %}
-                    <p class="product-overview-meta">для {% if product.roast_level == 'espresso' %}эспрессо{% else %}фильтра{% endif %}</p>
-                    {% endif %}
-                    <div class="product-overview-rating">
-                        <span>★ {{ product.rating_avg|floatformat:"1u" }}</span>
-                        <a href="#tab-reviews" onclick="switchTab('reviews');return false;" style="color:inherit;text-decoration:none;">◌ {{ product.reviews_count }}</a>
-                    </div>
-                </div>
-                <h1>{{ product.name }}</h1>
-                <div class="product-overview-subline">
-                    {% if product.processing_method %}<p class="product-overview-meta">{{ product.processing_method }}</p>{% endif %}
-                    <div class="product-overview-flags">
-                        {% if product.is_featured %}<span class="product-overview-week">сорт недели</span>{% endif %}
-                        {% if product.is_bestseller %}<span class="product-overview-popular">популярный</span>{% endif %}
-                    </div>
-                </div>
-                <div class="product-overview-flavor">
-                    {% if product.flavor_description_html %}{{ product.flavor_description_html|colorize_flavors }}{% else %}{{ product.short_description|default:product.name|safe }}{% endif %}
-                </div>
-                {% if product.has_taste_profile %}
-                <div class="product-overview-scales">
-                    {% if product.has_body_profile %}<div><span>Плотность</span><i style="--value:{{ product.body }}0%"></i></div>{% endif %}
-                    {% if product.has_acidity_profile %}<div><span>Кислотность</span><i style="--value:{{ product.acidity }}0%"></i></div>{% endif %}
-                </div>
-                {% endif %}
-            </section>
+    {# ---------- BREADCRUMBS ---------- #}
+    <nav class="aspect-pd__crumbs" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span>/</span>
+      <a href="{% url 'catalog:catalog' %}">Кофе</a>
+      <span>/</span>
+      <span style="color:#000">{{ product.name }}</span>
+    </nav>
 
-            {# LEFT: Vertical Thumbnails #}
-            <div class="product-thumbnails" style="display:flex; flex-direction:column; gap:10px;">
-                {% if product.main_image %}
-                <button onclick="document.getElementById('main-image').src='{{ product.main_image.url }}'"
-                        style="width:100%; aspect-ratio:1; background:white; border:1.5px solid #ebebeb; border-radius:16px; padding:6px; cursor:pointer; transition:border-color 0.2s;"
-                        onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='#ebebeb'">
-                    <img src="{{ product.main_image.url }}" 
-                         onerror="this.onerror=null;this.src='{% static 'asset/images/product-placeholder.svg' %}'"
-                         style="width:100%; height:100%; object-fit:contain;" alt="">
-                </button>
-                {% endif %}
-                {% for img in product.images.all %}
-                <button onclick="document.getElementById('main-image').src='{{ img.image.url }}'"
-                        style="width:100%; aspect-ratio:1; background:white; border:1.5px solid #ebebeb; border-radius:16px; padding:6px; cursor:pointer; transition:border-color 0.2s;"
-                        onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='#ebebeb'">
-                    <img src="{{ img.image.url }}" 
-                         onerror="this.onerror=null;this.src='{% static 'asset/images/product-placeholder.svg' %}'"
-                         style="width:100%; height:100%; object-fit:contain;" alt="">
-                </button>
-                {% endfor %}
-            </div>
+    {# ---------- MAIN ---------- #}
+    <div class="aspect-pd__grid">
 
-            {# MIDDLE: Main Image #}
-            <div class="product-image-panel">
-                <div style="background:white; border-radius:28px; border:1px solid #ebebeb; aspect-ratio:1; display:flex; align-items:center; justify-content:center; padding:40px; overflow:hidden;">
-                    {% if primary_image %}
-                        <img src="{{ primary_image.url }}" id="main-image"
-                             onerror="this.onerror=null;this.src='{% static 'asset/images/product-placeholder.svg' %}'"
-                             style="display:block; width:100%; height:100%; max-width:100%; max-height:100%; margin:auto; object-fit:contain; object-position:center; transition:transform 0.5s;"
-                             onmouseover="this.style.transform='scale(1.05)'"
-                             onmouseout="this.style.transform='scale(1)'"
-                             alt="{{ product.name }}">
-                    {% else %}
-                        <img src="{% static 'asset/images/product-placeholder.svg' %}" id="main-image" style="display:block; width:100%; height:100%; max-width:100%; max-height:100%; margin:auto; padding:40px; object-fit:contain; object-position:center;" alt="{{ product.name }}">
-                    {% endif %}
-                </div>
-                {% if product.q_score %}<div class="product-q-badge"><span>ОЦЕНКА Q-ГРЕЙДЕРА</span><strong>{{ product.q_score }}</strong><small>LIMITED MICROLOT COFFEE</small></div>{% endif %}
-            </div>
+      {# ---------- ГАЛЕРЕЯ ---------- #}
+      <div class="aspect-pd__gallery">
+        <div class="aspect-pd__thumbs">
+          {% if product.main_image %}
+          <button type="button" class="aspect-pd__thumb is-active" onclick="document.getElementById('pd-main-image').src='{{ product.main_image.url }}'">
+            <img src="{{ product.main_image.url }}" onerror="this.onerror=null;this.src='{% static 'asset/images/product-placeholder.svg' %}'" alt="">
+          </button>
+          {% endif %}
+          {% for img in product.images.all %}
+          <button type="button" class="aspect-pd__thumb" onclick="document.getElementById('pd-main-image').src='{{ img.image.url }}'">
+            <img src="{{ img.image.url }}" onerror="this.onerror=null;this.src='{% static 'asset/images/product-placeholder.svg' %}'" alt="">
+          </button>
+          {% endfor %}
+        </div>
+        <div class="aspect-pd__main">
+          {% if primary_image %}
+          <img id="pd-main-image" src="{{ primary_image.url }}" onerror="this.onerror=null;this.src='{% static 'asset/images/product-placeholder.svg' %}'" alt="{{ product.name }}">
+          {% else %}
+          <img id="pd-main-image" src="{% static 'asset/images/product-placeholder.svg' %}" alt="{{ product.name }}">
+          {% endif %}
+        </div>
+      </div>
 
-            {# RIGHT: Info & Purchase #}
-            <div class="product-info-panel" style="display:flex; flex-direction:column; gap:20px;">
+      {# ---------- ИНФО ---------- #}
+      <div class="aspect-pd__info">
 
-                {# Rating & reviews #}
-                <div style="display:flex; align-items:center; gap:16px; font-size:14px;">
-                    <div style="display:flex; align-items:center; gap:4px; font-weight:700;">
-                        <svg style="width:16px; height:16px; color:#f59e0b; fill:currentColor;"><use href="{% static 'asset/images/sprite.svg' %}#icons--star"></use></svg>
-                        {{ product.rating_avg|floatformat:"1u" }}
-                    </div>
-                    <a href="#tab-reviews" onclick="switchTab('reviews')"
-                       style="color:rgba(0,0,0,0.4); display:flex; align-items:center; gap:4px; text-decoration:none; transition:color 0.2s;"
-                       onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,0.4)'">
-                        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                        {{ product.reviews_count }}
-                    </a>
-                    {% if product.is_bestseller %}
-                    <span style="color:rgba(0,0,0,0.4);">популярный</span>
-                    {% endif %}
-                </div>
-
-                {# Title #}
-                <div>
-                    {% if product.roast_level %}
-                    <span style="color:rgba(0,0,0,0.4); font-size:13px; font-weight:500; display:block; margin-bottom:4px;">
-                        для {% if product.roast_level == 'espresso' %}эспрессо{% else %}фильтра{% endif %}
-                    </span>
-                    {% endif %}
-                    <h1 style="font-size:40px; font-weight:900; text-transform:uppercase; line-height:1.1; color:black; margin:0 0 6px 0;">{{ product.name }}</h1>
-                    {% if product.processing_method %}<span style="color:rgba(0,0,0,0.5); font-size:14px; font-weight:500;">{{ product.processing_method }}</span>{% endif %}
-                </div>
-
-                {# Flavor description — inline tags #}
-                <div class="detail-flavor-description" style="font-size:15px; color:black; line-height:1.7;">
-                    {% if product.flavor_description_html %}
-                        {{ product.flavor_description_html|colorize_flavors }}
-                    {% elif product.short_description %}
-                        {{ product.short_description|safe }}
-                    {% elif product.description %}
-                        {{ product.description|striptags|truncatechars:240 }}
-                    {% endif %}
-                </div>
-
-                {# Progress Bars #}
-                {% if product.has_taste_profile %}
-                <div style="display:flex; gap:40px;">
-                    {% if product.has_body_profile %}
-                    <div>
-                        <div style="font-size:13px; font-weight:500; color:black; margin-bottom:6px;">Плотность</div>
-                        <div style="height:2px; width:110px; background:#e0e0e0; border-radius:2px; overflow:hidden;">
-                            <div style="background:black; height:100%; width:{{ product.body }}0%;"></div>
-                        </div>
-                    </div>
-                    {% endif %}
-                    {% if product.has_acidity_profile %}
-                    <div>
-                        <div style="font-size:13px; font-weight:500; color:black; margin-bottom:6px;">Кислотность</div>
-                        <div style="height:2px; width:110px; background:#e0e0e0; border-radius:2px; overflow:hidden;">
-                            <div style="background:black; height:100%; width:{{ product.acidity }}0%;"></div>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                {% endif %}
-
-                {# Discount card #}
-                {% if request.user.is_authenticated and active_promo %}
-                <div data-v-7d8ae2e7="" class="w-full bg-white space-y-4 rounded-3xl h-full p-6 !p-0 relative !space-y-0 !w-fit max-sm:!w-full"><div data-v-7d8ae2e7="" class="bg-gradient w-fit max-sm:w-full xs:min-w-[300px] rounded-2xl flex flex-col-reverse gap-1 justify-center bg-[100%_auto] bg-no-repeat bg-center min-h-[72px] px-6"><p data-v-7d8ae2e7="" class="text-[14px] leading-[1.2] text-[--black-50]"><!----> {{ active_promo.discount_value }}{% if active_promo.discount_type == 'percent' %}%{% else %}₽{% endif %} <span data-v-7d8ae2e7="" class="lowercase">на первый заказ</span></p><div data-v-7d8ae2e7="" class="relative w-full flex items-center gap-1"><p data-v-7d8ae2e7="" class="text-[14px] leading-[1.3] medium"> Промокод </p><button data-v-7d8ae2e7="" class="text-[14px] leading-[1.2] text-white bg-black pt-[1px] px-1.5 rounded" type="button" data-copy-promo="{{ active_promo.code }}" onclick="tcCopyPromo(this)" aria-label="Скопировать промокод">{{ active_promo.code }}</button></div><svg data-v-7d8ae2e7="" width="40" height="40" viewBox="0 0 40 40" fill="none" class="absolute top-0 bottom-0 m-auto pointer-events-none right-1" style="transition: transform 0.5s ease-in-out; transform: rotate(90deg) translateY(4px);"><path data-v-7d8ae2e7="" d="M11.61 5.5L25 19.9999L19 26.8332" stroke="black" stroke-width="2.66875" style="transition: opacity 0.4s ease-in-out; opacity: 0.5;"></path></svg></div><div data-v-7d8ae2e7="" class="space-y-2 max-2xl:md:flex-col max-2xl:md:items-end">{% if cart_promo_code == active_promo.code %}<button data-v-7d8ae2e7="" type="button" class="tc-btn btn-dark tc-promo-applied-button w-full !absolute inset-0 z-10 w-full h-full top-0 left-0 !transform-none !opacity-0 !rounded-2xl" disabled=""><!----><!----><span class="text-primary duration-200">Применён</span><!----><!----></button>{% else %}<form method="POST" action="{% url 'orders:apply_promo' %}">{% csrf_token %}<input type="hidden" name="code" value="{{ active_promo.code }}"><input type="hidden" name="next" value="{{ request.path }}"><button data-v-7d8ae2e7="" type="submit" class="tc-btn btn-dark w-full !absolute inset-0 z-10 w-full h-full top-0 left-0 !transform-none !opacity-0 !rounded-2xl" style="cursor:pointer;"><!----><!----><span class="text-primary duration-200">Применить</span><!----><!----></button></form>{% endif %}</div></div>
-                {% elif request.user.is_authenticated %}
-                {% else %}
-                {# Guest: login prompt #}
-                <div style="background:#f2f4f7; border-radius:18px; padding:14px 16px; display:flex; align-items:center; justify-content:space-between;">
-                    <div>
-                        <p style="font-size:14px; font-weight:700; color:black; margin:0 0 2px 0;">Войдите, и станет дешевле</p>
-                        <p style="font-size:12px; color:rgba(0,0,0,0.4); margin:0;">В аккаунте больше скидок</p>
-                    </div>
-                    <a href="/login/"
-                       style="padding:10px; background:white; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,0.08); display:flex; align-items:center; justify-content:center; transition:transform 0.2s;"
-                       onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                        <svg style="width:20px; height:20px; opacity:0.8;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 17l5-5-5-5"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H3"/>
-                        </svg>
-                    </a>
-                </div>
-                {% endif %}
-
-
-                {# Weight / Grind / Price / Actions #}
-                {% with first_v=product.variants.all.0 %}
-                <div class="product-purchase-panel" x-data="productCard({ id: {{ product.id }}, slug: '{{ product.slug }}', price: {{ first_v.price|default:0|floatformat:0 }}, inStock: {{ product.in_stock|yesno:'true,false'}}, inWishlist: {% if product.id in wishlist_ids %}true{% else %}false{% endif %} })">
-                    {# Weight + Grind row #}
-                    {% if product.has_purchase_options %}
-                    <div class="product-purchase-options" style="display:flex; align-items:stretch; gap:12px; margin-bottom:16px;">
-
-                        {# Weight buttons #}
-                        {% if product.has_packaging_options %}
-                        <div style="background:#f0f0f2; border-radius:12px; padding:4px; display:flex; align-items:center; gap:4px; flex-shrink:0;">
-                            {% for pkg in product.priced_packagings %}
-                            <button class="weight-btn"
-                                    style="padding:8px 18px; border-radius:9px; font-size:14px; font-weight:700; cursor:pointer; border:none; transition:all 0.2s;"
-                                    :class="weight === {{ pkg.weight }} ? 'weight-btn--active' : 'weight-btn--inactive'"
-                                    @click="setWeight({{ pkg.weight }})">
-                                {{ pkg.weight }} г{% if pkg.old_price and pkg.old_price > pkg.price %}&nbsp;<sup style="color:#ef4444; font-size:10px;">-{{ pkg.discount_percent }}%</sup>{% endif %}
-                            </button>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-
-                        {# Grind dropdown — Alpine-bound #}
-                        {% if product.has_grind_options %}
-                        <div style="position:relative; min-width:180px; flex-shrink:0;" @click.outside="grindOpen = false">
-                            <button type="button"
-                                    style="width:100%; height:100%; background:#f0f0f2; border:none; border-radius:12px; padding:10px 36px 10px 14px; font-size:14px; font-weight:700; cursor:pointer; color:black; text-align:left; display:flex; align-items:center; justify-content:space-between; gap:8px;"
-                                    @click.stop="if(!grindOpen){ document.dispatchEvent(new CustomEvent('closeAllGrindDropdowns', {detail:{exceptId:id}})); } grindOpen = !grindOpen">
-                                <span x-text="currentComboLabel" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">в зёрнах</span>
-                                <svg style="width:16px; height:16px; opacity:0.4;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
-                            </button>
-                            <div style="position:absolute; top:100%; left:0; right:0; background:white; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.12); z-index:50; overflow:hidden; margin-top:4px;"
-                                 x-show="grindOpen" x-transition x-cloak>
-                                <template x-for="combo in combos" :key="combo.grind + '|' + combo.roast">
-                                    <button type="button"
-                                            style="display:block; width:100%; padding:10px 14px; font-size:14px; font-weight:700; text-align:left; border:none; cursor:pointer; background:transparent; color:black;"
-                                            :style="grind === combo.grind && roast === combo.roast ? 'background:#f0f0f2;' : ''"
-                                            @click.stop="setCombo(combo.grind, combo.roast); grindOpen = false">
-                                        <span x-text="combo.label"></span>
-                                    </button>
-                                </template>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-
-                    {# Add to cart + action buttons #}
-                    <div class="product-purchase-actions" style="display:flex; align-items:center; gap:10px;">
-                        <template x-if="!justAdded">
-                            <button id="add-to-cart-btn" data-variant-id="{{ first_v.id|default:'' }}"
-                                    class="product-detail-buy !ml-0 tc-btn-pay" type="button" :disabled="!currentVariant" @click.stop="addToCart()"
-                                    style="height:52px; padding:0 22px; border-radius:12px; font-weight:700; display:flex; align-items:center; gap:12px; border:none; cursor:pointer; background:black; color:white;">
-                                <span x-show="currentVariant && currentVariant.old_price" x-text="currentVariant ? Math.round(currentVariant.old_price) : ''" style="text-decoration:line-through;color:#7C8074;font-size:14px;font-weight:600;margin-right:4px"></span>
-                                <span class="text-nowrap" style="font-size:19px;" x-text="currentPrice + ' ₽'"></span>
-                                <div style="width:1px; height:16px; background:rgba(255,255,255,0.2);"></div>
-                                <svg style="width:20px; height:20px;"><use href="{% static 'asset/images/sprite.svg' %}#icons--shop"></use></svg>
-                            </button>
-                        </template>
-                        <template x-if="justAdded">
-                            <button class="product-detail-buy tc-btn-pay tc-btn-pay--added" :class="{ active: justAdded }" :style="justAdded ? 'margin-left:0;background: radial-gradient(157.14% 133.98% at -41.6% 65.41%, #f4f1b9 0%, #bff3df 46%, #c8dcff 65.5%, #da8fdd 83%, #f4f1b9 97%); color: #000; box-shadow: none; height:52px; padding:0 22px; border-radius:12px; font-weight:700; display:flex; align-items:center; gap:12px; border:none; cursor:pointer;' : ''" type="button">
-                                <span class="product-detail-cart-step w-8 h-8 flex m-0 cursor-pointer" @click.stop="decrementCart()">
-                                    <svg class="w-4 h-4 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="{% static 'asset/images/sprite.svg' %}#icons--minus"></use></svg>
-                                </span>
-                                <span class="text-nowrap" style="font-size:19px;" x-text="currentPrice + ' ₽'"></span>
-                                <span class="product-detail-cart-step w-8 h-8 flex m-0 cursor-pointer" @click.stop="incrementCart()">
-                                    <svg class="w-4 h-4 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="{% static 'asset/images/sprite.svg' %}#icons--plus"></use></svg>
-                                </span>
-                            </button>
-                        </template>
-                        <div class="product-detail-cart-qty text-[14px] leading-[1.2] text-[var(--black-50)] text-nowrap" x-show="justAdded" x-text="' x ' + cartQty"></div>
-
-                        <div class="product-detail-actions" style="display:flex; gap:8px;">
-                            <button class="product-detail-action tc-tile__bottom--btn"
-                                    @click="toggleWishlist()"
-                                    :class="{ 'is-active': inWishlist }"
-                                    style="width:52px; height:52px; display:flex; align-items:center; justify-content:center; border-radius:12px; border:1.5px solid #ebebeb; background:white; cursor:pointer; transition:all 0.2s;"
-                                    :title="inWishlist ? 'Убрать из избранного' : 'В избранное'">
-                                <svg aria-hidden="true" class="w-6 h-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" :stroke="inWishlist ? '#000' : '#000'" stroke-width="1.8">
-                                    <path x-show="!inWishlist" stroke-linecap="round" stroke-linejoin="round" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                    <path x-show="inWishlist" fill="#000" stroke-linecap="round" stroke-linejoin="round" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                </svg>
-                            </button>
-                            <button class="product-detail-action" @click="toggleCompare()"
-                                    :class="{ 'is-active': inCompare }"
-                                    style="width:52px; height:52px; display:flex; align-items:center; justify-content:center; border-radius:12px; border:1.5px solid #ebebeb; background:white; cursor:pointer; transition:all 0.2s;" title="В сравнение">
-                                <svg x-show="!inCompare" class="h-[32px] w-[32px] min-w-[32px]" style="color:#000"><use href="{% static 'asset/images/sprite.svg' %}#icons--comparison"></use></svg>
-                                <svg x-show="inCompare" class="h-[32px] w-[32px] min-w-[32px]" style="color:#000"><use href="{% static 'asset/images/sprite.svg' %}#icons--comparison-fill"></use></svg>
-                            </button>
-                            <button class="product-detail-action" @click="toggleNote()"
-                                    :class="{ 'is-active': hasNote }"
-                                    style="width:52px; height:52px; display:flex; align-items:center; justify-content:center; border-radius:12px; border:1.5px solid #ebebeb; background:white; cursor:pointer; transition:all 0.2s;" title="Заметка">
-                                <svg x-show="!hasNote" style="width:20px; height:20px;" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l4 4v14H7z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 3v5h5M10 13h6M10 17h6"/>
-                                </svg>
-                                <svg x-show="hasNote" class="h-[20px] w-[20px]" viewBox="0 0 24 24"><use href="{% static 'asset/images/sprite.svg' %}#icons--note-fill"></use></svg>
-                            </button>
-                        </div>
-
-                        {# Note Modal #}
-
-                        <script type="application/json" id="variants-json" class="variants-data">
-                            [{% for v in product.variants.all %}{% with eop=v.effective_old_price ep=v.effective_price %}{"id":{{ v.id }},"weight":{{ v.weight }},"grind":"{{ v.grind }}","grind_label":"{{ v.get_grind_display }}","roast":"{{ v.roast_type.slug|default:'' }}","roast_label":"{{ v.roast_display }}","price":{{ ep|default:0|floatformat:0 }},"old_price":{% if eop and eop > ep %}{{ eop|floatformat:0 }}{% else %}null{% endif %}}{% if not forloop.last %},{% endif %}{% endwith %}{% endfor %}]
-                        </script>
-                    </div>
-                </div>
-
-                {% endwith %}
-            </div>
+        {# Мета-строка #}
+        <div class="aspect-pd__meta">
+          {% if product.roast_level %}
+          <span class="aspect-pd__meta-tag">
+            {% if product.roast_level == 'espresso' %}для эспрессо{% else %}для фильтра{% endif %}
+          </span>
+          {% endif %}
+          <span class="aspect-pd__rating">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 1.8 3.08 6.24 6.89 1-4.98 4.85 1.18 6.86L12 17.51l-6.17 3.24 1.18-6.86-4.98-4.85 6.89-1L12 1.8Z"/></svg>
+            {{ product.rating_avg|floatformat:"1u" }}
+          </span>
+          <span>{{ product.reviews_count }} отзывов</span>
         </div>
 
-
-        {# ── TABS SECTION ── #}
-        <div style="margin-top:80px; max-width:860px; margin-left:auto; margin-right:auto;" id="product-tabs">
-            <div style="border-bottom:1px solid #ebebeb; display:flex; gap:24px; margin-bottom:48px; overflow-x:auto;">
-                <button class="tab-btn active" data-target="info" id="tab-btn-info">ОПИСАНИЕ</button>
-                <button class="tab-btn" data-target="reviews" id="tab-btn-reviews">ОТЗЫВЫ&nbsp;<span style="color:var(--opacity-50,rgba(0,0,0,.5));">{{ product.reviews_count }}</span></button>
-                <button class="tab-btn" data-target="recipes" id="tab-btn-recipes">РЕЦЕПТЫ{% if recipes_count %}&nbsp;<span style="color:var(--opacity-50,rgba(0,0,0,.5));">{{ recipes_count }}</span>{% endif %}</button>
-                <button class="tab-btn" data-target="storage" id="tab-btn-storage">ХРАНЕНИЕ</button>
-                <button class="tab-btn" data-target="delivery" id="tab-btn-delivery">ДОСТАВКА</button>
-            </div>
-
-            {# INFO TAB — reference: Подробнее / Описание / Способы приготовления / Хранение / Доставка+Гарантия #}
-            <div id="tab-panel-info" class="tab-panel" style="display:flex; flex-direction:column; gap:32px;">
-
-                <div class="pdx-section">
-                    <h2 class="pdx-h2">Подробнее</h2>
-                    <div class="pdx-chars">
-                        <ul class="pdx-chars-list">
-                            {% if product.q_score %}
-                            <li class="tc-char-item">
-                                <div style="font-size:14px; line-height:1.2; margin-bottom:4px; position:relative; color:#94a3b8;">
-                                    <span style="margin-right:2px; vertical-align:middle;">Оценка Q-грейдера</span>
-                                    <span class="tc-info-trigger" style="vertical-align:middle; cursor:pointer; position:relative; display:inline-block;">
-                                        <svg width="16" height="16" viewBox="0 0 64 64" fill="none" style="vertical-align:middle;"><circle cx="32" cy="32" r="21.3" stroke="currentColor" stroke-width="4.27"/><circle cx="32" cy="22.4" r="3.2" fill="currentColor"/><path d="M32 29.87V42.67" stroke="currentColor" stroke-width="4.27"/></svg>
-                                        <span class="tc-info-popup">Q-грейдинг — это единая система оценки кофе. Она помогает объективно оценивать кофе по 100-балльной шкале и присваивать ему класс. Для этого проводят каппинг — определяют вкус, аромат, послевкусие, дефекты и общее впечатление от кофе.</span>
-                                    </span>
-                                </div>
-                                <p style="font-size:18px; font-weight:600; text-transform:uppercase; line-height:1.2; margin:0;">{{ product.q_score }}</p>
-                            </li>
-                            {% endif %}
-                            {% if product.roast_level %}
-                            <li class="tc-char-item">
-                                <div style="font-size:14px; line-height:1.2; margin-bottom:4px; position:relative; color:#94a3b8;">
-                                    <span style="margin-right:2px; vertical-align:middle;">Степень обжарки</span>
-                                    <span class="tc-info-trigger" style="vertical-align:middle; cursor:pointer; position:relative; display:inline-block;">
-                                        <svg width="16" height="16" viewBox="0 0 64 64" fill="none" style="vertical-align:middle;"><circle cx="32" cy="32" r="21.3" stroke="currentColor" stroke-width="4.27"/><circle cx="32" cy="22.4" r="3.2" fill="currentColor"/><path d="M32 29.87V42.67" stroke="currentColor" stroke-width="4.27"/></svg>
-                                        <span class="tc-info-popup">Степень обжарки влияет на вкус кофе. Светлая — кислотная и фруктовая. Средняя — сбалансированная. Тёмная — насыщенная и горьковатая. Эспрессо — для приготовления в кофемашине.</span>
-                                    </span>
-                                </div>
-                                <p style="font-size:18px; font-weight:600; text-transform:uppercase; line-height:1.2; margin:0;">{{ product.get_roast_level_display }}</p>
-                            </li>
-                            {% endif %}
-                            {% if product.region %}
-                            <li class="tc-char-item">
-                                <div style="font-size:14px; line-height:1.2; margin-bottom:4px; position:relative; color:#94a3b8;">
-                                    <span style="margin-right:2px; vertical-align:middle;">Регион</span>
-                                    <span class="tc-info-trigger" style="vertical-align:middle; cursor:pointer; position:relative; display:inline-block;">
-                                        <svg width="16" height="16" viewBox="0 0 64 64" fill="none" style="vertical-align:middle;"><circle cx="32" cy="32" r="21.3" stroke="currentColor" stroke-width="4.27"/><circle cx="32" cy="22.4" r="3.2" fill="currentColor"/><path d="M32 29.87V42.67" stroke="currentColor" stroke-width="4.27"/></svg>
-                                        <span class="tc-info-popup">Регион произрастания кофе влияет на его вкусовой профиль. Климат, высота и состав почвы создают уникальные характеристики зерна.</span>
-                                    </span>
-                                </div>
-                                <p style="font-size:18px; font-weight:600; text-transform:uppercase; line-height:1.2; margin:0;">{{ product.region }}</p>
-                            </li>
-                            {% endif %}
-                            {% if product.processing_method %}
-                            <li class="tc-char-item">
-                                <div style="font-size:14px; line-height:1.2; margin-bottom:4px; position:relative; color:#94a3b8;">
-                                    <span style="margin-right:2px; vertical-align:middle;">Способ обработки</span>
-                                    <span class="tc-info-trigger" style="vertical-align:middle; cursor:pointer; position:relative; display:inline-block;">
-                                        <svg width="16" height="16" viewBox="0 0 64 64" fill="none" style="vertical-align:middle;"><circle cx="32" cy="32" r="21.3" stroke="currentColor" stroke-width="4.27"/><circle cx="32" cy="22.4" r="3.2" fill="currentColor"/><path d="M32 29.87V42.67" stroke="currentColor" stroke-width="4.27"/></svg>
-                                        <span class="tc-info-popup">Способ обработки — метод извлечения зерна из кофейной ягоды. Мытый, натуральный и хани — основные методы, каждый придаёт кофе особый вкусовой профиль.</span>
-                                    </span>
-                                </div>
-                                <p style="font-size:18px; font-weight:600; text-transform:uppercase; line-height:1.2; margin:0;">{{ product.processing_method }}</p>
-                            </li>
-                            {% endif %}
-                            {% if product.roaster or product.roaster_machine %}
-                            <li class="tc-char-item">
-                                <div style="font-size:14px; line-height:1.2; margin-bottom:4px; position:relative; color:#94a3b8;">
-                                    <span style="margin-right:2px; vertical-align:middle;">Ростер для обжарки</span>
-                                    <span class="tc-info-trigger" style="vertical-align:middle; cursor:pointer; position:relative; display:inline-block;">
-                                        <svg width="16" height="16" viewBox="0 0 64 64" fill="none" style="vertical-align:middle;"><circle cx="32" cy="32" r="21.3" stroke="currentColor" stroke-width="4.27"/><circle cx="32" cy="22.4" r="3.2" fill="currentColor"/><path d="M32 29.87V42.67" stroke="currentColor" stroke-width="4.27"/></svg>
-                                        <span class="tc-info-popup">Ростер — машина для обжарки кофе. Разные модели обеспечивают разный контроль температуры и воздушного потока, что влияет на профиль обжарки.</span>
-                                    </span>
-                                </div>
-                                <p style="font-size:18px; font-weight:600; text-transform:uppercase; line-height:1.2; margin:0;">{% if product.roaster %}{{ product.roaster.name }}{% else %}{{ product.roaster_machine }}{% endif %}</p>
-                            </li>
-                            {% endif %}
-                            {% if product.altitude %}
-                            <li class="tc-char-item">
-                                <div style="font-size:14px; line-height:1.2; margin-bottom:4px; position:relative; color:#94a3b8;">
-                                    <span style="margin-right:2px; vertical-align:middle;">Высота произрастания</span>
-                                    <span class="tc-info-trigger" style="vertical-align:middle; cursor:pointer; position:relative; display:inline-block;">
-                                        <svg width="16" height="16" viewBox="0 0 64 64" fill="none" style="vertical-align:middle;"><circle cx="32" cy="32" r="21.3" stroke="currentColor" stroke-width="4.27"/><circle cx="32" cy="22.4" r="3.2" fill="currentColor"/><path d="M32 29.87V42.67" stroke="currentColor" stroke-width="4.27"/></svg>
-                                        <span class="tc-info-popup">Высота произрастания влияет на плотность и вкус зерна. Чем выше растёт кофе, тем медленнее созревает ягода и тем сложнее и ярче вкус.</span>
-                                    </span>
-                                </div>
-                                <p style="font-size:18px; font-weight:600; text-transform:uppercase; line-height:1.2; margin:0;">{{ product.altitude }}</p>
-                            </li>
-                            {% endif %}
-                            {% if product.harvest_year %}
-                            <li class="tc-char-item">
-                                <div style="font-size:14px; line-height:1.2; margin-bottom:4px; position:relative; color:#94a3b8;">
-                                    <span style="margin-right:2px; vertical-align:middle;">Урожай</span>
-                                    <span class="tc-info-trigger" style="vertical-align:middle; cursor:pointer; position:relative; display:inline-block;">
-                                        <svg width="16" height="16" viewBox="0 0 64 64" fill="none" style="vertical-align:middle;"><circle cx="32" cy="32" r="21.3" stroke="currentColor" stroke-width="4.27"/><circle cx="32" cy="22.4" r="3.2" fill="currentColor"/><path d="M32 29.87V42.67" stroke="currentColor" stroke-width="4.27"/></svg>
-                                        <span class="tc-info-popup">Год сбора урожая. Свежий урожай обеспечивает максимально яркий и чистый вкус кофе.</span>
-                                    </span>
-                                </div>
-                                <p style="font-size:18px; font-weight:600; text-transform:uppercase; line-height:1.2; margin:0;">{{ product.harvest_year }}</p>
-                            </li>
-                            {% endif %}
-                            {% if product.variety %}
-                            <li class="tc-char-item">
-                                <div style="font-size:14px; line-height:1.2; margin-bottom:4px; position:relative; color:#94a3b8;">
-                                    <span style="margin-right:2px; vertical-align:middle;">Разновидность</span>
-                                    <span class="tc-info-trigger" style="vertical-align:middle; cursor:pointer; position:relative; display:inline-block;">
-                                        <svg width="16" height="16" viewBox="0 0 64 64" fill="none" style="vertical-align:middle;"><circle cx="32" cy="32" r="21.3" stroke="currentColor" stroke-width="4.27"/><circle cx="32" cy="22.4" r="3.2" fill="currentColor"/><path d="M32 29.87V42.67" stroke="currentColor" stroke-width="4.27"/></svg>
-                                        <span class="tc-info-popup">Ботаническая разновидность кофейного дерева. Разные разновидности имеют уникальные вкусовые характеристики и особенности выращивания.</span>
-                                    </span>
-                                </div>
-                                <p style="font-size:18px; font-weight:600; text-transform:uppercase; line-height:1.2; margin:0;">{{ product.variety }}</p>
-                            </li>
-                            {% endif %}
-                            {% if product.caffeine_content %}
-                            <li class="tc-char-item">
-                                <div style="font-size:14px; line-height:1.2; margin-bottom:4px; position:relative; color:#94a3b8;">
-                                    <span style="margin-right:2px; vertical-align:middle;">Содержание кофеина</span>
-                                    <span class="tc-info-trigger" style="vertical-align:middle; cursor:pointer; position:relative; display:inline-block;">
-                                        <svg width="16" height="16" viewBox="0 0 64 64" fill="none" style="vertical-align:middle;"><circle cx="32" cy="32" r="21.3" stroke="currentColor" stroke-width="4.27"/><circle cx="32" cy="22.4" r="3.2" fill="currentColor"/><path d="M32 29.87V42.67" stroke="currentColor" stroke-width="4.27"/></svg>
-                                        <span class="tc-info-popup">Процент содержания кофеина в зерне. Зависит от разновидности, региона произрастания и способа обработки.</span>
-                                    </span>
-                                </div>
-                                <p style="font-size:18px; font-weight:600; text-transform:uppercase; line-height:1.2; margin:0;">{{ product.caffeine_content }}</p>
-                            </li>
-                            {% endif %}
-                            {% if product.origin_country %}
-                            <li class="tc-char-item">
-                                <div style="font-size:14px; line-height:1.2; margin-bottom:4px; position:relative; color:#94a3b8;">
-                                    <span style="margin-right:2px; vertical-align:middle;">Страна происхождения</span>
-                                    <span class="tc-info-trigger" style="vertical-align:middle; cursor:pointer; position:relative; display:inline-block;">
-                                        <svg width="16" height="16" viewBox="0 0 64 64" fill="none" style="vertical-align:middle;"><circle cx="32" cy="32" r="21.3" stroke="currentColor" stroke-width="4.27"/><circle cx="32" cy="22.4" r="3.2" fill="currentColor"/><path d="M32 29.87V42.67" stroke="currentColor" stroke-width="4.27"/></svg>
-                                        <span class="tc-info-popup">Страна, где был выращен кофе. Каждая страна-производитель известна своими характерными вкусовыми профилями.</span>
-                                    </span>
-                                </div>
-                                <p style="font-size:18px; font-weight:600; text-transform:uppercase; line-height:1.2; margin:0;">{{ product.origin_country }}</p>
-                            </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </div>
-
-                {% if product.description %}
-                <div class="pdx-section">
-                    <h2 class="pdx-h2">Описание</h2>
-                    <div class="content-static pdx-desc">{{ product.description|safe }}</div>
-                </div>
-                {% endif %}
-
-                {% if brewing_methods %}
-                <div class="pdx-section">
-                    <h2 class="pdx-h2">Способы приготовления</h2>
-                    {% url 'pages:how_to_choose_coffee' as how_to_choose_coffee_url %}
-                    <div class="pdx-brew-grid">
-                        {% for method in brewing_methods %}
-                        <div class="pdx-brew-card">
-                            <img class="pdx-brew-icon" src="/static/single_page/images/{% if method.slug == 'turka' or method.slug == 'cezve' %}jezva.svg{% elif method.slug == 'geyzer' or method.slug == 'moka' %}moka.svg{% else %}espresso_machine.svg{% endif %}" alt="{{ method.name }}">
-                            <div class="pdx-brew-body">
-                                <p>{{ method.name }}</p>
-                                <span>Открыть руководство<a href="{% if method.guide_url and method.guide_url != '#' %}{{ method.guide_url }}{% else %}{{ how_to_choose_coffee_url }}{% endif %}">link</a></span>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-
-                <div class="pdx-section">
-                    <h2 class="pdx-h2">Хранение</h2>
-                    {% if product.storage_description %}
-                    <div class="pdx-soft-card tc-richtext">{{ product.storage_description|safe }}</div>
-                    {% elif site_settings.default_storage_description %}
-                    <div class="pdx-soft-card tc-richtext">{{ site_settings.default_storage_description|safe }}</div>
-                    {% else %}
-                    <div class="pdx-stack">
-                        <div class="pdx-soft-card pdx-icon-card">
-                            <svg class="pdx-card-icon"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--pack"></use></svg>
-                            <div class="pdx-icon-card-body">
-                                <p class="pdx-card-title">При комнатной температуре</p>
-                                <div class="pdx-card-text">
-                                    <p>В закрытой пачке при комнатной температуре кофе можно хранить 1–2 месяца.</p>
-                                    <p>После вскрытия упаковки этот срок сокращается, поэтому мы рекомендуем покупать кофе в том объёме, который вы выпьете за одну-две недели максимум.</p>
-                                    <p>После помола свежесть кофе улетучивается не за дни, а за минуты. Поэтому смалывать зёрна лучше непосредственно перед приготовлением.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pdx-soft-card pdx-icon-card">
-                            <svg class="pdx-card-icon"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--cold"></use></svg>
-                            <div class="pdx-icon-card-body">
-                                <p class="pdx-card-title">В морозилке</p>
-                                <div class="pdx-card-text">
-                                    <p>В закрытой пачке в морозилке кофе можно хранить до полугода.</p>
-                                    <p>Важно, чтобы там не было посторонних запахов, потому что кофе может легко его впитать. Так кофе можно хранить до полугода, однако разморозить его можно только один раз при комнатной температуре в течение 10–12 часов. Замораживать повторно нельзя.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="pdx-two-col">
-                    <div class="pdx-section">
-                        <h2 class="pdx-h2">Доставка</h2>
-                        {% if product.delivery_description %}
-                        <div class="pdx-soft-card tc-richtext">{{ product.delivery_description|safe }}</div>
-                        {% elif site_settings.default_delivery_description %}
-                        <div class="pdx-soft-card tc-richtext">{{ site_settings.default_delivery_description|safe }}</div>
-                        {% else %}
-                        <div class="pdx-soft-card">
-                            <svg class="pdx-card-icon pdx-card-icon-top"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--delivery"></use></svg>
-                            <div class="pdx-card-text">
-                                <p>Вы можете оформить заказ на сумму от 600 ₽, мы доставим его в любой город до пункта выдачи или до двери.</p>
-                                <p>Стоимость доставки рассчитывается автоматически в корзине и зависит от вашего города, суммы и веса заказа. Почти всегда доставляем бесплатно.</p>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="pdx-section">
-                        <h2 class="pdx-h2">Гарантия</h2>
-                        <div class="pdx-soft-card">
-                            <img class="pdx-card-icon pdx-card-icon-top" src="/static/single_page/images/ic-sca-control.png" alt="Контроль качества пройден" style="width:56px;height:56px;">
-                            <div class="pdx-card-text">
-                                <p>Мы обжариваем этот кофе каждый день. Если кофе не понравится — бесплатно заменим или вернем оплату.</p>
-                                <p class="pdx-card-note"><svg width="16" height="16"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--info"></use></svg><span>Как это работает?</span></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {# REVIEWS TAB #}
-            <div id="tab-panel-reviews" class="tab-panel" style="display:none;">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:32px;">
-                    <h2 style="font-size:24px; font-weight:900; text-transform:uppercase; margin:0;">Отзывы ({{ product.reviews_count }})</h2>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <svg style="width:20px; height:20px; color:#f59e0b; fill:currentColor;"><use href="{% static 'asset/images/sprite.svg' %}#icons--star"></use></svg>
-                        <span style="font-size:20px; font-weight:900;">{{ product.rating_avg|floatformat:"1u" }}</span>
-                    </div>
-                </div>
-
-                <div style="background:white; border-radius:20px; border:1px solid #ebebeb; padding:24px; margin-bottom:32px;">
-                    {% if request.user.is_authenticated %}
-                    <h3 style="font-weight:700; font-size:17px; margin:0 0 16px 0;">Написать отзыв</h3>
-                    <form id="review-form">
-                        {% csrf_token %}
-                        <div style="display:flex; gap:8px; margin-bottom:16px;" id="star-rating">
-                            {% for i in "12345" %}
-                            <button type="button" class="star-btn" data-rating="{{ i }}" style="font-size:28px; color:#d1d5db; background:none; border:none; cursor:pointer; transition:color 0.2s; padding:0;">★</button>
-                            {% endfor %}
-                        </div>
-                        <input type="hidden" name="rating" id="rating-val" value="5">
-                        <div style="margin-bottom:16px;">
-                            <p style="font-size:14px; font-weight:700; margin:0 0 8px 0; color:rgba(0,0,0,0.6);">Оценка доставки</p>
-                            <div style="display:flex; gap:8px;" id="delivery-star-rating">
-                                {% for i in "12345" %}
-                                <button type="button" class="delivery-star-btn" data-rating="{{ i }}" style="font-size:28px; color:#d1d5db; background:none; border:none; cursor:pointer; transition:color 0.2s; padding:0;">★</button>
-                                {% endfor %}
-                            </div>
-                            <input type="hidden" name="delivery_rating" id="delivery-rating-val" value="">
-                        </div>
-                        <textarea name="text" rows="4" placeholder="Расскажите о своих впечатлениях..." required
-                                  style="width:100%; border:1.5px solid #ebebeb; border-radius:12px; padding:14px; font-size:15px; resize:none; outline:none; transition:border-color 0.2s; box-sizing:border-box; font-family:inherit;"
-                                  onfocus="this.style.borderColor='#000'" onblur="this.style.borderColor='#ebebeb'"></textarea>
-                        <div style="margin-bottom:16px;">
-                            <label style="font-size:14px; font-weight:700; margin:0 0 8px 0; color:rgba(0,0,0,0.6); display:block;">Текст отзыва о доставке</label>
-                            <input name="delivery_operator" placeholder="Оператор доставки (СДЭК, Почта России...)" type="text"
-                                   style="width:100%; border:1.5px solid #ebebeb; border-radius:12px; padding:12px 14px; font-size:15px; outline:none; transition:border-color 0.2s; box-sizing:border-box; font-family:inherit; margin-bottom:8px;"
-                                   onfocus="this.style.borderColor='#000'" onblur="this.style.borderColor='#ebebeb'"/>
-                            <textarea name="delivery_text" rows="2" placeholder="Комментарий о доставке (необязательно)"
-                                      style="width:100%; border:1.5px solid #ebebeb; border-radius:12px; padding:14px; font-size:15px; resize:none; outline:none; transition:border-color 0.2s; box-sizing:border-box; font-family:inherit;"
-                                      onfocus="this.style.borderColor='#000'" onblur="this.style.borderColor='#ebebeb'"></textarea>
-                        </div>
-                        <div style="margin-top:12px;">
-                            <button type="submit" style="background:black; color:white; padding:12px 32px; border-radius:12px; font-weight:700; border:none; cursor:pointer; transition:background 0.2s;"
-                                    onmouseover="this.style.background='rgba(0,0,0,0.8)'" onmouseout="this.style.background='black'">
-                                Отправить отзыв
-                            </button>
-                        </div>
-                        <p id="review-success" style="display:none; color:#16a34a; font-weight:700; margin-top:8px;">✓ Отзыв отправлен на модерацию. Спасибо!</p>
-                        <p id="review-error" style="display:none; color:#dc2626; font-size:13px; margin-top:8px;"></p>
-                    </form>
-                    {% else %}
-                    <h3 style="font-weight:700; font-size:17px; margin:0 0 8px 0;">Войдите, чтобы оставить отзыв</h3>
-                    <p style="font-size:14px; color:rgba(0,0,0,0.55); margin:0 0 16px 0;">Оценка и отзыв доступны после авторизации.</p>
-                    <a href="/login/?next={{ request.path }}%23reviews" style="display:inline-flex; background:black; color:white; padding:12px 24px; border-radius:12px; font-weight:700; text-decoration:none;">Войти или зарегистрироваться</a>
-                    {% endif %}
-                </div>
-
-                <div style="display:flex; flex-direction:column; gap:16px;" id="reviews-list">
-                    {% for review in reviews %}
-                        {% include "catalog/_review_card.html" %}
-                    {% empty %}
-                    <div style="text-align:center; padding:48px 0; color:rgba(0,0,0,0.4);">
-                        <p style="font-size:18px; margin:0 0 8px 0;">Отзывов пока нет</p>
-                        <p style="font-size:14px; margin:0;">Будьте первым — оставьте отзыв об этом кофе</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            {# BREWING TAB #}
-            {% if brewing_methods %}
-            {% url 'pages:how_to_choose_coffee' as how_to_choose_coffee_url %}
-            <div id="tab-panel-brewing" class="tab-panel" style="display:none;">
-                <h2 style="font-size:24px; font-weight:900; text-transform:uppercase; margin-bottom:24px;">Способы приготовления</h2>
-                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;">
-                    {% for method in brewing_methods %}
-                    <div style="background:white; border-radius:20px; border:1.5px solid #ebebeb; padding:20px; display:flex; align-items:center; gap:16px; cursor:pointer; transition:border-color 0.2s;"
-                         onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='#ebebeb'">
-                        <div style="width:56px; height:56px; background:#f5f5f5; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <svg style="width:32px; height:32px;"><use href="{% static 'asset/images/sprite.svg' %}#icons--coffee"></use></svg>
-                        </div>
-                        <div>
-                            <p style="font-weight:700; font-size:15px; margin:0 0 4px 0;">{{ method.name }}</p>
-                        <a href="{% if method.guide_url and method.guide_url != '#' %}{{ method.guide_url }}{% else %}{{ how_to_choose_coffee_url }}{% endif %}" style="color:rgba(0,0,0,0.55); font-size:13px; text-decoration:none;">Открыть руководство →</a>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div style="background:white; border-radius:20px; border:1.5px solid #ebebeb; padding:20px; display:flex; align-items:center; gap:16px; cursor:pointer; transition:border-color 0.2s;"
-                         onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='#ebebeb'">
-                        <div style="width:56px; height:56px; background:#f5f5f5; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <svg style="width:32px; height:32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 8l-1 12h12l-1-12M7 8c0-2.5 1.5-4 5-4s5 1.5 5 4"></path></svg>
-                        </div>
-                        <div>
-                            <p style="font-weight:700; font-size:15px; margin:0 0 4px 0;">Эспрессо-машина</p>
-                        <a href="{{ how_to_choose_coffee_url }}" style="color:rgba(0,0,0,0.55); font-size:13px; text-decoration:none;">Открыть руководство →</a>
-                        </div>
-                    </div>
-                    <div style="background:white; border-radius:20px; border:1.5px solid #ebebeb; padding:20px; display:flex; align-items:center; gap:16px; cursor:pointer; transition:border-color 0.2s;"
-                         onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='#ebebeb'">
-                        <div style="width:56px; height:56px; background:#f5f5f5; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <svg style="width:32px; height:32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h2l1 5h12l1-5h2M9 12V7h6v5"></path></svg>
-                        </div>
-                        <div>
-                            <p style="font-weight:700; font-size:15px; margin:0 0 4px 0;">Турка</p>
-                        <a href="{{ how_to_choose_coffee_url }}" style="color:rgba(0,0,0,0.55); font-size:13px; text-decoration:none;">Открыть руководство →</a>
-                        </div>
-                    </div>
-                    <div style="background:white; border-radius:20px; border:1.5px solid #ebebeb; padding:20px; display:flex; align-items:center; gap:16px; cursor:pointer; transition:border-color 0.2s;"
-                         onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='#ebebeb'">
-                        <div style="width:56px; height:56px; background:#f5f5f5; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <svg style="width:32px; height:32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 10c0-2-1.5-3-5-3s-5 1-5 3v3c0 2 1.5 3 5 3s5-1 5-3v-3zM9 16l-3 5h10l-3-5"></path></svg>
-                        </div>
-                        <div>
-                            <p style="font-weight:700; font-size:15px; margin:0 0 4px 0;">Гейзерная кофеварка</p>
-                        <a href="{{ how_to_choose_coffee_url }}" style="color:rgba(0,0,0,0.55); font-size:13px; text-decoration:none;">Открыть руководство →</a>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            {# RECIPES TAB — публичная лента рецептов, как на исходнике #}
-            <div id="tab-panel-recipes" class="tab-panel" style="display:none;">
-                <style>
-                    .recipe-post-feed{display:flex;flex-direction:column;gap:22px;margin-bottom:32px;max-width:610px}
-                    .recipe-post-card{background:#fff;border:1px solid #ececf0;border-radius:18px;padding:18px;color:#111;box-shadow:0 1px 0 rgba(0,0,0,.02)}
-                    .recipe-post-header{align-items:flex-start;display:flex;gap:11px;margin-bottom:16px}
-                    .recipe-post-avatar{align-items:center;background:#eee5d8;border-radius:50%;display:flex;flex:0 0 48px;font-size:16px;font-weight:700;height:48px;justify-content:center;overflow:hidden;width:48px}
-                    .recipe-post-avatar img{height:100%;object-fit:cover;width:100%}
-                    .recipe-post-author{flex:1;min-width:0;padding-top:2px}.recipe-post-author strong{display:block;font-size:14px;line-height:1.25}.recipe-post-author span{color:rgba(0,0,0,.5);display:block;font-size:12px;line-height:1.3;margin-top:3px}
-                    .recipe-post-header time{color:rgba(0,0,0,.5);font-size:11px;line-height:1.3;padding-top:3px;white-space:nowrap}
-                    .recipe-post-copy{font-size:14px;line-height:1.55;overflow-wrap:anywhere}.recipe-post-copy>:first-child{margin-top:0}.recipe-post-copy>:last-child{margin-bottom:0}.recipe-post-copy p{margin:0 0 14px}.recipe-post-copy ul{margin:0 0 14px;padding-left:20px}
-                    .recipe-post-media{background:#f4f4f6;border-radius:10px;display:block;margin:16px 0 0;max-height:536px;object-fit:contain;width:100%}
-                    .recipe-product-snippet{background:#f6f6f8;border-radius:10px;margin-top:16px;padding:14px}
-                    .recipe-product-link{align-items:center;color:#1768ff;display:flex;font-size:13px;font-weight:700;gap:10px;text-decoration:none}.recipe-product-link img{background:#fff;border-radius:6px;height:48px;object-fit:contain;width:48px}
-                    .recipe-product-fallback{align-items:center;background:#fff;border-radius:6px;color:#111;display:flex;height:48px;justify-content:center;width:48px}
-                    .recipe-product-details{font-size:12px;line-height:1.45;margin-top:14px}.recipe-detail-grid{display:grid;gap:12px 16px;grid-template-columns:repeat(3,minmax(0,1fr))}.recipe-detail-item{min-width:0}.recipe-detail-item.full{grid-column:1/-1}.recipe-detail-item.wide{grid-column:span 2}.recipe-detail-item b{display:block;font-size:11px;margin-bottom:2px}.recipe-detail-item span{color:#555;display:block;overflow-wrap:anywhere}.recipe-brew-chart{display:block;height:auto;margin-top:14px;overflow:visible;width:100%}.recipe-brew-chart .grid-line{stroke:#d8d8dd;stroke-width:1}.recipe-brew-chart .step-line{fill:none;stroke:#202020;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.7}.recipe-brew-chart .point{fill:#fff;stroke:#111;stroke-width:3}.recipe-brew-chart text{fill:#777;font-family:'Gotham Pro',sans-serif;font-size:11px}.recipe-brew-chart .axis-unit{fill:#666;font-size:9px;font-weight:700;text-transform:uppercase}
-                    .recipe-post-actions{align-items:center;display:flex;gap:8px;justify-content:space-between;margin-top:14px}.recipe-post-meta{align-items:center;display:flex;gap:8px}.recipe-post-pill,.recipe-post-share,.recipe-post-open{align-items:center;background:#f6f6f8;border:0;border-radius:8px;color:#555;display:inline-flex;font-size:12px;gap:6px;height:32px;justify-content:center;padding:0 10px;text-decoration:none}.recipe-post-pill svg,.recipe-post-share svg{fill:none;height:15px;stroke:currentColor;width:15px}.recipe-post-share{cursor:pointer;padding:0;width:34px}.recipe-post-open{color:#111;font-weight:700}
-                    .recipe-composer-toggle{align-items:center;background:#fff;border:1.5px solid #111;border-radius:10px;color:#111;cursor:pointer;display:inline-flex;font:700 14px/1 'Gotham Pro',sans-serif;gap:8px;margin:0 0 20px;padding:11px 15px}.recipe-composer-toggle svg{height:16px;transition:transform .2s;width:16px}.recipe-composer-toggle[aria-expanded=true] svg{transform:rotate(45deg)}.recipe-composer-wrap{margin-bottom:24px;max-width:610px}.recipe-composer-wrap[hidden]{display:none!important}
-                    @media(max-width:640px){.recipe-post-card{border-left:0;border-radius:14px;border-right:0;padding:16px 14px}.recipe-post-header time{font-size:10px}.recipe-post-actions{align-items:flex-start;flex-direction:column}.recipe-post-open{width:100%}.recipe-detail-grid{gap:10px 12px}.recipe-brew-chart text{font-size:10px}}
-                </style>
-                <h2 style="font-size:24px; font-weight:900; text-transform:uppercase; margin-bottom:20px;">Рецепты приготовления</h2>
-
-                {% if recipes %}
-                <button class="recipe-composer-toggle" id="recipe-composer-toggle" type="button" aria-expanded="false" aria-controls="recipe-composer-wrap">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-                    <span>Добавить рецепт</span>
-                </button>
-                {% endif %}
-
-                {% if recipes %}
-                <div class="recipe-post-feed">
-                    {% for recipe in recipes %}
-                    <article class="recipe-post-card" id="recipe-{{ recipe.pk }}">
-                        <header class="recipe-post-header">
-                            <div class="recipe-post-avatar">
-                                {% if recipe.author and recipe.author.avatar %}<img src="{{ recipe.author.avatar.url }}" alt="" loading="lazy">
-                                {% elif recipe.author %}{{ recipe.author.first_name|default:recipe.author.email|first|upper }}
-                                {% else %}A{% endif %}
-                            </div>
-                            <div class="recipe-post-author">
-                                <strong>{% if recipe.author %}{{ recipe.author.get_full_name|default:recipe.author.email }}{% else %}Aspect Coffee{% endif %}</strong>
-                                {% if recipe.author %}{% with level=recipe.author.get_level city=recipe.author.get_city %}<span style="color:{{ level.color }}">{{ level.name }}{% if city %}, г. {{ city }}{% endif %}</span>{% endwith %}{% endif %}
-                            </div>
-                            <time datetime="{{ recipe.created_at|date:'c' }}">{{ recipe.created_at|date:"d.m.Y" }}</time>
-                        </header>
-
-                        <div class="recipe-post-copy">{{ recipe.post_html|safe }}</div>
-                        {% if recipe.main_image %}
-                        <img class="recipe-post-media" src="{{ recipe.main_image.url }}" alt="{{ recipe.name }}" loading="lazy">
-                        {% endif %}
-
-                        <div class="recipe-product-snippet">
-                            <a class="recipe-product-link" href="{{ product.get_absolute_url }}">
-                                {% if product.main_image %}<img src="{{ product.main_image.url }}" alt="" loading="lazy">
-                                {% else %}<span class="recipe-product-fallback">☕</span>{% endif %}
-                                <span>{{ product.name }}</span>
-                            </a>
-                            <div class="recipe-product-details">
-                                <div class="recipe-detail-grid">
-                                    <div class="recipe-detail-item full"><b>Способ приготовления:</b><span>{{ recipe.display_method }}</span></div>
-                                    {% if recipe.display_notes %}<div class="recipe-detail-item full"><b>Заметки:</b><span>{{ recipe.display_notes }}</span></div>{% endif %}
-                                    {% for item in recipe.display_details %}
-                                    <div class="recipe-detail-item{% if item.source_label == 'Помол' %} wide{% endif %}"><b>{{ item.label }}:</b><span>{{ item.value }}</span></div>
-                                    {% endfor %}
-                                </div>
-
-                                {% if recipe.brew_chart %}
-                                <svg class="recipe-brew-chart" viewBox="0 0 600 220" role="img" aria-label="График вливаний">
-                                    <text class="axis-unit" x="0" y="10">МЛ</text>
-                                    {% for tick in recipe.brew_chart.y_ticks %}
-                                    <line class="grid-line" x1="44" y1="{{ tick.y }}" x2="590" y2="{{ tick.y }}"></line>
-                                    <text x="4" y="{{ tick.y|add:'4' }}">{{ tick.label }}</text>
-                                    {% endfor %}
-                                    {% for tick in recipe.brew_chart.x_ticks %}
-                                    <line class="grid-line" x1="{{ tick.x }}" y1="10" x2="{{ tick.x }}" y2="180"></line>
-                                    <text x="{{ tick.x }}" y="201" text-anchor="middle">{{ tick.label }}</text>
-                                    {% endfor %}
-                                    <path class="step-line" d="{{ recipe.brew_chart.path }}"></path>
-                                    {% for point in recipe.brew_chart.points %}<circle class="point" cx="{{ point.x }}" cy="{{ point.y }}" r="4"></circle>{% endfor %}
-                                    <text class="axis-unit" x="590" y="216" text-anchor="end">ВРЕМЯ</text>
-                                </svg>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <footer class="recipe-post-actions">
-                            <div class="recipe-post-meta">
-                                <span class="recipe-post-pill"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>{{ recipe.time_minutes }} мин</span>
-                                <span class="recipe-post-pill">{{ recipe.get_difficulty_display }}</span>
-                                <button class="recipe-post-share" type="button" data-recipe-share="{% url 'catalog:recipe_detail' recipe.slug %}" data-recipe-title="{{ recipe.name }}" aria-label="Поделиться"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12v7a2 2 0 002 2h8a2 2 0 002-2v-7m-4-5l-4-4-4 4m4-4v13"/></svg></button>
-                            </div>
-                            <a class="recipe-post-open" href="{% url 'catalog:recipe_detail' recipe.slug %}">Открыть рецепт →</a>
-                        </footer>
-                    </article>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <p style="color:rgba(0,0,0,0.5); margin-bottom:32px;">Пока нет рецептов для этого товара. Будьте первым!</p>
-                {% endif %}
-
-                {# ── Reference-style recipe composer (2.3) ── #}
-                <div class="recipe-composer-wrap" id="recipe-composer-wrap"{% if recipes %} hidden{% endif %}>
-                {% if can_add_recipe %}
-                <div class="rc-card" style="margin-top:8px;">
-                    <div class="rc-user">
-                        {% if request.user.avatar %}
-                        <img class="rc-ava-img" src="{{ request.user.avatar.url }}" alt="">
-                        {% else %}
-                        <div class="rc-ava">{{ request.user.first_name|default:request.user.username|slice:":1"|upper }}</div>
-                        {% endif %}
-                        <div><b>{{ request.user.first_name|default:request.user.username|default:"Покупатель" }}</b><span>Ваш рецепт увидят другие покупатели</span></div>
-                    </div>
-                    <form id="recipe-form" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="hidden" name="name" id="recipe-name">
-
-                        <textarea class="rc-note mini" id="recipe-post" placeholder="Написать пост"></textarea>
-
-                        <div class="rc-prod">
-                            {% if product.main_image %}<img src="{{ product.main_image.url }}" alt="">{% endif %}
-                            <div><div class="t">кофе</div><div class="n">{{ product.name }}</div></div>
-                        </div>
-
-                        <div class="rc-label">Оцените кофе</div>
-                        <div class="rc-stars" id="recipe-stars">
-                            {% for i in "12345" %}<button type="button" data-v="{{ i }}">★</button>{% endfor %}
-                        </div>
-                        <input type="hidden" id="recipe-rating" value="0">
-
-                        <div class="rc-label">Выберите способ приготовления</div>
-                        <div class="rc-select">
-                            <select id="recipe-method">
-                                <option value="">Способ приготовления</option>
-                                <option>Эспрессо-машина</option><option>V60 / Пуровер</option><option>Аэропресс</option>
-                                <option>Кемекс</option><option>Турка</option><option>Гейзерная кофеварка</option><option>Френч-пресс</option>
-                            </select>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-                        </div>
-
-                        <div class="rc-label">Заметки к рецепту</div>
-                        <textarea class="rc-note" id="recipe-notes" rows="3" placeholder="Расскажите, как вы готовите этот кофе"></textarea>
-                        <input type="hidden" name="description" id="recipe-description">
-
-                        <button type="button" class="rc-adv-toggle" id="recipe-adv-toggle" aria-expanded="false">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-                            <span>Заполнить расширенный рецепт</span>
-                        </button>
-
-                        <div class="rc-adv" id="recipe-adv" hidden>
-                            <div class="rc-sec-card">
-                                <p class="rc-sec-title">Кофе</p>
-                                <div class="rc-grid">
-                                    <div class="rc-field">
-                                        <label>Дозировка</label>
-                                        <div class="rc-counter">
-                                            <button type="button" class="rc-counter-btn" data-step="-1"><svg width="12" height="12"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--minus"></use></svg></button>
-                                            <span class="rc-counter-val"><input data-note="Дозировка" data-counter type="number" min="0" value="0"><i>г</i></span>
-                                            <button type="button" class="rc-counter-btn" data-step="1"><svg width="12" height="12"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--plus"></use></svg></button>
-                                        </div>
-                                    </div>
-                                    <div class="rc-field"><label>Дата обжарки</label><input data-note="Дата обжарки" type="date"></div>
-                                    <div class="rc-field full"><label>Кофемолка и помол</label><input data-note="Помол" placeholder="Кофемолка"></div>
-                                </div>
-                            </div>
-                            <div class="rc-sec-card">
-                                <p class="rc-sec-title">Вода</p>
-                                <div class="rc-grid">
-                                    <div class="rc-field full"><label>Производитель</label><input data-note="Вода" placeholder="Поиск"></div>
-                                    <div class="rc-field">
-                                        <label>Температура</label>
-                                        <div class="rc-counter">
-                                            <button type="button" class="rc-counter-btn" data-step="-1"><svg width="12" height="12"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--minus"></use></svg></button>
-                                            <span class="rc-counter-val"><input data-note="Температура, °C" data-counter type="number" min="0" max="100" value="94"><i>°C</i></span>
-                                            <button type="button" class="rc-counter-btn" data-step="1"><svg width="12" height="12"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--plus"></use></svg></button>
-                                        </div>
-                                    </div>
-                                    <div class="rc-field">
-                                        <label>Минерализация</label>
-                                        <div class="rc-counter">
-                                            <button type="button" class="rc-counter-btn" data-step="-10"><svg width="12" height="12"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--minus"></use></svg></button>
-                                            <span class="rc-counter-val"><input data-note="Минерализация, ppm" data-counter type="number" min="0" value="130"><i>ppm</i></span>
-                                            <button type="button" class="rc-counter-btn" data-step="10"><svg width="12" height="12"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--plus"></use></svg></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="rc-sec-card">
-                                <p class="rc-sec-title">Вливания</p>
-                                <input type="hidden" name="steps" id="recipe-steps-data" value="[]">
-                                <div id="recipe-steps-editor">
-                                    <div class="rc-pour recipe-step-row">
-                                        <input type="hidden" data-field="kind" value="pour">
-                                        <input data-field="text" placeholder="Смачивание">
-                                        <input data-field="time" type="number" min="0" value="0" placeholder="сек">
-                                        <input data-field="water" type="number" min="0" value="0" placeholder="мл">
-                                        <button type="button" class="del" title="Удалить"><svg width="14" height="14"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--x"></use></svg></button>
-                                    </div>
-                                    <div class="rc-pour-actions">
-                                        <button type="button" id="recipe-add-step" class="rc-btn-dark"><svg width="14" height="14"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--plus"></use></svg><span>Вливание</span></button>
-                                        <button type="button" id="recipe-add-end" class="rc-btn-dark"><span>Конец приготовления</span></button>
-                                    </div>
-                                    <div class="rc-chart">
-                                        <svg id="recipe-graph" viewBox="0 0 640 202" preserveAspectRatio="none"></svg>
-                                        <span class="rc-axis rc-axis-ml">МЛ</span>
-                                        <span class="rc-axis rc-axis-time">Время</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="rc-grid" style="margin-top:16px;">
-                                <div class="rc-field"><label>Время (мин)</label><input name="time_minutes" id="recipe-time" type="number" min="1" max="600" value="3"></div>
-                                <div class="rc-field"><label>Сложность</label>
-                                    <select name="difficulty" id="recipe-difficulty" class="rc-difficulty">
-                                        <option value="easy">Простой</option><option value="medium" selected>Средний</option><option value="hard">Сложный</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="rc-label">Фото рецепта (необязательно)</div>
-                        <label class="rc-photo-btn" id="recipe-photo-btn">
-                            <svg width="20" height="20"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--photo"></use></svg>
-                            <span data-photo-label>Добавить фото</span>
-                            <input type="file" name="main_image" accept="image/*">
-                        </label>
-                        <div class="rc-photo-preview" id="recipe-photo-preview" hidden>
-                            <img alt="Фото рецепта">
-                            <button type="button" title="Убрать фото"><svg width="12" height="12"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--x"></use></svg></button>
-                        </div>
-
-                        <button type="submit" class="rc-publish">Опубликовать</button>
-                        <p id="recipe-success" style="display:none; color:#16a34a; font-weight:700; margin-top:12px;">✓ Рецепт отправлен на модерацию. Спасибо!</p>
-                        <p id="recipe-error" style="display:none; color:#dc2626; font-size:13px; margin-top:12px;"></p>
-                    </form>
-                </div>
-                {% else %}
-                <div class="rc-card" style="margin-top:8px; text-align:center;">
-                    <p style="font-weight:700; font-size:16px; margin:0 0 6px;">Поделитесь своим рецептом</p>
-                    <p style="font-size:14px; color:rgba(0,0,0,0.5); margin:0 0 16px;">Рецепт может добавить покупатель, получивший этот кофе.</p>
-                    <a href="/login/?next={{ request.path }}%23recipes" class="rc-publish" style="display:inline-block;width:auto;padding:14px 28px;text-decoration:none;">Войти</a>
-                </div>
-                {% endif %}
-                </div>
-            </div>
-
-            {# STORAGE TAB #}
-            <div id="tab-panel-storage" class="tab-panel" style="display:none;">
-                <h2 style="font-size:24px; font-weight:900; text-transform:uppercase; margin-bottom:24px;">Хранение</h2>
-                {% if product.storage_description %}
-                <div class="tc-richtext" style="background:white; border-radius:20px; border:1px solid #ebebeb; padding:32px; font-size:15px; color:rgba(0,0,0,0.75); line-height:1.7;">{{ product.storage_description|safe }}</div>
-                {% elif site_settings.default_storage_description %}
-                <div class="tc-richtext" style="background:white; border-radius:20px; border:1px solid #ebebeb; padding:32px; font-size:15px; color:rgba(0,0,0,0.75); line-height:1.7;">{{ site_settings.default_storage_description|safe }}</div>
-                {% else %}
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
-                    <div style="background:white; border-radius:20px; border:1px solid #ebebeb; padding:32px;">
-                        <div style="width:48px; height:48px; background:#f5f5f5; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
-                            <svg style="width:24px; height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19c-1.657 0-3-1.343-3-3 0-1.312.836-2.428 2-2.83V5a2 2 0 114 0v8.17a3.001 3.001 0 11-3 5.83zM12 5v8.5"></path></svg>
-                        </div>
-                        <h3 style="font-weight:900; font-size:18px; text-transform:uppercase; margin:0 0 16px 0;">При комнатной температуре</h3>
-                        <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
-                            <li style="display:flex; align-items:flex-start; gap:8px; font-size:15px; color:rgba(0,0,0,0.7);"><span style="color:#22c55e; margin-top:2px;">✓</span> Срок хранения в закрытой пачке: 1–2 месяца</li>
-                            <li style="display:flex; align-items:flex-start; gap:8px; font-size:15px; color:rgba(0,0,0,0.7);"><span style="color:#f59e0b; margin-top:2px;">!</span> Рекомендуем покупать объём на 1–2 недели</li>
-                            <li style="display:flex; align-items:flex-start; gap:8px; font-size:15px; color:rgba(0,0,0,0.7);"><span style="color:#ef4444; margin-top:2px;">✗</span> После помола кофе теряет свежесть за несколько часов</li>
-                        </ul>
-                    </div>
-                    <div style="background:white; border-radius:20px; border:1px solid #ebebeb; padding:32px;">
-                        <div style="width:48px; height:48px; background:#f5f5f5; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
-                            <svg style="width:24px; height:24px; color:rgba(0,0,0,0.55);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                        </div>
-                        <h3 style="font-weight:900; font-size:18px; text-transform:uppercase; margin:0 0 16px 0;">В морозилке</h3>
-                        <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
-                            <li style="display:flex; align-items:flex-start; gap:8px; font-size:15px; color:rgba(0,0,0,0.7);"><span style="color:#22c55e; margin-top:2px;">✓</span> Срок хранения до 6 месяцев</li>
-                            <li style="display:flex; align-items:flex-start; gap:8px; font-size:15px; color:rgba(0,0,0,0.7);"><span style="color:#f59e0b; margin-top:2px;">!</span> Избегайте посторонних запахов</li>
-                            <li style="display:flex; align-items:flex-start; gap:8px; font-size:15px; color:rgba(0,0,0,0.7);"><span style="color:#ef4444; margin-top:2px;">✗</span> Повторная заморозка запрещена — размораживайте за 10–12 часов</li>
-                        </ul>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-
-            {# DELIVERY TAB #}
-            <div id="tab-panel-delivery" class="tab-panel" style="display:none;">
-                <h2 style="font-size:24px; font-weight:900; text-transform:uppercase; margin-bottom:24px;">Доставка</h2>
-                {% if product.delivery_description %}
-                <div class="tc-richtext" style="background:white; border-radius:20px; border:1px solid #ebebeb; padding:32px; font-size:15px; color:rgba(0,0,0,0.75); line-height:1.7;">{{ product.delivery_description|safe }}</div>
-                {% elif site_settings.default_delivery_description %}
-                <div class="tc-richtext" style="background:white; border-radius:20px; border:1px solid #ebebeb; padding:32px; font-size:15px; color:rgba(0,0,0,0.75); line-height:1.7;">{{ site_settings.default_delivery_description|safe }}</div>
-                {% else %}
-                <div style="display:flex; flex-direction:column; gap:16px;">
-                    <div style="background:white; border-radius:20px; border:1px solid #ebebeb; padding:24px; display:flex; align-items:flex-start; gap:16px;">
-                        <div style="width:48px; height:48px; background:#f5f5f5; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <svg style="width:24px; height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                        </div>
-                        <div>
-                            <p style="font-weight:700; font-size:16px; margin:0 0 4px 0;">Минимальная сумма заказа: 600 ₽</p>
-                            <p style="font-size:14px; color:rgba(0,0,0,0.6); margin:0;">Доставка в любой город России — до пункта выдачи или до двери. Стоимость рассчитывается в корзине автоматически.</p>
-                        </div>
-                    </div>
-                    <div style="background:white; border-radius:20px; border:1px solid #ebebeb; padding:24px; display:flex; align-items:flex-start; gap:16px;">
-                        <div style="width:48px; height:48px; background:#f5f5f5; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <svg style="width:24px; height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
-                        </div>
-                        <div>
-                            <p style="font-weight:700; font-size:16px; margin:0 0 4px 0;">Бесплатная доставка</p>
-                            <p style="font-size:14px; color:rgba(0,0,0,0.6); margin:0;">В большинстве случаев доставка бесплатна при заказе от 600 ₽. Точная стоимость показывается при оформлении.</p>
-                        </div>
-                    </div>
-                    <div style="background:white; border-radius:20px; border:1px solid #ebebeb; padding:24px; display:flex; align-items:flex-start; gap:16px;">
-                        <div style="width:48px; height:48px; background:#f5f5f5; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <svg style="width:24px; height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <div>
-                            <p style="font-weight:700; font-size:16px; margin:0 0 4px 0;">Срок доставки</p>
-                            <p style="font-size:14px; color:rgba(0,0,0,0.6); margin:0;">Отправляем кофе в день обжарки. Срок зависит от региона — обычно 2–7 рабочих дней.</p>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
+        {# Название #}
+        <div>
+          <h1 class="aspect-pd__title">{{ product.name }}</h1>
+          {% if product.processing_method %}
+          <p class="aspect-pd__subtitle">{{ product.processing_method }}</p>
+          {% endif %}
         </div>
 
-        {# ── Related Products ── #}
-        {% if product.related_products.all %}
-        <div style="margin-top:80px;">
-            <h2 style="font-size:32px; font-weight:900; text-transform:uppercase; margin-bottom:24px;">Похожие товары</h2>
-            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px;">
-                {% for rel in product.related_products.all|slice:":4" %}
-                <div>{% include "catalog/_product_card.html" with product=rel %}</div>
-                {% endfor %}
-            </div>
+        {# Описание #}
+        <div class="aspect-pd__flavor">
+          {% if product.flavor_description_html %}
+            {{ product.flavor_description_html|colorize_flavors }}
+          {% elif product.short_description %}
+            {{ product.short_description|safe }}
+          {% endif %}
+        </div>
+
+        {# Шкалы #}
+        {% if product.has_taste_profile %}
+        <div class="aspect-pd__scales">
+          {% if product.has_body_profile %}
+          <div>
+            <div class="aspect-pd__scale-label">Плотность</div>
+            <span class="aspect-pd__scale-bar"><span class="aspect-pd__scale-fill" style="width: {% widthratio product.body 10 100 %}%"></span></span>
+          </div>
+          {% endif %}
+          {% if product.has_acidity_profile %}
+          <div>
+            <div class="aspect-pd__scale-label">Кислотность</div>
+            <span class="aspect-pd__scale-bar"><span class="aspect-pd__scale-fill" style="width: {% widthratio product.acidity 10 100 %}%"></span></span>
+          </div>
+          {% endif %}
         </div>
         {% endif %}
 
+        {# Характеристики: обжарка + помол #}
+        <div class="aspect-pd__specs">
+          {% if product.get_roast_level_display %}
+          <div class="aspect-pd__spec">
+            <span class="aspect-pd__spec-label">Обжарка</span>
+            <span class="aspect-pd__spec-value">{{ product.get_roast_level_display }}</span>
+          </div>
+          {% endif %}
+          {% if product.grind_type %}
+          <div class="aspect-pd__spec">
+            <span class="aspect-pd__spec-label">Помол</span>
+            <span class="aspect-pd__spec-value">{{ product.grind_type.name }}</span>
+          </div>
+          {% endif %}
+          {% if product.origin_country %}
+          <div class="aspect-pd__spec">
+            <span class="aspect-pd__spec-label">Страна</span>
+            <span class="aspect-pd__spec-value">{{ product.origin_country }}</span>
+          </div>
+          {% endif %}
+          {% if product.q_score %}
+          <div class="aspect-pd__spec">
+            <span class="aspect-pd__spec-label">Q-оценка</span>
+            <span class="aspect-pd__spec-value">{{ product.q_score }}</span>
+          </div>
+          {% endif %}
+        </div>
+
+        {# Покупка #}
+        {% with first_v=product.variants.all.0 %}
+        <div class="aspect-pd__purchase"
+             x-data="productCard({
+               id: {{ product.id }},
+               slug: '{{ product.slug }}',
+               price: {{ first_v.price|default:0|floatformat:0 }},
+               inStock: {{ product.in_stock|yesno:'true,false'}},
+               inWishlist: {% if product.id in wishlist_ids %}true{% else %}false{% endif %}
+             })">
+
+          {% if product.has_purchase_options %}
+          <div class="aspect-pd__options">
+
+            {% if product.has_packaging_options %}
+            <div class="aspect-pd__weights">
+              {% for pkg in product.priced_packagings %}
+              <button type="button" class="aspect-pd__weight"
+                      :class="{ 'is-active': weight === {{ pkg.weight }} }"
+                      @click="setWeight({{ pkg.weight }})">
+                {{ pkg.weight }} г
+                {% if pkg.old_price and pkg.old_price > pkg.price %}
+                <sup style="color:#fff; font-size:10px;">−{{ pkg.discount_percent }}%</sup>
+                {% endif %}
+              </button>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if product.has_grind_options %}
+            <div class="aspect-pd__grind" @click.outside="grindOpen = false">
+              <button type="button" class="aspect-pd__grind-btn"
+                      @click.stop="if(!grindOpen){ document.dispatchEvent(new CustomEvent('closeAllGrindDropdowns', {detail:{exceptId:id}})); } grindOpen = !grindOpen">
+                <span x-text="currentComboLabel">в зёрнах</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="aspect-pd__grind-menu" x-show="grindOpen" x-transition x-cloak>
+                <template x-for="combo in combos" :key="combo.grind + '|' + combo.roast">
+                  <button type="button" class="aspect-pd__grind-item"
+                          :class="{ 'is-active': grind === combo.grind && roast === combo.roast }"
+                          @click.stop="setCombo(combo.grind, combo.roast); grindOpen = false">
+                    <span x-text="combo.label"></span>
+                  </button>
+                </template>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          {# Цена #}
+          <div class="aspect-pd__price-row">
+            <div class="aspect-pd__price">
+              <template x-if="currentVariant && currentVariant.old_price">
+                <span class="aspect-pd__price-old" x-text="Math.round(currentVariant.old_price) + ' ₽'"></span>
+              </template>
+              <span class="aspect-pd__price-current" x-text="currentPrice + ' ₽'"></span>
+            </div>
+          </div>
+
+          {# Кнопки #}
+          <div class="aspect-pd__buy-row">
+            <template x-if="!justAdded">
+              <button type="button" class="aspect-pd__buy" :disabled="!currentVariant" @click.stop="addToCart()">
+                <span>В корзину</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:20px; height:20px;"><path d="M6 2h12l-1 14H7zM4 18h16"/></svg>
+              </button>
+            </template>
+            <template x-if="justAdded">
+              <div class="aspect-pd__counter">
+                <button type="button" class="aspect-pd__counter-btn" @click.stop="decrementCart()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:18px; height:18px;"><path d="M5 12h14"/></svg>
+                </button>
+                <span class="aspect-pd__counter-val" x-text="cartQty"></span>
+                <button type="button" class="aspect-pd__counter-btn" @click.stop="incrementCart()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:18px; height:18px;"><path d="M12 5v14M5 12h14"/></svg>
+                </button>
+              </div>
+            </template>
+
+            <button type="button" class="aspect-pd__action"
+                    :class="{ 'is-active': inWishlist }"
+                    @click.stop="toggleWishlist()"
+                    :title="inWishlist ? 'Убрать из избранного' : 'В избранное'">
+              <svg viewBox="0 0 24 24" :fill="inWishlist ? 'currentColor' : 'none'" :stroke="inWishlist ? 'none' : 'currentColor'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </button>
+
+            <button type="button" class="aspect-pd__action"
+                    :class="{ 'is-active': inCompare }"
+                    @click.stop="toggleCompare()"
+                    title="В сравнение">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+            </button>
+
+            <button type="button" class="aspect-pd__action"
+                    :class="{ 'is-active': hasNote }"
+                    @click.stop="toggleNote()"
+                    title="Заметка">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <path d="M14 2v6h6"/>
+              </svg>
+            </button>
+          </div>
+
+          {# variants-data #}
+          <script type="application/json" class="variants-data">
+            [{% for v in product.variants.all %}{% with eop=v.effective_old_price ep=v.effective_price %}{"id":{{ v.id }},"weight":{{ v.weight }},"grind":"{{ v.grind }}","grind_label":"{{ v.get_grind_display }}","roast":"{{ v.roast_type.slug|default:'' }}","roast_label":"{{ v.roast_display }}","packaging_id":{{ v.packaging_id|default:0 }},"price":{{ ep|default:0|floatformat:0 }},"old_price":{% if eop and eop > ep %}{{ eop|floatformat:0 }}{% else %}null{% endif %}}{% if not forloop.last %},{% endif %}{% endwith %}{% endfor %}]
+          </script>
+        </div>
+        {% endwith %}
+      </div>
     </div>
-</div>
 
-<style>
-.tab-btn {
-    padding-bottom: 18px;
-    font-size: 13px;
-    font-weight: 900;
-    color: rgba(0,0,0,0.3);
-    border-bottom: 3px solid transparent;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    background: none;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-    letter-spacing: 0.03em;
-}
-.tab-btn:hover { color: rgba(0,0,0,0.6); }
-.tab-btn.active {
-    color: #000;
-    border-bottom-color: #000;
-}
+    {# ---------- АККОРДЕОН: ХАРАКТЕРИСТИКИ / ХРАНЕНИЕ / ДОСТАВКА ---------- #}
+    <div class="aspect-pd__blocks">
 
-/* ── Описание товара: структура и размеры из приложенного desktop-эталона ── */
-.pdx-section{width:100%}
-.pdx-h2{
-    color:#000;
-    font-family:'DIN Pro Black','Arial Narrow',sans-serif;
-    font-size:24px;
-    font-weight:900;
-    line-height:1.1;
-    margin:0 0 16px;
-    text-transform:uppercase;
-}
-.pdx-chars,.pdx-soft-card{
-    background:#f0f0f2;
-    border-radius:16px;
-    box-sizing:border-box;
-    padding:24px;
-}
-.pdx-chars-list{
-    display:grid;
-    gap:20px 28px;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    list-style:none;
-    margin:0;
-    padding:0;
-}
-.pdx-desc{color:#111;font-size:14px;line-height:1.45}
-.pdx-desc p{margin:0 0 12px}
-.pdx-desc p:last-child{margin-bottom:0}
-.pdx-brew-grid{
-    display:grid;
-    gap:16px;
-    grid-template-columns:repeat(12,minmax(0,1fr));
-}
-.pdx-brew-card{
-    align-items:center;
-    background:#f0f0f2;
-    border-radius:16px;
-    box-sizing:border-box;
-    display:flex;
-    grid-column:span 5;
-    min-height:64px;
-    padding:16px;
-    position:relative;
-}
-.pdx-brew-icon{flex:0 0 32px;height:32px;object-fit:contain;width:32px}
-.pdx-brew-body{min-width:0;padding-left:8px}
-.pdx-brew-body p{font-size:14px;font-weight:600;line-height:1.3;margin:0 0 4px}
-.pdx-brew-body span{color:#1d63f0;font-size:14px;line-height:1.2;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:4px;transition:text-decoration-color .2s}
-.pdx-brew-card:hover .pdx-brew-body span{text-decoration-color:rgba(29,99,240,.35)}
-.pdx-brew-body a{font-size:0;inset:0;opacity:0;position:absolute}
-.pdx-stack{display:flex;flex-direction:column;gap:16px}
-.pdx-icon-card{display:flex;flex-wrap:nowrap}
-.pdx-card-icon{flex:0 0 64px;height:64px;margin:0 8px 8px 0;width:64px}
-.pdx-card-icon-top{display:block;margin-bottom:16px}
-.pdx-icon-card-body{flex:1;min-width:0}
-.pdx-card-title{font-size:14px;font-weight:600;line-height:1.3;margin:0 0 12px}
-.pdx-card-text,.tc-richtext{font-size:14px;line-height:1.3}
-.pdx-card-text p,.tc-richtext p{margin:0 0 12px}
-.pdx-card-text p:last-child,.tc-richtext p:last-child{margin-bottom:0}
-.pdx-two-col{display:grid;gap:24px;grid-template-columns:repeat(2,minmax(0,1fr))}
-.pdx-two-col .pdx-soft-card{height:100%}
-.pdx-card-note{align-items:center;display:flex;gap:4px}
-.pdx-card-note svg{flex:0 0 16px}
+      {% if product.q_score or product.region or product.altitude or product.variety or product.caffeine_content or product.harvest_year %}
+      <details class="aspect-pd__block" open>
+        <summary>Подробнее о кофе</summary>
+        <div class="aspect-pd__block-body">
+          <ul>
+            {% if product.q_score %}<li><strong>Q-оценка:</strong> {{ product.q_score }}</li>{% endif %}
+            {% if product.region %}<li><strong>Регион:</strong> {{ product.region }}</li>{% endif %}
+            {% if product.altitude %}<li><strong>Высота произрастания:</strong> {{ product.altitude }}</li>{% endif %}
+            {% if product.variety %}<li><strong>Разновидность:</strong> {{ product.variety }}</li>{% endif %}
+            {% if product.caffeine_content %}<li><strong>Кофеин:</strong> {{ product.caffeine_content }}%</li>{% endif %}
+            {% if product.harvest_year %}<li><strong>Урожай:</strong> {{ product.harvest_year }}</li>{% endif %}
+          </ul>
+        </div>
+      </details>
+      {% endif %}
 
-@media(max-width:757px){
-    .pdx-h2{font-size:22px}
-    .pdx-chars,.pdx-soft-card{padding:16px}
-    .pdx-chars-list{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .pdx-brew-card{grid-column:span 12;padding:10px 12px}
-    .pdx-icon-card{display:block}
-    .pdx-two-col{grid-template-columns:1fr}
-}
+      {% if product.description %}
+      <details class="aspect-pd__block" open>
+        <summary>Описание</summary>
+        <div class="aspect-pd__block-body">
+          {{ product.description|safe }}
+        </div>
+      </details>
+      {% endif %}
 
-/* ── characteristics list reset ── */
-.tc-char-item { list-style:none !important; }
-.tc-char-item::before,
-.tc-char-item::marker { content:none !important; display:none !important; }
-/* ── tooltip for ⓘ in characteristics ── */
-.tc-info-trigger { position:relative; }
-.tc-info-popup {
-    display:none;
-    position:absolute;
-    left:50%; top:calc(100% + 12px);
-    transform:translateX(-50%);
-    width:280px;
-    background:#fff;
-    color:#333;
-    font-size:14px;
-    line-height:1.5;
-    padding:16px;
-    border-radius:12px;
-    box-shadow:0 4px 24px rgba(0,0,0,0.13);
-    z-index:10000;
-    pointer-events:auto;
-}
-.tc-info-popup::after {
-    content:'';
-    position:absolute;
-    bottom:100%; left:50%;
-    transform:translateX(-50%);
-    border:8px solid transparent;
-    border-bottom-color:#fff;
-}
-/* dark backdrop via box-shadow on popup */
-.tc-info-trigger:hover .tc-info-popup,
-.tc-info-trigger:focus-within .tc-info-popup {
-    display:block;
-    box-shadow: 0 0 0 9999px rgba(0,0,0,0.4), 0 4px 24px rgba(0,0,0,0.13);
-}
-@media (max-width:767px) {
-    .tc-info-popup {
-        position:fixed;
-        left:16px !important; right:16px !important;
-        bottom:auto !important; top:50% !important;
-        transform:translateY(-50%) !important;
-        width:auto !important;
-        max-width:calc(100vw - 32px);
-    }
-    .tc-info-popup::after { display:none; }
-    ul[style*="grid-template-columns:repeat(3"] {
-        grid-template-columns:1fr !important;
-    }
-}
+      <details class="aspect-pd__block">
+        <summary>Хранение</summary>
+        <div class="aspect-pd__block-body">
+          {% if product.storage_description %}
+            {{ product.storage_description|safe }}
+          {% elif site_settings.default_storage_description %}
+            {{ site_settings.default_storage_description|safe }}
+          {% else %}
+            <p><strong>При комнатной температуре.</strong> В закрытой пачке — 1–2 месяца. После вскрытия рекомендуем употребить за 1–2 недели.</p>
+            <p><strong>В морозилке.</strong> До 6 месяцев в закрытой пачке. Размораживать один раз при комнатной температуре 10–12 часов.</p>
+          {% endif %}
+        </div>
+      </details>
 
-@media (max-width: 1024px) {
-    .product-main-grid {
-        grid-template-columns: 1fr !important;
-    }
-    .product-thumbnails {
-        display: none !important;
-    }
-}
+      <details class="aspect-pd__block">
+        <summary>Доставка</summary>
+        <div class="aspect-pd__block-body">
+          {% if product.delivery_description %}
+            {{ product.delivery_description|safe }}
+          {% elif site_settings.default_delivery_description %}
+            {{ site_settings.default_delivery_description|safe }}
+          {% else %}
+            <p>Отправляем кофе в день обжарки. Срок доставки по Санкт-Петербургу и большинству городов России — 3–5 дней. В удалённые регионы — до 10 дней.</p>
+          {% endif %}
+        </div>
+      </details>
+    </div>
 
-/* Рецепты: композиция из переданного эталонного product recipes layout. */
-#tab-panel-recipes > h2 { font-family:'DIN Pro Black','Arial Narrow',sans-serif !important; font-size:32px !important; letter-spacing:.01em; }
-#tab-panel-recipes > div[style*="grid-template-columns:repeat(auto-fill"] { grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:24px !important; }
-#tab-panel-recipes > div[style*="grid-template-columns:repeat(auto-fill"] > a { background:transparent !important; border:0 !important; border-radius:0 !important; overflow:visible !important; }
-#tab-panel-recipes > div[style*="grid-template-columns:repeat(auto-fill"] > a > img,#tab-panel-recipes > div[style*="grid-template-columns:repeat(auto-fill"] > a > div:first-child { border-radius:16px !important; height:auto !important; aspect-ratio:1.48; overflow:hidden; }
-#tab-panel-recipes > div[style*="grid-template-columns:repeat(auto-fill"] > a > div:last-child { padding:14px 0 0 !important; }
-#tab-panel-recipes > div[style*="grid-template-columns:repeat(auto-fill"] h3 { font-family:'DIN Pro Black','Arial Narrow',sans-serif !important; font-size:22px !important; line-height:1.15 !important; }
-#tab-panel-recipes > div[style*="grid-template-columns:repeat(auto-fill"] span { color:var(--black-50) !important; }
-@media(max-width:1099px){#tab-panel-recipes > div[style*="grid-template-columns:repeat(auto-fill"]{grid-template-columns:repeat(2,minmax(0,1fr)) !important}}@media(max-width:575px){#tab-panel-recipes > div[style*="grid-template-columns:repeat(auto-fill"]{grid-template-columns:1fr !important}}
+    {# ---------- ОТЗЫВЫ ---------- #}
+    <section class="aspect-pd__reviews" id="reviews">
+      <div class="aspect-pd__reviews-head">
+        <h2 class="aspect-pd__reviews-title">Отзывы ({{ product.reviews_count }})</h2>
+        <div class="aspect-pd__reviews-rating">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 1.8 3.08 6.24 6.89 1-4.98 4.85 1.18 6.86L12 17.51l-6.17 3.24 1.18-6.86-4.98-4.85 6.89-1L12 1.8Z"/></svg>
+          {{ product.rating_avg|floatformat:"1u" }}
+        </div>
+      </div>
 
-/* Рецепты — та же центральная таб-композиция, что в приложенном эталоне. */
-#tab-panel-recipes{margin-left:auto;margin-right:auto;max-width:880px;padding:8px 0 28px}
-#tab-panel-recipes>h2{font-size:36px!important;line-height:1.12!important;margin-bottom:26px!important;text-transform:uppercase}
-#tab-panel-recipes>div[style*="grid-template-columns:repeat(auto-fill"]{align-items:start;display:grid!important;margin-bottom:42px!important}
-#tab-panel-recipes>div[style*="grid-template-columns:repeat(auto-fill"]>a{display:block!important;min-width:0;position:relative}
-#tab-panel-recipes>div[style*="grid-template-columns:repeat(auto-fill"]>a>img,#tab-panel-recipes>div[style*="grid-template-columns:repeat(auto-fill"]>a>div:first-child{background:#e7e7e7;border-radius:16px!important;display:block;transition:transform .28s ease}
-#tab-panel-recipes>div[style*="grid-template-columns:repeat(auto-fill"]>a:hover>img,#tab-panel-recipes>div[style*="grid-template-columns:repeat(auto-fill"]>a:hover>div:first-child{transform:scale(1.018)}
-#tab-panel-recipes>div[style*="grid-template-columns:repeat(auto-fill"]>a>div:last-child{padding:13px 0 0!important}
-#tab-panel-recipes>div[style*="grid-template-columns:repeat(auto-fill"] h3{margin:5px 0 9px!important}
-#tab-panel-recipes>div[style*="grid-template-columns:repeat(auto-fill"]>a>div:last-child>div{gap:12px!important;margin-bottom:0!important}
-@media(max-width:575px){#tab-panel-recipes{padding-bottom:20px}#tab-panel-recipes>h2{font-size:28px!important}#tab-panel-recipes>div[style*="grid-template-columns:repeat(auto-fill"]{gap:28px!important}}
+      {# Форма отзыва #}
+      <div class="aspect-pd__review-form">
+        {% if request.user.is_authenticated %}
+        <h3>Написать отзыв</h3>
+        <form id="review-form">
+          {% csrf_token %}
+          <div class="aspect-pd__stars" id="star-rating">
+            {% for i in "12345" %}
+            <button type="button" class="aspect-pd__star on" data-rating="{{ i }}">★</button>
+            {% endfor %}
+          </div>
+          <input type="hidden" name="rating" id="rating-val" value="5">
+          <textarea name="text" rows="4" class="aspect-pd__textarea" placeholder="Расскажите о своих впечатлениях..." required></textarea>
+          <div style="margin-bottom:12px;">
+            <p style="font-size:12px; font-weight:700; margin:0 0 6px; color:rgba(0,0,0,.5); text-transform:uppercase; letter-spacing:.06em;">Оценка доставки</p>
+            <div class="aspect-pd__stars" id="delivery-star-rating">
+              {% for i in "12345" %}
+              <button type="button" class="aspect-pd__star" data-rating="{{ i }}">★</button>
+              {% endfor %}
+            </div>
+            <input type="hidden" name="delivery_rating" id="delivery-rating-val" value="">
+          </div>
+          <input type="text" name="delivery_operator" class="aspect-pd__input" placeholder="Оператор доставки (СДЭК, Почта России...)">
+          <textarea name="delivery_text" rows="2" class="aspect-pd__textarea" placeholder="Комментарий о доставке (необязательно)"></textarea>
+          <button type="submit" class="aspect-pd__submit">Отправить отзыв</button>
+          <p id="review-success" style="display:none; color:#2A4A34; font-weight:700; margin: 12px 0 0;">✓ Отзыв отправлен на модерацию. Спасибо!</p>
+          <p id="review-error" style="display:none; color:#B91C1C; font-size:13px; margin: 12px 0 0;"></p>
+        </form>
+        {% else %}
+        <h3>Войдите, чтобы оставить отзыв</h3>
+        <p style="font-size:14px; color:rgba(0,0,0,.55); margin:0 0 16px;">Оценка и отзыв доступны после авторизации.</p>
+        <a href="/login/?next={{ request.path }}%23reviews" class="aspect-pd__submit" style="text-decoration:none;">Войти или зарегистрироваться</a>
+        {% endif %}
+      </div>
 
-/* Desktop measurements from saveweb2zip-com-shop-aspectcoffee-ru (1).zip. */
-@media(min-width:1100px){
-  .product-main-grid{grid-template-columns:minmax(255px,1fr) 78px minmax(440px,1.7fr) minmax(285px,1fr)!important;gap:24px!important}
-  .product-overview-panel{padding-top:0}.product-overview-panel h1{font-size:40px;line-height:1.08}
-  .product-image-panel{padding:0 18px}.product-image-panel>div:first-child{aspect-ratio:1/1!important}
-  #product-tabs{margin-top:72px!important;max-width:880px!important}
-  #product-tabs>div:first-child{align-items:center;background:#f0f0f2;border:0!important;border-radius:12px;display:inline-flex!important;gap:2px!important;margin-bottom:34px!important;max-width:100%;padding:4px;}
-  #product-tabs .tab-btn{border:0!important;border-radius:9px;color:rgba(0,0,0,.5);font-family:'DIN Pro Medium',sans-serif;font-size:14px;line-height:19px;padding:8px 13px!important}
-  #product-tabs .tab-btn.active{background:#fff;color:#000}
-  #product-tabs .tab-panel{padding-bottom:18px}
-}
+      {# Список отзывов #}
+      <div class="aspect-pd__reviews-list">
+        {% for review in reviews %}
+          {% include "catalog/_review_card.html" %}
+        {% empty %}
+        <div style="text-align:center; padding:48px 0; color:rgba(0,0,0,.45);">
+          <p style="font-size:18px; margin:0 0 8px;">Отзывов пока нет</p>
+          <p style="font-size:14px; margin:0;">Будьте первым — оставьте отзыв об этом кофе</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
 
-/* Non-review product content follows the white rounded desktop panel in the supplied capture. */
-@media(min-width:758px){
-  div[style*="min-height:100vh"]{background:#f6f6f8!important}
-  div[style*="max-width:1240px"]{max-width:1340px!important}
-  #product-tabs{background:transparent;border-radius:0;box-sizing:border-box;max-width:760px!important;margin:42px auto 0!important;padding:0 0 70px!important;min-height:0}
-  #product-tabs>div:first-child{margin-left:auto!important;margin-right:auto!important;max-width:100%;width:600px}
-  #product-tabs>div:first-child .tab-btn{flex:1 1 0;justify-content:center;text-align:center}
-  #product-tabs .tab-panel:not(#tab-panel-reviews){margin-left:auto;margin-right:auto;max-width:880px}
-  #tab-panel-info{gap:42px!important}
-  #tab-panel-info>div:first-child>h2,#tab-panel-info>div:nth-child(2)>h2{font-family:'DIN Pro Black','Arial Narrow',sans-serif!important;font-size:28px!important;line-height:1.1!important;margin-bottom:18px!important;text-transform:uppercase}
-  #tab-panel-info>div:first-child>div{background:#f4f4f6!important;border-radius:16px!important;padding:24px!important}
-  #tab-panel-info>div:first-child ul{gap:22px 26px!important;padding-right:0!important}
-  #tab-panel-info .tc-char-item>div{color:rgba(0,0,0,.7)!important}
-  #tab-panel-info .tc-char-item p{font-family:'DIN Pro Medium',sans-serif!important;font-size:18px!important}
-  #tab-panel-info>div:nth-child(2)>div{color:#111!important;font-size:16px!important;line-height:1.55!important}
-  #tab-panel-storage,#tab-panel-delivery,#tab-panel-brewing{max-width:880px!important;margin-left:auto!important;margin-right:auto!important}
-}
+    {# ---------- ПОХОЖИЕ ТОВАРЫ ---------- #}
+    {% if product.related_products.exists %}
+    <section class="aspect-pd__related">
+      <div class="aspect-pd__related-head">
+        <h2 class="aspect-pd__related-title">Похожие товары</h2>
+      </div>
+      <div class="aspect-pd__related-grid">
+        {% for rel in product.related_products.all|slice:":4" %}
+          {% include "catalog/_product_card.html" with product=rel %}
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
 
-/* Final ZIP-accurate product layout. Reviews panel intentionally remains untouched. */
-@media(min-width:1100px){
-  div[style*="min-height:100vh"]{background:#fff!important;padding-bottom:80px!important}
-  div[style*="max-width:1240px"]{max-width:1080px!important}
-  .product-overview-panel{display:none!important}
-  .container>nav.py-6{padding-bottom:12px!important;padding-top:12px!important}
-  .product-main-grid{grid-template-columns:96px 490px 330px!important;gap:26px!important;justify-content:start}
-  .product-thumbnails{grid-column:1!important;grid-row:1!important;padding-top:4px}
-  .product-thumbnails button{border:0!important;border-radius:14px!important;height:112px!important;padding:10px!important;width:96px!important}
-  .product-image-panel{grid-column:2!important;grid-row:1!important;padding:0!important;position:relative}
-  .product-image-panel>div:first-child{height:490px!important;aspect-ratio:auto!important;overflow:visible!important}
-  .product-image-panel #main-image{height:100%!important;max-height:490px!important;width:100%!important}
-  .product-info-panel{display:flex!important;gap:17px!important;grid-column:3!important;grid-row:1!important;padding-top:3px}
-  .product-info-panel>div:nth-child(1){display:flex!important}
-  .product-info-panel>div:nth-child(2){display:block!important}
-  .product-info-panel>.detail-flavor-description{display:block!important}
-  .product-info-panel>div:nth-child(4){display:flex!important}
-  .product-info-panel h1{font-family:'DIN Pro Black','Arial Narrow',sans-serif!important;font-size:40px!important;line-height:1.08!important}
-  .product-q-badge{align-items:center;background:#050505;border:5px solid #fff;border-radius:50%;color:#fff;display:flex;flex-direction:column;height:142px;justify-content:center;left:auto;position:absolute;right:2px;text-align:center;top:-10px;transform:rotate(-5deg);width:142px;z-index:3}
-  .product-q-badge span,.product-q-badge small{font:12px/1 'DIN Pro Black','Arial Narrow',sans-serif}.product-q-badge strong{font:46px/1 'DIN Pro Black','Arial Narrow',sans-serif;margin:5px 0}
-  #product-tabs{background:transparent!important;border-radius:0!important;box-sizing:border-box;max-width:760px!important;min-height:0!important;margin:42px auto 0!important;padding:0 0 70px!important}
-  #product-tabs>div:first-child{margin:0 auto 30px!important;max-width:100%;width:600px!important}
-  #product-tabs .tab-panel:not(#tab-panel-reviews){max-width:760px!important}
-  #tab-panel-info>div:first-child>h2,#tab-panel-info>div:nth-child(2)>h2{font-size:24px!important}
-  #tab-panel-info>div:first-child>div{padding:22px 20px!important}
-  #tab-panel-info>div:first-child ul{gap:22px 28px!important;grid-template-columns:repeat(3,1fr)!important}
-  #tab-panel-info .tc-char-item p{font-size:16px!important}
-  #tab-panel-recipes{max-width:760px!important}
-  #tab-panel-recipes>div[style*="grid-template-columns:repeat(auto-fill"]{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important}
-  #tab-panel-recipes>div[style*="background:white"]{box-sizing:border-box!important;max-width:440px!important;padding:18px!important}
-  #recipe-steps-editor .recipe-step-row{grid-template-columns:1fr 78px 78px 44px!important}
-}
-@media(max-width:1099px){.product-q-badge{display:none}}
-
-/* ── Recipe composer (reference-style) ── */
-#tab-panel-recipes{--rc-line:#ebebeb;--rc-soft:#f0f0f2;--rc-muted:rgba(0,0,0,.5)}
-.rc-card{background:#fff;border:1.5px solid var(--rc-line);border-radius:22px;padding:22px}
-.rc-user{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-.rc-ava{width:44px;height:44px;border-radius:50%;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font:700 17px/1 'Gotham Pro',sans-serif;flex-shrink:0}
-.rc-ava-img{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0}
-.rc-user b{font-size:15px;font-weight:700;display:block;line-height:1.2}
-.rc-user span{font-size:13px;color:var(--rc-muted)}
-.rc-note{width:100%;border:1.5px solid var(--rc-line);border-radius:16px;padding:14px 16px;font:400 15px/1.5 'Gotham Pro',sans-serif;resize:none;outline:none;transition:.2s;box-sizing:border-box}
-.rc-note:focus{border-color:#000}
-.rc-note.mini{min-height:52px}
-.rc-prod{display:flex;align-items:center;gap:14px;background:#f7f7f9;border-radius:16px;padding:12px 14px;margin:14px 0}
-.rc-prod img{width:46px;height:46px;object-fit:contain;border-radius:10px;background:#fff;flex-shrink:0}
-.rc-prod .t{font-size:11px;color:var(--rc-muted);text-transform:uppercase;letter-spacing:.04em}
-.rc-prod .n{font-size:15px;font-weight:900;text-transform:uppercase;font-family:'DIN Pro Black','Arial Narrow',sans-serif;line-height:1.1}
-.rc-label{font-size:13px;color:var(--rc-muted);margin:18px 0 8px;font-weight:500}
-.rc-stars{display:flex;gap:6px}
-.rc-stars button{background:none;border:0;cursor:pointer;font-size:30px;line-height:1;color:#d8d8dc;padding:0;transition:.15s}
-.rc-stars button.on{color:#ffb400}
-.rc-select{position:relative;margin-top:2px}
-.rc-select select,.rc-difficulty{width:100%;appearance:none;background:var(--rc-soft);border:0;border-radius:14px;padding:14px 40px 14px 16px;font:500 15px/1 'Gotham Pro',sans-serif;cursor:pointer;color:#000;box-sizing:border-box}
-.rc-difficulty{background:#fff;border:1.5px solid var(--rc-line);padding:12px 14px;font-size:14px}
-.rc-select svg{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:16px;height:16px;opacity:.5;pointer-events:none}
-.rc-adv-toggle{display:inline-flex;align-items:center;gap:7px;margin:16px 0 4px;color:#000;font-size:14px;font-weight:700;cursor:pointer;background:none;border:0;padding:0}
-.rc-adv-toggle svg{width:16px;height:16px;transition:.2s}
-.rc-adv-toggle.open svg{transform:rotate(45deg)}
-.rc-adv{background:var(--rc-soft);border-radius:16px;padding:16px;margin-top:14px;display:flex;flex-direction:column;gap:16px}
-.rc-sec-card{background:#fff;border-radius:16px;padding:16px}
-.rc-sec-title{font-family:'DIN Pro Black','Arial Narrow',sans-serif;font-size:18px;letter-spacing:.05em;text-transform:uppercase;color:#000;margin:0 0 16px}
-.rc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
-.rc-field{display:flex;flex-direction:column;gap:6px}
-.rc-field.full{grid-column:1/-1}
-.rc-field label{font-size:12px;color:var(--rc-muted)}
-.rc-field input{border:1.5px solid var(--rc-line);border-radius:12px;padding:12px 14px;font:400 14px/1 'Gotham Pro',sans-serif;outline:none;transition:.2s;width:100%;box-sizing:border-box}
-.rc-field input:focus{border-color:#000}
-/* Counter (reference tc-counter): [−] value unit [+] */
-.rc-counter{display:flex;align-items:center;justify-content:space-between;border:1.5px solid var(--rc-line);border-radius:12px;background:#fff;padding:4px}
-.rc-counter-btn{width:36px;height:36px;min-width:36px;border:0;border-radius:9px;background:var(--rc-soft);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#000;transition:.15s}
-.rc-counter-btn:hover{background:#e4e4e8}
-.rc-counter-btn svg{fill:currentColor}
-.rc-counter-val{display:inline-flex;align-items:baseline;gap:3px;font:500 15px 'Gotham Pro',sans-serif}
-.rc-counter-val input{border:0!important;padding:0!important;width:3.5ch!important;text-align:right;font:500 15px 'Gotham Pro',sans-serif;outline:none;background:transparent;-moz-appearance:textfield;appearance:textfield}
-.rc-counter-val input::-webkit-outer-spin-button,.rc-counter-val input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.rc-counter-val i{font-style:normal;color:var(--rc-muted);font-size:14px}
-#recipe-steps-editor .rc-pour{display:grid;grid-template-columns:1fr 84px 84px 44px;gap:8px;align-items:center;margin-bottom:8px}
-#recipe-steps-editor .rc-pour input:not([type=hidden]){border:1.5px solid var(--rc-line);border-radius:11px;padding:11px 10px;font:400 14px 'Gotham Pro',sans-serif;outline:none;width:100%;box-sizing:border-box;background:#fff}
-#recipe-steps-editor .rc-pour input:focus{border-color:#000}
-#recipe-steps-editor .rc-pour .del{border:0;background:var(--rc-soft);border-radius:10px;height:42px;cursor:pointer;color:#000;display:inline-flex;align-items:center;justify-content:center;transition:.15s}
-#recipe-steps-editor .rc-pour .del:hover{background:#e4e4e8}
-#recipe-steps-editor .rc-pour .del svg{fill:none;stroke:currentColor}
-.rc-pour-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-/* Dark pill buttons — reference btn-dark-sm */
-.rc-btn-dark{border:0;background:var(--black,#000);color:#fff;border-radius:12px;padding:11px 16px;font:700 13px 'Gotham Pro',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.2s}
-.rc-btn-dark:hover{background:var(--black-80,#333)}
-.rc-btn-dark svg{fill:currentColor}
-/* Chart with axis labels — reference chart-container */
-.rc-chart{position:relative;margin-top:14px;padding:24px 0 22px}
-.rc-chart svg{width:100%;height:158px;display:block}
-.rc-axis{position:absolute;color:var(--rc-muted);font-family:'DIN Pro Medium',sans-serif;font-size:14px;text-transform:uppercase;z-index:2}
-.rc-axis-ml{left:0;top:0}
-.rc-axis-time{right:9px;bottom:0}
-/* Photo upload — icon button + preview, no native "Choose file" control */
-.rc-photo-btn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--rc-line);background:#fff;border-radius:12px;padding:11px 16px;font:700 13px 'Gotham Pro',sans-serif;cursor:pointer;transition:.2s;margin-top:4px}
-.rc-photo-btn:hover{border-color:#000}
-.rc-photo-btn svg{fill:none;stroke:currentColor}
-.rc-photo-btn input[type=file]{display:none}
-.rc-photo-preview{position:relative;display:inline-block;margin-top:10px}
-.rc-photo-preview[hidden]{display:none!important}
-.rc-photo-preview img{width:96px;height:96px;object-fit:cover;border-radius:12px;display:block}
-.rc-photo-preview button{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border:0;border-radius:50%;background:#000;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.rc-photo-preview button svg{fill:none;stroke:currentColor}
-.rc-publish{width:100%;margin-top:22px;background:#000;color:#fff;border:0;border-radius:14px;padding:16px;font:700 15px 'Gotham Pro',sans-serif;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:.2s}
-.rc-publish:hover{background:#222}
-@media(max-width:575px){.rc-grid{grid-template-columns:1fr}#recipe-steps-editor .rc-pour{grid-template-columns:1fr 64px 64px 30px}}
-</style>
+  </div>
+</main>
 
 <script>
-// ── Tab Switching ──
-function switchTab(target) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => { p.style.display = 'none'; });
-
-    const btn = document.getElementById('tab-btn-' + target);
-    const panel = document.getElementById('tab-panel-' + target);
-    if (btn) btn.classList.add('active');
-    if (panel) {
-        if (target === 'info') panel.style.display = 'flex';
-        else panel.style.display = 'block';
-    }
-
-    // Scroll to tabs section
-    document.getElementById('product-tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.target));
-});
-
-if (window.location.hash === '#reviews') {
-    switchTab('reviews');
-    document.getElementById('product-tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-const recipeComposer = document.getElementById('recipe-composer-wrap');
-const recipeComposerToggle = document.getElementById('recipe-composer-toggle');
-if (recipeComposer) {
-    const anchor = recipeComposerToggle || document.querySelector('#tab-panel-recipes h2');
-    anchor?.insertAdjacentElement('afterend', recipeComposer);
-}
-if (recipeComposer && recipeComposerToggle) {
-    recipeComposerToggle.addEventListener('click', () => {
-        const opening = recipeComposer.hidden;
-        recipeComposer.hidden = !opening;
-        recipeComposerToggle.setAttribute('aria-expanded', String(opening));
-        recipeComposerToggle.querySelector('span').textContent = opening ? 'Скрыть форму' : 'Добавить рецепт';
-    });
-}
-
-document.querySelectorAll('[data-recipe-share]').forEach((button) => {
-    button.addEventListener('click', async () => {
-        const url = new URL(button.dataset.recipeShare, window.location.origin).href;
-        try {
-            if (navigator.share) await navigator.share({ title: button.dataset.recipeTitle, url });
-            else await navigator.clipboard.writeText(url);
-        } catch (_) {}
-    });
-});
-
-// ── Variant Selection — now handled by Alpine productCard ──
-
-// ── Star Rating ──
-const stars = document.querySelectorAll('.star-btn');
-const ratingInput = document.getElementById('rating-val');
-let currentRating = 5;
-
-stars.forEach((star, idx) => {
+// ── Star rating ──
+(function () {
+  const stars = document.querySelectorAll('#star-rating .aspect-pd__star');
+  const input = document.getElementById('rating-val');
+  if (!stars.length || !input) return;
+  let currentRating = 5;
+  stars.forEach((star, idx) => {
     star.addEventListener('mouseenter', () => {
-        stars.forEach((s, i) => { s.style.color = i <= idx ? '#f59e0b' : '#d1d5db'; });
+      stars.forEach((s, i) => s.classList.toggle('on', i <= idx));
     });
     star.addEventListener('mouseleave', () => {
-        stars.forEach((s, i) => { s.style.color = i < currentRating ? '#f59e0b' : '#d1d5db'; });
+      stars.forEach((s, i) => s.classList.toggle('on', i < currentRating));
     });
     star.addEventListener('click', () => {
-        currentRating = idx + 1;
-        if (ratingInput) ratingInput.value = currentRating;
-        stars.forEach((s, i) => { s.style.color = i < currentRating ? '#f59e0b' : '#d1d5db'; });
+      currentRating = idx + 1;
+      input.value = currentRating;
+      stars.forEach((s, i) => s.classList.toggle('on', i < currentRating));
     });
-});
-stars.forEach((s, i) => { s.style.color = i < 5 ? '#f59e0b' : '#d1d5db'; });
+  });
+})();
 
-// Delivery star rating
-const deliveryStars = document.querySelectorAll('#delivery-star-rating .delivery-star-btn');
-const deliveryRatingInput = document.getElementById('delivery-rating-val');
-let currentDeliveryRating = 0;
-deliveryStars.forEach((s) => {
-    s.addEventListener('click', () => {
-        currentDeliveryRating = parseInt(s.dataset.rating);
-        deliveryRatingInput.value = currentDeliveryRating;
-        deliveryStars.forEach((d, i) => { d.style.color = i < currentDeliveryRating ? '#f59e0b' : '#d1d5db'; });
+// ── Delivery star rating ──
+(function () {
+  const stars = document.querySelectorAll('#delivery-star-rating .aspect-pd__star');
+  const input = document.getElementById('delivery-rating-val');
+  if (!stars.length || !input) return;
+  let currentRating = 0;
+  stars.forEach((star, idx) => {
+    star.addEventListener('mouseenter', () => {
+      stars.forEach((s, i) => s.classList.toggle('on', i <= idx));
     });
-    s.addEventListener('mouseenter', () => {
-        const r = parseInt(s.dataset.rating);
-        deliveryStars.forEach((d, i) => { d.style.color = i < r ? '#f59e0b' : '#d1d5db'; });
+    star.addEventListener('mouseleave', () => {
+      stars.forEach((s, i) => s.classList.toggle('on', i < currentRating));
     });
-});
-document.getElementById('delivery-star-rating')?.addEventListener('mouseleave', () => {
-    deliveryStars.forEach((d, i) => { d.style.color = i < currentDeliveryRating ? '#f59e0b' : '#d1d5db'; });
-});
+    star.addEventListener('click', () => {
+      currentRating = idx + 1;
+      input.value = currentRating;
+      stars.forEach((s, i) => s.classList.toggle('on', i < currentRating));
+    });
+  });
+})();
 
-// ── Review Form Submit ──
-const reviewForm = document.getElementById('review-form');
-if (reviewForm) {
-    reviewForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const text = reviewForm.querySelector('[name=text]').value.trim();
-        const rating = ratingInput?.value || 5;
-        if (!text) {
-            const errEl = document.getElementById('review-error');
-            errEl.textContent = 'Напишите текст отзыва';
-            errEl.style.display = 'block';
-            return;
-        }
-        try {
-            const resp = await fetch('/api/v1/catalog/products/{{ product.slug }}/reviews/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
-                body: JSON.stringify({ rating: parseInt(rating), delivery_rating: currentDeliveryRating || null, text, delivery_text: reviewForm.querySelector('[name=delivery_text]')?.value || '', delivery_operator: reviewForm.querySelector('[name=delivery_operator]')?.value || '' })
-            });
-            if (resp.ok || resp.status === 201) {
-                document.getElementById('review-success').textContent = '✓ Отзыв отправлен на модерацию. Спасибо!';
-                document.getElementById('review-success').style.display = 'block';
-                document.getElementById('review-error').style.display = 'none';
-                reviewForm.reset();
-                // Отзыв публикуется сразу — обновляем страницу, чтобы он появился в списке.
-                setTimeout(() => { window.location.hash = 'reviews'; window.location.reload(); }, 900);
-            } else {
-                const data = await resp.json();
-                const errEl = document.getElementById('review-error');
-                errEl.textContent = data.detail || 'Ошибка отправки. Возможно, нужно войти в аккаунт.';
-                errEl.style.display = 'block';
-            }
-        } catch(err) {
-            const errEl = document.getElementById('review-error');
-            errEl.textContent = 'Произошла ошибка. Попробуйте позже.';
-            errEl.style.display = 'block';
-        }
-    });
-}
-
-// ── CSRF Helper ──
+// ── CSRF helper ──
 function getCookie(name) {
-    let v = null;
-    document.cookie.split(';').forEach(c => {
-        c = c.trim();
-        if (c.startsWith(name + '=')) v = decodeURIComponent(c.slice(name.length + 1));
-    });
-    return v;
+  let v = null;
+  document.cookie.split(';').forEach(c => {
+    c = c.trim();
+    if (c.startsWith(name + '=')) v = decodeURIComponent(c.slice(name.length + 1));
+  });
+  return v;
 }
 
-// ── Recipe composer: rating, advanced toggle, pourings graph, submit ──
-const PRODUCT_NAME = "{{ product.name|escapejs }}";
-function rcEsc(s){return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-
-// Star rating
-(function(){
-    const wrap = document.getElementById('recipe-stars');
-    if (!wrap) return;
-    const input = document.getElementById('recipe-rating');
-    const btns = [...wrap.querySelectorAll('button')];
-    const paint = n => btns.forEach((b,i) => b.classList.toggle('on', i < n));
-    btns.forEach((b,i) => {
-        b.addEventListener('mouseenter', () => paint(i+1));
-        b.addEventListener('click', () => { input.value = i+1; paint(i+1); });
-    });
-    wrap.addEventListener('mouseleave', () => paint(Number(input.value)));
+// ── Review form ──
+(function () {
+  const form = document.getElementById('review-form');
+  if (!form) return;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = form.querySelector('[name=text]').value.trim();
+    const rating = Number(document.getElementById('rating-val').value) || 5;
+    const deliveryRating = Number(document.getElementById('delivery-rating-val').value) || null;
+    if (!text) {
+      const err = document.getElementById('review-error');
+      err.textContent = 'Напишите текст отзыва';
+      err.style.display = 'block';
+      return;
+    }
+    try {
+      const resp = await fetch('{% url "pages:reviews_create" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': getCookie('csrftoken'),
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams({
+          rating: rating,
+          delivery_rating: deliveryRating || '',
+          text: text,
+          delivery_text: form.querySelector('[name=delivery_text]').value || '',
+          delivery_operator: form.querySelector('[name=delivery_operator]').value || ''
+        })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        document.getElementById('review-success').style.display = 'block';
+        document.getElementById('review-error').style.display = 'none';
+        form.reset();
+      } else {
+        const err = document.getElementById('review-error');
+        err.textContent = 'Ошибка отправки. Попробуйте позже.';
+        err.style.display = 'block';
+      }
+    } catch (err) {
+      const el = document.getElementById('review-error');
+      el.textContent = 'Произошла ошибка. Попробуйте позже.';
+      el.style.display = 'block';
+    }
+  });
 })();
-
-// Advanced section toggle
-(function(){
-    const t = document.getElementById('recipe-adv-toggle');
-    const adv = document.getElementById('recipe-adv');
-    if (!t || !adv) return;
-    t.addEventListener('click', () => {
-        const open = adv.hasAttribute('hidden');
-        if (open) adv.removeAttribute('hidden'); else adv.setAttribute('hidden','');
-        t.classList.toggle('open', open);
-        t.setAttribute('aria-expanded', open ? 'true' : 'false');
-        t.querySelector('span').textContent = open ? 'Заполнить сокращённый рецепт' : 'Заполнить расширенный рецепт';
-    });
-})();
-
-// Pourings editor + live volume/time graph
-const recipeStepsEditor = document.getElementById('recipe-steps-editor');
-if (recipeStepsEditor) {
-    const syncRecipeSteps = () => {
-        const rows = [...recipeStepsEditor.querySelectorAll('.recipe-step-row')];
-        const steps = rows.map(row => ({
-            kind: (row.querySelector('[data-field=kind]') || {}).value || 'pour',
-            time_seconds: Number((row.querySelector('[data-field=time]') || {}).value) || 0,
-            water_ml: Number((row.querySelector('[data-field=water]') || {}).value) || 0,
-            description: ((row.querySelector('[data-field=text]') || {}).value || '').trim()
-        }));
-        document.getElementById('recipe-steps-data').value = JSON.stringify(steps);
-        let total = 0;
-        const pours = steps.filter(s => s.kind === 'pour');
-        const totalMax = Math.max(1, pours.reduce((sum, s) => sum + s.water_ml, 0));
-        const maxTime = Math.max(60, ...steps.map(s => s.time_seconds));
-        const points = ['0,190'];
-        pours.slice().sort((a,b) => a.time_seconds-b.time_seconds).forEach(s => {
-            total += s.water_ml;
-            points.push(`${16 + s.time_seconds / maxTime * 616},${190 - Math.min(178, total / totalMax * 178)}`);
-        });
-        const gridLines = [0,1,2,3,4].map(i => `<line x1="0" y1="${12 + i*44.5}" x2="640" y2="${12 + i*44.5}" stroke="#00000014" stroke-width="1"/>`).join('');
-        document.getElementById('recipe-graph').innerHTML = gridLines + `<polyline fill="none" stroke="#111" stroke-width="3" stroke-linejoin="round" points="${points.join(' ')}"/>`;
-    };
-    const bind = row => row.querySelectorAll('input,select').forEach(el => el.addEventListener('input', syncRecipeSteps));
-    const addRow = (kind, placeholder) => {
-        const row = recipeStepsEditor.querySelector('.recipe-step-row').cloneNode(true);
-        row.querySelector('[data-field=kind]').value = kind;
-        row.querySelectorAll('input:not([type=hidden])').forEach(i => { i.value = i.dataset.field === 'text' ? '' : 0; });
-        const txt = row.querySelector('[data-field=text]');
-        if (placeholder) { txt.placeholder = placeholder; }
-        recipeStepsEditor.querySelector('.rc-pour-actions').before(row);
-        bind(row);
-        syncRecipeSteps();
-    };
-    document.getElementById('recipe-add-step').addEventListener('click', () => addRow('pour', 'Вливание'));
-    document.getElementById('recipe-add-end').addEventListener('click', () => addRow('action', 'Конец приготовления'));
-    recipeStepsEditor.addEventListener('click', e => {
-        const del = e.target.closest('.del');
-        if (!del) return;
-        const rows = recipeStepsEditor.querySelectorAll('.recipe-step-row');
-        if (rows.length <= 1) { del.closest('.recipe-step-row').querySelectorAll('input:not([type=hidden])').forEach(i => i.value = i.dataset.field === 'text' ? '' : 0); }
-        else { del.closest('.recipe-step-row').remove(); }
-        syncRecipeSteps();
-    });
-    recipeStepsEditor.querySelectorAll('input,select').forEach(el => el.addEventListener('input', syncRecipeSteps));
-    syncRecipeSteps();
-}
-
-// Counter [−]/[+] buttons
-document.querySelectorAll('.rc-counter').forEach(counter => {
-    const input = counter.querySelector('input[data-counter]');
-    counter.querySelectorAll('.rc-counter-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const step = Number(btn.dataset.step) || 1;
-            let v = (Number(input.value) || 0) + step;
-            if (input.min !== '') v = Math.max(Number(input.min), v);
-            if (input.max !== '') v = Math.min(Number(input.max), v);
-            input.value = v;
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-        });
-    });
-});
-
-// Photo picker: icon button + thumbnail preview instead of the native control
-(function(){
-    const btn = document.getElementById('recipe-photo-btn');
-    if (!btn) return;
-    const input = btn.querySelector('input[type=file]');
-    const label = btn.querySelector('[data-photo-label]');
-    const preview = document.getElementById('recipe-photo-preview');
-    const img = preview.querySelector('img');
-    const clear = () => {
-        input.value = '';
-        preview.setAttribute('hidden', '');
-        if (img.src) { URL.revokeObjectURL(img.src); img.removeAttribute('src'); }
-        label.textContent = 'Добавить фото';
-    };
-    input.addEventListener('change', () => {
-        const f = input.files[0];
-        if (!f) { clear(); return; }
-        if (img.src) URL.revokeObjectURL(img.src);
-        img.src = URL.createObjectURL(f);
-        preview.removeAttribute('hidden');
-        label.textContent = 'Заменить фото';
-    });
-    preview.querySelector('button').addEventListener('click', clear);
-    document.getElementById('recipe-form').addEventListener('reset', () => setTimeout(clear, 0));
-})();
-
-// ── Recipe Form Submit — assemble rich fields into backend payload ──
-const recipeForm = document.getElementById('recipe-form');
-if (recipeForm) {
-    const showErr = msg => { const e = document.getElementById('recipe-error'); e.textContent = msg; e.style.display = 'block'; };
-    recipeForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const post = (document.getElementById('recipe-post').value || '').trim();
-        const notes = (document.getElementById('recipe-notes').value || '').trim();
-        const method = (document.getElementById('recipe-method').value || '').trim();
-        const rating = Number(document.getElementById('recipe-rating').value) || 0;
-        const timeMinutes = document.getElementById('recipe-time').value;
-        const difficulty = document.getElementById('recipe-difficulty').value;
-        const imageFile = recipeForm.querySelector('[name=main_image]').files[0];
-
-        if (!post && !notes) { showErr('Напишите пост или заметки к рецепту'); return; }
-
-        // Название рецепта
-        const name = (method ? method + ' · ' + PRODUCT_NAME : 'Рецепт · ' + PRODUCT_NAME).slice(0, 300);
-
-        // Описание в HTML (модерируется перед публикацией)
-        const parts = [];
-        if (post) parts.push('<p>' + rcEsc(post) + '</p>');
-        const meta = [];
-        if (method) meta.push('<b>Способ приготовления:</b> ' + rcEsc(method));
-        if (rating) meta.push('<b>Оценка кофе:</b> ' + rating + '/5');
-        if (meta.length) parts.push('<p>' + meta.join('<br>') + '</p>');
-        if (notes) parts.push('<p>' + rcEsc(notes).replace(/\n/g, '<br>') + '</p>');
-        // Расширенные поля (Кофе/Вода)
-        const details = [];
-        document.querySelectorAll('#recipe-adv [data-note]').forEach(inp => {
-            const v = (inp.value || '').trim();
-            if (!v || (inp.hasAttribute('data-counter') && Number(v) === 0)) return;
-            details.push('<li><b>' + rcEsc(inp.dataset.note) + ':</b> ' + rcEsc(v) + '</li>');
-        });
-        if (details.length) parts.push('<ul>' + details.join('') + '</ul>');
-        // Вливания
-        try {
-            const steps = JSON.parse(document.getElementById('recipe-steps-data').value || '[]')
-                .filter(s => s.water_ml || (s.description || '').trim() || s.time_seconds);
-            if (steps.length) {
-                const li = steps.map(s => '<li>' + (s.time_seconds ? s.time_seconds + ' с' : '') +
-                    (s.water_ml ? ' — ' + s.water_ml + ' мл' : '') +
-                    (s.description ? ': ' + rcEsc(s.description) : '') + '</li>').join('');
-                parts.push('<p><b>Вливания:</b></p><ul>' + li + '</ul>');
-            }
-        } catch (_) {}
-        const description = parts.join('\n') || ('<p>' + rcEsc(notes || post) + '</p>');
-
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('description', description);
-        formData.append('time_minutes', timeMinutes || 3);
-        formData.append('difficulty', difficulty || 'medium');
-        formData.append('steps', document.getElementById('recipe-steps-data').value || '[]');
-        if (imageFile) formData.append('main_image', imageFile);
-
-        try {
-            const resp = await fetch('{% url "catalog:recipe_add" slug=product.slug %}', {
-                method: 'POST',
-                headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                body: formData
-            });
-            const data = await resp.json();
-            if (resp.ok && data.ok) {
-                document.getElementById('recipe-success').textContent = '✓ ' + (data.message || 'Рецепт отправлен на модерацию. Спасибо!');
-                document.getElementById('recipe-success').style.display = 'block';
-                document.getElementById('recipe-error').style.display = 'none';
-                recipeForm.reset();
-            } else {
-                showErr(data.error || 'Ошибка отправки. Попробуйте позже.');
-            }
-        } catch(err) {
-            showErr('Произошла ошибка. Попробуйте позже.');
-        }
-    });
-}
 </script>
-
-<style>
-/* Mobile product layout follows the supplied reference: information first,
-   image in the middle, then taste/scales, options and a stable action row. */
-@media (max-width: 757px) {
-    .product-detail-root {
-        padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important;
-    }
-
-    .product-detail-root > .container {
-        box-sizing: border-box !important;
-        max-width: 476px !important;
-        padding-left: 16px !important;
-        padding-right: 16px !important;
-    }
-
-    .product-detail-root .container > nav.py-6 {
-        padding-bottom: 12px !important;
-        padding-top: 12px !important;
-    }
-
-    .product-detail-root .container > nav.py-6 > * {
-        display: none !important;
-    }
-
-    .product-detail-root .container > nav.py-6 > a:nth-of-type(2) {
-        color: rgba(0, 0, 0, 0.45) !important;
-        display: inline-flex !important;
-        font-family: "DIN Pro Black", "Arial Narrow", sans-serif !important;
-        font-size: 14px !important;
-        text-transform: uppercase !important;
-    }
-
-    .product-detail-root .container > nav.py-6 > a:nth-of-type(2)::before {
-        content: "‹\00a0";
-    }
-
-    .product-main-grid {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 0 !important;
-        min-width: 0 !important;
-    }
-
-    .product-overview-panel,
-    .product-info-panel {
-        display: contents !important;
-    }
-
-    .product-thumbnails {
-        display: none !important;
-    }
-
-    .product-overview-head {
-        align-items: flex-start !important;
-        display: flex !important;
-        gap: 10px !important;
-        justify-content: space-between !important;
-        order: 1 !important;
-        width: 100% !important;
-    }
-
-    .product-overview-head .product-overview-meta {
-        font-size: 13px !important;
-        margin: 0 !important;
-    }
-
-    .product-overview-head .product-overview-rating {
-        align-items: center !important;
-        flex-wrap: wrap !important;
-        font-size: 13px !important;
-        gap: 8px !important;
-        justify-content: flex-end !important;
-        margin: 0 !important;
-    }
-
-    .product-overview-panel > h1 {
-        font-size: 26px !important;
-        line-height: 1.05 !important;
-        margin: 7px 0 5px !important;
-        order: 2 !important;
-    }
-
-    .product-overview-subline {
-        align-items: flex-start !important;
-        display: flex !important;
-        gap: 12px !important;
-        justify-content: space-between !important;
-        order: 3 !important;
-    }
-
-    .product-overview-subline .product-overview-meta {
-        font-size: 14px !important;
-        margin: 0 !important;
-    }
-
-    .product-overview-flags {
-        align-items: flex-end !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 4px !important;
-    }
-
-    .product-overview-week {
-        background: #000 !important;
-        border-radius: 4px !important;
-        color: #fff !important;
-        font-family: "DIN Pro Black", "Arial Narrow", sans-serif !important;
-        font-size: 12px !important;
-        padding: 3px 7px !important;
-        text-transform: uppercase !important;
-    }
-
-    .product-overview-popular {
-        color: rgba(0, 0, 0, 0.5) !important;
-        font-size: 13px !important;
-    }
-
-    .product-image-panel {
-        box-sizing: border-box !important;
-        margin: 24px auto 18px !important;
-        max-width: 360px !important;
-        order: 4 !important;
-        padding: 0 !important;
-        width: 100% !important;
-    }
-
-    .product-image-panel > div:first-child {
-        aspect-ratio: 1 / 1 !important;
-        box-sizing: border-box !important;
-        height: auto !important;
-        max-height: 360px !important;
-        padding: 12px !important;
-    }
-
-    .product-image-panel #main-image {
-        height: 100% !important;
-        max-height: 336px !important;
-        object-fit: contain !important;
-        transform: none !important;
-        width: 100% !important;
-    }
-
-    .product-overview-flavor {
-        font-size: 14px !important;
-        line-height: 1.45 !important;
-        margin: 0 0 18px !important;
-        order: 5 !important;
-        text-align: left !important;
-    }
-
-    .product-overview-scales {
-        gap: 18px !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        margin-bottom: 18px !important;
-        max-width: none !important;
-        order: 6 !important;
-        width: 100% !important;
-    }
-
-    .product-info-panel > div:not(.product-purchase-panel) {
-        display: none !important;
-    }
-
-    .product-purchase-panel {
-        min-width: 0 !important;
-        order: 7 !important;
-        width: 100% !important;
-    }
-
-    .product-purchase-options {
-        align-items: stretch !important;
-        display: grid !important;
-        gap: 8px !important;
-        grid-template-columns: minmax(0, 1fr) minmax(116px, 44%) !important;
-        margin-bottom: 12px !important;
-        min-width: 0 !important;
-    }
-
-    .product-purchase-options > div:first-child {
-        min-width: 0 !important;
-        overflow-x: auto !important;
-        padding: 3px !important;
-        scrollbar-width: none;
-    }
-
-    .product-purchase-options > div:first-child::-webkit-scrollbar {
-        display: none;
-    }
-
-    .product-purchase-options > div:first-child .weight-btn {
-        flex: 0 0 auto !important;
-        min-height: 36px !important;
-        padding: 6px 10px !important;
-        white-space: nowrap !important;
-    }
-
-    .product-purchase-options > div:last-child {
-        flex-shrink: 1 !important;
-        min-width: 0 !important;
-        width: 100% !important;
-    }
-
-    .product-purchase-actions {
-        align-items: center !important;
-        display: flex !important;
-        gap: 6px !important;
-        min-width: 0 !important;
-        width: 100% !important;
-    }
-
-    .product-detail-buy {
-        box-sizing: border-box !important;
-        flex: 1 1 auto !important;
-        font-size: 16px !important;
-        gap: 4px !important;
-        height: 40px !important;
-        justify-content: center !important;
-        max-width: 100% !important;
-        min-height: 40px !important;
-        min-width: 0 !important;
-        overflow: hidden !important;
-        padding: 0 8px !important;
-    }
-
-    .product-detail-buy .text-nowrap {
-        display: block !important;
-        min-width: 0 !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-    }
-
-    .product-detail-cart-step {
-        flex: 0 0 26px !important;
-        height: 26px !important;
-        width: 26px !important;
-    }
-
-    .product-detail-cart-qty {
-        flex: 0 0 auto !important;
-        font-size: 12px !important;
-        font-variant-numeric: tabular-nums;
-        min-width: 0 !important;
-        overflow: visible !important;
-    }
-
-    .product-detail-actions {
-        align-items: center !important;
-        display: flex !important;
-        flex: 0 0 auto !important;
-        gap: 4px !important;
-        min-width: 0 !important;
-    }
-
-    .product-detail-action {
-        align-items: center !important;
-        box-sizing: border-box !important;
-        display: flex !important;
-        flex: 0 0 40px !important;
-        height: 40px !important;
-        justify-content: center !important;
-        min-height: 40px !important;
-        min-width: 40px !important;
-        padding: 0 !important;
-        width: 40px !important;
-    }
-
-    .product-detail-action svg {
-        height: 18px !important;
-        min-width: 18px !important;
-        width: 18px !important;
-    }
-
-    #product-tabs {
-        box-sizing: border-box !important;
-        margin-top: 32px !important;
-        min-width: 0 !important;
-        width: 100% !important;
-    }
-
-    #product-tabs > div:first-child {
-        align-items: center !important;
-        display: flex !important;
-        gap: 18px !important;
-        margin: 0 -16px 26px !important;
-        max-width: calc(100% + 32px) !important;
-        overflow-x: auto !important;
-        padding: 0 16px 8px !important;
-        scroll-padding-inline: 16px;
-        scrollbar-width: none;
-        width: calc(100% + 32px) !important;
-    }
-
-    #product-tabs > div:first-child::-webkit-scrollbar {
-        display: none;
-    }
-
-    #product-tabs .tab-btn {
-        box-sizing: border-box !important;
-        flex: 0 0 auto !important;
-        font-size: 13px !important;
-        letter-spacing: 0.01em !important;
-        min-width: max-content !important;
-        padding: 10px 0 8px !important;
-        width: auto !important;
-    }
-
-    #product-tabs .tab-panel {
-        min-width: 0 !important;
-        overflow-wrap: anywhere;
-    }
-
-    #product-tabs .pdx-chars-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-}
-
-@media (max-width: 360px) {
-    .product-overview-panel > h1 {
-        font-size: 23px !important;
-    }
-
-    .product-detail-buy,
-    .product-detail-action {
-        height: 36px !important;
-        min-height: 36px !important;
-    }
-
-    .product-detail-action {
-        flex-basis: 36px !important;
-        min-width: 36px !important;
-        width: 36px !important;
-    }
-}
-</style>
 
 {% endblock %}
