@@ -39,6 +39,6 @@ backups/
 Thumbs.db
 
 # Scripts (временные патчи)
-add_*.py
-fix_*.py
-check_*.py
+/add_*.py
+/fix_*.py
+/check_*.py

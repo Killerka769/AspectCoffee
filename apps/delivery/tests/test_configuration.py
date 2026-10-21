@@ -5,6 +5,18 @@ from apps.delivery.cdek import CDEKClient
 
 
 class CDEKConfigurationTests(SimpleTestCase):
+    def test_management_command_is_discoverable_and_never_prints_credentials(self):
+        import io
+        import json
+        from django.conf import settings
+        from django.core.management import call_command
+        output = io.StringIO()
+        call_command("check_integrations", stdout=output)
+        result = json.loads(output.getvalue())
+        self.assertEqual(result["network_requests_sent"], 0)
+        self.assertFalse(result["yookassa"]["external_verified"])
+        self.assertNotIn(settings.YOOKASSA_SECRET_KEY, output.getvalue())
+
     @override_settings(CDEK_TEST_MODE=False, CDEK_API_URL="")
     def test_live_mode_selects_live_api(self):
         self.assertEqual(CDEKClient().base_url, "https://api.cdek.ru/v2")
