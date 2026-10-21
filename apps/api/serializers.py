@@ -168,6 +168,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = ["id", "product_name", "variant_description", "qty", "price_at_order", "total_price"]
 class OrderCreateSerializer(serializers.Serializer):
+    def validate_payment_method(self, value):
+        from django.conf import settings
+        if value == Order.PAYMENT_COD and not settings.PAYMENT_COD_ENABLED:
+            raise serializers.ValidationError("Оплата при получении недоступна")
+        return value
+
     delivery_type = serializers.ChoiceField(choices=Order.DELIVERY_CHOICES)
     delivery_address = serializers.JSONField()
     payment_method = serializers.ChoiceField(choices=Order.PAYMENT_CHOICES)

@@ -12,6 +12,16 @@ from apps.users.models import Address, User
 
 
 class CheckoutRegressionTests(TestCase):
+    @override_settings(PAYMENT_COD_ENABLED=False)
+    def test_disabled_cod_is_hidden_and_rejected_on_server(self):
+        self._anonymous_cart()
+        response = self.client.get("/basket/")
+        self.assertNotContains(response, 'name="payment_method_radio" type="radio" value="cod"')
+        response = self._post_checkout(self._checkout_data())
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Оплата при получении недоступна", response.json()["error"])
+        self.assertFalse(Order.objects.exists())
+
     def setUp(self):
         self.site_settings = SiteSettings.load()
         self.site_settings.enable_pickup = True

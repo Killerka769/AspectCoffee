@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.conf import settings
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -104,6 +105,7 @@ def basket_view(request):
     from apps.orders.recurring import recurring_payments_enabled
 
     recurring_enabled = recurring_payments_enabled()
+    cod_enabled = settings.PAYMENT_COD_ENABLED
     enabled_delivery_types = site_settings.enabled_delivery_types()
     default_delivery_type = site_settings.default_delivery_type()
     cart_service = CartService(request)
@@ -209,6 +211,8 @@ def basket_view(request):
                 raise ValueError("Укажите корректную электронную почту")
             if delivery_type not in enabled_delivery_types:
                 raise ValueError("Выбранный способ доставки сейчас недоступен")
+            if payment_method == Order.PAYMENT_COD and not cod_enabled:
+                raise ValueError("Оплата при получении недоступна")
             if payment_method not in dict(Order.PAYMENT_CHOICES):
                 raise ValueError("Выберите способ оплаты")
             if repeat_requested and payment_method != Order.PAYMENT_CARD:
@@ -464,7 +468,6 @@ def basket_view(request):
                     _cdek_log.getLogger(__name__).error(f"CDEK waybill queue error for order {order.id}: {exc}")
 
             if order.payment_method in ["card", "sbp"]:
-                from django.conf import settings
                 shop_id = getattr(settings, "YOOKASSA_SHOP_ID", "")
                 secret_key = getattr(settings, "YOOKASSA_SECRET_KEY", "")
                 if shop_id and secret_key:
@@ -562,6 +565,7 @@ def basket_view(request):
         "total_weight": total_weight,
         "default_delivery_type": default_delivery_type,
         "recurring_payments_enabled": recurring_enabled,
+        "cod_enabled": cod_enabled,
     })
 
 

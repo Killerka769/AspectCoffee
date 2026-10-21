@@ -242,6 +242,7 @@ EMAIL_USE_SSL = config("EMAIL_USE_SSL", default=False, cast=bool)
 EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", default=10, cast=int)
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="Aspect Coffee <info@aspectcoffee.ru>")
 CONTACT_EMAIL = config("CONTACT_EMAIL", default="")
+PAYMENT_COD_ENABLED = config("PAYMENT_COD_ENABLED", default=False, cast=bool)
 
 # Browser Web Push (VAPID). The private PEM is generated on the production
 # host and copied into the image; the public key is safe to expose to clients.

@@ -1,6 +1,7 @@
 import logging
 from decimal import Decimal, InvalidOperation
 from django.db import transaction
+from django.conf import settings
 from apps.users.models import User, BonusTransaction, Address
 from apps.orders.models import Order, OrderItem, Cart
 
@@ -31,6 +32,8 @@ class CheckoutService:
 
     @transaction.atomic
     def place_order(self, data, order_user=None):
+        if data.get("payment_method") == Order.PAYMENT_COD and not settings.PAYMENT_COD_ENABLED:
+            raise ValueError("Оплата при получении недоступна")
         if self.user.is_authenticated:
             cart = Cart.objects.get(user=self.user)
         else:
