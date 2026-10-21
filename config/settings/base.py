@@ -241,6 +241,7 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False, cast=bool)
 EMAIL_USE_SSL = config("EMAIL_USE_SSL", default=False, cast=bool)
 EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", default=10, cast=int)
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="Aspect Coffee <info@aspectcoffee.ru>")
+CONTACT_EMAIL = config("CONTACT_EMAIL", default="")
 
 # Browser Web Push (VAPID). The private PEM is generated on the production
 # host and copied into the image; the public key is safe to expose to clients.
@@ -275,7 +276,10 @@ YOOKASSA_SHOP_ID = config("YOOKASSA_SHOP_ID", default="")
 YOOKASSA_SECRET_KEY = config("YOOKASSA_SECRET_KEY", default="")
 CDEK_CLIENT_ID = config("CDEK_CLIENT_ID", default="")
 CDEK_CLIENT_SECRET = config("CDEK_CLIENT_SECRET", default="")
-CDEK_API_URL = config("CDEK_API_URL", default="https://api.cdek.ru/v2")
+CDEK_TEST_MODE = config("CDEK_TEST_MODE", default=False, cast=bool)
+CDEK_API_URL = config("CDEK_API_URL", default="") or (
+    "https://api.edu.cdek.ru/v2" if CDEK_TEST_MODE else "https://api.cdek.ru/v2"
+)
 SENTRY_DSN = config("SENTRY_DSN", default="")
 import sentry_sdk
 if SENTRY_DSN:
@@ -634,12 +638,5 @@ CELERY_BEAT_SCHEDULE = {
 }
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ЮKassa Configuration
-YOOKASSA_SHOP_ID = config("YOOKASSA_SHOP_ID", default="")
-YOOKASSA_SECRET_KEY = config("YOOKASSA_SECRET_KEY", default="")
+# ЮKassa credentials are defined once in the integrations section above.
 YOOKASSA_RECURRENT_ENABLED = config("YOOKASSA_RECURRENT_ENABLED", default=True, cast=bool)
-
-# CDEK Configuration
-CDEK_ACCOUNT = config("CDEK_CLIENT_ID", default="")
-CDEK_PASSWORD = config("CDEK_CLIENT_SECRET", default="")
-CDEK_TEST_MODE = config("CDEK_TEST_MODE", default=False, cast=bool)

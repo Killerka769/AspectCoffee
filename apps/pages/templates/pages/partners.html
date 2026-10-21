@@ -78,17 +78,18 @@
           <div class="mt-4 space-y-2">
             <p class="text-[13px] text-white/40 flex items-center gap-2">
               <svg class="w-4 h-4"><use href="{% static 'asset/images/sprite.svg' %}#icons--mail"></use></svg>
-              partners@aspectcoffee.ru
+              {{ site_settings.contact_email }}
             </p>
             <p class="text-[13px] text-white/40 flex items-center gap-2">
               <svg class="w-4 h-4"><use href="{% static 'asset/images/sprite.svg' %}#icons--phone"></use></svg>
-              8 (800) 123-45-67
+              {{ site_settings.contact_phone }}
             </p>
           </div>
         </div>
-        <a href="/contact-us/" class="shrink-0 inline-block bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-[14px]">Оставить заявку →</a>
+        <a href="#inquiry" class="shrink-0 inline-block bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-[14px]">Оставить заявку →</a>
       </div>
     </div>
+    {% include "pages/_contact_form.html" %}
   </div>
 </main>
 {% endblock %}

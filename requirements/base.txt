@@ -6,7 +6,7 @@ drf-spectacular==0.27.2
 django-axes==7.0.1
 django-cors-headers==4.3.1
 # Database
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.10
 
 # Cache & Queue
 celery==5.4.0
@@ -23,8 +23,6 @@ django-import-export==4.1.1
 # CKEditor 4 is still referenced by active models and historical migrations.
 # Keep it pinned until the planned field/data migration to CKEditor 5 is complete.
 django-ckeditor==6.7.3
-# Installed for that planned migration; active model fields have not moved yet.
-django-ckeditor-5==0.2.20
 
 # OAuth / Social Auth
 django-allauth[socialaccount]==65.14.1

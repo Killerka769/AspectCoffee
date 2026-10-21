@@ -1,0 +1,27 @@
+<section id="inquiry" class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm">
+  <h2 class="text-[22px] font-din-black uppercase mb-6">{{ contact_subject }}</h2>
+  {% if contact_sent %}
+    <div role="status" class="text-center py-8">
+      <h3 class="font-bold text-[17px] mb-2">Спасибо за обращение!</h3>
+      <p class="text-[14px] text-black/60">Ваше письмо отправлено. Мы свяжемся с вами в ближайшее время.</p>
+    </div>
+  {% endif %}
+  {% if contact_subject == "Подписка на кофе" %}<p class="text-sm text-black/60 mb-4">Это заявка менеджеру. Отправка формы не подключает подписку и не разрешает автоматические списания.</p>{% endif %}
+  <form method="post" action="{{ request.path }}#inquiry" class="space-y-5">
+    {% csrf_token %}
+    {{ contact_form.website }}
+    {% if contact_form.non_field_errors or contact_form.website.errors %}<div role="alert" class="text-red-700">{{ contact_form.non_field_errors }}{{ contact_form.website.errors }}</div>{% endif %}
+    {% for field in contact_form.visible_fields %}
+      <div>
+        {% if field.name == "consent" %}
+          <label class="text-[13px]">{{ field }} Согласен с <a href="{% url 'pages:privacy' %}" class="underline">политикой конфиденциальности</a></label>
+        {% else %}
+          <label for="{{ field.id_for_label }}" class="text-[13px] font-bold mb-1 block">{{ field.label }}</label>
+          {{ field }}
+        {% endif %}
+        {% if field.errors %}<div role="alert" class="text-sm text-red-700">{{ field.errors }}</div>{% endif %}
+      </div>
+    {% endfor %}
+    <button type="submit" class="w-full py-4 rounded-xl bg-black text-white font-bold text-[14px] hover:bg-gray-800">Отправить</button>
+  </form>
+</section>

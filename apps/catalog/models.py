@@ -727,6 +727,10 @@ class SiteSettings(models.Model):
         help_text="Базовая ссылка на основной сайт (О компании, Достижения и т.д.). Без / в конце.",
     )
     contact_phone = models.CharField("Телефон", max_length=32, default="+78003334980", blank=True)
+    contact_email = models.EmailField(
+        "Email сайта для заявок", blank=True, default="",
+        help_text="Получатель контактных форм, партнёрских заявок и запросов подписки. Пусто — CONTACT_EMAIL или адрес отправителя из настроек сервера.",
+    )
     contact_telegram = models.CharField("Telegram", max_length=200, default="", blank=True)
     contact_whatsapp = models.CharField("WhatsApp", max_length=200, default="https://api.whatsapp.com/send?phone=79508382000", blank=True)
     free_delivery_min = models.PositiveIntegerField("Бесплатная доставка от (₽)", default=2500)

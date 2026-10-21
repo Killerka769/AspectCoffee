@@ -8,7 +8,7 @@ from django.http import FileResponse, HttpResponse, JsonResponse
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from apps.catalog.models import Product, Category, Review
-from .forms import CommunityPostForm
+from .forms import CommunityPostForm, ContactForm
 from .models import (
     CommunityPost, CommunityPostLike, CommunityPostDislike,
     CommunityPostBookmark, CommunityPostRepost, CommunityPostComment, ReviewComment,
@@ -76,11 +76,58 @@ def disabled(request):
 
 
 def contact_us(request):
-    return _static_page(request, "contact_us")
+    return _inquiry_page(request, "contact_us", "Контактная форма")
 
 
 def partners(request):
-    return _static_page(request, "partners")
+    return _inquiry_page(request, "partners", "Партнёрство")
+
+
+def _inquiry_page(request, template, subject):
+    import logging
+    from django.core.cache import cache
+    from django.core.mail import EmailMessage
+    from django.utils.crypto import salted_hmac
+    from .contact_delivery import ContactDeliveryError, recipient_address
+
+    form = ContactForm(request.POST if request.method == "POST" else None)
+    status = 200
+    sent_key = "contact_sent_" + template
+    sent = request.session.pop(sent_key, False) if request.method != "POST" else False
+    if request.method == "POST" and form.is_valid():
+        throttle = None
+        try:
+            recipient = recipient_address()
+            if request.session.session_key is None:
+                request.session.create()
+            throttle = "contact:" + salted_hmac("contact-form", request.session.session_key + ":" + template).hexdigest()
+            if not cache.add(throttle, True, timeout=60):
+                form.add_error(None, "Пожалуйста, подождите минуту перед повторной отправкой.")
+                status = 429
+            else:
+                email = EmailMessage(
+                    subject="Заявка с сайта: " + subject,
+                    body="\n".join(("Тема: " + subject, "Имя: " + form.cleaned_data["name"],
+                                     "Email: " + form.cleaned_data["email"], "", form.cleaned_data["message"])),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[recipient], reply_to=[form.cleaned_data["email"]],
+                )
+                if email.send(fail_silently=False) != 1:
+                    raise ContactDeliveryError("Mail backend did not accept the message")
+                request.session[sent_key] = True
+                return redirect("pages:" + template)
+        except Exception as error:
+            if throttle:
+                try:
+                    cache.delete(throttle)
+                except Exception:
+                    logging.getLogger(__name__).warning("Contact throttle cleanup failed")
+            logging.getLogger(__name__).error("Contact delivery failed: %s", type(error).__name__)
+            form.add_error(None, "Письмо не отправлено. Попробуйте позже или свяжитесь с нами по телефону.")
+            status = 503
+    elif request.method == "POST":
+        status = 400
+    return render(request, "pages/" + template + ".html", {"contact_form": form, "contact_sent": sent, "contact_subject": subject}, status=status)
 
 
 def privacy(request):
@@ -191,7 +238,7 @@ def sitemap_xml(request):
 
 
 def subscription(request):
-    return _static_page(request, "subscription")
+    return _inquiry_page(request, "subscription", "Подписка на кофе")
 
 
 def reviews_page(request):

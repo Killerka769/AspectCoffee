@@ -399,7 +399,7 @@ class ParserSettingAdmin(ModelAdmin):
 class SiteSettingsAdmin(ModelAdmin):
     fieldsets = (
         ("Основное", {"fields": ("site_name",)}),
-        ("Ссылки и контакты", {"fields": ("wholesale_url", "main_site_url", "contact_phone", "contact_telegram", "contact_whatsapp", "free_delivery_min")}),
+        ("Ссылки и контакты", {"fields": ("wholesale_url", "main_site_url", "contact_phone", "contact_email", "contact_telegram", "contact_whatsapp", "free_delivery_min")}),
         ("Корзина и оформление", {"fields": ("cart_guarantee_text", "repeat_order_text", "payment_timeout_minutes", "success_title", "success_message", "success_footer")}),
         ("Автоплатежи", {
             "fields": ("recurring_payments_enabled",),
