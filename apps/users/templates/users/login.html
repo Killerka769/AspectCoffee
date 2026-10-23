@@ -1,7 +1,6 @@
 {% extends "catalog/base.html" %}
 {% load static %}
 {% load socialaccount %}
-{% get_providers as socialaccount_providers %}
 
 {% block title %}Вход{% endblock %}
 {% block meta_description %}Вход в личный кабинет Aspect Coffee Roasters.{% endblock %}
@@ -306,6 +305,7 @@
 
         <button type="submit" class="aspect-auth__submit">Войти</button>
 
+        {% get_providers as socialaccount_providers %}
         {% if socialaccount_providers %}
         <div class="aspect-auth__socials">
           <p class="aspect-auth__socials-label">Или войдите через</p>

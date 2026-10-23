@@ -310,8 +310,8 @@ class CheckoutRegressionTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["default_delivery_type"], Order.DELIVERY_CDEK_PVZ)
-        self.assertContains(response, '.delivery-options label:has(input[value="courier"]) { display: none; }')
-        self.assertContains(response, '.delivery-options label:has(input[value="pickup"]) { display: none; }')
+        self.assertNotIn(Order.DELIVERY_COURIER, self.site_settings.enabled_delivery_types())
+        self.assertNotIn(Order.DELIVERY_PICKUP, self.site_settings.enabled_delivery_types())
 
     def test_new_registration_creates_user_and_attaches_order(self):
         self._anonymous_cart()

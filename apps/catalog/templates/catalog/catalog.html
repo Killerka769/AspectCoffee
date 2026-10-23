@@ -387,6 +387,12 @@
   scrollbar-width: none;
 }
 .aspect-sidebar::-webkit-scrollbar { display: none; }
+html.tc-filter-scroll-lock,body.tc-filter-scroll-lock{overflow:hidden!important;overscroll-behavior:none}
+.aspect-sidebar{overscroll-behavior-y:contain}
+.aspect-sidebar-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.aspect-sidebar-reset{color:#2a4a34;text-decoration:underline;font-size:13px}
+.aspect-sidebar-close{display:none;border:0;background:transparent;color:#2a4a34;font-size:26px;cursor:pointer}
+@media(max-width:1024px){.aspect-sidebar-close{display:block}}
 .aspect-sidebar__count {
   font-size: 14px;
   color: rgba(0,0,0,.5);
@@ -1468,7 +1474,7 @@
 
     {# ===== МОБИЛЬНЫЕ КНОПКИ ===== #}
     <div class="aspect-catalog__mobile-controls">
-      <button type="button" class="aspect-catalog__mobile-btn" id="mobile-filter-btn">
+      <button type="button" class="aspect-catalog__mobile-btn" id="mobile-filter-btn" aria-controls="sidebar-filters" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
         Фильтры
       </button>
@@ -1479,6 +1485,10 @@
 
       {# ---------- САЙДБАР ---------- #}
       <aside class="aspect-sidebar" id="sidebar-filters">
+        <div class="aspect-sidebar-tools">
+          {% if request.GET %}<a class="aspect-sidebar-reset" href="{{ request.path }}" data-testid="mobile-catalog-reset">Сбросить фильтры</a>{% endif %}
+          <button type="button" class="aspect-sidebar-close" id="mobile-filter-close" aria-label="Закрыть фильтры">×</button>
+        </div>
         <div class="aspect-sidebar__count">
           <strong>{{ filtered_count|default:paginator.count|default:0 }}</strong>
           из {{ total_count|default:paginator.count|default:0 }}
@@ -1715,6 +1725,7 @@
   function openSidebar() {
     if (!sidebar) return;
     sidebar.classList.add('is-open');
+    if (btn) btn.setAttribute('aria-expanded','true');
     if (!backdrop) {
       backdrop = document.createElement('div');
       backdrop.className = 'aspect-sidebar-backdrop';
@@ -1727,11 +1738,14 @@
   function closeSidebar() {
     if (!sidebar) return;
     sidebar.classList.remove('is-open');
+    if (btn) btn.setAttribute('aria-expanded','false');
     if (backdrop) { backdrop.remove(); backdrop = null; }
     document.documentElement.classList.remove('tc-filter-scroll-lock');
     document.body.classList.remove('tc-filter-scroll-lock');
   }
   btn && btn.addEventListener('click', openSidebar);
+  var closeBtn = document.getElementById('mobile-filter-close');
+  closeBtn && closeBtn.addEventListener('click', closeSidebar);
   document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebar(); });
   document.body.addEventListener('htmx:beforeSwap', function(e) {
     if (e.detail && e.detail.target && e.detail.target.id === 'catalog-main') closeSidebar();

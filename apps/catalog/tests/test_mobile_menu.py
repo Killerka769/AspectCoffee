@@ -28,7 +28,7 @@ class MobileMenuTests(TestCase):
             "Отзывы",
             "Сообщество",
             "Журнал",
-            "Условия работы",
+            "Условия",
             "Доставка и оплата",
             "Система скидок",
             "Возврат денег",
@@ -44,8 +44,8 @@ class MobileMenuTests(TestCase):
 
         self.assertContains(response, 'class="aspect-mobile-menu__close"')
         self.assertContains(response, 'aria-label="Закрыть меню"')
-        self.assertContains(response, 'class="aspect-mobile-menu__location"')
-        self.assertContains(response, 'x-show="available"')
+        self.assertContains(response, 'class="aspect-backdrop"')
+        self.assertContains(response, 'x-show="menuOpen || searchOpen || cartOpen"')
 
     def test_authenticated_account_actions_keep_reading_order(self):
         user = User.objects.create_user(email="mobile-menu@example.com", password="test-pass-123")

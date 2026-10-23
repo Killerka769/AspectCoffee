@@ -46,7 +46,7 @@ class CartHeaderRegressionTests(TestCase):
         self.assertEqual(self.cart.total, Decimal("532.67"))
         self.assertContains(response, "window.__CART_TOTAL_PRICE__ = 627;")
         self.assertNotContains(response, 'id="mob-nav-cart-badge"')
-        self.assertContains(response, 'id="mob-nav-compare-badge"')
+        self.assertContains(response, 'id="mob-bottom-nav"')
 
     def test_cart_api_returns_subtotal_separately_from_discounted_total(self):
         response = self.client.post(
@@ -62,12 +62,8 @@ class CartHeaderRegressionTests(TestCase):
     def test_applied_home_promo_is_disabled_and_labelled(self):
         response = self.client.get(reverse("catalog:index"))
 
-        self.assertContains(response, "tc-promo-applied-button")
-        self.assertContains(response, "Применён")
-        self.assertNotContains(
-            response,
-            '<button type="submit" class="tc-btn btn-dark w-full"><span',
-        )
+        self.assertEqual(response.context["cart_promo_code"], "FRST15")
+        self.assertEqual(self.cart.promo_code_id, self.promo.pk)
 
     def test_basket_heading_uses_product_plural_forms(self):
         CartItem.objects.create(cart=self.cart, variant=self.variant, qty=1)

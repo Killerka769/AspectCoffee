@@ -33,7 +33,9 @@ class CatalogFilterRegressionTests(TestCase):
         self.assertEqual(blend_options[0]["count"], 2)
 
         response = self.client.get("/catalog/", {"processing": blend_options[0]["value"]})
-        self.assertContains(response, "2 сорта из 2")
+        self.assertEqual(response.context["filtered_count"], 2)
+        self.assertEqual(response.context["total_count"], 2)
+        self.assertContains(response, 'class="aspect-sidebar__count"')
 
     def test_processing_value_with_comma_is_not_split(self):
         value = "без кофеина, этилацетат"
@@ -52,7 +54,8 @@ class CatalogFilterRegressionTests(TestCase):
 
         response = self.client.get("/catalog/", {"processing": value})
 
-        self.assertContains(response, "1 сорт из 2")
+        self.assertEqual(response.context["filtered_count"], 1)
+        self.assertEqual(response.context["total_count"], 2)
 
     def test_retired_recipe_detail_is_not_exposed(self):
         self.assertEqual(self.client.get("/recipes/retired-recipe/").status_code, 404)

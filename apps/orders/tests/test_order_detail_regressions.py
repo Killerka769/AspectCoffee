@@ -48,7 +48,7 @@ class OrderDetailRegressionTests(TestCase):
         self.assertContains(response, "+79995554433")
         self.assertContains(response, "д. 1")
         self.assertContains(response, "Повторить заказ")
-        self.assertContains(response, "не включена в оплату")
+        self.assertContains(response, "Не включена в сумму оплаты")
 
     def test_admin_exposes_repeat_order_action(self):
         model_admin = OrderAdmin(Order, AdminSite())
