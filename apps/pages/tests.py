@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from apps.catalog.models import Product, Recipe, Review, SiteSettings
+from apps.catalog.models import Product, Review, SiteSettings
 from apps.pages.models import CommunityPost, CommunityPostComment
 from apps.users.models import User
 
@@ -75,31 +75,9 @@ class ContentLifecycleTests(TestCase):
         self.assertTrue(review.is_approved)
         self.assertContains(self.client.get("/reviews/"), review.text)
 
-    def test_recipe_is_hidden_until_published_then_appears_on_product(self):
-        settings = SiteSettings.load()
-        settings.allow_recipe_without_order = True
-        settings.save(update_fields=["allow_recipe_without_order"])
-
-        response = self.client.post(
-            f"/product/{self.product.slug}/recipe/add/",
-            {
-                "name": "Рецепт проходит модерацию",
-                "description": "Описание рецепта",
-                "time_minutes": "7",
-                "difficulty": Recipe.DIFF_EASY,
-                "steps": "[]",
-            },
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json()["ok"])
-        recipe = Recipe.objects.get(name="Рецепт проходит модерацию")
-        self.assertFalse(recipe.is_published)
-        product_url = f"/product/{self.product.slug}/"
-        self.assertNotContains(self.client.get(product_url), recipe.name)
-
-        recipe.is_published = True
-        recipe.save(update_fields=["is_published", "updated_at"])
-        self.assertContains(self.client.get(product_url), recipe.name)
+    def test_retired_recipe_submission_is_not_reintroduced(self):
+        response = self.client.post(f"/product/{self.product.slug}/recipe/add/", {"name": "Retired feature"})
+        self.assertEqual(response.status_code, 404)
 
     def test_community_post_visibility_is_controlled_from_admin_flag(self):
         response = self.client.post(

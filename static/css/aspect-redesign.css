@@ -1,0 +1,1110 @@
+/* =========================================================
+   ASPECT REDESIGN v5 — ФИНАЛЬНЫЙ
+   Шапка, меню, поиск, иконки, burger, футер, миникарзина,
+   мобильное меню, тосты.
+   Подключается ПОСЛЕДНИМ.
+   ========================================================= */
+
+/* ---------- 0. ЛЭЙАУТ ---------- */
+html body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  color: #000000;
+}
+html body .body-wrap {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+html body .body-wrap > main {
+  flex: 1 1 auto;
+}
+@media (max-width: 1099px) {
+  html body .body-wrap {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ---------- 1. ШАПКА ---------- */
+html body #header.aspect-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E5E8E5;
+  padding: 0;
+  box-shadow: none;
+}
+html body #header.aspect-header::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: #2A4A34;
+  z-index: 2;
+}
+html body .aspect-header__inner {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  min-height: 76px;
+}
+
+/* Логотип */
+html body .aspect-header__logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+html body .aspect-header__logo img {
+  display: block;
+  height: 42px;
+  width: auto;
+}
+
+/* ---------- 2. МЕНЮ ---------- */
+html body .aspect-header__nav {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+}
+html body .aspect-header__nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+html body .aspect-header__nav-item {
+  position: relative;
+  padding: 8px 0;
+}
+html body .aspect-header__nav-item > .nav-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #000 !important;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  line-height: 1;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 6px 0;
+  position: relative;
+  transition: color .2s ease;
+}
+html body .aspect-header__nav-item > .nav-title:hover {
+  color: #2A4A34 !important;
+}
+html body .aspect-header__nav-item > .nav-title::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -2px;
+  height: 2px;
+  background: #2A4A34;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .2s ease;
+}
+html body .aspect-header__nav-item > .nav-title:hover::after {
+  transform: scaleX(1);
+}
+html body .aspect-header__nav-item .nav-chevron {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  color: currentColor;
+  transition: transform .2s ease;
+}
+html body .aspect-header__nav-item:hover .nav-chevron {
+  transform: rotate(180deg);
+}
+html body .aspect-header__nav-item .nav-count {
+  color: rgba(0,0,0,.45);
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 2px;
+}
+
+/* Выпадающие подменю */
+html body .aspect-header__submenu {
+  position: absolute;
+  top: 100%;
+  left: -16px;
+  min-width: 240px;
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.08);
+  padding: 12px;
+  margin: 0;
+  list-style: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: opacity .2s ease, transform .2s ease, visibility .2s;
+  z-index: 30;
+}
+html body .aspect-header__submenu.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+html body .aspect-header__submenu li + li { margin-top: 2px; }
+html body .aspect-header__submenu a {
+  display: block;
+  padding: 9px 14px;
+  border-radius: 12px;
+  color: #000 !important;
+  font-family: "Open Sans", Arial, sans-serif;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background .15s ease, color .15s ease;
+}
+html body .aspect-header__submenu a:hover {
+  background: #F4F6F4;
+  color: #2A4A34 !important;
+}
+
+/* ---------- 3. ИКОНКИ ---------- */
+html body .aspect-header__icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+html body .aspect-header__icons .icon-btn,
+html body .aspect-header__icons .header-cart__btn {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: transparent !important;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: #000000 !important;
+  text-decoration: none;
+  transition: background .2s ease, color .2s ease;
+}
+
+html body .aspect-header__icons .icon-btn:hover,
+html body .aspect-header__icons .header-cart__btn:hover {
+  background: #F4F6F4 !important;
+  color: #2A4A34 !important;
+}
+
+/* SVG — контурные, тонкие */
+html body .aspect-header__icons .icon-btn svg,
+html body .aspect-header__icons .header-cart__btn svg {
+  width: 22px !important;
+  height: 22px !important;
+  display: block;
+  color: currentColor !important;
+  stroke: currentColor !important;
+  fill: none !important;
+  stroke-width: 1.6 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+html body .aspect-header__icons .icon-btn:hover svg,
+html body .aspect-header__icons .header-cart__btn:hover svg {
+  stroke: #2A4A34 !important;
+  color: #2A4A34 !important;
+}
+
+/* На всякий случай — если иконка составная, у всех частей контур */
+html body .aspect-header__icons .icon-btn svg path,
+html body .aspect-header__icons .icon-btn svg circle,
+html body .aspect-header__icons .icon-btn svg rect,
+html body .aspect-header__icons .icon-btn svg polyline,
+html body .aspect-header__icons .icon-btn svg line,
+html body .aspect-header__icons .header-cart__btn svg path,
+html body .aspect-header__icons .header-cart__btn svg circle,
+html body .aspect-header__icons .header-cart__btn svg rect,
+html body .aspect-header__icons .header-cart__btn svg polyline,
+html body .aspect-header__icons .header-cart__btn svg line {
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.6 !important;
+  color: #000000 !important;
+}
+
+html body .aspect-header__icons .icon-btn:hover svg path,
+html body .aspect-header__icons .icon-btn:hover svg circle,
+html body .aspect-header__icons .icon-btn:hover svg rect,
+html body .aspect-header__icons .icon-btn:hover svg polyline,
+html body .aspect-header__icons .icon-btn:hover svg line,
+html body .aspect-header__icons .header-cart__btn:hover svg path,
+html body .aspect-header__icons .header-cart__btn:hover svg circle,
+html body .aspect-header__icons .header-cart__btn:hover svg rect,
+html body .aspect-header__icons .header-cart__btn:hover svg polyline,
+html body .aspect-header__icons .header-cart__btn:hover svg line {
+  stroke: #2A4A34 !important;
+  color: #2A4A34 !important;
+}
+
+/* Бейдж-счётчик */
+html body .aspect-header__icons .icon-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #2A4A34;
+  color: #FFFFFF !important;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #FFFFFF;
+  box-sizing: content-box;
+}
+
+
+/* ---------- 4. BURGER — только на мобильном ---------- */
+/* Исправленный селектор с ДВУМЯ подчеркиваниями и тотальным приоритетом !important */
+html body .aspect-header__inner .aspect-header__burger,
+html body .aspect-header__inner button.aspect-header__burger,
+html body #header.aspect-header .aspect-header__burger {
+  display: none !important;
+}
+
+/* Включаем бургер-меню обратно исключительно на планшетах и мобилках */
+@media (max-width: 1099px) {
+  html body .aspect-header__inner .aspect-header__burger,
+  html body .aspect-header__inner button.aspect-header__burger,
+  html body #header.aspect-header .aspect-header__burger {
+    display: inline-flex !important;
+  }
+}
+
+/* ---------- 5. ПОИСК ---------- */
+html body .header-search {
+  position: relative;
+}
+html body .header-search__form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  height: 46px;
+  padding: 0 4px 0 0;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,.05);
+  width: min(460px, calc(100vw - 60px));
+}
+html body .header-search__scope {
+  border: 0;
+  border-right: 1px solid #E5E8E5;
+  background: #F4F6F4;
+  padding: 0 26px 0 14px;
+  height: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  color: #000;
+  outline: none;
+  border-top-left-radius: 14px;
+  border-bottom-left-radius: 14px;
+  appearance: none;
+  cursor: pointer;
+}
+html body .header-search__input {
+  flex: 1 1 auto;
+  height: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  padding: 0 8px 0 12px;
+  font-size: 15px;
+  color: #000;
+}
+html body .header-search__input::placeholder { color: rgba(0,0,0,.4); }
+html body .header-search__close {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 0;
+  background: transparent;
+  color: rgba(0,0,0,.45);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+html body .header-search__close:hover {
+  background: #F4F6F4;
+  color: #000;
+}
+html body .header-search__close svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+}
+html body .header-search__suggest {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(0,0,0,.12);
+  max-height: 480px;
+  overflow: auto;
+  padding: 8px;
+  z-index: 40;
+}
+html body .header-search__suggest-empty {
+  padding: 18px;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(0,0,0,.45);
+}
+html body .header-search__suggest-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #000;
+  transition: background .15s ease;
+}
+html body .header-search__suggest-item:hover { background: #F4F6F4; }
+html body .header-search__suggest-img {
+  width: 48px; height: 48px; min-width: 48px;
+  background: #F4F6F4;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+html body .header-search__suggest-img img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+}
+html body .header-search__suggest-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+html body .header-search__suggest-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html body .header-search__suggest-sub {
+  font-size: 12px;
+  color: rgba(0,0,0,.5);
+  margin-top: 2px;
+}
+html body .header-search__suggest-price {
+  font-size: 13px;
+  font-weight: 700;
+  color: #000;
+  white-space: nowrap;
+}
+html body .header-search__suggest-all {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+  border: 0;
+  border-radius: 12px;
+  background: #F4F6F4;
+  color: #000;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+html body .header-search__suggest-all:hover { background: #E8EEE8; }
+
+/* ---------- 6. ПОДЛОЖКА ---------- */
+html body .aspect-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 210;
+  transition: opacity .2s ease;
+}
+
+/* ---------- 7. МИНИ-КОРЗИНА ---------- */
+html body .mobile-mini-cart {
+  position: fixed;
+  top: 88px;
+  right: 32px;
+  width: min(420px, calc(100vw - 32px));
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 20px;
+  box-shadow: 0 16px 48px rgba(0,0,0,.14);
+  padding: 12px;
+  z-index: 220;
+  max-height: calc(100dvh - 120px);
+  overflow: hidden;
+}
+html body .mini-cart-loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+html body .mini-cart-loading span {
+  width: 32px; height: 32px;
+  border: 4px solid #E5E8E5;
+  border-top-color: #2A4A34;
+  border-radius: 50%;
+  animation: aspect-spin .9s linear infinite;
+}
+@keyframes aspect-spin { to { transform: rotate(360deg); } }
+
+/* ---------- 8. МОБИЛЬНОЕ МЕНЮ ---------- */
+html body .aspect-mobile-menu {
+  position: fixed;
+  top: 0; left: 0;
+  height: 100dvh;
+  width: min(320px, calc(100vw - 48px));
+  background: #FFFFFF;
+  border-right: 1px solid #E5E8E5;
+  padding: 60px 24px 24px;
+  z-index: 220;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+html body .aspect-mobile-menu__close {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  border: 0;
+  background: #F4F6F4;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+}
+html body .aspect-mobile-menu__close svg {
+  width: 20px; height: 20px;
+  stroke: currentColor;
+  fill: none;
+}
+html body .aspect-mobile-menu__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 24px;
+}
+html body .aspect-mobile-menu__title {
+  display: block;
+  padding: 12px 0;
+  color: #000 !important;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom: 1px solid #F0F0F0;
+}
+html body .aspect-mobile-menu__title:hover { color: #2A4A34 !important; }
+html body .aspect-mobile-menu__section {
+  padding: 16px 0 8px;
+  border-top: 1px solid #E5E8E5;
+  margin-top: 16px;
+}
+html body .aspect-mobile-menu__subtitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.45);
+  margin-bottom: 8px;
+}
+html body .aspect-mobile-menu__section a {
+  display: block;
+  padding: 8px 0;
+  color: #000 !important;
+  font-size: 15px;
+  text-decoration: none;
+}
+html body .aspect-mobile-menu__section a:hover { color: #2A4A34 !important; }
+html body .aspect-mobile-menu__account {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #E5E8E5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+html body .aspect-mobile-menu__logout {
+  display: block;
+  padding: 12px 0;
+  color: rgba(0,0,0,.5) !important;
+  font-size: 15px;
+  text-decoration: none;
+}
+html body .aspect-mobile-menu__logout:hover { color: #2A4A34 !important; }
+
+/* ---------- 9. ТОСТЫ ---------- */
+html body .aspect-toast-stack {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+html body .aspect-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: #000000;
+  color: #FFFFFF;
+  font-size: 14px;
+  min-width: 280px;
+  box-shadow: 0 15px 50px -12px rgba(0,0,0,.5);
+}
+html body .aspect-toast.is-success { background: #2A4A34; }
+html body .aspect-toast.is-error { background: #B91C1C; }
+html body .aspect-toast button {
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  color: rgba(255,255,255,.6);
+  font-size: 18px;
+  cursor: pointer;
+}
+html body .aspect-toast button:hover { color: #FFFFFF; }
+
+/* ---------- 10. ФУТЕР — HOVER (не белый, а тёмный) ---------- */
+/* aspect-brand.css больше не перебивает футер, но на всякий случай закрепим */
+html body .aspect-footer a {
+  color: #FFFFFF;
+}
+html body .aspect-footer a:hover,
+html body .aspect-footer__links a:hover,
+html body .aspect-footer__phone:hover,
+html body .aspect-footer__legal a:hover {
+  color: #0F1B14 !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  opacity: 1;
+}
+html body .aspect-footer__phone:hover {
+  text-decoration: none;
+}
+html body .aspect-footer__social {
+  border-color: rgba(255,255,255,.4);
+}
+html body .aspect-footer__social:hover {
+  background: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+  color: #2A4A34 !important;
+  text-decoration: none !important;
+}
+html body .aspect-footer__legal a:hover {
+  color: #FFFFFF !important;
+}
+
+/* ---------- 11. СКРЫТИЕ ОСТАТКОВ TESTI ---------- */
+html body #header .mob-header-hide > nav:not(.aspect-header__nav),
+html body #header .mob-header-hide > div[data-v-fb25dd5c]:not(.aspect-header__icons),
+html body #header .header-notice__btn,
+html body #header .header-compare-shell,
+html body #header .header-enter {
+  display: none !important;
+}
+
+/* ---------- 12. АДАПТИВ ---------- */
+@media (max-width: 1099px) {
+  html body .aspect-header__inner {
+    padding: 12px 20px;
+    min-height: 68px;
+    gap: 20px;
+  }
+  html body .aspect-header__nav { display: none !important; }
+  html body .aspect-header__logo img { height: 34px; }
+  html body .aspect-header__icons .icon-btn { width: 40px; height: 40px; }
+  html body .aspect-header__icons .icon-btn svg { width: 22px; height: 22px; }
+  html body .mobile-mini-cart {
+    top: 76px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
+
+@media (max-width: 757px) {
+  html body .aspect-header__inner {
+    padding: 10px 14px;
+    gap: 12px;
+    min-height: 60px;
+  }
+  html body .aspect-header__logo img { height: 30px; }
+  html body .aspect-header__icons { gap: 2px; }
+  html body .aspect-header__icons .icon-btn { width: 38px; height: 38px; }
+  html body .aspect-header__icons .icon-btn svg { width: 20px; height: 20px; }
+
+  html body .header-search__form {
+    position: fixed;
+    top: 60px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
+    z-index: 150;
+    background: #FFFFFF;
+    box-shadow: 0 12px 32px rgba(0,0,0,.12);
+  }
+  html body .header-search__scope { display: none; }
+  html body .header-search__suggest { left: 0; right: 0; }
+
+  html body .aspect-toast-stack {
+    left: 12px;
+    right: 12px;
+    bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+  html body .aspect-toast { min-width: 0; width: 100%; }
+}
+
+/* =========================================================
+   ASPECT CARD — стили карточки товара
+   (использует классы .aspect-card*)
+   ========================================================= */
+
+   .aspect-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #E5E8E5;
+    border-radius: 22px;
+    padding: 18px;
+    height: 100%;
+    min-height: 440px;
+    transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+  }
+  .aspect-card:hover {
+    transform: translateY(-4px);
+    border-color: #2A4A34;
+    box-shadow: 0 18px 40px rgba(42,74,52,.1);
+  }
+  
+  /* Шапка */
+  .aspect-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    min-height: 20px;
+  }
+  .aspect-card__cat {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,.5);
+  }
+  .aspect-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .aspect-card__rating,
+  .aspect-card__comments {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2A4A34;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: none;
+  }
+  .aspect-card__rating svg,
+  .aspect-card__comments svg { width: 13px; height: 13px; }
+  
+  /* Флаги */
+  .aspect-card__flags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .aspect-flag {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    background: #F4F6F4;
+    color: rgba(0,0,0,.6);
+    border-radius: 6px;
+  }
+  .aspect-flag--sca { background: #2A4A34; color: #fff; }
+  .aspect-flag--dark { background: #000; color: #fff; }
+  .aspect-flag--green { background: #2A4A34; color: #fff; }
+  
+  /* Название */
+  .aspect-card__title-block {
+    margin-bottom: 12px;
+  }
+  .aspect-card__title {
+    font-family: "Roboto Condensed", Arial, sans-serif;
+    font-weight: 900;
+    font-size: 17px;
+    line-height: 1.15;
+    text-transform: uppercase;
+    letter-spacing: .01em;
+    color: #000;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 4px;
+    min-height: 39px;
+  }
+  .aspect-card__title:hover { color: #2A4A34; }
+  .aspect-card__process {
+    font-size: 12px;
+    color: rgba(0,0,0,.5);
+    position: relative;
+    cursor: help;
+    display: inline-block;
+    border-bottom: 1px dashed rgba(0,0,0,.2);
+  }
+  .aspect-card__process-pop {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    background: #fff;
+    border: 1px solid #E5E8E5;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #000;
+    width: 240px;
+    box-shadow: 0 12px 32px rgba(0,0,0,.12);
+    z-index: 30;
+  }
+  .aspect-card__process-pop p { margin: 0; line-height: 1.4; }
+  
+  /* Фото */
+  .aspect-card__media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #F4F6F4;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .aspect-card__media-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  .aspect-card__media-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 14px;
+    display: block;
+    transition: transform .5s ease;
+  }
+  .aspect-card:hover .aspect-card__media-link img {
+    transform: scale(1.05);
+  }
+  
+  /* Описание */
+  .aspect-card__desc {
+    margin-bottom: 10px;
+    text-align: left;
+    min-height: 38px;
+  }
+  .aspect-card__desc p {
+    font-size: 13px;
+    line-height: 1.4;
+    color: rgba(0,0,0,.55);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Шкалы */
+  .aspect-card__scales {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .aspect-card__scale {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .aspect-card__scale-label {
+    font-size: 11px;
+    color: rgba(0,0,0,.5);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    min-width: 70px;
+  }
+  .aspect-card__scale-bar {
+    flex: 1;
+    height: 4px;
+    background: #EFEFEF;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .aspect-card__scale-fill {
+    display: block;
+    height: 100%;
+    background: #2A4A34;
+    border-radius: 999px;
+    transition: width .3s ease;
+  }
+  
+  /* Опции: вес и помол */
+  .aspect-card__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+    align-items: center;
+  }
+  .aspect-card__weights {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .aspect-card__weight {
+    padding: 5px 10px;
+    border: 1px solid #E5E8E5;
+    background: #fff;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #000;
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .aspect-card__weight:hover { background: #F4F6F4; border-color: #2A4A34; }
+  .aspect-card__weight.is-active { background: #2A4A34; border-color: #2A4A34; color: #fff; }
+  .aspect-card__weight.is-unavail { opacity: .3; cursor: not-allowed; }
+  
+  .aspect-card__grind {
+    position: relative;
+  }
+  .aspect-card__grind-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border: 1px solid #E5E8E5;
+    background: #fff;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #000;
+    cursor: pointer;
+  }
+  .aspect-card__grind-btn:hover { background: #F4F6F4; }
+  .aspect-card__grind-btn svg { width: 10px; height: 10px; }
+  .aspect-card__grind-menu {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    right: 0;
+    min-width: 200px;
+    background: #fff;
+    border: 1px solid #E5E8E5;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0,0,0,.12);
+    padding: 6px;
+    z-index: 40;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  .aspect-card__grind-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border: 0;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #000;
+    cursor: pointer;
+  }
+  .aspect-card__grind-item:hover { background: #F4F6F4; }
+  .aspect-card__grind-item.is-active { background: #2A4A34; color: #fff; }
+  
+  .aspect-card__variant-msg {
+    font-size: 11px;
+    color: #B91C1C;
+    margin-bottom: 8px;
+    min-height: 0;
+  }
+  
+  /* Футер: цена + кнопка */
+  .aspect-card__footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #F0F0F0;
+  }
+  .aspect-card__price {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .aspect-card__old {
+    font-size: 12px;
+    color: rgba(0,0,0,.35);
+    text-decoration: line-through;
+    line-height: 1;
+  }
+  .aspect-card__current {
+    font-family: "Roboto Condensed", Arial, sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    line-height: 1;
+    color: #000;
+    letter-spacing: -.01em;
+  }
+  .aspect-card__buy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 14px;
+    background: #000;
+    color: #fff;
+    border: 0;
+    border-radius: 12px;
+    font-family: "Roboto Condensed", Arial, sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .2s ease, transform .2s ease;
+  }
+  .aspect-card__buy svg { width: 16px; height: 16px; }
+  .aspect-card__buy:hover:not(:disabled) {
+    background: #2A4A34;
+    transform: translateY(-1px);
+  }
+  .aspect-card__buy:disabled { opacity: .4; cursor: not-allowed; }
+  
+  .aspect-card__counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #F4F6F4;
+    border-radius: 12px;
+    padding: 4px;
+  }
+  .aspect-card__counter-btn {
+    width: 32px; height: 32px;
+    border: 0;
+    background: #fff;
+    border-radius: 9px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .aspect-card__counter-btn:hover { background: #2A4A34; color: #fff; }
+  .aspect-card__counter-btn svg { width: 14px; height: 14px; }
+  .aspect-card__counter-val {
+    min-width: 28px;
+    text-align: center;
+    font-weight: 700;
+  }
+  
+  /* Действия */
+  .aspect-card__actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 5;
+  }
+  .aspect-card__action {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 0;
+    background: rgba(255,255,255,.95);
+    color: #000;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s ease, color .15s ease;
+    backdrop-filter: blur(4px);
+  }
+  .aspect-card__action svg { width: 16px; height: 16px; }
+  .aspect-card__action:hover { background: #2A4A34; color: #fff; }
+  .aspect-card__action.is-active { background: #2A4A34; color: #fff; }
+  
+  /* Адаптив */
+  @media (max-width: 599px) {
+    .aspect-card { padding: 14px; min-height: 380px; }
+    .aspect-card__title { font-size: 15px; min-height: 34px; }
+    .aspect-card__current { font-size: 18px; }
+    .aspect-card__buy { font-size: 12px; padding: 8px 12px; }
+  }

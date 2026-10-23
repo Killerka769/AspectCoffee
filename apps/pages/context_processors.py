@@ -1,6 +1,5 @@
-"""Context processor exposing admin-managed pages models (banners, site links, compare count)
-to all templates so the navbar/footer/home page can render them without per-view changes.
-"""
+"""Context processor exposing admin-managed pages models to all templates."""
+
 
 def site_chrome(request):
     ctx = {
@@ -11,20 +10,7 @@ def site_chrome(request):
         "compare_count": 0,
         "site_settings": None,
     }
-    try:
-        from .models import SiteLink
-        all_links = list(SiteLink.objects.filter(is_active=True).order_by("group", "order", "label"))
-        for link in all_links:
-            if link.group == "footer_company":
-                ctx["footer_links_company"].append(link)
-            elif link.group == "footer_help":
-                ctx["footer_links_help"].append(link)
-            elif link.group == "footer_catalog":
-                ctx["footer_links_catalog"].append(link)
-            elif link.group == "promo":
-                ctx["promo_links"][link.label] = link
-    except Exception:
-        pass
+    # SiteLink model was removed — footer links are now hardcoded in the template.
     try:
         from apps.catalog.models import SiteSettings
         ctx["site_settings"] = SiteSettings.load()

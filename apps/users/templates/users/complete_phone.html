@@ -1,103 +1,252 @@
 {% extends "catalog/base.html" %}
+{% load static %}
 
 {% block title %}Подтверждение телефона — Aspect Coffee{% endblock %}
-{% block body_extra_class %} grey-theme{% endblock %}
+
+{% block extra_css %}
+<style>
+.asp-auth { background: #FFFFFF; padding: 60px 0 80px; min-height: 60vh; }
+.asp-auth__container { width: min(488px, calc(100% - 32px)); margin: 0 auto; }
+.asp-auth__card {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 24px;
+  padding: 40px 44px;
+}
+@media (max-width: 599px) {
+  .asp-auth { padding: 32px 0 60px; }
+  .asp-auth__card { padding: 28px 22px; border-radius: 18px; }
+}
+.asp-auth__icon {
+  width: 72px; height: 72px;
+  margin: 0 auto 24px;
+  background: #E8EEE8;
+  color: #2A4A34;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.asp-auth__icon svg { width: 34px; height: 34px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+.asp-auth__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 10px;
+  text-align: center;
+}
+.asp-auth__sub {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #5A5A5A;
+  margin: 0 0 28px;
+  text-align: center;
+}
+
+.asp-auth__messages { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.asp-auth__msg {
+  padding: 14px 18px; border-radius: 14px;
+  font-size: 13px; font-weight: 600; line-height: 1.5;
+}
+.asp-auth__msg--error { background: #FEF2F2; color: #B91C1C; border: 1px solid #FCA5A5; }
+.asp-auth__msg--success { background: #E8EEE8; color: #2A4A34; border: 1px solid #8FB89A; }
+
+.asp-auth__form { display: flex; flex-direction: column; gap: 16px; }
+.asp-auth__field { display: flex; flex-direction: column; gap: 6px; }
+.asp-auth__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  padding-left: 4px;
+}
+
+.asp-auth__phone-row { display: flex; gap: 8px; }
+.asp-auth__phone-code { position: relative; flex-shrink: 0; }
+.asp-auth__phone-code-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 90px;
+  padding: 14px 12px;
+  background: #F4F6F4;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #000;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.asp-auth__phone-code-btn:hover { background: #E8EEE8; }
+.asp-auth__phone-code-btn svg { width: 10px; height: 10px; stroke: currentColor; fill: none; }
+.asp-auth__phone-drop {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 220px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.12);
+  padding: 6px 0;
+  z-index: 50;
+}
+.asp-auth__phone-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+}
+.asp-auth__phone-option:hover { background: #F4F6F4; }
+.asp-auth__phone-option-code { font-family: monospace; color: #5A5A5A; width: 44px; }
+
+.asp-auth__input {
+  width: 100%;
+  background: #F4F6F4;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: "Open Sans", Arial, sans-serif;
+  color: #000;
+  outline: none;
+  transition: background .2s ease, border-color .2s ease;
+  box-sizing: border-box;
+}
+.asp-auth__input:focus { background: #FFFFFF; border-color: #2A4A34; }
+
+.asp-auth__submit {
+  display: block;
+  width: 100%;
+  padding: 16px 24px;
+  border: 0;
+  border-radius: 14px;
+  background: #000000;
+  color: #FFFFFF;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+  margin-top: 8px;
+}
+.asp-auth__submit:hover { background: #2A4A34; transform: translateY(-2px); }
+
+.asp-auth__hint {
+  font-size: 12px;
+  color: #5A5A5A;
+  line-height: 1.55;
+  padding: 14px 16px;
+  background: #F4F6F4;
+  border-radius: 12px;
+  margin: 0;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<main class="tc-phone-completion-page">
-  <div
-    class="tc-phone-completion-wrap"
-    x-data="{
-      phoneCode: '{{ phone_code|escapejs }}',
-      phoneLength: 10,
-      phoneCodeOpen: false,
-      get phoneCodes() { return TCPhone.codes; },
-      selectPhoneCode(code) {
-        TCPhone.selectCode(code, this);
-        this.$nextTick(() => TCPhone.applyCountry(this.$refs.phoneGroup, code));
-      }
-    }"
-    x-init="selectPhoneCode(phoneCode)"
-  >
-    <section class="tc-phone-completion-card" aria-labelledby="phone-completion-title">
-      <div class="tc-phone-completion-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M8.5 3.5h7A1.5 1.5 0 0 1 17 5v14a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 19V5a1.5 1.5 0 0 1 1.5-1.5Z" stroke="currentColor" stroke-width="1.7"/>
-          <path d="M10 6h4M11 18h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-        </svg>
+<main class="asp-auth">
+  <div class="asp-auth__container">
+
+    <div class="asp-auth__card"
+         x-data="{
+            phoneCode: '{{ phone_code|escapejs }}',
+            phoneLength: 10,
+            phoneCodeOpen: false,
+            get phoneCodes() { return (window.TCPhone && TCPhone.codes) ? TCPhone.codes : [{code:'+7',country:'Россия'}]; },
+            selectPhoneCode(code) {
+              if (window.TCPhone && TCPhone.selectCode) { TCPhone.selectCode(code, this); }
+              else { this.phoneCode = code; }
+              this.$nextTick(() => {
+                if (window.TCPhone && TCPhone.applyCountry) {
+                  TCPhone.applyCountry(this.$refs.phoneGroup, code);
+                }
+              });
+            }
+         }"
+         x-init="selectPhoneCode(phoneCode)">
+
+      <div class="asp-auth__icon">
+        <svg viewBox="0 0 24 24"><path d="M8.5 3.5h7A1.5 1.5 0 0 1 17 5v14a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 19V5a1.5 1.5 0 0 1 1.5-1.5Z"/><path d="M10 6h4M11 18h2"/></svg>
       </div>
 
-      <header class="tc-phone-completion-head">
-        <h1 id="phone-completion-title">Подтвердите телефон</h1>
-        <p>
-          В вашей учётной записи нет номера телефона — {{ provider_label }}
-          не передал его при OAuth-входе. Номер нужен для оформления заказов
-          и получения важных уведомлений.
-        </p>
-      </header>
+      <h1 class="asp-auth__title">Подтвердите телефон</h1>
+      <p class="asp-auth__sub">
+        В вашей учётной записи нет номера — {{ provider_label }} не передал его при входе.
+        Номер нужен для оформления заказов и важных уведомлений.
+      </p>
 
       {% if messages %}
-      <div class="tc-phone-completion-messages" role="status">
+      <div class="asp-auth__messages">
         {% for message in messages %}
-        <div class="tc-phone-completion-message {% if message.tags == 'error' %}is-error{% else %}is-success{% endif %}">
+        <div class="asp-auth__msg {% if message.tags == 'error' %}asp-auth__msg--error{% else %}asp-auth__msg--success{% endif %}">
           {{ message }}
         </div>
         {% endfor %}
       </div>
       {% endif %}
 
-      <form method="post" class="tc-phone-completion-form" data-tc-phone-group x-ref="phoneGroup">
+      <form method="post" class="asp-auth__form" data-tc-phone-group x-ref="phoneGroup">
         {% csrf_token %}
         <input type="hidden" name="phone_code" :value="phoneCode" data-tc-phone-code>
 
-        <div class="tc-phone-completion-field">
-          <label class="tc-input__label" for="phone-primary">Номер телефона</label>
-          <div class="tc-phone__field items-stretch">
-            <div @click.outside="phoneCodeOpen = false" class="tc-select phone-select flex-none relative min-w-[82px]">
-              <div class="tc-select__field">
-                <button type="button" @click="phoneCodeOpen = !phoneCodeOpen" class="tc-select__field--select cursor-pointer w-full"
-                        aria-label="Выбрать код страны" :aria-expanded="phoneCodeOpen.toString()">
-                  <span class="select-text" x-text="phoneCode" data-tc-phone-code-label>+7</span>
-                  <span class="tc-select__field--arr"></span>
-                </button>
-              </div>
-              <div x-cloak x-show="phoneCodeOpen" x-transition
-                   class="absolute left-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 w-[220px] max-h-[240px] overflow-y-auto z-[100] py-1">
+        <div class="asp-auth__field">
+          <label class="asp-auth__label">Номер телефона</label>
+          <div class="asp-auth__phone-row">
+            <div class="asp-auth__phone-code" @click.outside="phoneCodeOpen = false">
+              <button type="button" class="asp-auth__phone-code-btn" @click="phoneCodeOpen = !phoneCodeOpen">
+                <span x-text="phoneCode">+7</span>
+                <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
+              </button>
+              <div class="asp-auth__phone-drop" x-show="phoneCodeOpen" x-cloak>
                 <template x-for="c in phoneCodes" :key="c.code">
-                  <button type="button" @click="selectPhoneCode(c.code)"
-                          :class="phoneCode === c.code ? 'bg-gray-100 font-bold' : ''"
-                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2">
-                    <span class="font-mono text-gray-500 w-10" x-text="c.code"></span>
+                  <button type="button" class="asp-auth__phone-option" @click="selectPhoneCode(c.code)">
+                    <span class="asp-auth__phone-option-code" x-text="c.code"></span>
                     <span x-text="c.country"></span>
                   </button>
                 </template>
               </div>
             </div>
-            <input id="phone-primary" type="tel" name="phone" value="{{ phone_value }}" required
+            <input type="tel" name="phone" value="{{ phone_value }}" required
                    autocomplete="tel" inputmode="tel" placeholder="(900) 000-00-00"
-                   class="tc-input__field--input w-full" data-tc-phone-input
-                   :data-phone-code="phoneCode" :data-phone-length="phoneLength">
+                   class="asp-auth__input" data-tc-phone-input
+                   :data-phone-code="phoneCode" :data-phone-length="phoneLength"
+                   style="flex:1;">
           </div>
         </div>
 
-        <div class="tc-phone-completion-field">
-          <label class="tc-input__label" for="phone-repeat">Повторите номер</label>
-          <input id="phone-repeat" type="tel" name="phone_repeat" value="{{ phone_repeat }}" required
+        <div class="asp-auth__field">
+          <label class="asp-auth__label">Повторите номер</label>
+          <input type="tel" name="phone_repeat" value="{{ phone_repeat }}" required
                  autocomplete="off" inputmode="tel" placeholder="(900) 000-00-00"
-                 class="tc-input__field--input w-full" data-tc-phone-input
+                 class="asp-auth__input" data-tc-phone-input
                  :data-phone-code="phoneCode" :data-phone-length="phoneLength">
         </div>
 
-        <p class="tc-phone-completion-hint">
-          Введите один и тот же номер в оба поля — это защитит учётную запись
-          от случайной ошибки.
+        <p class="asp-auth__hint">
+          Введите один и тот же номер в оба поля — это защитит аккаунт от случайной ошибки.
         </p>
 
-        <button type="submit" class="tc-btn btn-dark tc-phone-completion-submit">
-          <span class="text-primary duration-200">Подтвердить и продолжить</span>
-        </button>
+        <button type="submit" class="asp-auth__submit">Подтвердить и продолжить</button>
+
       </form>
-    </section>
+
+    </div>
+
   </div>
 </main>
 {% endblock %}

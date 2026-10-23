@@ -13,14 +13,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.throttling import AnonRateThrottle
-from apps.catalog.models import Category, Product, Recipe, Review
+from apps.catalog.models import Category, Product, Review
 from apps.catalog.filters import ProductFilter
 from apps.orders.models import Cart, CartItem, Order, PromoCode
 from apps.users.models import User
 from apps.delivery.cdek import CDEKClient
 from .serializers import (
     CategorySerializer, ProductListSerializer, ProductDetailSerializer,
-    RecipeSerializer, ReviewSerializer,
+    ReviewSerializer,
     RegisterSerializer, UserProfileSerializer,
     CartSerializer, CartItemSerializer, PromoApplySerializer,
     OrderSerializer, OrderCreateSerializer,
@@ -178,7 +178,7 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = "slug"
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.filter(is_active=True).select_related("category").prefetch_related(
-        "variants", "images", "tags", "flavor_notes", "brew_methods",
+        "variants", "images", "flavor_notes", "brew_methods",
     )
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
@@ -210,10 +210,7 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(product=product)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-class RecipeViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Recipe.objects.filter(is_published=True).select_related("brew_method")
-    serializer_class = RecipeSerializer
-    lookup_field = "slug"
+
 def get_or_create_cart(request):
     if request.user.is_authenticated:
         cart, _ = Cart.objects.get_or_create(user=request.user)

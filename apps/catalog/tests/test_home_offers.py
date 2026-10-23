@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from apps.catalog.views import _available_home_promo, _home_loyalty_offer
 from apps.orders.models import Order, PromoCode
-from apps.users.models import DiscountLevel, User
+from apps.users.models import User
 
 
 class HomeOfferTests(TestCase):
@@ -49,7 +49,8 @@ class HomeOfferTests(TestCase):
         self.assertEqual(_available_home_promo(self.user), self.second_promo)
 
     def test_earned_discount_is_returned_with_available_promo(self):
-        DiscountLevel.objects.create(min_amount=5000, discount_percent=3, is_active=True)
+        self.user.wholesale_discount = 3
+        self.user.save(update_fields=["wholesale_discount"])
         self.create_order(promo_code=self.first_promo)
 
         offer = _home_loyalty_offer(self.user)
@@ -59,7 +60,6 @@ class HomeOfferTests(TestCase):
         self.assertEqual(offer["total_spent"], Decimal("6000"))
 
     def test_unpaid_new_order_does_not_earn_discount(self):
-        DiscountLevel.objects.create(min_amount=5000, discount_percent=3, is_active=True)
         self.create_order(
             payment_status=Order.PAYMENT_STATUS_PENDING,
             status=Order.STATUS_NEW,

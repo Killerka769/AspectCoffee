@@ -126,15 +126,15 @@ class BlogSeriesPost(models.Model):
         return f"{self.series}: {self.post}"
 
 
-class BlogSeriesVisit(models.Model):
-    series = models.ForeignKey(BlogSeries, on_delete=models.CASCADE, related_name="visits", verbose_name="Серия")
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="blog_series_visits", verbose_name="Пользователь")
-    visited_at = models.DateTimeField("Посещено", auto_now=True)
+# class BlogSeriesVisit(models.Model):
+#     series = models.ForeignKey(BlogSeries, on_delete=models.CASCADE, related_name="visits", verbose_name="Серия")
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="blog_series_visits", verbose_name="Пользователь")
+#     visited_at = models.DateTimeField("Посещено", auto_now=True)
 
-    class Meta:
-        verbose_name = "Посещение серии статей"
-        verbose_name_plural = "Посещения серий статей"
-        unique_together = [("series", "user")]
+#     class Meta:
+#         verbose_name = "Посещение серии статей"
+#         verbose_name_plural = "Посещения серий статей"
+#         unique_together = [("series", "user")]
 
 
 class ArticleLike(models.Model):
@@ -161,46 +161,46 @@ class ArticleComment(models.Model):
         ordering = ["created_at"]
 
 
-class ArticleBookmark(models.Model):
-    """User bookmarked (saved to favourites) a blog article."""
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-        related_name="article_bookmarks", verbose_name="Пользователь",
-    )
-    post = models.ForeignKey(
-        BlogPost, on_delete=models.CASCADE,
-        related_name="bookmarks", verbose_name="Статья",
-    )
-    added_at = models.DateTimeField(auto_now_add=True, verbose_name="Добавлена")
+# class ArticleBookmark(models.Model):
+#     """User bookmarked (saved to favourites) a blog article."""
+#     user = models.ForeignKey(
+#         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+#         related_name="article_bookmarks", verbose_name="Пользователь",
+#     )
+#     post = models.ForeignKey(
+#         BlogPost, on_delete=models.CASCADE,
+#         related_name="bookmarks", verbose_name="Статья",
+#     )
+#     added_at = models.DateTimeField(auto_now_add=True, verbose_name="Добавлена")
 
-    class Meta:
-        verbose_name = "Закладка статьи"
-        verbose_name_plural = "Закладки статей"
-        unique_together = [("user", "post")]
-        ordering = ["-added_at"]
+#     class Meta:
+#         verbose_name = "Закладка статьи"
+#         verbose_name_plural = "Закладки статей"
+#         unique_together = [("user", "post")]
+#         ordering = ["-added_at"]
 
-    def __str__(self):
-        return f"{self.user} → {self.post.title}"
+#     def __str__(self):
+#         return f"{self.user} → {self.post.title}"
 
 
-class ArticleReadHistory(models.Model):
-    """Track the last time a user visited a blog article."""
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-        related_name="article_reads", verbose_name="Пользователь",
-    )
-    post = models.ForeignKey(
-        BlogPost, on_delete=models.CASCADE,
-        related_name="reads", verbose_name="Статья",
-    )
-    read_at = models.DateTimeField(auto_now=True, verbose_name="Прочитано")
+# class ArticleReadHistory(models.Model):
+#     """Track the last time a user visited a blog article."""
+#     user = models.ForeignKey(
+#         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+#         related_name="article_reads", verbose_name="Пользователь",
+#     )
+#     post = models.ForeignKey(
+#         BlogPost, on_delete=models.CASCADE,
+#         related_name="reads", verbose_name="Статья",
+#     )
+#     read_at = models.DateTimeField(auto_now=True, verbose_name="Прочитано")
 
-    class Meta:
-        verbose_name = "История чтения"
-        verbose_name_plural = "История чтения"
-        unique_together = [("user", "post")]
-        ordering = ["-read_at"]
+#     class Meta:
+#         verbose_name = "История чтения"
+#         verbose_name_plural = "История чтения"
+#         unique_together = [("user", "post")]
+#         ordering = ["-read_at"]
 
-    def __str__(self):
-        return f"{self.user} читал {self.post.title}"
+#     def __str__(self):
+#         return f"{self.user} читал {self.post.title}"
 

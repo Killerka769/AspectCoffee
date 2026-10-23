@@ -6,8 +6,11 @@ from django.core.validators import RegexValidator
 from django.db import models
 from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFill
+
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
+
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("Email обязателен")
@@ -16,6 +19,7 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
+
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
@@ -25,7 +29,10 @@ class UserManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Суперпользователь должен иметь is_superuser=True.")
         return self.create_user(email, password, **extra_fields)
+
+
 from django.core.exceptions import ValidationError
+
 
 def validate_avatar_file(value):
     ext = value.name.split('.')[-1].lower()
@@ -33,6 +40,7 @@ def validate_avatar_file(value):
         raise ValidationError("Неподдерживаемый формат изображения. Используйте JPG, PNG или WEBP.")
     if value.size > 2 * 1024 * 1024:
         raise ValidationError("Файл слишком велик. Максимум 2 МБ.")
+
 
 class User(AbstractUser):
     ROLE_CUSTOMER = "customer"
@@ -75,12 +83,8 @@ class User(AbstractUser):
     )
     email_confirmed = models.BooleanField("Email подтверждён", default=False)
     wholesale_discount = models.PositiveIntegerField(
-        "Оптовая скидка (%)", default=0,
-        help_text="Скидка от розничной цены для оптового покупателя",
-    )
-    credit_limit = models.DecimalField(
-        "Лимит кредита", max_digits=12, decimal_places=2,
-        null=True, blank=True,
+        "Персональная скидка (%)", default=0,
+        help_text="Фиксированная скидка, назначается вручную (партнёрам, VIP, оптовым клиентам).",
     )
     company_name = models.CharField("Компания", max_length=255, blank=True)
     company_inn = models.CharField("ИНН", max_length=12, blank=True)
@@ -138,6 +142,7 @@ class User(AbstractUser):
     @property
     def is_warehouse_operator(self):
         return self.role == self.ROLE_WAREHOUSE
+
     @property
     def phone_display(self):
         """Format phone as international: +7 901 357-35-77"""
@@ -153,10 +158,8 @@ class User(AbstractUser):
         except Exception:
             return self.phone
 
-
     def get_available_bonus_points(self):
         from django.utils import timezone
-        from datetime import timedelta
         now = timezone.now()
         earned = self.bonus_transactions.filter(
             type=BonusTransaction.TYPE_EARN,
@@ -229,6 +232,8 @@ class User(AbstractUser):
         if self.role == self.ROLE_WAREHOUSE:
             self.is_staff = True
         super().save(*args, **kwargs)
+
+
 class Address(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE,
@@ -241,79 +246,25 @@ class Address(models.Model):
     apartment = models.CharField("Квартира/офис", max_length=50, blank=True)
     postal_code = models.CharField("Индекс", max_length=10, blank=True)
     is_default = models.BooleanField("По умолчанию", default=False)
+
     class Meta:
         verbose_name = "Адрес"
         verbose_name_plural = "Адреса"
         ordering = ["-is_default", "label"]
+
     def __str__(self):
         house_part = f", д. {self.house}" if self.house else ""
         return f"{self.city}, {self.street}{house_part} ({self.user.email})"
+
     def save(self, *args, **kwargs):
         if self.is_default:
             Address.objects.filter(user=self.user, is_default=True).update(is_default=False)
         super().save(*args, **kwargs)
 
-class Achievement(models.Model):
-    CONDITION_TYPES = [
-        ("orders_count", "Количество заказов"),
-        ("total_spent", "Общая сумма покупок"),
-    ]
-    title = models.CharField("Название", max_length=100)
-    description = models.TextField("Описание", blank=True)
-    icon = models.ImageField("Иконка", upload_to="achievements/", blank=True, null=True)
-    condition_type = models.CharField("Тип условия", max_length=30, choices=CONDITION_TYPES)
-    condition_value = models.PositiveIntegerField("Значение условия", default=0)
-    sort_order = models.PositiveIntegerField("Порядок", default=0)
-    is_active = models.BooleanField("Активно", default=True)
-    created_at = models.DateTimeField("Создано", auto_now_add=True)
 
-    class Meta:
-        verbose_name = "Достижение"
-        verbose_name_plural = "Достижения"
-        ordering = ["sort_order", "pk"]
-
-    def __str__(self):
-        return self.title
-
-    def check_user(self, user):
-        from django.db.models import Sum
-        from apps.orders.models import Order
-        qs = Order.objects.filter(user=user).exclude(status=Order.STATUS_CANCELLED)
-        if self.condition_type == "orders_count":
-            return qs.count()
-        elif self.condition_type == "total_spent":
-            return qs.aggregate(t=Sum("total_amount"))["t"] or 0
-        return 0
-
-
-class DiscountLevel(models.Model):
-    min_amount = models.PositiveIntegerField("Минимальная сумма покупок", default=0)
-    discount_percent = models.PositiveIntegerField("Процент скидки", default=0)
-    sort_order = models.PositiveIntegerField("Порядок", default=0)
-    is_active = models.BooleanField("Активно", default=True)
-
-    class Meta:
-        verbose_name = "Уровень скидки"
-        verbose_name_plural = "Уровни скидок"
-        ordering = ["sort_order", "min_amount"]
-
-    def __str__(self):
-        return f"От {self.min_amount} ₽ — {self.discount_percent}%"
-
-
-class UserAchievement(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_achievements", verbose_name="Пользователь")
-    achievement = models.ForeignKey(Achievement, on_delete=models.CASCADE, related_name="user_achievements", verbose_name="Достижение")
-    earned_at = models.DateTimeField("Получено", auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Достижение пользователя"
-        verbose_name_plural = "Достижения пользователей"
-        unique_together = ["user", "achievement"]
-        ordering = ["-earned_at"]
-
-    def __str__(self):
-        return f"{self.user.email} — {self.achievement.title}"
+# ❌ УДАЛЕНО: Achievement
+# ❌ УДАЛЕНО: DiscountLevel
+# ❌ УДАЛЕНО: UserAchievement
 
 
 class BonusTransaction(models.Model):
@@ -515,6 +466,7 @@ class PaymentTransaction(models.Model):
 
     def mark_completed(self):
         """Mark payment as completed and update user balance."""
+        from django.utils import timezone
         if self.status == 'completed':
             return False
 

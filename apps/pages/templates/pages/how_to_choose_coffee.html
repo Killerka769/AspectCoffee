@@ -4,132 +4,410 @@
 {% block title %}Как выбрать кофе — Гайд для начинающих и профи{% endblock %}
 {% block meta_description %}Полный гид по выбору кофе: степени обжарки, вкусовые профили, страны происхождения. Поможем найти ваш идеальный кофе.{% endblock %}
 
-{% block content %}
-<main class="w-full bg-[#f5f5f5] min-h-screen py-8 md:py-12">
-  <div class="max-w-[1100px] mx-auto px-4 md:px-6">
-    <nav class="flex items-center gap-2 text-[13px] text-black/40 mb-8">
-      <a href="/" class="hover:text-black transition-colors">Главная</a>
-      <span class="text-black/20">/</span>
-      <span class="text-black font-medium">Как выбрать кофе</span>
-    </nav>
-    <h1 class="text-[32px] md:text-[44px] font-din-black uppercase leading-tight mb-4">Как выбрать кофе</h1>
-    <p class="text-[16px] text-black/50 max-w-2xl mb-12">Разбираемся в степенях обжарки, вкусовых профилях и странах произрастания, чтобы вы могли выбрать идеальный кофе для себя.</p>
+{% block extra_css %}
+<style>
+.aspect-guide { background: #FFFFFF; padding-bottom: 80px; }
+.aspect-guide__container { width: min(1100px, calc(100% - 32px)); margin: 0 auto; }
 
-    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
-      <h2 class="text-[24px] font-din-black uppercase mb-6 flex items-center gap-3">
-        <svg class="w-8 h-8"><use href="{% static 'asset/images/sprite.svg' %}#icons--fire"></use></svg>
+.aspect-guide__crumbs {
+  display: flex; align-items: center; gap: 8px;
+  padding: 24px 0;
+  font-size: 13px; color: #5A5A5A;
+}
+.aspect-guide__crumbs a { color: #5A5A5A; text-decoration: none; transition: color .2s ease; }
+.aspect-guide__crumbs a:hover { color: #2A4A34; }
+.aspect-guide__crumbs span { color: rgba(0,0,0,.3); }
+.aspect-guide__crumbs .current { color: #000; font-weight: 500; }
+
+.aspect-guide__hero {
+  padding: 16px 0 40px;
+  border-bottom: 1px solid #E5E8E5;
+  margin-bottom: 48px;
+  position: relative;
+}
+.aspect-guide__hero::after {
+  content: ""; position: absolute;
+  left: 0; bottom: -1px;
+  width: 72px; height: 3px;
+  background: #2A4A34;
+}
+.aspect-guide__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 16px;
+}
+.aspect-guide__lead {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #5A5A5A;
+  max-width: 720px;
+  margin: 0;
+}
+
+.aspect-guide__card {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 24px;
+  padding: 40px 44px;
+  margin-bottom: 24px;
+}
+@media (max-width: 757px) {
+  .aspect-guide__card { padding: 24px 20px; border-radius: 18px; }
+}
+.aspect-guide__section-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(22px, 2.6vw, 30px);
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #F0F0F0;
+  position: relative;
+  display: flex; align-items: center; gap: 14px;
+}
+.aspect-guide__section-title::after {
+  content: ""; position: absolute;
+  left: 0; bottom: -1px;
+  width: 48px; height: 3px;
+  background: #2A4A34;
+}
+.aspect-guide__section-title svg {
+  width: 28px; height: 28px;
+  stroke: #2A4A34; fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+/* Обжарка */
+.aspect-guide__roasts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 899px) {
+  .aspect-guide__roasts { grid-template-columns: 1fr; }
+}
+.aspect-guide__roast {
+  padding: 26px 24px;
+  border-radius: 18px;
+  border: 1px solid #E5E8E5;
+  background: #F4F6F4;
+}
+.aspect-guide__roast-badge {
+  display: inline-block;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #2A4A34;
+  color: #FFFFFF;
+  margin-bottom: 14px;
+}
+.aspect-guide__roast-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 6px;
+}
+.aspect-guide__roast-sub {
+  font-size: 12px;
+  color: #5A5A5A;
+  margin: 0 0 12px;
+}
+.aspect-guide__roast-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #5A5A5A;
+  margin: 0 0 12px;
+}
+.aspect-guide__roast-for {
+  font-size: 13px;
+  color: #000;
+  padding-top: 12px;
+  border-top: 1px solid #E5E8E5;
+}
+.aspect-guide__roast-for strong { color: #2A4A34; font-weight: 900; }
+
+/* Профили */
+.aspect-guide__profiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 899px) {
+  .aspect-guide__profiles { grid-template-columns: 1fr; }
+}
+.aspect-guide__profile {
+  display: flex;
+  gap: 16px;
+  padding: 22px 24px;
+  background: #F4F6F4;
+  border-radius: 16px;
+  transition: background .2s ease, transform .2s ease;
+}
+.aspect-guide__profile:hover {
+  background: #E8EEE8;
+  transform: translateX(4px);
+}
+.aspect-guide__profile-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: #2A4A34;
+  color: #FFFFFF;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.aspect-guide__profile-icon svg {
+  width: 20px; height: 20px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.aspect-guide__profile-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 6px;
+}
+.aspect-guide__profile-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #5A5A5A;
+  margin: 0;
+}
+
+/* Страны */
+.aspect-guide__countries {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.aspect-guide__country {
+  padding: 22px 24px;
+  background: #F4F6F4;
+  border-radius: 16px;
+  border-left: 3px solid #2A4A34;
+}
+.aspect-guide__country-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 6px;
+}
+.aspect-guide__country-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #5A5A5A;
+  margin: 0;
+}
+
+/* CTA */
+.aspect-guide__cta {
+  background: #000000;
+  color: #FFFFFF;
+  border-radius: 24px;
+  padding: 48px 44px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.aspect-guide__cta::before {
+  content: "";
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(42,74,52,.6) 0%, rgba(0,0,0,0) 70%);
+  pointer-events: none;
+}
+.aspect-guide__cta-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  margin: 0 0 12px;
+  position: relative; z-index: 2;
+}
+.aspect-guide__cta-text {
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(255,255,255,.7);
+  max-width: 520px;
+  margin: 0 auto 24px;
+  position: relative; z-index: 2;
+}
+.aspect-guide__cta-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 32px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900; font-size: 13px;
+  letter-spacing: .1em; text-transform: uppercase;
+  text-decoration: none;
+  transition: background .2s ease, color .2s ease, transform .2s ease;
+  position: relative; z-index: 2;
+}
+.aspect-guide__cta-btn:hover {
+  background: #2A4A34;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  transform: translateY(-2px);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="aspect-guide">
+  <div class="aspect-guide__container">
+
+    <nav class="aspect-guide__crumbs" aria-label="Хлебные крошки">
+      <a href="/">Главная</a>
+      <span>/</span>
+      <span class="current">Как выбрать кофе</span>
+    </nav>
+
+    <header class="aspect-guide__hero">
+      <h1 class="aspect-guide__title">Как выбрать кофе</h1>
+      <p class="aspect-guide__lead">
+        Разбираемся в степенях обжарки, вкусовых профилях и странах произрастания, чтобы вы могли выбрать идеальный кофе для себя.
+      </p>
+    </header>
+
+    {# ---------- СТЕПЕНИ ОБЖАРКИ ---------- #}
+    <section class="aspect-guide__card">
+      <h2 class="aspect-guide__section-title">
+        <svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
         Степени обжарки
       </h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        <div class="bg-[#faf8f0] rounded-2xl p-6 border border-amber-200/40">
-          <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-amber-600"><use href="{% static 'asset/images/sprite.svg' %}#icons--sun"></use></svg>
-          </div>
-          <h3 class="font-bold text-[17px] mb-2">Светлая обжарка</h3>
-          <p class="text-[13px] text-black/50 mb-3">Light Roast</p>
-          <p class="text-[14px] text-black/70 leading-relaxed mb-3">Сохраняет максимум вкусовых качеств зерна. Яркая кислотность, цветочные и фруктовые ноты, сложный аромат.</p>
-          <p class="text-[13px] text-black/50">Лучше всего для: фильтр, пуровер, кемекс, аэропресс</p>
+      <div class="aspect-guide__roasts">
+        <div class="aspect-guide__roast">
+          <span class="aspect-guide__roast-badge">Light</span>
+          <h3 class="aspect-guide__roast-title">Светлая обжарка</h3>
+          <p class="aspect-guide__roast-sub">Light Roast</p>
+          <p class="aspect-guide__roast-text">Сохраняет максимум вкусовых качеств зерна. Яркая кислотность, цветочные и фруктовые ноты, сложный аромат.</p>
+          <p class="aspect-guide__roast-for"><strong>Лучше всего для:</strong> фильтр, пуровер, кемекс, аэропресс</p>
         </div>
-        <div class="bg-[#f5f0eb] rounded-2xl p-6 border border-amber-300/40">
-          <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-amber-700"><use href="{% static 'asset/images/sprite.svg' %}#icons--fire"></use></svg>
-          </div>
-          <h3 class="font-bold text-[17px] mb-2">Средняя обжарка</h3>
-          <p class="text-[13px] text-black/50 mb-3">Medium Roast</p>
-          <p class="text-[14px] text-black/70 leading-relaxed mb-3">Сбалансированный вкус с умеренной кислотностью и сладостью. Карамельные, ореховые и шоколадные ноты.</p>
-          <p class="text-[13px] text-black/50">Лучше всего для: универсальный вариант для любых методов</p>
+        <div class="aspect-guide__roast">
+          <span class="aspect-guide__roast-badge">Medium</span>
+          <h3 class="aspect-guide__roast-title">Средняя обжарка</h3>
+          <p class="aspect-guide__roast-sub">Medium Roast</p>
+          <p class="aspect-guide__roast-text">Сбалансированный вкус с умеренной кислотностью и сладостью. Карамельные, ореховые и шоколадные ноты.</p>
+          <p class="aspect-guide__roast-for"><strong>Лучше всего для:</strong> универсальный вариант для любых методов</p>
         </div>
-        <div class="bg-[#f0ebe5] rounded-2xl p-6 border border-amber-300/40">
-          <div class="w-12 h-12 bg-amber-300 rounded-full flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-amber-800"><use href="{% static 'asset/images/sprite.svg' %}#icons--fire"></use></svg>
-          </div>
-          <h3 class="font-bold text-[17px] mb-2">Тёмная обжарка</h3>
-          <p class="text-[13px] text-black/50 mb-3">Dark Roast</p>
-          <p class="text-[14px] text-black/70 leading-relaxed mb-3">Насыщенный плотный вкус с низкой кислотностью. Горький шоколад, карамель, дымные ноты, орехи.</p>
-          <p class="text-[13px] text-black/50">Лучше всего для: эспрессо, мока, турка</p>
+        <div class="aspect-guide__roast">
+          <span class="aspect-guide__roast-badge">Dark</span>
+          <h3 class="aspect-guide__roast-title">Тёмная обжарка</h3>
+          <p class="aspect-guide__roast-sub">Dark Roast</p>
+          <p class="aspect-guide__roast-text">Насыщенный плотный вкус с низкой кислотностью. Горький шоколад, карамель, дымные ноты, орехи.</p>
+          <p class="aspect-guide__roast-for"><strong>Лучше всего для:</strong> эспрессо, мока, турка</p>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
-      <h2 class="text-[24px] font-din-black uppercase mb-6 flex items-center gap-3">
-        <svg class="w-8 h-8"><use href="{% static 'asset/images/sprite.svg' %}#icons--coffee"></use></svg>
+    {# ---------- ВКУСОВЫЕ ПРОФИЛИ ---------- #}
+    <section class="aspect-guide__card">
+      <h2 class="aspect-guide__section-title">
+        <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4zM6 1v3M10 1v3M14 1v3"/></svg>
         Вкусовые профили
       </h2>
-      <div class="grid md:grid-cols-2 gap-4">
-        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
-          <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0"><svg class="w-5 h-5 text-red-600"><use href="{% static 'asset/images/sprite.svg' %}#icons--eco-leaf"></use></svg></div>
+      <div class="aspect-guide__profiles">
+        <div class="aspect-guide__profile">
+          <div class="aspect-guide__profile-icon">
+            <svg viewBox="0 0 24 24"><path d="M6 3h12v14a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/><path d="M9 21v-4h6v4"/></svg>
+          </div>
           <div>
-            <h3 class="font-bold text-[15px] mb-1">Фруктовые и ягодные</h3>
-            <p class="text-[13px] text-black/60">Африканские сорта: Эфиопия, Кения, Руанда. Яркая кислотность, ноты ягод, цитрусовых, тропических фруктов.</p>
+            <h3 class="aspect-guide__profile-title">Фруктовые и ягодные</h3>
+            <p class="aspect-guide__profile-text">Африканские сорта: Эфиопия, Кения, Руанда. Яркая кислотность, ноты ягод, цитрусовых, тропических фруктов.</p>
           </div>
         </div>
-        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
-          <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0"><svg class="w-5 h-5 text-amber-600"><use href="{% static 'asset/images/sprite.svg' %}#icons--chocolate"></use></svg></div>
+        <div class="aspect-guide__profile">
+          <div class="aspect-guide__profile-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+          </div>
           <div>
-            <h3 class="font-bold text-[15px] mb-1">Ореховые и шоколадные</h3>
-            <p class="text-[13px] text-black/60">Центральная и Южная Америка: Бразилия, Колумбия, Гватемала. Миндаль, фундук, какао, карамель.</p>
+            <h3 class="aspect-guide__profile-title">Ореховые и шоколадные</h3>
+            <p class="aspect-guide__profile-text">Центральная и Южная Америка: Бразилия, Колумбия, Гватемала. Миндаль, фундук, какао, карамель.</p>
           </div>
         </div>
-        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
-          <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center shrink-0"><svg class="w-5 h-5 text-yellow-600"><use href="{% static 'asset/images/sprite.svg' %}#icons--eco-leaf"></use></svg></div>
+        <div class="aspect-guide__profile">
+          <div class="aspect-guide__profile-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
           <div>
-            <h3 class="font-bold text-[15px] mb-1">Цветочные</h3>
-            <p class="text-[13px] text-black/60">Эфиопия и Йемен. Ноты жасмина, бергамота, лаванды, розы. Деликатный и ароматный профиль.</p>
+            <h3 class="aspect-guide__profile-title">Цветочные</h3>
+            <p class="aspect-guide__profile-text">Эфиопия и Йемен. Ноты жасмина, бергамота, лаванды, розы. Деликатный и ароматный профиль.</p>
           </div>
         </div>
-        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
-          <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0"><svg class="w-5 h-5 text-green-600"><use href="{% static 'asset/images/sprite.svg' %}#icons--fire"></use></svg></div>
+        <div class="aspect-guide__profile">
+          <div class="aspect-guide__profile-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
           <div>
-            <h3 class="font-bold text-[15px] mb-1">Пряные и насыщенные</h3>
-            <p class="text-[13px] text-black/60">Индонезия, Суматра, Вьетнам. Пряности, табак, тёмный шоколад, плотное тело, низкая кислотность.</p>
+            <h3 class="aspect-guide__profile-title">Пряные и насыщенные</h3>
+            <p class="aspect-guide__profile-text">Индонезия, Суматра, Вьетнам. Пряности, табак, тёмный шоколад, плотное тело, низкая кислотность.</p>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm mb-8">
-      <h2 class="text-[24px] font-din-black uppercase mb-6 flex items-center gap-3">
-        <svg class="w-8 h-8"><use href="{% static 'asset/images/sprite.svg' %}#icons--globe"></use></svg>
+    {# ---------- СТРАНЫ ---------- #}
+    <section class="aspect-guide__card">
+      <h2 class="aspect-guide__section-title">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         Страны происхождения
       </h2>
-      <div class="space-y-4">
-        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
-          <img src="{% static 'asset/images/flag-ethiopia.svg' %}" alt="Эфиопия" class="w-8 h-8 rounded-full object-cover" onerror="this.style.display='none'">
-          <div>
-            <h3 class="font-bold text-[15px] mb-1">Эфиопия</h3>
-            <p class="text-[13px] text-black/60">Родина кофе. Сорта с яркой кислотностью, цветочными и фруктовыми нотами. Легендарные Иргачефф, Йиргачеффе, Сидамо.</p>
-          </div>
+      <div class="aspect-guide__countries">
+        <div class="aspect-guide__country">
+          <h3 class="aspect-guide__country-title">Эфиопия</h3>
+          <p class="aspect-guide__country-text">Родина кофе. Сорта с яркой кислотностью, цветочными и фруктовыми нотами. Легендарные Иргачефф, Йиргачеффе, Сидамо.</p>
         </div>
-        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
-          <img src="{% static 'asset/images/flag-colombia.svg' %}" alt="Колумбия" class="w-8 h-8 rounded-full object-cover" onerror="this.style.display='none'">
-          <div>
-            <h3 class="font-bold text-[15px] mb-1">Колумбия</h3>
-            <p class="text-[13px] text-black/60">Сбалансированный кофе с карамельной сладостью, ореховыми нотами и мягкой кислотностью. Один из самых популярных регионов.</p>
-          </div>
+        <div class="aspect-guide__country">
+          <h3 class="aspect-guide__country-title">Колумбия</h3>
+          <p class="aspect-guide__country-text">Сбалансированный кофе с карамельной сладостью, ореховыми нотами и мягкой кислотностью. Один из самых популярных регионов.</p>
         </div>
-        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
-          <img src="{% static 'asset/images/flag-brazil.svg' %}" alt="Бразилия" class="w-8 h-8 rounded-full object-cover" onerror="this.style.display='none'">
-          <div>
-            <h3 class="font-bold text-[15px] mb-1">Бразилия</h3>
-            <p class="text-[13px] text-black/60">Мягкий, сладкий кофе с нотами шоколада, карамели и орехов. Низкая кислотность, плотное тело. Отлично для эспрессо.</p>
-          </div>
+        <div class="aspect-guide__country">
+          <h3 class="aspect-guide__country-title">Бразилия</h3>
+          <p class="aspect-guide__country-text">Мягкий, сладкий кофе с нотами шоколада, карамели и орехов. Низкая кислотность, плотное тело. Отлично для эспрессо.</p>
         </div>
-        <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl">
-          <img src="{% static 'asset/images/flag-kenya.svg' %}" alt="Кения" class="w-8 h-8 rounded-full object-cover" onerror="this.style.display='none'">
-          <div>
-            <h3 class="font-bold text-[15px] mb-1">Кения</h3>
-            <p class="text-[13px] text-black/60">Яркий, сложный кофе с высокой кислотностью. Ноты чёрной смородины, цитрусовых, томата. Любимец специалитет-энтузиастов.</p>
-          </div>
+        <div class="aspect-guide__country">
+          <h3 class="aspect-guide__country-title">Кения</h3>
+          <p class="aspect-guide__country-text">Яркий, сложный кофе с высокой кислотностью. Ноты чёрной смородины, цитрусовых, томата. Любимец специалитет-энтузиастов.</p>
         </div>
       </div>
+    </section>
+
+    {# ---------- CTA ---------- #}
+    <div class="aspect-guide__cta">
+      <h2 class="aspect-guide__cta-title">Не знаете с чего начать?</h2>
+      <p class="aspect-guide__cta-text">Загляните в каталог — у нас есть фильтры по обжарке, вкусовому профилю и стране. Подберёте свой кофе за минуту.</p>
+      <a href="{% url 'catalog:catalog' %}" class="aspect-guide__cta-btn">В каталог →</a>
     </div>
 
-    <div class="bg-black text-white rounded-[24px] p-6 md:p-10 mb-8">
-      <h2 class="text-[24px] font-din-black uppercase mb-4">Не знаете с чего начать?</h2>
-      <p class="text-[15px] text-white/60 mb-6 max-w-xl">Напишите нам, и мы поможем подобрать идеальный кофе под ваш вкус и способ заваривания.</p>
-      <a href="/contact-us/" class="inline-block bg-white text-black font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors text-[14px]">Связаться с нами →</a>
-    </div>
   </div>
 </main>
 {% endblock %}

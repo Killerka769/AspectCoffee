@@ -5,14 +5,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     RegisterView, LogoutView, EmailConfirmView,
     DeliveryCalcView, DeliveryPVZView,
-    CategoryViewSet, ProductViewSet, RecipeViewSet,
+    CategoryViewSet, ProductViewSet,
     CartView, CartItemView, CartPromoView,
     OrderViewSet, SearchSuggestView,
 )
 router = DefaultRouter()
 router.register(r"catalog/categories", CategoryViewSet, basename="category")
 router.register(r"catalog/products", ProductViewSet, basename="product")
-router.register(r"catalog/recipes", RecipeViewSet, basename="recipe")
+# router.register(r"catalog/recipes", RecipeViewSet, basename="recipe")
 router.register(r"orders", OrderViewSet, basename="order")
 urlpatterns = [
     path("auth/register/", RegisterView.as_view(), name="register"),

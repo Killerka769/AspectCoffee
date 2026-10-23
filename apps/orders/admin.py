@@ -9,7 +9,7 @@ from unfold.decorators import action
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources, fields
 from .models import (
-    Banner, Cart, CartItem, Order, OrderItem, ProductNote, PromoCode, Wishlist,
+    Cart, CartItem, Order, OrderItem, ProductNote, PromoCode, Wishlist,
     RecurringCharge, RecurringOrder,
 )
 
@@ -343,11 +343,11 @@ class PromoCodeAdmin(ModelAdmin):
     list_filter = ["discount_type", "is_active"]
     search_fields = ["code"]
     readonly_fields = ["used_count"]
-@admin.register(Banner)
-class BannerAdmin(ModelAdmin):
-    list_display = ["title", "is_active", "show_from", "show_to", "order"]
-    list_editable = ["is_active", "order"]
-    search_fields = ["title"]
+# @admin.register(Banner)
+# class BannerAdmin(ModelAdmin):
+#     list_display = ["title", "is_active", "show_from", "show_to", "order"]
+#     list_editable = ["is_active", "order"]
+#     search_fields = ["title"]
 @admin.register(Cart)
 class CartAdmin(ModelAdmin):
     list_display = ["id", "user", "session_key_short", "total_display", "total_items_display", "updated_at"]

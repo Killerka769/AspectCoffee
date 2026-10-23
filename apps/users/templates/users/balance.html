@@ -1,89 +1,382 @@
-{% extends "users/base_account.html" %}{% load static %}{% block account_content %}
-<div class="space-y-8">
-  <h2 class="text-[24px] font-din-black uppercase leading-[1.2] m-0">Внутренний счёт</h2>
+{% extends "users/base_account.html" %}
+{% load static catalog_extras %}
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    {# BALANCE CARD (HTML/CSS credit-card look) #}
-    <div class="rounded-2xl p-8 relative overflow-hidden flex flex-col justify-between" style="min-height:260px;background:linear-gradient(135deg,#2a2a2a 0%,#000 60%);">
-      <div class="flex items-start justify-between">
-        <img width="48" height="48" src="https://img.icons8.ru/fluency/96/sim-card-chip.png" alt="sim-card-chip">
-        <div class="text-[11px] text-[var(--white)] opacity-50 font-din-black uppercase tracking-[0.1em]">Aspect Coffee</div>
+{% block title %}Внутренний счёт{% endblock %}
+
+{% block extra_css %}
+<style>
+.asp-bal { display: flex; flex-direction: column; gap: 32px; }
+
+.asp-bal__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+  color: #000;
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F0F0F0;
+  position: relative;
+}
+.asp-bal__title::after {
+  content: ""; position: absolute;
+  left: 0; bottom: -1px;
+  width: 40px; height: 3px;
+  background: #2A4A34;
+}
+
+.asp-bal__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+@media (max-width: 899px) { .asp-bal__grid { grid-template-columns: 1fr; } }
+
+/* Карта-баланс */
+.asp-bal__card {
+  background: linear-gradient(135deg, #2A4A34 0%, #1E3626 60%, #000 100%);
+  border-radius: 24px;
+  padding: 32px;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  color: #FFFFFF;
+}
+.asp-bal__card::before {
+  content: "";
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.asp-bal__card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+.asp-bal__chip {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #FFD86B 0%, #E5A624 100%);
+  position: relative;
+}
+.asp-bal__chip::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 4px;
+}
+.asp-bal__card-brand {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.55);
+}
+.asp-bal__card-dots {
+  display: flex;
+  gap: 6px;
+  margin: 24px 0 20px;
+  position: relative;
+  z-index: 2;
+}
+.asp-bal__card-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.4);
+}
+.asp-bal__card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.55);
+  margin: 0 0 8px;
+  position: relative;
+  z-index: 2;
+}
+.asp-bal__card-value {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(40px, 5vw, 56px);
+  line-height: 1;
+  letter-spacing: -.02em;
+  color: #FFFFFF;
+  margin: 0 0 8px;
+  position: relative;
+  z-index: 2;
+}
+.asp-bal__card-note {
+  font-size: 12px;
+  color: rgba(255,255,255,.55);
+  margin: 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* Форма пополнения */
+.asp-bal__topup {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 24px;
+  padding: 28px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.asp-bal__topup-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  margin: 0 0 4px;
+}
+.asp-bal__topup-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 12px;
+}
+.asp-bal__input {
+  width: 100%;
+  background: #F4F6F4;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  padding: 16px 18px;
+  font-size: 16px;
+  font-family: "Open Sans", Arial, sans-serif;
+  color: #000;
+  outline: none;
+  transition: background .2s ease, border-color .2s ease;
+  box-sizing: border-box;
+}
+.asp-bal__input:focus { background: #FFFFFF; border-color: #2A4A34; }
+.asp-bal__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.asp-bal__preset {
+  padding: 9px 16px;
+  background: #F4F6F4;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .04em;
+  color: #000;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.asp-bal__preset:hover { background: #E8EEE8; border-color: #2A4A34; color: #2A4A34; }
+.asp-bal__submit {
+  display: block;
+  width: 100%;
+  padding: 16px 24px;
+  border: 0;
+  border-radius: 14px;
+  background: #2A4A34;
+  color: #FFFFFF;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+.asp-bal__submit:hover { background: #1E3626; transform: translateY(-2px); }
+.asp-bal__hint {
+  font-size: 11px;
+  color: #5A5A5A;
+  text-align: center;
+  margin: 0;
+}
+
+/* Бонусный блок */
+.asp-bal__card-info {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 20px;
+  padding: 24px 28px;
+}
+.asp-bal__card-info-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  margin: 0 0 14px;
+}
+.asp-bal__bonus-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #F0F0F0;
+}
+.asp-bal__bonus-label {
+  font-size: 14px;
+  color: #000;
+}
+.asp-bal__bonus-value {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 26px;
+  color: #2A4A34;
+}
+.asp-bal__bonus-hint {
+  font-size: 12px;
+  color: #5A5A5A;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Транзакции */
+.asp-bal__transactions {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 20px;
+  padding: 24px 28px;
+}
+.asp-bal__tx-list {
+  display: flex;
+  flex-direction: column;
+}
+.asp-bal__tx {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #F5F5F5;
+}
+.asp-bal__tx:last-child { border-bottom: 0; }
+.asp-bal__tx-body { flex: 1; min-width: 0; }
+.asp-bal__tx-desc {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 2px;
+}
+.asp-bal__tx-desc span { color: #5A5A5A; font-weight: 400; }
+.asp-bal__tx-meta {
+  font-size: 12px;
+  color: #5A5A5A;
+  margin: 0;
+}
+.asp-bal__tx-amount {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.asp-bal__tx-amount--earn { color: #2A4A34; }
+.asp-bal__tx-amount--spend { color: #5A5A5A; }
+.asp-bal__tx-amount--expire { color: #B91C1C; }
+.asp-bal__tx-amount--adjust { color: #000; }
+</style>
+{% endblock %}
+
+{% block account_content %}
+<div class="asp-bal">
+
+  <h1 class="asp-bal__title">Внутренний счёт</h1>
+
+  {# ═══ CARD + TOPUP ═══ #}
+  <div class="asp-bal__grid">
+
+    {# CARD #}
+    <div class="asp-bal__card">
+      <div class="asp-bal__card-head">
+        <div class="asp-bal__chip"></div>
+        <div class="asp-bal__card-brand">Aspect Coffee</div>
       </div>
-      <div class="flex items-center gap-2 my-6">
-        <span class="w-2 h-2 rounded-full bg-[var(--white)] opacity-40"></span>
-        <span class="w-2 h-2 rounded-full bg-[var(--white)] opacity-40"></span>
-        <span class="w-2 h-2 rounded-full bg-[var(--white)] opacity-40"></span>
-        <span class="w-2 h-2 rounded-full bg-[var(--white)] opacity-40"></span>
-        <span class="w-2 h-2 rounded-full bg-[var(--white)] opacity-40 ml-3"></span>
-        <span class="w-2 h-2 rounded-full bg-[var(--white)] opacity-40"></span>
-        <span class="w-2 h-2 rounded-full bg-[var(--white)] opacity-40"></span>
-        <span class="w-2 h-2 rounded-full bg-[var(--white)] opacity-40"></span>
-        <span class="w-2 h-2 rounded-full bg-[var(--white)] opacity-40 ml-3"></span>
-        <span class="w-2 h-2 rounded-full bg-[var(--white)] opacity-40"></span>
-        <span class="w-2 h-2 rounded-full bg-[var(--white)] opacity-40"></span>
-        <span class="w-2 h-2 rounded-full bg-[var(--white)] opacity-40"></span>
+
+      <div class="asp-bal__card-dots">
+        {% for i in "123456789012" %}<span class="asp-bal__card-dot"></span>{% endfor %}
       </div>
+
       <div>
-        <div class="text-[11px] text-[var(--white)] opacity-50 font-din-black uppercase tracking-[0.1em] mb-2">Текущий баланс</div>
-        <div class="text-[48px] font-din-black text-[var(--white)] leading-[1.2]">{{ user.balance|floatformat:0 }} <span class="rub">₽</span></div>
-        <div class="text-[12px] text-[var(--white)] opacity-50 mt-2">Бонусные баллы: {{ available_points }}</div>
+        <p class="asp-bal__card-label">Текущий баланс</p>
+        <p class="asp-bal__card-value">{{ user.balance|floatformat:0 }} ₽</p>
+        <p class="asp-bal__card-note">Бонусных баллов: {{ available_points }}</p>
       </div>
     </div>
 
-    {# TOP-UP FORM #}
-    <form method="post" action="{% url 'users:topup_balance' %}" class="bg-[var(--white)] rounded-2xl p-6 space-y-3">
+    {# TOPUP #}
+    <form method="post" action="{% url 'users:topup_balance' %}" class="asp-bal__topup">
       {% csrf_token %}
-      <div class="text-[11px] text-[var(--black-50)] font-din-black uppercase tracking-[0.1em] mb-3">Пополнить</div>
-      <label class="block text-[12px] font-din-black uppercase tracking-[0.04em]">Сумма (₽)</label>
-      <div class="tc-input">
-        <div class="tc-input__field">
-          <input type="number" name="amount" min="100" max="100000" step="100" value="1000" required class="tc-input__field--input">
-        </div>
+
+      <div>
+        <p class="asp-bal__topup-label">Пополнение</p>
+        <p class="asp-bal__topup-title">Пополнить счёт</p>
       </div>
-      <div class="flex gap-2 flex-wrap">
-        <button type="button" onclick="this.form.amount.value=500" class="px-3 py-1.5 bg-[var(--black-4)] rounded-lg text-[12px] font-din-black hover:bg-[var(--black-5)]">500</button>
-        <button type="button" onclick="this.form.amount.value=1000" class="px-3 py-1.5 bg-[var(--black-4)] rounded-lg text-[12px] font-din-black hover:bg-[var(--black-5)]">1 000</button>
-        <button type="button" onclick="this.form.amount.value=3000" class="px-3 py-1.5 bg-[var(--black-4)] rounded-lg text-[12px] font-din-black hover:bg-[var(--black-5)]">3 000</button>
-        <button type="button" onclick="this.form.amount.value=5000" class="px-3 py-1.5 bg-[var(--black-4)] rounded-lg text-[12px] font-din-black hover:bg-[var(--black-5)]">5 000</button>
-        <button type="button" onclick="this.form.amount.value=10000" class="px-3 py-1.5 bg-[var(--black-4)] rounded-lg text-[12px] font-din-black hover:bg-[var(--black-5)]">10 000</button>
+
+      <input type="number" name="amount" min="100" max="100000" step="100" value="1000" required
+             class="asp-bal__input" placeholder="Сумма, ₽" id="topup-amount">
+
+      <div class="asp-bal__presets">
+        <button type="button" class="asp-bal__preset" onclick="document.getElementById('topup-amount').value=500">500</button>
+        <button type="button" class="asp-bal__preset" onclick="document.getElementById('topup-amount').value=1000">1 000</button>
+        <button type="button" class="asp-bal__preset" onclick="document.getElementById('topup-amount').value=3000">3 000</button>
+        <button type="button" class="asp-bal__preset" onclick="document.getElementById('topup-amount').value=5000">5 000</button>
+        <button type="button" class="asp-bal__preset" onclick="document.getElementById('topup-amount').value=10000">10 000</button>
       </div>
-      <button type="submit" class="tc-btn btn-dark w-full">Пополнить</button>
-      <div class="text-[10px] text-[var(--black-50)] text-center">Мин. 100 ₽ · макс. 100 000 ₽</div>
+
+      <button type="submit" class="asp-bal__submit">Пополнить →</button>
+      <p class="asp-bal__hint">Мин. 100 ₽ · макс. 100 000 ₽</p>
     </form>
+
   </div>
 
-  {# BONUS PROGRAM INFO #}
-  <div class="bg-[var(--white)] rounded-2xl p-6 space-y-4">
-    <div class="text-[11px] text-[var(--black-50)] font-din-black uppercase tracking-[0.1em]">Бонусная программа</div>
-    <div class="flex items-center justify-between">
-      <span class="text-[14px]">Накоплено баллов</span>
-      <span class="text-[24px] font-din-black leading-[1.2]">{{ available_points }} баллов</span>
+  {# ═══ BONUS INFO ═══ #}
+  <div class="asp-bal__card-info">
+    <p class="asp-bal__card-info-title">Бонусная программа</p>
+    <div class="asp-bal__bonus-row">
+      <span class="asp-bal__bonus-label">Накоплено баллов</span>
+      <span class="asp-bal__bonus-value">{{ available_points }} б.</span>
     </div>
-    <p class="text-[12px] text-[var(--black-50)] m-0">1 балл = 1 ₽ при следующем заказе. Баллы сгорают через 6 месяцев.</p>
+    <p class="asp-bal__bonus-hint">1 балл = 1 ₽ при следующем заказе. Баллы сгорают через 6 месяцев.</p>
   </div>
 
-  {# TRANSACTION HISTORY #}
+  {# ═══ TRANSACTIONS ═══ #}
   {% if transactions %}
-  <div class="bg-[var(--white)] rounded-2xl p-6 space-y-4">
-    <div class="text-[11px] text-[var(--black-50)] font-din-black uppercase tracking-[0.1em]">История операций</div>
-    <div class="space-y-2">
+  <div class="asp-bal__transactions">
+    <p class="asp-bal__card-info-title">История операций</p>
+    <div class="asp-bal__tx-list">
       {% for t in transactions %}
-      <div class="flex items-center justify-between py-2 border-b border-[var(--black-4)] last:border-b-0">
-        <div>
-          <div class="text-[14px] font-medium">
+      <div class="asp-bal__tx">
+        <div class="asp-bal__tx-body">
+          <p class="asp-bal__tx-desc">
             {{ t.description|default:t.get_type_display }}
-            {% if t.order %}<span class="text-[var(--black-50)]">· Заказ #{{ t.order.pk }}</span>{% endif %}
-          </div>
-          <div class="text-[11px] text-[var(--black-50)]">
+            {% if t.order %}<span>· Заказ #{{ t.order.pk }}</span>{% endif %}
+          </p>
+          <p class="asp-bal__tx-meta">
             {{ t.created_at|date:"d.m.Y H:i" }}
-            {% if t.expires_at %} · сгорит {{ t.expires_at|date:"d.m.Y" }}{% endif %}
-          </div>
+            {% if t.expires_at %} · сгорает {{ t.expires_at|date:"d.m.Y" }}{% endif %}
+          </p>
         </div>
-        <div class="text-[18px] font-din-black
-          {% if t.type == 'earn' %}text-green-700
-          {% elif t.type == 'spend' %}text-[var(--black-50)]
-          {% elif t.type == 'expire' %}text-red-600
-          {% else %}text-[var(--black)]{% endif %}">
+        <div class="asp-bal__tx-amount asp-bal__tx-amount--{{ t.type }}">
           {% if t.type == 'earn' %}+{% elif t.type == 'spend' %}-{% elif t.type == 'expire' %}-{% endif %}{{ t.amount }} б.
         </div>
       </div>
@@ -91,5 +384,6 @@
     </div>
   </div>
   {% endif %}
+
 </div>
 {% endblock %}

@@ -7,8 +7,8 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.html import strip_tags
 from .models import (
-    BlogPost, BlogCategory, BlogSeries, BlogSeriesVisit,
-    ArticleBookmark, ArticleReadHistory, ArticleLike, ArticleComment, BlogPostView,
+    BlogPost, BlogCategory, BlogSeries,
+    ArticleLike, ArticleComment, BlogPostView,
 )
 
 
@@ -47,15 +47,13 @@ def _reading_minutes(post):
     return max(1, round(words / 170))
 
 
-def _liked_bookmarked_ids(request):
-    liked_ids, bookmarked_ids = set(), set()
+def _liked_ids(request):
     if request.user.is_authenticated:
-        liked_ids = set(ArticleLike.objects.filter(user=request.user).values_list("post_id", flat=True))
-        bookmarked_ids = set(ArticleBookmark.objects.filter(user=request.user).values_list("post_id", flat=True))
-    return liked_ids, bookmarked_ids
+        return set(ArticleLike.objects.filter(user=request.user).values_list("post_id", flat=True))
+    return set()
 
 
-def _decorate_posts(page_items, liked_ids, bookmarked_ids):
+def _decorate_posts(page_items, liked_ids):
     """Attach card presentation data: reading time, short views and
     the repeating feed pattern [wide + narrow] -> [3 columns]."""
     for idx, post in enumerate(page_items):
@@ -63,17 +61,18 @@ def _decorate_posts(page_items, liked_ids, bookmarked_ids):
         post.views_display = _short_count(post.unique_views_count)
         post.is_wide = idx % 5 == 0
         post.is_liked = post.id in liked_ids
-        post.is_bookmarked = post.id in bookmarked_ids
 
 
 def _journal_series(request):
-    if request.user.is_authenticated:
-        visited = set(BlogSeriesVisit.objects.filter(user=request.user).values_list("series_id", flat=True))
-    else:
-        visited = set(request.session.get("visited_blog_series", []))
+    """Return all active journal series.
+
+    Note: BlogSeriesVisit was removed — we no longer hide series the user has
+    already opened. All active series are always shown.
+    """
     series_list = list(
-        BlogSeries.objects.filter(is_active=True).exclude(id__in=visited)
-        .prefetch_related("series_items__post").order_by("order", "id")
+        BlogSeries.objects.filter(is_active=True)
+        .prefetch_related("series_items__post")
+        .order_by("order", "id")
     )
     result = []
     for series in series_list:
@@ -112,8 +111,8 @@ def index(request):
     categories = BlogCategory.objects.all()
     journal_series = _journal_series(request)
 
-    liked_ids, bookmarked_ids = _liked_bookmarked_ids(request)
-    _decorate_posts(page_obj.object_list, liked_ids, bookmarked_ids)
+    liked_ids = _liked_ids(request)
+    _decorate_posts(page_obj.object_list, liked_ids)
 
     context = {
         "posts": page_obj,
@@ -123,7 +122,7 @@ def index(request):
         "search_query": search_query,
         "selected_sort": selected_sort,
         "journal_series": journal_series,
-        "bookmarked_ids": bookmarked_ids,
+        "liked_ids": liked_ids,
         "posts_count_label": f"{paginator.count} {_ru_plural(paginator.count, 'статья', 'статьи', 'статей')}",
     }
     return render(request, "blog/index.html", context)
@@ -180,12 +179,7 @@ def detail(request, slug):
     series_slug = request.GET.get("series", "").strip()
     if series_slug:
         active_series = get_object_or_404(BlogSeries, slug=series_slug, is_active=True)
-        if request.user.is_authenticated:
-            BlogSeriesVisit.objects.update_or_create(user=request.user, series=active_series)
-        else:
-            visited = set(request.session.get("visited_blog_series", []))
-            visited.add(active_series.id)
-            request.session["visited_blog_series"] = list(visited)
+        # BlogSeriesVisit tracking was removed — no per-user visited flag.
         series_posts = [
             item.post for item in active_series.series_items.select_related("post").all()
             if item.post.is_published and item.post_id != post.id
@@ -197,22 +191,15 @@ def detail(request, slug):
     post.views_display = _short_count(post.unique_views_count)
     post.show_updated_date = post.updated_at.date() != post.created_at.date()
 
-    # Track reading history for logged-in users
-    is_bookmarked = False
+    # ArticleReadHistory was removed — no per-user read history is written here.
     is_liked = False
     if request.user.is_authenticated:
-        ArticleReadHistory.objects.update_or_create(
-            user=request.user, post=post,
-            defaults={}  # auto_now=True on read_at will update it
-        )
-        is_bookmarked = ArticleBookmark.objects.filter(user=request.user, post=post).exists()
         is_liked = ArticleLike.objects.filter(user=request.user, post=post).exists()
 
     context = {
         "post": post,
         "recent_posts": recent_posts,
         "categories": categories,
-        "is_bookmarked": is_bookmarked,
         "is_liked": is_liked,
         "article_comments": post.comments.filter(is_approved=True),
         "active_series": active_series,
@@ -237,8 +224,8 @@ def category(request, slug):
     categories = BlogCategory.objects.all()
     journal_series = _journal_series(request)
 
-    liked_ids, bookmarked_ids = _liked_bookmarked_ids(request)
-    _decorate_posts(page_obj.object_list, liked_ids, bookmarked_ids)
+    liked_ids = _liked_ids(request)
+    _decorate_posts(page_obj.object_list, liked_ids)
 
     context = {
         "posts": page_obj,
@@ -247,26 +234,10 @@ def category(request, slug):
         "current_category": slug,
         "selected_sort": selected_sort,
         "journal_series": journal_series,
-        "bookmarked_ids": bookmarked_ids,
+        "liked_ids": liked_ids,
         "posts_count_label": f"{paginator.count} {_ru_plural(paginator.count, 'статья', 'статьи', 'статей')}",
     }
     return render(request, "blog/index.html", context)
-
-
-@require_POST
-def toggle_bookmark(request, slug):
-    """Toggle article bookmark for authenticated users. Returns JSON."""
-    if not request.user.is_authenticated:
-        return JsonResponse({"ok": False, "error": "login_required"}, status=401)
-    post = get_object_or_404(BlogPost, slug=slug, is_published=True)
-    bookmark, created = ArticleBookmark.objects.get_or_create(user=request.user, post=post)
-    if not created:
-        bookmark.delete()
-        bookmarked = False
-    else:
-        bookmarked = True
-    total = ArticleBookmark.objects.filter(user=request.user).count()
-    return JsonResponse({"ok": True, "bookmarked": bookmarked, "total": total})
 
 
 @require_POST

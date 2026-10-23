@@ -3,15 +3,15 @@
   <style>
     .aspect-footer {
       margin-top: auto;
-      background: #000;
-      color: #fff;
-      padding: 48px 0 32px;
+      background: #2A4A34;
+      color: #FFFFFF;
+      padding: 56px 0 32px;
     }
     .aspect-footer__inner {
       width: min(1340px, calc(100% - 32px));
       margin: 0 auto;
       display: grid;
-      grid-template-columns: minmax(260px, 1.15fr) repeat(3, minmax(160px, 0.8fr));
+      grid-template-columns: minmax(280px, 1.3fr) repeat(3, minmax(160px, 0.85fr));
       gap: 48px 40px;
     }
     .aspect-footer__brand {
@@ -21,17 +21,18 @@
     }
     .aspect-footer__logo {
       display: block;
-      width: 60px;
+      width: 200px;
       height: auto;
-      filter: invert(1);
-      margin-bottom: 28px;
+      filter: invert(1) brightness(2);
+      margin-bottom: 24px;
     }
     .aspect-footer__name,
     .aspect-footer__title {
       margin: 0 0 18px;
-      color: #fff;
-      font-family: "DIN Pro Black", "DIN Pro Medium", sans-serif;
+      color: #FFFFFF;
+      font-family: "Roboto Condensed", Arial, sans-serif;
       font-size: 20px;
+      font-weight: 900;
       line-height: 1.15;
       letter-spacing: .04em;
       text-transform: uppercase;
@@ -39,7 +40,7 @@
     .aspect-footer__copy {
       max-width: 430px;
       margin: 0 0 24px;
-      color: rgba(255,255,255,.58);
+      color: rgba(255,255,255,.7);
       font-size: 14px;
       line-height: 1.55;
     }
@@ -50,126 +51,162 @@
       gap: 12px;
     }
     .aspect-footer a {
-      color: #fff;
+      color: #FFFFFF;
       text-decoration: none;
+      font-size: 15px;
+      transition: color .2s ease;
     }
     .aspect-footer a:hover,
     .aspect-footer a:focus-visible {
-      color: rgba(255,255,255,.72);
+      color: #0F1B14;
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
     .aspect-footer__phone {
       display: inline-block;
-      margin-bottom: 14px;
-      font-family: "DIN Pro Black", "DIN Pro Medium", sans-serif;
-      font-size: clamp(25px, 2.1vw, 38px);
+      margin-bottom: 18px;
+      color: #FFFFFF;
+      font-family: "Roboto Condensed", Arial, sans-serif;
+      font-weight: 900;
+      font-size: clamp(26px, 2.2vw, 42px);
       line-height: 1;
+      letter-spacing: .01em;
       white-space: nowrap;
+      text-decoration: none;
+    }
+    .aspect-footer__phone:hover {
+      color: #0F1B14;
+      text-decoration: none;
     }
     .aspect-footer__socials {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 8px;
+      margin-top: 6px;
     }
     .aspect-footer__social {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 40px;
-      padding: 9px 14px;
-      border: 1px solid rgba(255,255,255,.28);
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 1px solid rgba(255,255,255,.4);
       border-radius: 12px;
       font-size: 14px;
+      color: #FFFFFF;
+      transition: background .2s ease, border-color .2s ease, color .2s ease;
+    }
+    .aspect-footer__social:hover {
+      background: #FFFFFF;
+      border-color: #FFFFFF;
+      color: #2A4A34;
+      text-decoration: none;
+    }
+    .aspect-footer__partners-note {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.08);
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(255,255,255,.85);
+    }
+    .aspect-footer__partners-note strong {
+      color: #FFFFFF;
+      font-weight: 700;
+    }
+    .aspect-footer__partners-note a {
+      color: #FFFFFF;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .aspect-footer__partners-note a:hover {
+      color: #0F1B14;
     }
     .aspect-footer__legal {
       grid-column: 1 / -1;
       display: flex;
       flex-wrap: wrap;
       gap: 12px 28px;
-      padding-top: 24px;
-      border-top: 1px solid rgba(255,255,255,.16);
-      color: rgba(255,255,255,.58);
+      padding-top: 28px;
+      border-top: 1px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.7);
       font-size: 13px;
     }
     .aspect-footer__legal a {
-      color: rgba(255,255,255,.68);
+      color: rgba(255,255,255,.8);
+      font-size: 13px;
+    }
+    .aspect-footer__legal a:hover {
+      color: #FFFFFF;
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
     @media (max-width: 1099px) {
       .aspect-footer__inner {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 40px 32px;
       }
     }
     @media (max-width: 757px) {
       .aspect-footer {
-        padding: 36px 0 calc(96px + env(safe-area-inset-bottom));
+        padding: 40px 0 calc(96px + env(safe-area-inset-bottom));
       }
       .aspect-footer__inner {
         grid-template-columns: 1fr;
-        gap: 34px;
+        gap: 32px;
       }
-      .aspect-footer__logo {
-        width: 60px;
-        margin-bottom: 22px;
-      }
-      .aspect-footer__legal {
-        flex-direction: column;
-        gap: 10px;
-      }
+      .aspect-footer__logo { width: 150px; margin-bottom: 20px; }
+      .aspect-footer__name,
+      .aspect-footer__title { font-size: 18px; }
+      .aspect-footer__phone { font-size: 28px; }
+      .aspect-footer__legal { flex-direction: column; gap: 10px; }
     }
   </style>
 
   <div class="aspect-footer__inner">
+
     <section class="aspect-footer__brand">
-      <a href="/" aria-label="Aspect Coffee — на главную">
+      <a href="/" aria-label="Aspect Coffee Roasters — на главную">
         <img class="aspect-footer__logo"
-             src="{% static 'asset/images/ic-logo-60.svg' %}"
-             alt="Aspect Coffee"
-             width="60"
-             height="36"
+             src="{% static 'asset/images/logo-aspect.svg' %}"
+             alt="Aspect Coffee Roasters"
+             width="200"
+             height="34"
              loading="lazy">
       </a>
-      <p class="aspect-footer__name">{{ site_settings.site_name|default:"Aspect Coffee" }}</p>
+      <p class="aspect-footer__name">Aspect Coffee Roasters</p>
       <p class="aspect-footer__copy">
-        © {% now "Y" %} {{ site_settings.site_name|default:"Aspect Coffee" }}.
-        Использование материалов сайта допускается только с письменного согласия правообладателя.
+        Ваш проводник в мире спешалти. Прямые закупки, открытое ценообразование, диалог через вкус.
+      </p>
+      <p class="aspect-footer__copy" style="margin-top:auto">
+        © {% now "Y" %} Aspect Coffee Roasters.<br>
+        Все права защищены.
       </p>
     </section>
 
     <section>
-      <h2 class="aspect-footer__title">Каталог</h2>
+      <h2 class="aspect-footer__title">Разделы</h2>
       <nav class="aspect-footer__links" aria-label="Разделы каталога">
-        {% if footer_links_catalog %}
-          {% for link in footer_links_catalog %}
-            <a href="{{ link.url }}"{% if link.open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.label }}</a>
-          {% endfor %}
-        {% else %}
-          <a href="/coffee/">Кофе</a>
-          <a href="/tea/">Чай</a>
-          <a href="/accessories/">Аксессуары и мерч</a>
-          <a href="/chocolate/">Шоколад и сиропы</a>
-          <a href="/giftbox/">Наборы</a>
-          <a href="/accessories/gift-certificate/">Подарочный сертификат</a>
-          {% if site_settings.wholesale_url %}
-            <a href="{{ site_settings.wholesale_url }}" target="_blank" rel="noopener noreferrer">Оптовые поставки ↗</a>
-          {% endif %}
-        {% endif %}
+        <a href="/catalog/">Кофе</a>
+        <a href="/accessories/">Аксессуары и мерч</a>
+        <a href="/giftbox/">Наборы</a>
+        <a href="/accessories/gift-certificate/">Подарочный сертификат</a>
+        <!-- <a href="/cafes/">Карта кофеен</a> -->
+        <a href="/partners/">Партнёры</a>
+        <!-- <a href="/promo/">Акции и новинки</a> -->
       </nav>
     </section>
 
     <section>
       <h2 class="aspect-footer__title">Помощь</h2>
       <nav class="aspect-footer__links" aria-label="Помощь покупателю">
-        {% if footer_links_help %}
-          {% for link in footer_links_help %}
-            <a href="{{ link.url }}"{% if link.open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.label }}</a>
-          {% endfor %}
-        {% else %}
-          <a href="/shipment-and-payment/">Доставка и оплата</a>
-          <a href="/discount-system/">Система скидок</a>
-          <a href="/return-money/">Возврат денег</a>
-          <a href="/faq/">Частые вопросы</a>
-          <a href="/contact-us/">Контакты</a>
-        {% endif %}
+        <a href="/shipment-and-payment/">Доставка и оплата</a>
+        <a href="/discount-system/">Система скидок</a>
+        <a href="/return-money/">Возврат денег</a>
+        <a href="/faq/">Частые вопросы</a>
+        <a href="/how-to-choose-coffee/">Как выбрать кофе</a>
+        <a href="/contact-us/">Контакты</a>
       </nav>
     </section>
 
@@ -177,6 +214,8 @@
       <h2 class="aspect-footer__title">Контакты</h2>
       {% if site_settings.contact_phone %}
         <a class="aspect-footer__phone" href="tel:{{ site_settings.contact_phone }}">{{ site_settings.contact_phone }}</a>
+      {% else %}
+        <a class="aspect-footer__phone" href="tel:+78003334980">+7 800 333 49 80</a>
       {% endif %}
       <div class="aspect-footer__socials">
         {% if site_settings.contact_telegram %}
@@ -184,15 +223,15 @@
         {% endif %}
         {% if site_settings.contact_whatsapp %}
           <a class="aspect-footer__social" href="{{ site_settings.contact_whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        {% else %}
+          <a class="aspect-footer__social" href="https://api.whatsapp.com/send?phone=79508382000" target="_blank" rel="noopener noreferrer">WhatsApp</a>
         {% endif %}
       </div>
-      {% if footer_links_company %}
-        <nav class="aspect-footer__links" aria-label="О компании" style="margin-top:20px">
-          {% for link in footer_links_company %}
-            <a href="{{ link.url }}"{% if link.open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.label }}</a>
-          {% endfor %}
-        </nav>
-      {% endif %}
+
+      <div class="aspect-footer__partners-note">
+        <strong>Партнёрам:</strong> скидка 30% от 20 кг/мес.<br>
+        <a href="/partners/">Условия и договор →</a>
+      </div>
     </section>
 
     <nav class="aspect-footer__legal" aria-label="Юридическая информация">

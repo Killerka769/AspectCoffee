@@ -3,8 +3,7 @@ from django.db.models import Count, Q
 from unfold.admin import ModelAdmin, TabularInline
 from .models import (
     BlogCategory, BlogPost, BlogPostView, BlogSeries, BlogSeriesPost,
-    ArticleBookmark, ArticleComment, ArticleLike, ArticleReadHistory,
-    BlogSeriesVisit,
+    ArticleComment, ArticleLike,
 )
 
 
@@ -160,25 +159,25 @@ class ReadOnlyActivityAdmin(ModelAdmin):
         return False
 
 
-@admin.register(ArticleBookmark)
-class ArticleBookmarkAdmin(ReadOnlyActivityAdmin):
-    list_display = ("post", "user", "added_at")
-    list_filter = ("added_at",)
-    search_fields = ("post__title", "user__email")
-    readonly_fields = ("post", "user", "added_at")
+# @admin.register(ArticleBookmark)
+# class ArticleBookmarkAdmin(ReadOnlyActivityAdmin):
+#     list_display = ("post", "user", "added_at")
+#     list_filter = ("added_at",)
+#     search_fields = ("post__title", "user__email")
+#     readonly_fields = ("post", "user", "added_at")
 
 
-@admin.register(ArticleReadHistory)
-class ArticleReadHistoryAdmin(ReadOnlyActivityAdmin):
-    list_display = ("post", "user", "read_at")
-    list_filter = ("read_at",)
-    search_fields = ("post__title", "user__email")
-    readonly_fields = ("post", "user", "read_at")
+# @admin.register(ArticleReadHistory)
+# class ArticleReadHistoryAdmin(ReadOnlyActivityAdmin):
+#     list_display = ("post", "user", "read_at")
+#     list_filter = ("read_at",)
+#     search_fields = ("post__title", "user__email")
+#     readonly_fields = ("post", "user", "read_at")
 
 
-@admin.register(BlogSeriesVisit)
-class BlogSeriesVisitAdmin(ReadOnlyActivityAdmin):
-    list_display = ("series", "user", "visited_at")
-    list_filter = ("visited_at",)
-    search_fields = ("series__title", "user__email")
-    readonly_fields = ("series", "user", "visited_at")
+# @admin.register(BlogSeriesVisit)
+# class BlogSeriesVisitAdmin(ReadOnlyActivityAdmin):
+#     list_display = ("series", "user", "visited_at")
+#     list_filter = ("visited_at",)
+#     search_fields = ("series__title", "user__email")
+#     readonly_fields = ("series", "user", "visited_at")

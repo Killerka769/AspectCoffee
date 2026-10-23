@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from apps.blog.models import BlogPost
 from apps.catalog.facets import build_facets
-from apps.catalog.models import Product, Recipe
+from apps.catalog.models import Product
 
 
 class CatalogFilterRegressionTests(TestCase):
@@ -54,23 +54,8 @@ class CatalogFilterRegressionTests(TestCase):
 
         self.assertContains(response, "1 сорт из 2")
 
-    def test_published_recipe_appears_on_linked_product_page(self):
-        product = Product.objects.create(
-            name="Кофе с рецептом",
-            slug="coffee-with-recipe",
-            is_active=True,
-        )
-        recipe = Recipe.objects.create(
-            name="Рецепт покупателя",
-            slug="customer-recipe",
-            time_minutes=5,
-            is_published=True,
-        )
-        recipe.products.add(product)
-
-        response = self.client.get(product.get_absolute_url())
-
-        self.assertContains(response, recipe.name)
+    def test_retired_recipe_detail_is_not_exposed(self):
+        self.assertEqual(self.client.get("/recipes/retired-recipe/").status_code, 404)
 
     def test_search_suggestions_respect_selected_scope(self):
         Product.objects.create(

@@ -4,104 +4,342 @@
 {% get_providers as socialaccount_providers %}
 
 {% block title %}Вход{% endblock %}
-{% block body_extra_class %} grey-theme{% endblock %}
+{% block meta_description %}Вход в личный кабинет Aspect Coffee Roasters.{% endblock %}
+
 {% block head_extra %}
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.aspect-auth { background: #FFFFFF; padding: 60px 0 80px; min-height: 60vh; }
+.aspect-auth__container { width: min(488px, calc(100% - 32px)); margin: 0 auto; }
+.aspect-auth__card {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 24px;
+  padding: 40px 44px;
+}
+@media (max-width: 599px) {
+  .aspect-auth { padding: 32px 0 60px; }
+  .aspect-auth__card { padding: 28px 22px; border-radius: 18px; }
+}
+
+.aspect-auth__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(32px, 5vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 8px;
+}
+.aspect-auth__sub {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #5A5A5A;
+  margin: 0 0 32px;
+}
+
+.aspect-auth__form { display: flex; flex-direction: column; gap: 20px; }
+.aspect-auth__field { display: flex; flex-direction: column; gap: 6px; }
+.aspect-auth__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  padding-left: 4px;
+}
+.aspect-auth__input-wrap { position: relative; }
+.aspect-auth__input {
+  width: 100%;
+  background: #F4F6F4;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: "Open Sans", Arial, sans-serif;
+  color: #000;
+  outline: none;
+  transition: background .2s ease, border-color .2s ease;
+  box-sizing: border-box;
+}
+.aspect-auth__input:focus {
+  background: #FFFFFF;
+  border-color: #2A4A34;
+}
+.aspect-auth__input.is-error {
+  border-color: #B91C1C;
+  background: #FEF2F2;
+}
+.aspect-auth__input--pwd { padding-right: 48px; }
+.aspect-auth__pwd-toggle {
+  position: absolute;
+  right: 8px; top: 50%;
+  transform: translateY(-50%);
+  width: 36px; height: 36px;
+  border: 0; background: transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: #5A5A5A;
+  transition: background .15s ease, color .15s ease;
+}
+.aspect-auth__pwd-toggle:hover { background: #E8EEE8; color: #000; }
+.aspect-auth__pwd-toggle svg {
+  width: 20px; height: 20px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.8;
+}
+.aspect-auth__error {
+  font-size: 12px;
+  color: #B91C1C;
+  padding-left: 4px;
+  margin: 4px 0 0;
+}
+
+.aspect-auth__row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+}
+.aspect-auth__link {
+  font-size: 13px;
+  color: #5A5A5A;
+  text-decoration: none;
+  transition: color .2s ease;
+  border-bottom: 1px dotted transparent;
+}
+.aspect-auth__link:hover {
+  color: #2A4A34;
+  border-bottom-color: #2A4A34;
+}
+
+.aspect-auth__submit {
+  display: block;
+  width: 100%;
+  padding: 16px 24px;
+  border: 0;
+  border-radius: 14px;
+  background: #000000;
+  color: #FFFFFF;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+  margin-top: 8px;
+}
+.aspect-auth__submit:hover:not(:disabled) {
+  background: #2A4A34;
+  transform: translateY(-2px);
+}
+.aspect-auth__submit:disabled { opacity: .4; cursor: not-allowed; }
+
+.aspect-auth__socials {
+  padding-top: 24px;
+  border-top: 1px solid #F0F0F0;
+  margin-top: 8px;
+}
+.aspect-auth__socials-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  margin: 0 0 12px;
+}
+.aspect-auth__socials-row { display: flex; gap: 10px; }
+.aspect-auth__social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px; height: 52px;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  background: #FFFFFF;
+  text-decoration: none;
+  transition: border-color .2s ease, transform .2s ease;
+}
+.aspect-auth__social:hover {
+  border-color: #2A4A34;
+  transform: translateY(-2px);
+}
+.aspect-auth__social svg { width: 26px; height: 26px; }
+
+.aspect-auth__alt {
+  display: block;
+  width: 100%;
+  padding: 14px 24px;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  background: #FFFFFF;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+  margin-top: 8px;
+}
+.aspect-auth__alt:hover {
+  background: #2A4A34 !important;
+  border-color: #2A4A34 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+.aspect-auth__messages {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-bottom: 20px;
+}
+.aspect-auth__msg {
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.aspect-auth__msg--error {
+  background: #FEF2F2;
+  color: #B91C1C;
+  border: 1px solid #FCA5A5;
+}
+.aspect-auth__msg--success {
+  background: #E8EEE8;
+  color: #2A4A34;
+  border: 1px solid #8FB89A;
+}
+
+.aspect-auth__back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: color .2s ease;
+}
+.aspect-auth__back:hover { color: #2A4A34; }
+.aspect-auth__back svg {
+  width: 14px; height: 14px;
+  stroke: currentColor; fill: none;
+  stroke-width: 2;
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<div style="display:flex;justify-content:center;padding:40px 20px;">
-  <div style="width:100%;max-width:488px;">
-    <form method="post" action="{% url 'login' %}" class="bg-white rounded-3xl p-6 md:p-8">
-    {% csrf_token %}
-    <input type="hidden" name="next" value="{{ next_url }}">
+<main class="aspect-auth">
+  <div class="aspect-auth__container">
 
-    <div class="w-full mb-4">
-      <p class="text-[40px] font-din-black uppercase leading-[1.2] md:tracking-[0.01em] mb-0">Войти</p>
-    </div>
+    <div class="aspect-auth__card">
 
-    <div class="w-full space-y-8">
-      <div class="w-full space-y-4">
-        <div class="tc-input {% if field_errors.email %}error{% endif %} input-white xl:input-secondary">
-          <label class="tc-input__label" for="email-login">Электронная почта</label>
-          <div class="tc-input__field">
+      <a href="/" class="aspect-auth__back">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        На главную
+      </a>
+
+      <h1 class="aspect-auth__title">Войти</h1>
+      <p class="aspect-auth__sub">Войдите в личный кабинет, чтобы отслеживать заказы и получать персональные предложения.</p>
+
+      {% if messages %}
+      <div class="aspect-auth__messages">
+        {% for message in messages %}
+        <div class="aspect-auth__msg {% if message.tags == 'error' %}aspect-auth__msg--error{% else %}aspect-auth__msg--success{% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'login' %}" class="aspect-auth__form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next_url }}">
+
+        <div class="aspect-auth__field">
+          <label class="aspect-auth__label" for="email-login">Электронная почта</label>
+          <div class="aspect-auth__input-wrap">
             <input id="email-login" type="email" name="email" autocomplete="email"
                    value="{{ post_data.email|default:'' }}"
-                   class="tc-input__field--input"
+                   class="aspect-auth__input {% if field_errors.email %}is-error{% endif %}"
                    onblur="tcValidateLoginEmail(this)"
-                   oninput="this.closest('.tc-input').classList.remove('error')">
+                   oninput="this.classList.remove('is-error')">
           </div>
           {% if field_errors.email %}
-          <span class="error-message m-0 block mt-2 leading-[1.2] text-sm text-[var(--red)]" data-name="email">{{ field_errors.email }}</span>
+          <p class="aspect-auth__error">{{ field_errors.email }}</p>
           {% endif %}
         </div>
 
-        <div class="tc-input {% if field_errors.password %}error{% endif %} input-white xl:input-secondary" x-data="{ showPwd: false }">
-          <label class="tc-input__label" for="password-login">Пароль</label>
-          <div class="tc-input__field">
-            <input :type="showPwd ? 'text' : 'password'" name="password" id="password-login" autocomplete="current-password" placeholder="Пароль"
-                   class="pr-10 tc-input__field--input">
-            <button class="tc-input__field--btn-right" type="button" @click="showPwd = !showPwd">
-              <svg class="w-6 h-6" x-show="!showPwd"><use href="{% static 'images/sprite.svg' %}#icons--viewing-close"></use></svg>
-              <svg class="w-6 h-6" x-show="showPwd" x-cloak><use href="{% static 'images/sprite.svg' %}#icons--viewing-stroke"></use></svg>
+        <div class="aspect-auth__field" x-data="{ showPwd: false }">
+          <label class="aspect-auth__label" for="password-login">Пароль</label>
+          <div class="aspect-auth__input-wrap">
+            <input :type="showPwd ? 'text' : 'password'" name="password" id="password-login"
+                   autocomplete="current-password" placeholder="Пароль"
+                   class="aspect-auth__input aspect-auth__input--pwd {% if field_errors.password %}is-error{% endif %}">
+            <button type="button" class="aspect-auth__pwd-toggle" @click="showPwd = !showPwd" aria-label="Показать пароль">
+              <svg viewBox="0 0 24 24" x-show="!showPwd"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+              <svg viewBox="0 0 24 24" x-show="showPwd" x-cloak><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
           {% if field_errors.password %}
-          <span class="error-message m-0 block mt-2 leading-[1.2] text-sm text-[var(--red)]" data-name="password">{{ field_errors.password }}</span>
+          <p class="aspect-auth__error">{{ field_errors.password }}</p>
           {% endif %}
         </div>
-      </div>
 
-      <div class="flex justify-end">
-        <a href="{% url 'password_reset' %}" class="text-sm text-gray-700 hover:text-black hover:underline">Забыли пароль?</a>
-      </div>
+        <div class="aspect-auth__row">
+          <a href="{% url 'password_reset' %}" class="aspect-auth__link">Забыли пароль?</a>
+        </div>
 
-      <button type="submit" class="tc-btn btn-dark w-full">
-        <span class="text-primary duration-200">Войти</span>
-      </button>
+        <button type="submit" class="aspect-auth__submit">Войти</button>
 
-      <div class="w-full space-y-2">
-        <p class="text-[14px] leading-[1.3] medium">Войти через:</p>
-        <ul class="aspect-oauth-list list-none p-0 m-0">
-          <li>
-            <a href="{% url 'yandex_login' %}?next={{ next_url|urlencode }}" class="aspect-oauth-button" aria-label="Войти через Яндекс">
-              <svg viewBox="0 0 44 44" aria-hidden="true">
-                <circle cx="22" cy="22" r="11.667" fill="#FC3F1D"/>
-                <path d="M23.54 16.944h-1.078c-1.976 0-3.016 1.001-3.016 2.477 0 1.668.719 2.45 2.195 3.452l1.219.821-3.504 5.235h-2.618l3.144-4.683c-1.808-1.296-2.823-2.555-2.823-4.684 0-2.67 1.86-4.492 5.39-4.492h3.504v13.846H23.54V16.944Z" fill="#fff"/>
-              </svg>
-            </a>
-          </li>
-          <li>
-            <a href="{% url 'vk_login' %}?next={{ next_url|urlencode }}" class="aspect-oauth-button" aria-label="Войти через VK">
-              <svg viewBox="0 0 44 44" aria-hidden="true">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.687 11.687C10 13.374 10 16.09 10 21.52v.96c0 5.43 0 8.146 1.687 9.833C13.374 34 16.09 34 21.52 34h.96c5.43 0 8.146 0 9.833-1.687C34 30.626 34 27.91 34 22.48v-.96c0-5.43 0-8.146-1.687-9.833C30.626 10 27.91 10 22.48 10h-.96c-5.43 0-8.146 0-9.833 1.687ZM14.05 17.3c.13 6.24 3.25 9.99 8.72 9.99h.31v-3.57c2.01.2 3.53 1.67 4.14 3.57h2.84c-.78-2.84-2.83-4.41-4.11-5.01 1.28-.74 3.08-2.54 3.51-4.98h-2.58c-.56 1.98-2.22 3.78-3.8 3.95V17.3H20.5v6.92c-1.6-.4-3.62-2.34-3.71-6.92h-2.74Z" fill="#3277F6"/>
-              </svg>
-            </a>
-          </li>
-        </ul>
-      </div>
+        {% if socialaccount_providers %}
+        <div class="aspect-auth__socials">
+          <p class="aspect-auth__socials-label">Или войдите через</p>
+          <div class="aspect-auth__socials-row">
+            {% for provider in socialaccount_providers %}
+              {% if provider.id == "yandex" %}
+              <a href="{% url 'yandex_login' %}?next={{ next_url|urlencode }}" class="aspect-auth__social" aria-label="Войти через Яндекс">
+                <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="11.667" fill="#FC3F1D"/><path d="M23.54 16.944h-1.078c-1.976 0-3.016 1.001-3.016 2.477 0 1.668.719 2.45 2.195 3.452l1.219.821-3.504 5.235h-2.618l3.144-4.683c-1.808-1.296-2.823-2.555-2.823-4.684 0-2.67 1.86-4.492 5.39-4.492h3.504v13.846H23.54V16.944Z" fill="#fff"/></svg>
+              </a>
+              {% elif provider.id == "vk" %}
+              <a href="{% url 'vk_login' %}?next={{ next_url|urlencode }}" class="aspect-auth__social" aria-label="Войти через VK">
+                <svg viewBox="0 0 44 44" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.687 11.687C10 13.374 10 16.09 10 21.52v.96c0 5.43 0 8.146 1.687 9.833C13.374 34 16.09 34 21.52 34h.96c5.43 0 8.146 0 9.833-1.687C34 30.626 34 27.91 34 22.48v-.96c0-5.43 0-8.146-1.687-9.833C30.626 10 27.91 10 22.48 10h-.96c-5.43 0-8.146 0-9.833 1.687ZM14.05 17.3c.13 6.24 3.25 9.99 8.72 9.99h.31v-3.57c2.01.2 3.53 1.67 4.14 3.57h2.84c-.78-2.84-2.83-4.41-4.11-5.01 1.28-.74 3.08-2.54 3.51-4.98h-2.58c-.56 1.98-2.22 3.78-3.8 3.95V17.3H20.5v6.92c-1.6-.4-3.62-2.34-3.71-6.92h-2.74Z" fill="#3277F6"/></svg>
+              </a>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
 
-      <button type="button" class="tc-btn btn-white xl:btn-secondary w-full"
-              onclick="window.location.href='{% url 'register' %}'">
-        <span class="text-primary duration-200">Регистрация</span>
-      </button>
+        <a href="{% url 'register' %}" class="aspect-auth__alt">Регистрация</a>
+
+      </form>
     </div>
-    </form>
-  </div>
-</div>
-{% endblock %}
 
-{% block body_modal %}
+  </div>
+</main>
 
 <script>
 function tcValidateLoginEmail(el) {
   var v = el.value.trim();
-  var w = el.closest('.tc-input'); if (!w) return true;
-  if (!v) { w.classList.add('error'); return false; }
+  if (!v) { el.classList.add('is-error'); return false; }
   var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!re.test(v)) { w.classList.add('error'); return false; }
-  w.classList.remove('error'); return true;
+  if (!re.test(v)) { el.classList.add('is-error'); return false; }
+  el.classList.remove('is-error'); return true;
 }
 </script>
-
 {% endblock %}

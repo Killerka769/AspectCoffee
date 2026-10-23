@@ -58,62 +58,62 @@ class LegalDocument(models.Model):
         return reverse("pages:legal_document", kwargs={"slug": self.slug})
 
 
-class Banner(models.Model):
-    """Promo banner shown on the home page (above 'Сорта недели') and other slots.
-    Configurable in Django Admin so we don't hardcode links to the original site.
-    """
+# class Banner(models.Model):
+#     """Promo banner shown on the home page (above 'Сорта недели') and other slots.
+#     Configurable in Django Admin so we don't hardcode links to the original site.
+#     """
 
-    SLOT_CHOICES = [
-        ("home_weekly", _("Главная — над «Сорта недели»")),
-        ("home_top", _("Главная — Hero (вверху)")),
-        ("home_bottom", _("Главная — внизу")),
-        ("popular_block", _("Главная — блок «Популярное» (карточки в сетке)")),
-        ("new_block", _("Главная — блок «Новое» (карточки в сетке)")),
-    ]
+#     SLOT_CHOICES = [
+#         ("home_weekly", _("Главная — над «Сорта недели»")),
+#         ("home_top", _("Главная — Hero (вверху)")),
+#         ("home_bottom", _("Главная — внизу")),
+#         ("popular_block", _("Главная — блок «Популярное» (карточки в сетке)")),
+#         ("new_block", _("Главная — блок «Новое» (карточки в сетке)")),
+#     ]
 
-    slot = models.CharField(_("Слот"), max_length=32, choices=SLOT_CHOICES, default="home_weekly")
-    title = models.CharField(_("Заголовок"), max_length=200)
-    description = models.CharField(_("Описание"), max_length=500, blank=True)
-    image = models.ImageField(_("Изображение"), upload_to="banners/", blank=True, null=True)
-    link_url = models.CharField(_("URL"), max_length=500, blank=True)
-    button_label = models.CharField(_("Текст кнопки"), max_length=80, blank=True, default="Перейти")
-    is_active = models.BooleanField(_("Активен"), default=True)
-    order = models.PositiveIntegerField(_("Порядок"), default=0)
-    created_at = models.DateTimeField(_("Создан"), auto_now_add=True)
+#     slot = models.CharField(_("Слот"), max_length=32, choices=SLOT_CHOICES, default="home_weekly")
+#     title = models.CharField(_("Заголовок"), max_length=200)
+#     description = models.CharField(_("Описание"), max_length=500, blank=True)
+#     image = models.ImageField(_("Изображение"), upload_to="banners/", blank=True, null=True)
+#     link_url = models.CharField(_("URL"), max_length=500, blank=True)
+#     button_label = models.CharField(_("Текст кнопки"), max_length=80, blank=True, default="Перейти")
+#     is_active = models.BooleanField(_("Активен"), default=True)
+#     order = models.PositiveIntegerField(_("Порядок"), default=0)
+#     created_at = models.DateTimeField(_("Создан"), auto_now_add=True)
 
-    class Meta:
-        verbose_name = _("Баннер")
-        verbose_name_plural = _("Баннеры")
-        ordering = ["slot", "order", "-created_at"]
+#     class Meta:
+#         verbose_name = _("Баннер")
+#         verbose_name_plural = _("Баннеры")
+#         ordering = ["slot", "order", "-created_at"]
 
-    def __str__(self):
-        return f"{self.get_slot_display()}: {self.title}"
+#     def __str__(self):
+#         return f"{self.get_slot_display()}: {self.title}"
 
 
-class SiteLink(models.Model):
-    """Configurable links shown in footer / promo blocks.
-    Replaces hardcoded shop.aspectcoffee.ru references."""
+# class SiteLink(models.Model):
+#     """Configurable links shown in footer / promo blocks.
+#     Replaces hardcoded shop.aspectcoffee.ru references."""
 
-    GROUP_CHOICES = [
-        ("footer_company", _("Футер — Компания")),
-        ("footer_help", _("Футер — Помощь")),
-        ("footer_catalog", _("Футер — Каталог")),
-        ("promo", _("Промо-блоки")),
-    ]
-    group = models.CharField(_("Группа"), max_length=32, choices=GROUP_CHOICES)
-    label = models.CharField(_("Название"), max_length=120)
-    url = models.CharField(_("URL"), max_length=500)
-    open_new_tab = models.BooleanField(_("В новой вкладке"), default=False)
-    is_active = models.BooleanField(_("Активна"), default=True)
-    order = models.PositiveIntegerField(_("Порядок"), default=0)
+#     GROUP_CHOICES = [
+#         ("footer_company", _("Футер — Компания")),
+#         ("footer_help", _("Футер — Помощь")),
+#         ("footer_catalog", _("Футер — Каталог")),
+#         ("promo", _("Промо-блоки")),
+#     ]
+#     group = models.CharField(_("Группа"), max_length=32, choices=GROUP_CHOICES)
+#     label = models.CharField(_("Название"), max_length=120)
+#     url = models.CharField(_("URL"), max_length=500)
+#     open_new_tab = models.BooleanField(_("В новой вкладке"), default=False)
+#     is_active = models.BooleanField(_("Активна"), default=True)
+#     order = models.PositiveIntegerField(_("Порядок"), default=0)
 
-    class Meta:
-        verbose_name = _("Ссылка сайта")
-        verbose_name_plural = _("Ссылки сайта")
-        ordering = ["group", "order", "label"]
+#     class Meta:
+#         verbose_name = _("Ссылка сайта")
+#         verbose_name_plural = _("Ссылки сайта")
+#         ordering = ["group", "order", "label"]
 
-    def __str__(self):
-        return f"{self.get_group_display()}: {self.label}"
+#     def __str__(self):
+#         return f"{self.get_group_display()}: {self.label}"
 
 
 class CommunityPost(models.Model):
@@ -160,37 +160,37 @@ class CommunityPostLike(models.Model):
         return f"{self.user_id} -> post {self.post_id}"
 
 
-class CommunityPostDislike(models.Model):
-    post = models.ForeignKey(CommunityPost, on_delete=models.CASCADE, related_name="dislikes", verbose_name=_("Запись"))
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="community_post_dislikes", verbose_name=_("Пользователь"))
-    created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
+# class CommunityPostDislike(models.Model):
+#     post = models.ForeignKey(CommunityPost, on_delete=models.CASCADE, related_name="dislikes", verbose_name=_("Запись"))
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="community_post_dislikes", verbose_name=_("Пользователь"))
+#     created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
 
-    class Meta:
-        verbose_name = _("Отметка «не нравится»")
-        verbose_name_plural = _("Отметки «не нравится»")
-        unique_together = [("post", "user")]
-
-
-class CommunityPostBookmark(models.Model):
-    post = models.ForeignKey(CommunityPost, on_delete=models.CASCADE, related_name="bookmarks", verbose_name=_("Запись"))
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="community_post_bookmarks", verbose_name=_("Пользователь"))
-    created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
-
-    class Meta:
-        verbose_name = _("Закладка сообщества")
-        verbose_name_plural = _("Закладки сообщества")
-        unique_together = [("post", "user")]
+#     class Meta:
+#         verbose_name = _("Отметка «не нравится»")
+#         verbose_name_plural = _("Отметки «не нравится»")
+#         unique_together = [("post", "user")]
 
 
-class CommunityPostRepost(models.Model):
-    post = models.ForeignKey(CommunityPost, on_delete=models.CASCADE, related_name="reposts", verbose_name=_("Запись"))
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="community_post_reposts", verbose_name=_("Пользователь"))
-    created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
+# class CommunityPostBookmark(models.Model):
+#     post = models.ForeignKey(CommunityPost, on_delete=models.CASCADE, related_name="bookmarks", verbose_name=_("Запись"))
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="community_post_bookmarks", verbose_name=_("Пользователь"))
+#     created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
 
-    class Meta:
-        verbose_name = _("Репост сообщества")
-        verbose_name_plural = _("Репосты сообщества")
-        unique_together = [("post", "user")]
+#     class Meta:
+#         verbose_name = _("Закладка сообщества")
+#         verbose_name_plural = _("Закладки сообщества")
+#         unique_together = [("post", "user")]
+
+
+# class CommunityPostRepost(models.Model):
+#     post = models.ForeignKey(CommunityPost, on_delete=models.CASCADE, related_name="reposts", verbose_name=_("Запись"))
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="community_post_reposts", verbose_name=_("Пользователь"))
+#     created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
+
+#     class Meta:
+#         verbose_name = _("Репост сообщества")
+#         verbose_name_plural = _("Репосты сообщества")
+#         unique_together = [("post", "user")]
 
 
 class CommunityPostComment(models.Model):

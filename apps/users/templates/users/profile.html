@@ -4,374 +4,786 @@
 {% block title %}Мои данные{% endblock %}
 
 {% block account_content %}
-<div class="col-span-12 xl:col-span-7 2xl:col-span-6 space-y-12 md:space-y-8">
+<style>
+.asp-profile { display: flex; flex-direction: column; gap: 32px; }
 
-  {# === USER INFO CARD === #}
-  <div class="w-full space-y-4">
-    <div class="flex flex-row items-center gap-4 max-md:flex-col max-md:items-center max-md:text-center">
-      {# Avatar #}
-      <div class="relative shrink-0">
-        <div class="w-[120px] h-[120px] rounded-full overflow-hidden bg-[var(--black-5)]">
-          {% if user.avatar %}
-            <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}" class="w-full h-full object-cover">
-          {% else %}
-            <div class="w-full h-full flex items-center justify-center text-[48px] font-din-black text-[var(--black-50)]">
-              {{ user.get_full_name|default:user.email|first|upper }}
-            </div>
-          {% endif %}
-        </div>
-        <div class="md:absolute md:top-0 md:left-0 md:w-full md:h-full md:z-10 md:bg-[var(--opacity-50)] md:rounded-full md:opacity-0 hover:opacity-100 cursor-pointer md:duration-300 max-md:hidden">
-          <form method="post" enctype="multipart/form-data" class="flex flex-col items-center justify-center w-full h-full">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="avatar">
-            <label class="cursor-pointer flex flex-col items-center">
-              <svg class="h-8 w-8 md:text-[var(--white)]"><use href="#icons--photo"></use></svg>
-              <div class="text-[14px] leading-[1.2] md:!text-[var(--white)] md:!decoration-[transparent]">Заменить</div>
-              <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="this.form.submit()">
-            </label>
-          </form>
-        </div>
-      </div>
+/* Профиль */
+.asp-profile__user {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px;
+  background: #F4F6F4;
+  border-radius: 22px;
+  border: 1px solid #E5E8E5;
+}
+@media (max-width: 599px) {
+  .asp-profile__user { flex-direction: column; text-align: center; padding: 20px; }
+}
 
-      {# Name, phone, email #}
-      <div class="flex flex-col items-start gap-1 max-md:items-center flex-1 min-w-0">
-        <p class="m-0 text-[24px] font-din-black uppercase leading-[1.2] md:tracking-[0.02em]">
-          {{ user.get_full_name|default:user.email }}
-        </p>
-        {% if user.phone %}
-          <p class="m-0">{{ user.phone_display|default:user.phone }}</p>
+.asp-profile__avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 112px;
+  height: 112px;
+}
+.asp-profile__avatar {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #E8EEE8;
+  color: #2A4A34;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 40px;
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 8px 24px rgba(42,74,52,.15);
+}
+.asp-profile__avatar img { width: 100%; height: 100%; object-fit: cover; }
+.asp-profile__avatar-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0,0,0,.55);
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .2s ease;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.asp-profile__avatar-wrap:hover .asp-profile__avatar-overlay { opacity: 1; }
+.asp-profile__avatar-overlay svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+@media (max-width: 599px) {
+  .asp-profile__avatar-overlay { opacity: 1; background: rgba(0,0,0,.5); }
+}
+
+.asp-profile__user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+.asp-profile__name {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+  color: #000;
+  margin: 0;
+}
+.asp-profile__contact {
+  font-size: 14px;
+  color: #5A5A5A;
+  margin: 0;
+  word-break: break-word;
+}
+
+.asp-profile__edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  background: #FFFFFF;
+  color: #000;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+  align-self: flex-start;
+  margin-top: 12px;
+}
+.asp-profile__edit-btn:hover {
+  background: #2A4A34;
+  border-color: #2A4A34;
+  color: #FFFFFF;
+}
+.asp-profile__edit-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* Секция */
+.asp-profile__section { display: flex; flex-direction: column; gap: 16px; }
+.asp-profile__section-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+  color: #000;
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F0F0F0;
+  position: relative;
+}
+.asp-profile__section-title::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -1px;
+  width: 40px; height: 3px;
+  background: #2A4A34;
+}
+
+/* Адреса */
+.asp-addr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.asp-addr {
+  position: relative;
+  padding: 20px 22px;
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+.asp-addr:hover {
+  border-color: #2A4A34;
+  background: #F4F6F4;
+  transform: translateY(-2px);
+}
+.asp-addr__badge {
+  position: absolute;
+  top: 12px; right: 12px;
+  padding: 3px 10px;
+  background: #2A4A34;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border-radius: 999px;
+}
+.asp-addr__label {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  color: #000;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.asp-addr__label svg {
+  width: 18px; height: 18px;
+  stroke: #2A4A34; fill: none;
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+.asp-addr__text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #5A5A5A;
+  margin: 0;
+}
+.asp-addr__text + .asp-addr__text { margin-top: 4px; }
+
+.asp-addr--new {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  min-height: 130px;
+  padding: 20px 22px;
+  background: #F4F6F4;
+  border: 2px dashed #E5E8E5;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+  text-align: left;
+}
+.asp-addr--new:hover {
+  border-color: #2A4A34;
+  background: #E8EEE8;
+}
+.asp-addr--new svg {
+  width: 26px; height: 26px;
+  stroke: #2A4A34; fill: none;
+  stroke-width: 2;
+}
+.asp-addr--new span {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #000;
+}
+
+/* Карты */
+.asp-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.asp-card-add {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  min-height: 130px;
+  padding: 20px 22px;
+  background: #F4F6F4;
+  border: 2px dashed #E5E8E5;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+  text-align: left;
+}
+.asp-card-add:hover { border-color: #2A4A34; background: #E8EEE8; }
+.asp-card-add svg { width: 26px; height: 26px; stroke: #2A4A34; fill: none; stroke-width: 2; }
+.asp-card-add span {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #000;
+}
+.asp-profile__hint {
+  font-size: 12px;
+  color: #5A5A5A;
+  margin: 0;
+}
+
+/* Модалки */
+.asp-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 9999;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+.asp-modal.is-open { display: flex; }
+.asp-modal__box {
+  background: #FFFFFF;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 560px;
+  padding: 32px 36px;
+  margin: auto;
+  position: relative;
+}
+.asp-modal__box--sm { max-width: 480px; }
+@media (max-width: 599px) {
+  .asp-modal__box { padding: 24px 20px; border-radius: 18px; }
+}
+.asp-modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.asp-modal__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(22px, 3vw, 28px);
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+  color: #000;
+  margin: 0;
+}
+.asp-modal__close {
+  width: 36px; height: 36px;
+  border: 0;
+  background: #F4F6F4;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: #000;
+  flex-shrink: 0;
+  transition: background .15s ease;
+}
+.asp-modal__close:hover { background: #E8EEE8; }
+.asp-modal__close svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+.asp-modal__form { display: flex; flex-direction: column; gap: 18px; }
+
+.asp-field { display: flex; flex-direction: column; gap: 6px; }
+.asp-field__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  padding-left: 4px;
+}
+.asp-field__input {
+  width: 100%;
+  background: #F4F6F4;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: "Open Sans", Arial, sans-serif;
+  color: #000;
+  outline: none;
+  transition: background .2s ease, border-color .2s ease;
+  box-sizing: border-box;
+}
+.asp-field__input:focus { background: #FFFFFF; border-color: #2A4A34; }
+.asp-field__input:disabled { color: #5A5A5A; cursor: not-allowed; }
+
+.asp-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 599px) { .asp-grid-2 { grid-template-columns: 1fr; } }
+
+.asp-collapse {
+  border-top: 1px solid #F0F0F0;
+  padding-top: 16px;
+}
+.asp-collapse__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 8px 0;
+  user-select: none;
+}
+.asp-collapse__head:hover { opacity: .7; }
+.asp-collapse__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #000;
+  margin: 0;
+}
+.asp-collapse__arrow {
+  width: 18px; height: 18px;
+  stroke: #5A5A5A; fill: none;
+  stroke-width: 2;
+  transition: transform .2s ease;
+}
+.asp-collapse__arrow.is-open { transform: rotate(180deg); }
+.asp-collapse__body {
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.asp-pwd-toggle {
+  position: absolute;
+  right: 8px; top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 12px;
+  border: 0;
+  background: transparent;
+  color: #2A4A34;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.asp-pwd-toggle:hover { background: #E8EEE8; }
+.asp-input-with-btn { position: relative; }
+.asp-input-with-btn .asp-field__input { padding-right: 100px; }
+
+.asp-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.asp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border: 0;
+  border-radius: 14px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+.asp-btn--primary { background: #2A4A34; color: #FFFFFF; }
+.asp-btn--primary:hover { background: #1E3626; }
+.asp-btn--ghost {
+  background: #FFFFFF;
+  color: #000;
+  border: 1px solid #E5E8E5;
+}
+.asp-btn--ghost:hover { border-color: #2A4A34; color: #2A4A34; }
+.asp-btn--danger {
+  background: transparent;
+  color: #B91C1C;
+  border: 1px solid #FEE;
+}
+.asp-btn--danger:hover { background: #FEF2F2; }
+
+.asp-error {
+  padding: 10px 14px;
+  background: #FEF2F2;
+  color: #B91C1C;
+  border: 1px solid #FCA5A5;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Телефонная строка */
+.asp-phone-row { display: flex; gap: 8px; align-items: stretch; }
+.asp-phone-code { position: relative; flex-shrink: 0; }
+.asp-phone-code__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 90px;
+  padding: 14px 12px;
+  background: #F4F6F4;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.asp-phone-code__btn:hover { background: #E8EEE8; }
+.asp-phone-code__btn svg { width: 10px; height: 10px; stroke: currentColor; fill: none; }
+.asp-phone-code__drop {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 220px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.12);
+  padding: 6px 0;
+  z-index: 50;
+  display: none;
+}
+.asp-phone-code__drop.is-open { display: block; }
+.asp-phone-code__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+}
+.asp-phone-code__option:hover { background: #F4F6F4; }
+.asp-phone-code__option-code { font-family: monospace; color: #5A5A5A; width: 44px; }
+</style>
+
+<div class="asp-profile">
+
+  {# ═══ ПРОФИЛЬ ═══ #}
+  <div class="asp-profile__user">
+    <div class="asp-profile__avatar-wrap">
+      <div class="asp-profile__avatar">
+        {% if user.avatar %}
+          <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}">
+        {% else %}
+          {{ user.get_full_name|default:user.email|first|upper }}
         {% endif %}
-        <p class="m-0 break-all">{{ user.email }}</p>
       </div>
+      <form method="post" enctype="multipart/form-data" class="asp-profile__avatar-overlay">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="avatar">
+        <label style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Заменить
+          <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="this.form.submit()">
+        </label>
+      </form>
     </div>
 
-    <button type="button" class="tc-btn btn-white w-full" onclick="openEditModal()">
-      Редактировать данные
-    </button>
-  </div>
-
-  {# === ADDRESSES === #}
-  <div class="w-full space-y-4">
-    <h2 class="text-[24px] font-din-black uppercase leading-[1.2] m-0">Адреса</h2>
-    <div class="-mx-4 sm:mx-0">
-      {% if addresses %}
-        <div class="profile-addresses-layout px-4 sm:px-0">
-          <div class="profile-addresses-list scrollbar-touch-hide">
-          {% for address in addresses %}
-            <div class="profile-address-card text-left bg-[var(--white)] p-4 rounded-xl hover:bg-[var(--black-5)] active:bg-[var(--black-6)] duration-300 m-0 cursor-pointer relative" onclick="openAddressModal('{{ address.id }}', '{{ address.label|escapejs }}', '{{ address.city|escapejs }}', '{{ address.street|escapejs }}', '{{ address.house|escapejs }}', '{{ address.apartment|escapejs }}', '{{ address.postal_code|escapejs }}', {{ address.is_default|yesno:'true,false' }})">
-              {% if address.is_default %}
-                <span class="absolute top-2 right-2 text-[11px] font-bold uppercase tracking-wide bg-[var(--black)] text-[var(--white)] px-2 py-0.5 rounded-full">Основной</span>
-              {% endif %}
-              <span class="w-full flex items-center mb-1">
-                <svg class="h-[24px] w-[24px] min-w-[24px] -ml-1 mr-1 offset-mac-os"><use href="#icons--pin"></use></svg>
-                {% if address.label %}
-                  <span class="text-[18px] font-bold break-all">{{ address.label }}</span>
-                {% endif %}
-              </span>
-              <span class="w-full block text-left">{{ address.city }}{% if address.street %}, {{ address.street }}{% endif %}{% if address.house %}, д. {{ address.house }}{% endif %}{% if address.apartment %}, кв./офис {{ address.apartment }}{% endif %}</span>
-              {% if address.postal_code %}
-                <span class="w-full block text-left text-[14px] text-[var(--black-50)]">Индекс: {{ address.postal_code }}</span>
-              {% endif %}
-            </div>
-          {% endfor %}
-          </div>
-          <button type="button" onclick="openAddressModal()" class="profile-address-add text-left bg-[var(--white)] pt-2 px-4 pb-4 rounded-xl flex flex-col hover:bg-[var(--black-5)] active:bg-[var(--black-6)] duration-300 m-0 border-0 cursor-pointer">
-            <svg class="h-[32px] w-[32px] mb-auto -ml-1.5"><use href="#icons--plus"></use></svg>
-            <span class="text-[18px] font-bold flex">Новый адрес</span>
-          </button>
-        </div>
-      {% else %}
-        <form method="post" action="{% url 'users:addresses' %}" class="space-y-4 bg-[var(--white)] p-4 rounded-xl" autocomplete="off">
-          {% csrf_token %}
-          <input type="hidden" name="action" value="add">
-          <input type="hidden" name="next" value="{% url 'users:profile' %}">
-          <div class="tc-input">
-            <label class="tc-input__label">Название</label>
-            <div class="tc-input__field">
-              <input type="text" name="label" placeholder="Например, дом или работа" class="tc-input__field--input">
-            </div>
-          </div>
-          <div class="tc-input">
-            <label class="tc-input__label">Город</label>
-            <div class="tc-input__field">
-              <input type="text" name="city" placeholder="Укажите город" class="tc-input__field--input" required>
-            </div>
-          </div>
-          <div class="tc-input">
-            <label class="tc-input__label">Улица, дом</label>
-            <div class="tc-input__field">
-              <input type="text" name="street" placeholder="Введите адрес" class="tc-input__field--input" required>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="tc-input">
-              <label class="tc-input__label">Квартира или офис</label>
-              <div class="tc-input__field">
-                <input type="text" name="apartment" placeholder="Номер" class="tc-input__field--input">
-              </div>
-            </div>
-            <div class="tc-input">
-              <label class="tc-input__label">Индекс</label>
-              <div class="tc-input__field">
-                <input type="text" name="postal_code" placeholder="Индекс" class="tc-input__field--input">
-              </div>
-            </div>
-          </div>
-          <div class="w-full pt-2">
-            <button type="submit" class="tc-btn btn-dark w-full">Сохранить адрес</button>
-          </div>
-        </form>
+    <div class="asp-profile__user-info">
+      <h1 class="asp-profile__name">{{ user.get_full_name|default:user.email }}</h1>
+      {% if user.phone %}
+        <p class="asp-profile__contact">{{ user.phone_display|default:user.phone }}</p>
       {% endif %}
+      <p class="asp-profile__contact">{{ user.email }}</p>
+      <button type="button" class="asp-profile__edit-btn" onclick="openEditModal()">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+        Редактировать
+      </button>
     </div>
   </div>
 
-    {# === SAVED CARDS === #}
-  <div class="w-full space-y-4">
-    <h2 class="text-[24px] font-din-black uppercase leading-[1.2] m-0">Карты</h2>
-    <div class="-mx-4 sm:mx-0">
-      <div class="flex md:!grid md:grid-cols-12 md:gap-2 max-md:overflow-auto max-md:space-x-2 px-4 sm:px-0 scrollbar-touch-hide">
-        <button type="button" class="max-md:min-w-[325px] md:col-span-4 text-left bg-[var(--white)] pt-2 px-4 pb-4 rounded-xl flex flex-col hover:bg-[var(--black-5)] active:bg-[var(--black-6)] duration-300 m-0">
-          <svg class="h-[32px] w-[32px] mb-auto -ml-1.5"><use href="#icons--plus"></use></svg>
-          <span class="text-[18px] font-bold flex">Новая карта</span>
+  {# ═══ АДРЕСА ═══ #}
+  <div class="asp-profile__section">
+    <h2 class="asp-profile__section-title">Адреса</h2>
+
+    {% if addresses %}
+      <div class="asp-addr-grid">
+        {% for address in addresses %}
+          <div class="asp-addr" onclick="openAddressModal('{{ address.id }}', '{{ address.label|escapejs }}', '{{ address.city|escapejs }}', '{{ address.street|escapejs }}', '{{ address.house|escapejs }}', '{{ address.apartment|escapejs }}', '{{ address.postal_code|escapejs }}', {{ address.is_default|yesno:'true,false' }})">
+            {% if address.is_default %}<span class="asp-addr__badge">Основной</span>{% endif %}
+            {% if address.label %}
+              <p class="asp-addr__label">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ address.label }}
+              </p>
+            {% endif %}
+            <p class="asp-addr__text">{{ address.city }}{% if address.street %}, {{ address.street }}{% endif %}{% if address.house %}, д. {{ address.house }}{% endif %}{% if address.apartment %}, кв./офис {{ address.apartment }}{% endif %}</p>
+            {% if address.postal_code %}<p class="asp-addr__text">Индекс: {{ address.postal_code }}</p>{% endif %}
+          </div>
+        {% endfor %}
+
+        <button type="button" class="asp-addr--new" onclick="openAddressModal()">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Новый адрес</span>
         </button>
       </div>
+    {% else %}
+      <form method="post" action="{% url 'users:addresses' %}" class="asp-modal__form" autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        <input type="hidden" name="next" value="{% url 'users:profile' %}">
+        <div class="asp-field">
+          <label class="asp-field__label">Название</label>
+          <input type="text" name="label" placeholder="Например, дом или работа" class="asp-field__input">
+        </div>
+        <div class="asp-field">
+          <label class="asp-field__label">Город</label>
+          <input type="text" name="city" placeholder="Укажите город" class="asp-field__input" required>
+        </div>
+        <div class="asp-field">
+          <label class="asp-field__label">Улица, дом</label>
+          <input type="text" name="street" placeholder="Введите адрес" class="asp-field__input" required>
+        </div>
+        <div class="asp-grid-2">
+          <div class="asp-field">
+            <label class="asp-field__label">Квартира / офис</label>
+            <input type="text" name="apartment" placeholder="Номер" class="asp-field__input">
+          </div>
+          <div class="asp-field">
+            <label class="asp-field__label">Индекс</label>
+            <input type="text" name="postal_code" placeholder="Индекс" class="asp-field__input">
+          </div>
+        </div>
+        <button type="submit" class="asp-btn asp-btn--primary" style="width:100%;">Сохранить адрес</button>
+      </form>
+    {% endif %}
+  </div>
+
+  {# ═══ КАРТЫ ═══ #}
+  <div class="asp-profile__section">
+    <h2 class="asp-profile__section-title">Карты</h2>
+    <div class="asp-cards-grid">
+      <button type="button" class="asp-card-add">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Новая карта</span>
+      </button>
     </div>
-    <p class="text-[14px] leading-[1.2] text-[var(--black-30)] m-0">Для проверки карты спишется 1 <span class="rub">₽</span> и сразу вернётся</p>
+    <p class="asp-profile__hint">Для проверки карты спишется 1&nbsp;₽ и сразу вернётся.</p>
   </div>
 
 </div>
 {% endblock %}
 
 {% block account_modal %}
-<style>
-#edit-modal { display: none !important; position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(0,0,0,0.75) !important; z-index: 99999 !important; align-items: flex-start !important; justify-content: center !important; overflow-y: auto !important; padding: 2rem 1rem !important; }
-#edit-modal.show { display: flex !important; }
-#address-modal { display: none !important; position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(0,0,0,0.75) !important; z-index: 99999 !important; align-items: center !important; justify-content: center !important; padding: 1rem !important; }
-#address-modal.show { display: flex !important; }
-
-@media (max-width: 757px) {
-  .profile-addresses-layout { display: flex; align-items: stretch; gap: 8px; overflow: hidden; }
-  .profile-addresses-list { display: flex; flex: 1 1 auto; min-width: 0; gap: 8px; overflow-x: auto; overscroll-behavior-x: contain; }
-  .profile-address-card { flex: 0 0 100%; max-width: 100%; min-width: 0; }
-  .profile-address-add { flex: 0 0 max(30vw, 108px); min-width: max(30vw, 108px); align-self: stretch; }
-  .profile-address-add span { overflow-wrap: anywhere; }
-}
-@media (min-width: 758px) {
-  .profile-addresses-layout { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 8px; }
-  .profile-addresses-list { display: contents; }
-  .profile-address-card,
-  .profile-address-add { grid-column: span 6; }
-}
-
-.profile-section__header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 16px 0; user-select: none; }
-.profile-section__header:hover { opacity: 0.7; }
-.profile-section__arrow { transition: transform 0.3s ease; }
-.profile-section__arrow.open { transform: rotate(180deg); }
-
-.phone-code-wrapper { position: relative; min-width: 100px; flex-shrink: 0; }
-.phone-code-field { display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: var(--black-4); border: 1px solid var(--black-4); border-radius: 12px; height: 44px; padding: 0 12px; transition: background-color var(--ts), border-color var(--ts); }
-.phone-code-field:hover { background: var(--black-5); border-color: var(--black-5); }
-.phone-code-dropdown { display: none; position: absolute; left: 0; top: 100%; margin-top: 4px; background: white; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.05); width: 220px; max-height: 240px; overflow-y: auto; z-index: 50; padding: 4px 0; }
-.phone-code-item { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 8px 12px; font-size: 14px; border: none; background: none; cursor: pointer; transition: background 0.15s; }
-.phone-code-item:hover { background: rgba(0,0,0,0.03); }
-.phone-code-item.active { background: rgba(0,0,0,0.06); font-weight: 700; }
-.phone-code-item .code { font-family: monospace; color: rgba(0,0,0,0.5); width: 40px; }
-</style>
 
 {# ═══ EDIT MODAL ═══ #}
-<div id="edit-modal">
-  <div class="bg-white rounded-2xl w-full max-w-2xl mx-auto my-auto  p-6 md:p-8 relative" onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between mb-6">
-      <p class="text-[32px] md:text-[40px] font-din-black uppercase leading-[1.2] md:tracking-[0.01em] m-0">Редактировать данные</p>
-      <button type="button" onclick="closeEditModal()" class="text-[var(--black-50)] hover:text-[var(--black)] shrink-0 ml-4">
-        <svg class="h-6 w-6"><use href="#icons--x-light"></use></svg>
+<div class="asp-modal" id="edit-modal">
+  <div class="asp-modal__box" onclick="event.stopPropagation()">
+    <div class="asp-modal__head">
+      <h3 class="asp-modal__title">Редактировать данные</h3>
+      <button type="button" class="asp-modal__close" onclick="closeEditModal()" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
     </div>
-    <form method="post" action="{% url 'users:profile' %}" class="space-y-4" id="edit-profile-form" autocomplete="off">
+
+    <form method="post" action="{% url 'users:profile' %}" class="asp-modal__form" id="edit-profile-form" autocomplete="off">
       {% csrf_token %}
 
-      {# ── Имя и фамилия ── #}
-      <div class="tc-input" id="profile-phone-group" data-tc-phone-group>
-        <label class="tc-input__label">Имя и фамилия</label>
-        <div class="tc-input__field">
-          <input type="text" name="full_name" value="{{ user.first_name }} {{ user.last_name }}" placeholder="Имя и фамилия" class="tc-input__field--input">
-        </div>
+      <div class="asp-field" id="profile-phone-group" data-tc-phone-group>
+        <label class="asp-field__label">Имя и фамилия</label>
+        <input type="text" name="full_name" value="{{ user.first_name }} {{ user.last_name }}" placeholder="Имя и фамилия" class="asp-field__input">
       </div>
 
-      {# ── Телефон с выбором кода страны ── #}
-      <div class="tc-input">
-        <label class="tc-input__label">Телефон</label>
-        <div class="flex gap-2">
-          <div class="phone-code-wrapper" id="phone-code-wrapper">
-            <div class="phone-code-field" onclick="toggleProfilePhoneCode()">
-              <span id="profile-phone-code-text" class="text-[16px] font-medium" data-tc-phone-code-label>+7</span>
-              <svg class="h-4 w-4 opacity-40"><use href="#icons--arr-bottom"></use></svg>
-            </div>
-            <div class="phone-code-dropdown" id="profile-phone-code-dropdown"></div>
+      <div class="asp-field">
+        <label class="asp-field__label">Телефон</label>
+        <div class="asp-phone-row">
+          <div class="asp-phone-code" id="phone-code-wrapper">
+            <button type="button" class="asp-phone-code__btn" onclick="toggleProfilePhoneCode()">
+              <span id="profile-phone-code-text" data-tc-phone-code-label>+7</span>
+              <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
+            </button>
+            <div class="asp-phone-code__drop" id="profile-phone-code-dropdown"></div>
           </div>
           <input type="hidden" name="phone_code" id="profile-phone-code-hidden" value="+7" data-tc-phone-code>
-          <div class="tc-input flex-1">
-            <div class="tc-input__field">
-              <input type="tel" name="phone" id="profile-phone-input" value="{{ user.phone }}" placeholder="(900) 000-00-00" class="tc-input__field--input" data-tc-phone-input data-phone-code="+7" data-phone-length="10">
+          <input type="tel" name="phone" id="profile-phone-input" value="{{ user.phone }}" placeholder="(900) 000-00-00" class="asp-field__input" style="flex:1;" data-tc-phone-input data-phone-code="+7" data-phone-length="10">
+        </div>
+      </div>
+
+      <div class="asp-collapse">
+        <div class="asp-collapse__head" onclick="toggleProfileSection('account')">
+          <p class="asp-collapse__title">Аккаунт</p>
+          <svg class="asp-collapse__arrow is-open" id="profile-account-arrow" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="asp-collapse__body" id="profile-account-section">
+          <div class="asp-field">
+            <label class="asp-field__label">Электронная почта</label>
+            <input type="email" value="{{ user.email }}" class="asp-field__input" disabled>
+          </div>
+          <div class="asp-field">
+            <label class="asp-field__label">Пароль</label>
+            <div class="asp-input-with-btn">
+              <input type="password" value="********" class="asp-field__input" disabled>
+              <button type="button" class="asp-pwd-toggle" onclick="togglePasswordForm()">Изменить</button>
+            </div>
+          </div>
+          <div id="password-change-form" style="display:none;flex-direction:column;gap:12px;">
+            <input type="password" name="current_password" placeholder="Текущий пароль" class="asp-field__input">
+            <input type="password" name="new_password" placeholder="Новый пароль (мин. 8 символов)" class="asp-field__input">
+            <input type="password" name="new_password2" placeholder="Подтвердите новый пароль" class="asp-field__input">
+            <div id="pwd-errors"></div>
+            <div style="display:flex;gap:8px;">
+              <button type="button" onclick="submitPasswordChange()" class="asp-btn asp-btn--primary" style="flex:1;">Сохранить пароль</button>
+              <button type="button" onclick="togglePasswordForm()" class="asp-btn asp-btn--ghost">Отмена</button>
             </div>
           </div>
         </div>
       </div>
 
-      {# ── АККАУНТ (collapsible, default open) ── #}
-      <div class="border-t border-[var(--black-4)]">
-        <div class="profile-section__header" onclick="toggleProfileSection('account')">
-          <p class="text-[24px] font-din-black uppercase leading-[1.2] m-0">Аккаунт</p>
-          <svg class="h-5 w-5 profile-section__arrow open" id="profile-account-arrow"><use href="#icons--arr-bottom"></use></svg>
+      <div class="asp-collapse">
+        <div class="asp-collapse__head" onclick="toggleProfileSection('org')">
+          <p class="asp-collapse__title">Организация</p>
+          <svg class="asp-collapse__arrow{% if user.company_name or user.company_inn or user.company_address or user.company_kpp %} is-open{% endif %}" id="profile-org-arrow" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
         </div>
-        <div id="profile-account-section" class="space-y-4 pb-4">
-          <div class="tc-input">
-            <label class="tc-input__label">Электронная почта</label>
-            <div class="tc-input__field">
-              <input type="email" value="{{ user.email }}" class="tc-input__field--input" disabled>
-            </div>
+        <div class="asp-collapse__body" id="profile-org-section" style="display:{% if user.company_name or user.company_inn or user.company_address or user.company_kpp %}flex{% else %}none{% endif %};">
+          <div class="asp-field">
+            <label class="asp-field__label">Полное наименование организации</label>
+            <input type="text" name="company_name" value="{{ user.company_name }}" placeholder="Полное наименование" class="asp-field__input">
           </div>
-          <div class="tc-input">
-            <label class="tc-input__label">Пароль</label>
-            <div class="tc-input__field">
-              <input type="password" value="********" class="tc-input__field--input" disabled>
-              <button type="button" onclick="togglePasswordForm()" class="tc-input__field--btn-right tc-btn btn-xs" style="text-decoration:none;cursor:pointer;">Изменить</button>
-            </div>
+          <div class="asp-field">
+            <label class="asp-field__label">Юридический адрес</label>
+            <input type="text" name="company_address" value="{{ user.company_address }}" placeholder="Город, улица, дом, квартира" class="asp-field__input">
           </div>
-          <div id="password-change-form" style="display:none;" class="space-y-3 p-4 rounded-xl">
-            <div class="tc-input"><div class="tc-input__field"><input type="password" name="current_password" placeholder="Текущий пароль" class="tc-input__field--input"></div></div>
-            <div class="tc-input"><div class="tc-input__field"><input type="password" name="new_password" placeholder="Новый пароль (мин. 8 символов)" class="tc-input__field--input"></div></div>
-            <div class="tc-input"><div class="tc-input__field"><input type="password" name="new_password2" placeholder="Подтвердите новый пароль" class="tc-input__field--input"></div></div>
-            <div id="pwd-errors" class="space-y-1"></div>
-            <div class="flex gap-2">
-              <button type="button" onclick="submitPasswordChange()" class="tc-btn btn-dark btn-xs flex-1">Сохранить пароль</button>
-              <button type="button" onclick="togglePasswordForm()" class="tc-btn btn-secondary btn-xs">Отмена</button>
+          <div class="asp-grid-2">
+            <div class="asp-field">
+              <label class="asp-field__label">ИНН</label>
+              <input type="text" name="company_inn" value="{{ user.company_inn }}" placeholder="ИНН" class="asp-field__input" maxlength="12">
+            </div>
+            <div class="asp-field">
+              <label class="asp-field__label">КПП</label>
+              <input type="text" name="company_kpp" value="{{ user.company_kpp }}" placeholder="КПП" class="asp-field__input" maxlength="9">
             </div>
           </div>
         </div>
       </div>
 
-      {# ── ОРГАНИЗАЦИЯ (collapsible, default closed) ── #}
-      <div class="border-t border-[var(--black-4)]">
-        <div class="profile-section__header" onclick="toggleProfileSection('org')">
-          <p class="text-[24px] font-din-black uppercase leading-[1.2] m-0">Организация</p>
-          <svg class="h-5 w-5 profile-section__arrow{% if user.company_name or user.company_inn or user.company_address or user.company_kpp %} open{% endif %}" id="profile-org-arrow"><use href="#icons--arr-bottom"></use></svg>
-        </div>
-        <div id="profile-org-section" style="display:{% if user.company_name or user.company_inn or user.company_address or user.company_kpp %}block{% else %}none{% endif %};" class="space-y-4 pb-4">
-          <div class="tc-input">
-            <label class="tc-input__label">Полное наименование организации</label>
-            <div class="tc-input__field">
-              <input type="text" name="company_name" value="{{ user.company_name }}" placeholder="Полное наименование организации" class="tc-input__field--input">
-            </div>
-          </div>
-          <div class="tc-input">
-            <label class="tc-input__label">Юридический адрес</label>
-            <div class="tc-input__field">
-              <input type="text" name="company_address" value="{{ user.company_address }}" placeholder="Город, улица, дом, квартира" class="tc-input__field--input">
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="tc-input">
-              <label class="tc-input__label">ИНН</label>
-              <div class="tc-input__field">
-                <input type="text" name="company_inn" value="{{ user.company_inn }}" placeholder="ИНН" class="tc-input__field--input" maxlength="12">
-              </div>
-            </div>
-            <div class="tc-input">
-              <label class="tc-input__label">КПП</label>
-              <div class="tc-input__field">
-                <input type="text" name="company_kpp" value="{{ user.company_kpp }}" placeholder="КПП" class="tc-input__field--input" maxlength="9">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {# ── Кнопки ── #}
-      <div class="space-y-2 pt-2 border-t border-[var(--black-4)]">
-        <button type="submit" class="tc-btn btn-dark w-full">Сохранить</button>
-        <button type="button" class="tc-btn btn-secondary w-full" onclick="closeEditModal()">Отменить</button>
+      <div class="asp-actions">
+        <button type="submit" class="asp-btn asp-btn--primary">Сохранить</button>
+        <button type="button" class="asp-btn asp-btn--ghost" onclick="closeEditModal()">Отменить</button>
       </div>
     </form>
   </div>
 </div>
 
 {# ═══ ADDRESS MODAL ═══ #}
-<div id="address-modal">
-  <div class="bg-white rounded-2xl w-full max-w-md mx-auto my-auto p-6 md:p-8 relative" onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between mb-6">
-      <p id="addr-modal-title" class="text-[32px] md:text-[40px] font-din-black uppercase leading-[1.2] md:tracking-[0.01em] m-0">Новый адрес</p>
-      <button type="button" onclick="closeAddressModal()" class="text-[var(--black-50)] hover:text-[var(--black)] shrink-0 ml-4">
-        <svg class="h-6 w-6"><use href="#icons--x-light"></use></svg>
+<div class="asp-modal" id="address-modal">
+  <div class="asp-modal__box asp-modal__box--sm" onclick="event.stopPropagation()">
+    <div class="asp-modal__head">
+      <h3 class="asp-modal__title" id="addr-modal-title">Новый адрес</h3>
+      <button type="button" class="asp-modal__close" onclick="closeAddressModal()" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
     </div>
-    <form id="address-form" method="post" action="{% url 'users:addresses' %}" class="space-y-4" autocomplete="off">
+
+    <form id="address-form" method="post" action="{% url 'users:addresses' %}" class="asp-modal__form" autocomplete="off">
       {% csrf_token %}
       <input type="hidden" name="action" id="addr-action" value="add">
       <input type="hidden" name="id" id="addr-id" value="">
       <input type="hidden" name="next" value="{% url 'users:profile' %}">
-      <div class="tc-input">
-        <label class="tc-input__label">Название</label>
-        <div class="tc-input__field">
-          <input type="text" name="label" id="addr-label" placeholder="Например, дом или работа" class="tc-input__field--input">
+
+      <div class="asp-field">
+        <label class="asp-field__label">Название</label>
+        <input type="text" name="label" id="addr-label" placeholder="Например, дом или работа" class="asp-field__input">
+      </div>
+      <div class="asp-field">
+        <label class="asp-field__label">Город</label>
+        <input type="text" name="city" id="addr-city" placeholder="Укажите город" class="asp-field__input" required>
+      </div>
+      <div class="asp-field">
+        <label class="asp-field__label">Улица</label>
+        <input type="text" name="street" id="addr-street" placeholder="Улица" class="asp-field__input" required>
+      </div>
+      <div class="asp-grid-2">
+        <div class="asp-field">
+          <label class="asp-field__label">Дом</label>
+          <input type="text" name="house" id="addr-house" placeholder="Номер" class="asp-field__input">
+        </div>
+        <div class="asp-field">
+          <label class="asp-field__label">Квартира / офис</label>
+          <input type="text" name="apartment" id="addr-apartment" placeholder="Номер" class="asp-field__input">
         </div>
       </div>
-      <div class="tc-input">
-        <label class="tc-input__label">Город</label>
-        <div class="tc-input__field">
-          <input type="text" name="city" id="addr-city" placeholder="Укажите город" class="tc-input__field--input" required>
-        </div>
+      <div class="asp-field">
+        <label class="asp-field__label">Индекс</label>
+        <input type="text" name="postal_code" id="addr-postal_code" placeholder="Индекс" class="asp-field__input">
       </div>
-      <div class="tc-input">
-        <label class="tc-input__label">Улица</label>
-        <div class="tc-input__field">
-          <input type="text" name="street" id="addr-street" placeholder="Улица" class="tc-input__field--input" required>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div class="tc-input">
-          <label class="tc-input__label">Дом</label>
-          <div class="tc-input__field">
-            <input type="text" name="house" id="addr-house" placeholder="Номер" class="tc-input__field--input">
-          </div>
-        </div>
-        <div class="tc-input">
-          <label class="tc-input__label">Квартира или офис</label>
-          <div class="tc-input__field">
-            <input type="text" name="apartment" id="addr-apartment" placeholder="Номер" class="tc-input__field--input">
-          </div>
-        </div>
-      </div>
-      <div class="grid grid-cols-1 gap-4">
-        <div class="tc-input">
-          <label class="tc-input__label">Индекс</label>
-          <div class="tc-input__field">
-            <input type="text" name="postal_code" id="addr-postal_code" placeholder="Индекс" class="tc-input__field--input">
-          </div>
-        </div>
-      </div>
-      <label class="tc-checkbox cursor-pointer">
-        <input type="checkbox" name="is_default" id="addr-is_default" class="tc-checkbox__input cursor-pointer">
-        <span class="tc-checkbox__text">Сделать основным</span>
+
+      <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;">
+        <input type="checkbox" name="is_default" id="addr-is_default" style="width:20px;height:20px;accent-color:#2A4A34;">
+        <span>Сделать основным</span>
       </label>
-      <div class="w-full space-y-2 pt-2">
-        <button type="submit" class="tc-btn btn-dark w-full">Сохранить</button>
-        <button type="button" class="tc-btn btn-secondary w-full" onclick="closeAddressModal()">Отменить</button>
+
+      <div class="asp-actions">
+        <button type="submit" class="asp-btn asp-btn--primary">Сохранить</button>
+        <button type="button" class="asp-btn asp-btn--ghost" onclick="closeAddressModal()">Отменить</button>
       </div>
-      <button type="button" id="addr-delete-btn" class="tc-btn btn-danger w-full" onclick="deleteAddress()" style="display:none;">
-        <svg class="h-5 w-5"><use href="#icons--delete"></use></svg>
-        <span>Удалить</span>
+      <button type="button" id="addr-delete-btn" class="asp-btn asp-btn--danger" onclick="deleteAddress()" style="display:none;">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        Удалить
       </button>
     </form>
   </div>
 </div>
 
 <script>
-/* ── Phone country codes — from shared TCPhone utility ── */
-var _ppCodes = null;
-var _ppCode = '+7';
+/* Phone codes */
+var _ppCodes = null, _ppCode = '+7', _ppLen = 10;
 function _ppEnsureCodes() { if (!_ppCodes && typeof TCPhone !== "undefined") _ppCodes = TCPhone.codes; }
-var _ppLen = 10;
 
 function _ppInitDropdown() {
   var dd = document.getElementById('profile-phone-code-dropdown');
@@ -382,9 +794,8 @@ function _ppInitDropdown() {
   _ppCodes.forEach(function(c) {
     var btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'phone-code-item' + (_ppCode === c.code ? ' active' : '');
-    btn.innerHTML = '<span class="code">' + c.code + '</span><span>' + c.country + '</span>';
-    btn.setAttribute('data-code', c.code);
+    btn.className = 'asp-phone-code__option';
+    btn.innerHTML = '<span class="asp-phone-code__option-code">' + c.code + '</span><span>' + c.country + '</span>';
     btn.onclick = function() { _ppSelectCode(c.code); };
     dd.appendChild(btn);
   });
@@ -393,9 +804,8 @@ function _ppInitDropdown() {
 function toggleProfilePhoneCode() {
   var dd = document.getElementById('profile-phone-code-dropdown');
   if (!dd) return;
-  var show = dd.style.display === 'none' || dd.style.display === '';
-  dd.style.display = show ? 'block' : 'none';
-  if (show) _ppInitDropdown();
+  dd.classList.toggle('is-open');
+  if (dd.classList.contains('is-open')) _ppInitDropdown();
 }
 
 function _ppSelectCode(code) {
@@ -405,45 +815,39 @@ function _ppSelectCode(code) {
   _ppLen = c ? c.length : 10;
   document.getElementById('profile-phone-code-text').textContent = code;
   document.getElementById('profile-phone-code-hidden').value = code;
-  var inp = document.getElementById('profile-phone-input');
-  if (inp) {
+  if (typeof TCPhone !== 'undefined') {
     TCPhone.applyCountry(document.getElementById('profile-phone-group'), code, {focus: true});
   }
-  document.getElementById('profile-phone-code-dropdown').style.display = 'none';
+  document.getElementById('profile-phone-code-dropdown').classList.remove('is-open');
 }
 
 function tcProfilePhoneMask(e) {
   if (typeof TCPhone !== 'undefined') TCPhone.mask(e, _ppCode);
 }
 
-/* Close phone dropdown on outside click */
 document.addEventListener('click', function(e) {
   var wrapper = document.getElementById('phone-code-wrapper');
   var dd = document.getElementById('profile-phone-code-dropdown');
-  if (wrapper && dd && !wrapper.contains(e.target)) {
-    dd.style.display = 'none';
-  }
+  if (wrapper && dd && !wrapper.contains(e.target)) dd.classList.remove('is-open');
 });
 
-/* ── Collapsible sections ── */
 function toggleProfileSection(name) {
   var sec = document.getElementById('profile-' + name + '-section');
   var arrow = document.getElementById('profile-' + name + '-arrow');
   if (!sec || !arrow) return;
   if (sec.style.display === 'none') {
-    sec.style.display = '';
-    arrow.classList.add('open');
+    sec.style.display = 'flex';
+    arrow.classList.add('is-open');
   } else {
     sec.style.display = 'none';
-    arrow.classList.remove('open');
+    arrow.classList.remove('is-open');
   }
 }
 
-/* ── Password toggle ── */
 function togglePasswordForm() {
   var f = document.getElementById('password-change-form');
   if (!f) return;
-  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  f.style.display = f.style.display === 'none' ? 'flex' : 'none';
   document.getElementById('pwd-errors').innerHTML = '';
 }
 
@@ -454,9 +858,9 @@ function submitPasswordChange() {
   var np2 = form.querySelector('[name=new_password2]').value;
   var errBox = document.getElementById('pwd-errors');
   errBox.innerHTML = '';
-  if (!cur) { errBox.innerHTML = '<div class="p-2 rounded-lg text-[13px]" style="background:#fee2e2;color:#991b1b;">Введите текущий пароль</div>'; return; }
-  if (np.length < 8) { errBox.innerHTML = '<div class="p-2 rounded-lg text-[13px]" style="background:#fee2e2;color:#991b1b;">Пароль должен быть не менее 8 символов</div>'; return; }
-  if (np !== np2) { errBox.innerHTML = '<div class="p-2 rounded-lg text-[13px]" style="background:#fee2e2;color:#991b1b;">Пароли не совпадают</div>'; return; }
+  if (!cur) { errBox.innerHTML = '<div class="asp-error">Введите текущий пароль</div>'; return; }
+  if (np.length < 8) { errBox.innerHTML = '<div class="asp-error">Пароль должен быть не менее 8 символов</div>'; return; }
+  if (np !== np2) { errBox.innerHTML = '<div class="asp-error">Пароли не совпадают</div>'; return; }
 
   var fd = new FormData();
   fd.append('current_password', cur);
@@ -473,23 +877,21 @@ function submitPasswordChange() {
       togglePasswordForm();
       form.querySelectorAll('input').forEach(function(i) { i.value = ''; });
     } else {
-      errBox.innerHTML = '<div class="p-2 rounded-lg text-[13px]" style="background:#fee2e2;color:#991b1b;">' + (res.data.error || 'Ошибка смены пароля') + '</div>';
+      errBox.innerHTML = '<div class="asp-error">' + (res.data.error || 'Ошибка смены пароля') + '</div>';
     }
   }).catch(function() {
-    errBox.innerHTML = '<div class="p-2 rounded-lg text-[13px]" style="background:#fee2e2;color:#991b1b;">Ошибка. Проверьте текущий пароль.</div>';
+    errBox.innerHTML = '<div class="asp-error">Ошибка. Проверьте текущий пароль.</div>';
   });
 }
 
-/* ── Edit modal open/close ── */
 function openEditModal() {
   var modal = document.getElementById('edit-modal');
   if (!modal) return;
-  modal.classList.add('show');
+  modal.classList.add('is-open');
   document.body.style.overflow = 'hidden';
   _ppEnsureCodes();
-  /* Parse existing phone and set country code */
   var phoneInput = document.getElementById('profile-phone-input');
-  if (phoneInput) {
+  if (phoneInput && typeof TCPhone !== 'undefined') {
     var detected = TCPhone.detectCode(phoneInput.value);
     var hiddenCode = document.getElementById('profile-phone-code-hidden').value || '+7';
     _ppSelectCode(detected ? detected.code : hiddenCode);
@@ -501,15 +903,14 @@ function openEditModal() {
 function closeEditModal() {
   var modal = document.getElementById('edit-modal');
   if (!modal) return;
-  modal.classList.remove('show');
+  modal.classList.remove('is-open');
   document.body.style.overflow = '';
   var pf = document.getElementById('password-change-form');
   if (pf) pf.style.display = 'none';
   var dd = document.getElementById('profile-phone-code-dropdown');
-  if (dd) dd.style.display = 'none';
+  if (dd) dd.classList.remove('is-open');
 }
 
-/* Combine phone code + phone on form submit */
 document.addEventListener('DOMContentLoaded', function() {
   var form = document.getElementById('edit-profile-form');
   if (form) {
@@ -524,7 +925,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-/* ── Address modal ── */
 function openAddressModal(id, label, city, street, house, apartment, postalCode, isDefault) {
   var modal = document.getElementById('address-modal');
   if (!modal) return;
@@ -550,14 +950,14 @@ function openAddressModal(id, label, city, street, house, apartment, postalCode,
     idInput.value = '';
     deleteBtn.style.display = 'none';
   }
-  modal.classList.add('show');
+  modal.classList.add('is-open');
   document.body.style.overflow = 'hidden';
 }
 
 function closeAddressModal() {
   var modal = document.getElementById('address-modal');
   if (!modal) return;
-  modal.classList.remove('show');
+  modal.classList.remove('is-open');
   document.body.style.overflow = '';
 }
 
@@ -573,20 +973,11 @@ function deleteAddress() {
     .then(function() { window.location.reload(); });
 }
 
-/* ── Modal backdrop close + ESC ── */
 document.addEventListener('DOMContentLoaded', function() {
-  var editModal = document.getElementById('edit-modal');
-  if (editModal) {
-    editModal.addEventListener('click', function(e) {
-      if (e.target === editModal) closeEditModal();
-    });
-  }
-  var addressModal = document.getElementById('address-modal');
-  if (addressModal) {
-    addressModal.addEventListener('click', function(e) {
-      if (e.target === addressModal) closeAddressModal();
-    });
-  }
+  ['edit-modal','address-modal'].forEach(function(id){
+    var modal = document.getElementById(id);
+    if (modal) modal.addEventListener('click', function(e){ if (e.target === modal) (id==='edit-modal'?closeEditModal:closeAddressModal)(); });
+  });
 });
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') { closeEditModal(); closeAddressModal(); }

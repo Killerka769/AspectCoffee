@@ -1,649 +1,643 @@
 {% extends "catalog/base.html" %}
-{% load static %}
+{% load static catalog_extras %}
 
-{% block title %}Отзывы {% if total_count %}{{ total_count }}{% endif %} — Aspect Coffee{% endblock %}
+{% block title %}Отзывы{% if total_count %} — {{ total_count }}{% endif %} — Aspect Coffee{% endblock %}
+{% block meta_description %}Отзывы покупателей Aspect Coffee. Средняя оценка магазина {{ shop_avg }} из 5 на основе {{ total_count }} отзывов.{% endblock %}
 
 {% block extra_css %}
-<link href="{% static 'css/reference_all.css' %}?v=20260707-1" rel="stylesheet"/>
 <style>
-@font-face{font-display:swap;font-family:Gotham Pro;font-style:normal;font-weight:400;src:url(../fonts/GothamPro.woff2) format("woff2"),url(../fonts/GothamPro.woff) format("woff")}
-@font-face{font-display:swap;font-family:Gotham Pro Medium;font-style:normal;font-weight:500;src:url(../fonts/GothamPro-Medium.woff2) format("woff2"),url(../fonts/GothamPro-Medium.woff) format("woff")}
-@font-face{font-display:swap;font-family:Gotham Pro Bold;font-style:normal;font-weight:700;src:url(../fonts/GothamPro-Bold.woff2) format("woff2"),url(../fonts/GothamPro-Bold.woff) format("woff")}
-@font-face{font-display:swap;font-family:DIN Pro Light;font-style:normal;font-weight:300;src:url(../fonts/DINPro-CondensedLight.woff2) format("woff2"),url(../fonts/DINPro-CondensedLight.woff) format("woff")}
-@font-face{font-family:DIN Pro;src:url(../fonts/DINPro-CondensedRegular.woff2) format("woff2"),url(../fonts/DINPro-CondensedRegular.woff) format("woff")}
-@font-face{font-display:swap;font-family:DIN Pro Medium;font-style:normal;font-weight:500;src:url(../fonts/DINPro-CondensedMedium.woff2) format("woff2"),url(../fonts/DINPro-CondensedMedium.woff) format("woff")}
-@font-face{font-display:swap;font-family:DIN Pro Black;font-style:normal;font-weight:900;src:url(../fonts/DINPro-CondensedBlack.woff2) format("woff2"),url(../fonts/DINPro-CondensedBlack.woff) format("woff")}
+/* ==========================================================
+   ASPECT REVIEWS
+   ========================================================== */
 
-body { background: #f5f5f7; }
+.asp-rev { background: #FFFFFF; padding: 40px 0 80px; }
+.asp-rev__container { width: min(1340px, calc(100% - 32px)); margin: 0 auto; }
 
-.reviews-page { max-width: 1400px; margin: 0 auto; padding: 32px 16px 80px; }
-@media(min-width:758px){ .reviews-page { padding: 32px 24px 80px; } }
-
-.reviews-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 24px;
-  padding-top: 16px;
-}
-@media(min-width:758px){ .reviews-grid { padding-top: 16px; } }
-
-.reviews-sidebar {
-  grid-column: 1 / -1;
-}
-@media(min-width:1100px){
-  .reviews-sidebar { grid-column: span 4; }
-}
-@media(min-width:1536px){
-  .reviews-sidebar { grid-column: span 3; }
-}
-
-.reviews-content {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-}
-@media(max-width:1099px){
-  .reviews-grid { display: flex; flex-direction: column; gap: 16px; }
-  .reviews-content { order: 1; }
-  .reviews-sidebar { order: 2; }
-  .reviews-avg-row {
-    gap: 16px !important;
-    margin: 0 0 12px !important;
-    padding: 14px 16px;
-    background: #fff;
-    border-radius: 16px;
-  }
-  .reviews-avg-row > div { flex: 1 1 0; min-width: 0; }
-  .reviews-avg-value {
-    font-size: 40px !important;
-    letter-spacing: 0 !important;
-    line-height: 1 !important;
-  }
-  .reviews-avg-row svg {
-    width: 22px !important;
-    height: 22px !important;
-    margin-left: 4px !important;
-  }
-  .reviews-avg-label {
-    font-size: 12px !important;
-    padding-left: 4px !important;
-  }
-  .reviews-avg-label br { display: none; }
-  .filter-section { margin-bottom: 16px; }
-}
-@media(min-width:1100px){
-  .reviews-content { grid-column: span 7; }
-}
-@media(min-width:1536px){
-  .reviews-content { grid-column: span 6; }
-}
-
-/* big ratings now use Tailwind classes */
-
-.reviews-list-area {
-  display: flex;
-  flex-direction: column;
-}
-@media(min-width:758px){ .reviews-list-area { gap: 16px; } }
-@media(min-width:1100px){ .reviews-list-area { gap: 24px; } }
-
-.review-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 16px;
-}
-@media(min-width:758px){ .review-card { padding: 24px; } }
-
-.review-header {
-  display: flex;
-  align-items: flex-start;
-}
-
-.review-avatar {
-  width: 60px;
-  height: 60px;
-  min-width: 60px;
-  border-radius: 50%;
-  overflow: hidden;
+.asp-rev__head {
+  padding-bottom: 28px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid #E5E8E5;
   position: relative;
-  flex-shrink: 0;
-  background: #f5f5f7;
 }
-@media(min-width:758px){ .review-avatar { width: 48px; height: 48px; } }
+.asp-rev__head::after {
+  content: ""; position: absolute;
+  left: 0; bottom: -1px;
+  width: 72px; height: 3px;
+  background: #2A4A34;
+}
+.asp-rev__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0;
+}
+.asp-rev__title-count {
+  font-size: .55em;
+  color: #5A5A5A;
+  margin-left: 12px;
+  font-weight: 700;
+}
 
-.review-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
+/* LAYOUT */
+.asp-rev__layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+@media (max-width: 1099px) {
+  .asp-rev__layout { grid-template-columns: 1fr; }
+}
+
+/* SIDEBAR */
+.asp-rev__sidebar {
+  position: sticky;
+  top: 100px;
+}
+@media (max-width: 1099px) {
+  .asp-rev__sidebar { position: static; }
+}
+
+.asp-rev__avg-card {
+  background: #2A4A34;
+  color: #FFFFFF;
+  border-radius: 22px;
+  padding: 28px 26px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.asp-rev__avg-card::before {
+  content: "";
   position: absolute;
-  top: 0;
-  left: 0;
+  top: -100px; right: -80px;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+.asp-rev__avg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
+}
+.asp-rev__avg-item { text-align: center; }
+.asp-rev__avg-value {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 56px;
+  line-height: .95;
+  letter-spacing: -.02em;
+  color: #FFFFFF;
+  margin: 0;
+}
+.asp-rev__avg-star {
+  width: 22px; height: 22px;
+  fill: #FFB526;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+.asp-rev__avg-label {
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.65);
+  margin: 8px 0 0;
+  font-weight: 700;
 }
 
-.review-avatar-letter {
-  width: 100%;
-  height: 100%;
+.asp-rev__filter {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #F0F0F0;
+}
+.asp-rev__filter:last-child { border-bottom: 0; }
+.asp-rev__filter-title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0 0 14px;
+}
+.asp-rev__filter-list {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.asp-rev__filter-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 6px 0;
+  transition: color .15s ease;
+}
+.asp-rev__filter-item:hover { color: #2A4A34; }
+
+.asp-rev__checkbox {
+  width: 20px; height: 20px;
+  border: 1.5px solid #D5D8D5;
+  border-radius: 6px;
+  background: #FFFFFF;
+  flex-shrink: 0;
+  position: relative;
+  transition: background .15s ease, border-color .15s ease;
+}
+.asp-rev__checkbox.is-checked {
+  background: #2A4A34;
+  border-color: #2A4A34;
+}
+.asp-rev__checkbox.is-checked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='14' viewBox='0 0 17 14' fill='none'%3E%3Cpath d='M1.7 6.5 6.4 11l9.3-9' stroke='%23FFFFFF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px no-repeat;
+}
+.asp-rev__stars {
+  display: inline-flex;
+  gap: 1px;
+}
+.asp-rev__star { color: #E5E8E5; font-size: 16px; line-height: 1; }
+.asp-rev__star.is-filled { color: #FFB526; }
+.asp-rev__filter-count {
+  font-size: 12px;
+  color: #5A5A5A;
+  margin: 0 0 0 auto;
+  font-weight: 600;
+}
+
+.asp-rev__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #F4F6F4;
+  border: 0;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #000;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background .2s ease, color .2s ease;
+}
+.asp-rev__reset:hover { background: #2A4A34; color: #FFFFFF; }
+
+/* CONTENT */
+.asp-rev__content { display: flex; flex-direction: column; gap: 24px; }
+
+/* Форма отзыва */
+.asp-rev__write {
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 22px;
+  overflow: hidden;
+}
+.asp-rev__write-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 24px;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.asp-rev__write-bar:hover { background: #FAFBF9; }
+.asp-rev__write-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: #2A4A34;
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.04);
-  border-radius: 50%;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  flex-shrink: 0;
+  overflow: hidden;
 }
-
-.review-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  padding-left: 10px;
+.asp-rev__write-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.asp-rev__write-input {
   flex: 1;
-  gap: 2px;
-}
-
-.review-name {
-  font-size: 14px;
-  line-height: 1.3;
-  font-family: "Gotham Pro Medium", sans-serif;
-  margin: 0;
-  width: 100%;
-}
-@media(min-width:758px){ .review-name { width: auto; margin-right: auto; } }
-
-.review-date {
-  font-size: 14px;
-  line-height: 1.3;
-  color: #999;
-  margin: 0;
-  width: 100%;
-}
-@media(min-width:758px){ .review-date { width: auto; } }
-
-.review-body {
-  padding-top: 16px;
-}
-@media(min-width:758px){ .review-body { padding-top: 24px; } }
-
-.review-rating-line {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-@media(min-width:758px){ .review-rating-line { margin-bottom: 24px; } }
-
-.review-rating-label {
-  font-size: 14px;
-  line-height: 1.3;
-  font-family: "Gotham Pro Medium", sans-serif;
-  margin: 0;
-  margin-right: 4px;
-}
-
-.review-stars {
-  display: flex;
-  gap: 2px;
-  margin-left: 4px;
-}
-
-.review-star { color: #ffb526; font-size: 14px; }
-.review-star-empty { color: #dedede; font-size: 14px; }
-
-.review-text {
-  font-size: 16px;
-  line-height: 1.5;
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.filter-section { margin-bottom: 24px; }
-@media(min-width:758px){ .filter-section { margin-bottom: 32px; } }
-
-.filter-title {
-  font-family: "DIN Pro Black", sans-serif;
-  font-size: 16px;
-  text-transform: uppercase;
-  margin: 0 0 16px 0;
-}
-
-.filter-list { list-style: none; padding: 0; margin: 0; }
-
-.filter-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.filter-count {
-  color: #999;
-  font-size: 14px;
-  margin: 0;
-}
-
-.search-bar {
-  width: 100%;
-  margin-bottom: 16px;
-}
-
-.search-bar-inner {
-  background: #f5f5f7;
-  border-radius: 16px;
-  padding: 4px;
-}
-
-.search-bar-field {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid #f5f5f7;
-}
-
-.search-bar-field input {
-  flex: 1;
-  padding: 12px;
-  font-size: 16px;
-  outline: none;
+  font-size: 15px;
+  color: #5A5A5A;
+  border: 0;
   background: transparent;
-  border: none;
+  cursor: pointer;
+  outline: none;
 }
+.asp-rev__write-body { padding: 0 24px 24px; }
 
-.search-bar-field input::placeholder { color: #999; }
-
-.search-icon, .clear-icon {
-  padding: 0 12px;
-  color: #999;
+.asp-rev__write-user {
   display: flex;
   align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #F0F0F0;
 }
-
-.filter-reset-btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 16px;
-  border-radius: 12px;
-  border: 1px solid #ebebed;
-  background: #fff;
+.asp-rev__write-user strong {
+  display: block;
   font-size: 14px;
+  color: #000;
+}
+.asp-rev__write-user small {
+  display: block;
+  font-size: 12px;
+  color: #5A5A5A;
+  margin-top: 2px;
+}
+.asp-rev__write-close {
+  margin-left: auto;
+  background: none;
+  border: 0;
   cursor: pointer;
-  margin-top: 8px;
-  font-family: "Gotham Pro Medium", sans-serif;
+  font-size: 24px;
+  color: #5A5A5A;
+  line-height: 1;
+  padding: 4px 8px;
+}
+.asp-rev__write-close:hover { color: #000; }
+
+.asp-rev__form-field { margin-bottom: 18px; }
+.asp-rev__form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  margin: 0 0 8px;
+}
+.asp-rev__form-input,
+.asp-rev__form-textarea,
+.asp-rev__form-select {
+  width: 100%;
+  background: #F4F6F4;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-family: "Open Sans", Arial, sans-serif;
+  color: #000;
+  outline: none;
+  transition: background .2s ease, border-color .2s ease;
+  box-sizing: border-box;
+}
+.asp-rev__form-textarea { resize: vertical; min-height: 90px; }
+.asp-rev__form-input:focus,
+.asp-rev__form-textarea:focus,
+.asp-rev__form-select:focus {
+  background: #FFFFFF;
+  border-color: #2A4A34;
 }
 
-.filter-reset-btn:hover { background: #f5f5f7; }
+.asp-rev__stars-input {
+  display: flex;
+  gap: 6px;
+}
+.asp-rev__stars-input .star {
+  cursor: pointer;
+  color: #E5E8E5;
+  font-size: 30px;
+  line-height: 1;
+  transition: color .15s ease;
+}
+.asp-rev__stars-input .star.active,
+.asp-rev__stars-input .star:hover { color: #FFB526; }
 
-.leave-review-bar {
-  background: #fff;
+.asp-rev__submit {
+  display: block;
+  width: 100%;
+  padding: 16px 24px;
+  border: 0;
+  border-radius: 14px;
+  background: #2A4A34;
+  color: #FFFFFF;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+.asp-rev__submit:hover { background: #1E3626; transform: translateY(-2px); }
+
+.asp-rev__moderation {
+  padding: 20px 24px;
+  background: #E8EEE8;
+  border: 1px solid #8FB89A;
   border-radius: 16px;
-  padding: 16px;
+  font-size: 14px;
+  color: #2A4A34;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Login prompt */
+.asp-rev__login-prompt {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 16px;
+  padding: 22px 26px;
+  background: #F4F6F4;
+  border-radius: 18px;
+  border-left: 3px solid #2A4A34;
 }
-
-.leave-review-avatar {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
+.asp-rev__login-prompt-avatar {
+  width: 48px; height: 48px;
   border-radius: 50%;
+  background: #E8EEE8;
+  color: #2A4A34;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.leave-review-placeholder {
-  font-size: 14px;
-  color: rgba(0,0,0,0.4);
-  flex: 1;
-}
-
-.leave-review-placeholder a {
-  color: #000;
-  font-weight: bold;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.leave-review-placeholder a:hover { text-decoration: none; }
-
-.tc-rating-custom {
-  display: inline-flex;
-  direction: rtl;
-  font-size: 0;
-  justify-content: flex-end;
-  position: relative;
-  unicode-bidi: bidi-override;
-}
-.tc-rating-custom.readonly { cursor: default; }
-.tc-rating-custom.readonly::before {
-  content: "";
-  height: 100%;
-  left: 0;
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 2;
-}
-.tc-rating-custom input { display: none; }
-.tc-rating-custom input + label {
-  cursor: pointer;
-  display: block;
-  height: 18px;
-  width: 18px;
-  overflow: hidden;
-  position: relative;
-  white-space: nowrap;
-}
-.tc-rating-custom input + label:before {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='23' height='23' fill='none' viewBox='0 0 23 23'%3E%3Cg clip-path='url(%23a)'%3E%3Cpath stroke='%23b3b3b3' stroke-miterlimit='10' d='m12.009 4.21 2.336 4.133L19 9.288a.47.47 0 0 1 .253.778l-3.21 3.5.54 4.717a.47.47 0 0 1-.662.48l-4.32-1.97-4.32 1.97a.47.47 0 0 1-.662-.48l.54-4.718-3.21-3.5a.47.47 0 0 1 .253-.777l4.653-.945 2.337-4.134a.47.47 0 0 1 .818 0Z'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='a'%3E%3Cpath fill='%23fff' d='M.6.4H23v22.4H.6z'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E");
-  background-position: 50%;
-  background-repeat: no-repeat;
-  background-size: contain;
-  content: "";
-  display: inline-block;
-  height: 100%;
-  transition: .3s;
-  width: 100%;
-}
-.tc-rating-custom input + label:after {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='23' height='23' fill='none' viewBox='0 0 23 23'%3E%3Cg clip-path='url(%23a)'%3E%3Cpath fill='%23ffb526' stroke='%23ffb526' stroke-miterlimit='10' d='m12.009 4.21 2.336 4.133L19 9.288a.47.47 0 0 1 .253.778l-3.21 3.5.54 4.717a.47.47 0 0 1-.662.48l-4.32-1.97-4.32 1.97a.47.47 0 0 1-.662-.48l.54-4.718-3.21-3.5a.47.47 0 0 1 .253-.777l4.653-.945 2.337-4.134a.47.47 0 0 1 .818 0Z'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='a'%3E%3Cpath fill='%23fff' d='M.6.4H23v22.4H.6z'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E");
-  background-position: 50%;
-  background-repeat: no-repeat;
-  background-size: contain;
-  content: "";
-  display: inline-block;
-  height: 100%;
-  transition: .3s;
-  width: 100%;
-  opacity: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  z-index: 1;
-}
-.tc-rating-custom input:checked ~ label:before { content: ""; opacity: 0; }
-.tc-rating-custom input:checked ~ label:after { content: ""; opacity: 1; }
-
-.tc-checkbox__input {
-  background-color: #fff !important;
-  border: 1.5px solid #dedede !important;
-  border-radius: 6px;
-  height: 24px;
-  width: 24px;
-  min-width: 24px;
-  margin-right: 8px;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-block;
-  vertical-align: middle;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 20px;
   flex-shrink: 0;
 }
-.tc-checkbox__input:hover {
-  border-color: #b3b3b3 !important;
+.asp-rev__login-prompt-text {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #5A5A5A;
+  margin: 0;
 }
-.tc-checkbox__input.checked {
-  background-color: #fff !important;
-  border-color: #000 !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='12' fill='none'%3E%3Cpath d='M1.5 6 5.5 10 14.5 1' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  background-size: 16px 12px !important;
+.asp-rev__login-prompt-text a {
+  color: #2A4A34;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
+.asp-rev__login-prompt-text a:hover { color: #1E3626; text-decoration: none; }
+
+/* Search */
+.asp-rev__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F4F6F4;
+  border: 1px solid #E5E8E5;
+  border-radius: 14px;
+  padding: 4px 4px 4px 16px;
+  transition: background .2s ease, border-color .2s ease;
+}
+.asp-rev__search:focus-within { background: #FFFFFF; border-color: #2A4A34; }
+.asp-rev__search svg {
+  width: 20px; height: 20px;
+  stroke: #5A5A5A; fill: none; stroke-width: 2;
+  flex-shrink: 0;
+}
+.asp-rev__search input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  padding: 12px 8px;
+  font-size: 15px;
+  font-family: "Open Sans", Arial, sans-serif;
+  color: #000;
+  outline: none;
+  min-width: 0;
+}
+.asp-rev__search input::placeholder { color: #5A5A5A; }
+.asp-rev__search-clear {
+  border: 0;
+  background: transparent;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #5A5A5A;
+  display: flex;
+  align-items: center;
+}
+.asp-rev__search-clear:hover { background: #E8EEE8; color: #000; }
+
+/* List */
+.asp-rev__list { display: flex; flex-direction: column; gap: 16px; }
+
+/* Reuse existing .review-card styles from _reviews_list_partial (не трогаем) */
 </style>
 {% endblock %}
 
 {% block content %}
-<main class="reviews-page grey-theme" x-data="reviewFilters()">
+<main class="asp-rev">
+  <div class="asp-rev__container" x-data="reviewFilters()">
 
-  <div class="reviews-grid">
-
-    <div class="reviews-sidebar">
-      <div class="flex items-center min-h-[38px] mb-6 py-1 border-b border-[var(--black-5)] px-4 -mx-4 sm:mx-0 sm:p-0 xl:border-0 xl:min-h-[auto]">
-        <h1 class="text-[24px] m-0 xl:text-[40px]"> Отзывы <span class="text-[var(--black-50)]">{{ total_count }}</span></h1>
-      </div>
-
-      <div class="filter-section">
-        <p class="filter-title">С оценкой магазина</p>
-        <ul class="filter-list">
-          {% for star_val, star_count in shop_stars reversed %}
-          <li class="filter-item" style="cursor:pointer;" @click="toggleRating({{ star_val }})">
-            <div class="tc-checkbox__input" :class="ratings.includes({{ star_val }}) ? 'checked' : ''"></div>
-            <div class="flex gap-0.5" style="direction:ltr;">
-              {% for i in "12345" %}{% if forloop.counter <= star_val %}<span style="color:var(--yellow);font-size:18px;">&#9733;</span>{% else %}<span style="color:#dedede;font-size:18px;">&#9733;</span>{% endif %}{% endfor %}
-            </div>
-            <p class="filter-count">{{ star_count }}</p>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <div class="filter-section">
-        <p class="filter-title">С оценкой доставки</p>
-        <ul class="filter-list">
-          {% for star_val, star_count in delivery_stars reversed %}
-          <li class="filter-item" style="cursor:pointer;" @click="toggleDeliveryRating({{ star_val }})">
-            <div class="tc-checkbox__input" :class="deliveryRatings.includes({{ star_val }}) ? 'checked' : ''"></div>
-            <div class="flex gap-0.5" style="direction:ltr;">
-              {% for i in "12345" %}{% if forloop.counter <= star_val %}<span style="color:var(--yellow);font-size:18px;">&#9733;</span>{% else %}<span style="color:#dedede;font-size:18px;">&#9733;</span>{% endif %}{% endfor %}
-            </div>
-            <p class="filter-count">{{ star_count }}</p>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      {% if operators %}
-      <div class="filter-section">
-        <p class="filter-title">Доставка</p>
-        <ul class="filter-list">
-          {% for op in operators %}
-          <li class="filter-item">
-            <label class="tc-checkbox">
-              <input type="checkbox" value="{{ op }}" class="tc-checkbox__input" :checked="selectedOperators.includes('{{ op }}')" @change="toggleOperator('{{ op }}')">
-            </label>
-            <span style="font-size:14px;cursor:pointer;">{{ op }}</span>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %}
-
-      <template x-if="ratings.length || deliveryRatings.length || selectedOperators.length">
-        <button type="button" @click="ratings = []; deliveryRatings = []; selectedOperators = []; localStorage.removeItem('reviews_filters'); applyFilters()" class="filter-reset-btn">
-          <span>Сбросить фильтры</span>
-        </button>
-      </template>
-
+    <div class="asp-rev__head">
+      <h1 class="asp-rev__title">
+        Отзывы
+        {% if total_count %}<span class="asp-rev__title-count">{{ total_count }}</span>{% endif %}
+      </h1>
     </div>
 
-    {# ── RIGHT CONTENT ── #}
-    <div class="reviews-content">
+    <div class="asp-rev__layout">
 
-      {# Big ratings — exact reference layout #}
-      {% if total_count %}
-      <div class="reviews-avg-row flex flex-wrap justify-between gap-8 md:gap-24 md:-mt-11 mb-3 md:mb-8">
-        <div class="flex items-end">
-          <p class="reviews-avg-value text-[80px] md:text-[140px] 2xl:text-[200px] font-din-black uppercase leading-[1.2] md:tracking-[-0.3rem]">{{ shop_avg }}</p>
-          <div class="2xl:mb-9 xl:mb-5 mb-3.5">
-            <svg class="2xl:h-[114px] 2xl:w-[114px] md:w-[80px] md:h-[80px] text-[var(--yellow)] 2xl:-ml-2 md:ml-0 ml-1 w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-            <p class="reviews-avg-label text-[11px] md:text-[16px] m-0 md:pl-3.5 pl-2.5"> Средняя <br> оценка <br> магазина</p>
-          </div>
-        </div>
-        {% if delivery_avg %}
-        <div class="flex items-end">
-          <p class="reviews-avg-value text-[80px] md:text-[140px] 2xl:text-[200px] font-din-black uppercase leading-[1.2] md:tracking-[-0.3rem]">{{ delivery_avg }}</p>
-          <div class="2xl:mb-9 xl:mb-5 mb-3.5">
-            <svg class="2xl:h-[114px] 2xl:w-[114px] md:w-[80px] md:h-[80px] text-[var(--yellow)] 2xl:-ml-2 md:ml-0 ml-1 w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-            <p class="reviews-avg-label text-[11px] md:text-[16px] m-0 md:pl-3.5 pl-2.5"> Средняя <br> оценка <br> доставки</p>
+      {# ═══ SIDEBAR ═══ #}
+      <aside class="asp-rev__sidebar">
+
+        {% if total_count %}
+        <div class="asp-rev__avg-card">
+          <div class="asp-rev__avg-grid">
+            <div class="asp-rev__avg-item">
+              <p class="asp-rev__avg-value">{{ shop_avg }}</p>
+              <svg class="asp-rev__avg-star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <p class="asp-rev__avg-label">Магазин</p>
+            </div>
+            {% if delivery_avg %}
+            <div class="asp-rev__avg-item">
+              <p class="asp-rev__avg-value">{{ delivery_avg }}</p>
+              <svg class="asp-rev__avg-star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <p class="asp-rev__avg-label">Доставка</p>
+            </div>
+            {% endif %}
           </div>
         </div>
         {% endif %}
-      </div>
-      {% endif %}
 
-      {# Search #}
-      <div class="search-bar">
-        <div class="search-bar-inner">
-          <div class="search-bar-field">
-            <span class="search-icon">
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </span>
-            <input type="search" placeholder="Поиск" x-model="query" @input.debounce.400ms="applyFilters()">
-            <template x-if="query">
-              <button type="button" @click="query = ''; applyFilters()" class="clear-icon">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              </button>
-            </template>
+        {# ── Фильтр по оценке магазина ── #}
+        <div class="asp-rev__filter">
+          <h3 class="asp-rev__filter-title">Оценка магазина</h3>
+          <ul class="asp-rev__filter-list">
+            {% for star_val, star_count in shop_stars reversed %}
+            <li class="asp-rev__filter-item" @click="toggleRating({{ star_val }})">
+              <span class="asp-rev__checkbox" :class="ratings.includes({{ star_val }}) ? 'is-checked' : ''"></span>
+              <span class="asp-rev__stars">
+                {% for i in "12345" %}
+                  <span class="asp-rev__star{% if forloop.counter <= star_val %} is-filled{% endif %}">★</span>
+                {% endfor %}
+              </span>
+              <span class="asp-rev__filter-count">{{ star_count }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        {# ── Фильтр по оценке доставки ── #}
+        <div class="asp-rev__filter">
+          <h3 class="asp-rev__filter-title">Оценка доставки</h3>
+          <ul class="asp-rev__filter-list">
+            {% for star_val, star_count in delivery_stars reversed %}
+            <li class="asp-rev__filter-item" @click="toggleDeliveryRating({{ star_val }})">
+              <span class="asp-rev__checkbox" :class="deliveryRatings.includes({{ star_val }}) ? 'is-checked' : ''"></span>
+              <span class="asp-rev__stars">
+                {% for i in "12345" %}
+                  <span class="asp-rev__star{% if forloop.counter <= star_val %} is-filled{% endif %}">★</span>
+                {% endfor %}
+              </span>
+              <span class="asp-rev__filter-count">{{ star_count }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        {# ── Фильтр по оператору ── #}
+        {% if operators %}
+        <div class="asp-rev__filter">
+          <h3 class="asp-rev__filter-title">Оператор доставки</h3>
+          <ul class="asp-rev__filter-list">
+            {% for op in operators %}
+            <li class="asp-rev__filter-item" @click="toggleOperator('{{ op }}')">
+              <span class="asp-rev__checkbox" :class="selectedOperators.includes('{{ op }}') ? 'is-checked' : ''"></span>
+              <span style="font-size:14px;">{{ op }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <template x-if="ratings.length || deliveryRatings.length || selectedOperators.length">
+          <button type="button" class="asp-rev__reset"
+                  @click="ratings = []; deliveryRatings = []; selectedOperators = []; localStorage.removeItem('reviews_filters'); applyFilters()">
+            Сбросить фильтры
+          </button>
+        </template>
+
+      </aside>
+
+      {# ═══ CONTENT ═══ #}
+      <div class="asp-rev__content">
+
+        {# Search #}
+        <div class="asp-rev__search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-3.5-3.5"/></svg>
+          <input type="search" placeholder="Поиск по отзывам" x-model="query" @input.debounce.400ms="applyFilters()">
+          <template x-if="query">
+            <button type="button" class="asp-rev__search-clear" @click="query = ''; applyFilters()" aria-label="Очистить">
+              <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </template>
+        </div>
+
+        {# Write review #}
+        {% if request.user.is_authenticated %}
+        {% with level=request.user.get_level %}{% with city=request.user.get_city %}
+
+        <div class="asp-rev__write" x-data="{ open: false, sent: false }">
+
+          <div class="asp-rev__write-bar" x-show="!open && !sent" @click="open = true">
+            <div class="asp-rev__write-avatar">
+              {% if request.user.avatar %}
+                <img src="{{ request.user.avatar.url }}" alt="">
+              {% else %}
+                {{ request.user.first_name|first|upper|default:request.user.email|first|upper }}
+              {% endif %}
+            </div>
+            <input type="text" class="asp-rev__write-input" placeholder="Оставить отзыв" readonly>
           </div>
-        </div>
-      </div>
 
-      {# Leave review #}
-      {% if request.user.is_authenticated %}
-      {% with level=request.user.get_level %}{% with city=request.user.get_city %}
-      <div style="background:#fff;border-radius:16px;overflow:hidden;margin-bottom:16px;">
-
-        <div id="review-bar" onclick="document.getElementById('review-bar').style.display='none';document.getElementById('review-form-wrap').style.display='block';" style="display:flex;align-items:center;padding:16px;cursor:pointer;gap:10px;">
-          {% if request.user.avatar %}<img src="{{ request.user.avatar.url }}" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;">{% else %}<span style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#000;color:#fff;font-size:14px;font-weight:bold;flex-shrink:0;">{{ request.user.first_name|first|upper|default:request.user.email|first|upper }}</span>{% endif %}
-          <input type="text" placeholder="Оставить отзыв" style="border:none;outline:none;font-size:16px;flex:1;cursor:pointer;background:transparent;" readonly>
-        </div>
-
-        <div id="review-form-wrap" style="display:none;padding:16px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-            {% if request.user.avatar %}<img src="{{ request.user.avatar.url }}" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;">{% else %}<span style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#000;color:#fff;font-size:14px;font-weight:bold;flex-shrink:0;">{{ request.user.first_name|first|upper|default:request.user.email|first|upper }}</span>{% endif %}
-            <div style="flex:1;">
-              <p style="font-size:14px;font-weight:500;margin:0;">{{ request.user.first_name|default:request.user.email }}</p>
-              <p style="font-size:12px;color:{{ level.color|default:'#999' }};margin:0;">{{ level.name }}{% if city %}, {{ city }}{% endif %}</p>
+          <div class="asp-rev__write-body" x-show="open && !sent" x-cloak>
+            <div class="asp-rev__write-user">
+              <div class="asp-rev__write-avatar">
+                {% if request.user.avatar %}
+                  <img src="{{ request.user.avatar.url }}" alt="">
+                {% else %}
+                  {{ request.user.first_name|first|upper|default:request.user.email|first|upper }}
+                {% endif %}
+              </div>
+              <div>
+                <strong>{{ request.user.first_name|default:request.user.email }}</strong>
+                <small style="color:{{ level.color|default:'#5A5A5A' }};">{{ level.name }}{% if city %}, {{ city }}{% endif %}</small>
+              </div>
+              <button type="button" class="asp-rev__write-close" @click="open = false" aria-label="Закрыть">&times;</button>
             </div>
-            <button type="button" onclick="document.getElementById('review-bar').style.display='flex';document.getElementById('review-form-wrap').style.display='none';" style="background:none;border:none;cursor:pointer;font-size:24px;color:#999;line-height:1;">&times;</button>
+
+            <form id="review-form" onsubmit="submitReview(event)">
+              {% csrf_token %}
+
+              <div class="asp-rev__form-field">
+                <label class="asp-rev__form-label">Оценка магазина</label>
+                <div id="shop-stars" class="asp-rev__stars-input">
+                  <span class="star" data-value="1">★</span>
+                  <span class="star" data-value="2">★</span>
+                  <span class="star" data-value="3">★</span>
+                  <span class="star" data-value="4">★</span>
+                  <span class="star" data-value="5">★</span>
+                </div>
+                <input type="hidden" name="rating" id="rating-input" value="0">
+                <textarea name="text" class="asp-rev__form-textarea" placeholder="Отзыв о магазине" rows="3" style="margin-top:12px;"></textarea>
+              </div>
+
+              <div class="asp-rev__form-field">
+                <label class="asp-rev__form-label">Оценка доставки</label>
+                <div id="delivery-stars" class="asp-rev__stars-input">
+                  <span class="star" data-value="1">★</span>
+                  <span class="star" data-value="2">★</span>
+                  <span class="star" data-value="3">★</span>
+                  <span class="star" data-value="4">★</span>
+                  <span class="star" data-value="5">★</span>
+                </div>
+                <input type="hidden" name="delivery_rating" id="delivery-rating-input" value="">
+                <select name="delivery_operator" class="asp-rev__form-select" style="margin-top:12px;">
+                  <option value="">Укажите доставку</option>
+                  <option value="СДЭК">СДЭК</option>
+                  <option value="Почта России">Почта России</option>
+                  <option value="Boxberry">Boxberry</option>
+                  <option value="Яндекс Доставка">Яндекс Доставка</option>
+                </select>
+                <textarea name="delivery_text" class="asp-rev__form-textarea" placeholder="Отзыв о доставке" rows="3" style="margin-top:12px;"></textarea>
+              </div>
+
+              <button type="submit" class="asp-rev__submit">Отправить отзыв</button>
+            </form>
           </div>
 
-          <form id="review-form" onsubmit="submitReview(event)" style="display:flex;flex-direction:column;gap:16px;">
-            {% csrf_token %}
-            <div>
-              <p style="font-size:14px;font-weight:500;margin:0 0 8px 0;">Магазин</p>
-              <div id="shop-stars" style="display:flex;gap:4px;">
-                <span class="star" data-value="1">&#9733;</span>
-                <span class="star" data-value="2">&#9733;</span>
-                <span class="star" data-value="3">&#9733;</span>
-                <span class="star" data-value="4">&#9733;</span>
-                <span class="star" data-value="5">&#9733;</span>
-              </div>
-              <input type="hidden" name="rating" id="rating-input" value="0">
-              <textarea name="text" placeholder="Отзыв о магазине" rows="3" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;resize:none;margin-top:8px;box-sizing:border-box;"></textarea>
+          <div class="asp-rev__write-body" x-show="sent" x-cloak>
+            <div class="asp-rev__moderation">
+              Спасибо! Ваш отзыв отправлен на модерацию.
             </div>
-            <div>
-              <p style="font-size:14px;font-weight:500;margin:0 0 8px 0;">Доставка</p>
-              <div id="delivery-stars" style="display:flex;gap:4px;">
-                <span class="star" data-value="1">&#9733;</span>
-                <span class="star" data-value="2">&#9733;</span>
-                <span class="star" data-value="3">&#9733;</span>
-                <span class="star" data-value="4">&#9733;</span>
-                <span class="star" data-value="5">&#9733;</span>
-              </div>
-              <input type="hidden" name="delivery_rating" id="delivery-rating-input" value="">
-              <select name="delivery_operator" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;margin-top:8px;box-sizing:border-box;">
-                <option value="">Укажите доставку</option>
-                <option value="СДЭК">СДЭК</option>
-                <option value="Почта России">Почта России</option>
-                <option value="Boxberry">Boxberry</option>
-                <option value="Яндекс Доставка">Яндекс Доставка</option>
-              </select>
-              <textarea name="delivery_text" placeholder="Отзыв о доставке" rows="3" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;resize:none;margin-top:8px;box-sizing:border-box;"></textarea>
-            </div>
-            <div>
-              <p style="font-size:14px;font-weight:500;margin:0 0 8px 0;">Комментарий</p>
-              <textarea name="comment" placeholder="Расскажите о своих впечатлениях" rows="3" style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;resize:none;box-sizing:border-box;"></textarea>
-            </div>
-            <button type="submit" style="width:100%;padding:12px;background:#000;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer;">ОТПРАВИТЬ</button>
-          </form>
+          </div>
+
         </div>
-      </div>
-      {% endwith %}{% endwith %}
-      <div id="moderation-notice" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;">
-        <p style="margin:0;font-size:14px;font-weight:500;color:#166534;">Спасибо! Ваш отзыв отправлен на модерацию.</p>
-      </div>
-      {% else %}
-      <div class="leave-review-bar" onclick="window.location.href='/login/?next=/reviews/'">
-        <div class="leave-review-avatar" style="background:var(--black-4);color:var(--black-50);">?</div>
-        <p class="leave-review-placeholder" style="margin:0;">Чтобы оставить отзыв, необходимо <a href="/login/?next=/reviews/">войти</a> или <a href="/register/?next=/reviews/">зарегистрироваться</a>.</p>
-      </div>
-      {% endif %}
+        {% endwith %}{% endwith %}
 
-      <style>
-        .star { cursor:pointer; color:#ddd; font-size:28px; transition:color 0.15s; }
-        .star.active, .star:hover { color:#f59e0b; }
-      </style>
+        {% else %}
+        <div class="asp-rev__login-prompt">
+          <div class="asp-rev__login-prompt-avatar">?</div>
+          <p class="asp-rev__login-prompt-text">
+            Чтобы оставить отзыв, необходимо <a href="/login/?next=/reviews/">войти</a> или <a href="/register/?next=/reviews/">зарегистрироваться</a>.
+          </p>
+        </div>
+        {% endif %}
 
-      <script>
-      function initStars(containerId, inputId) {
-        var container = document.getElementById(containerId);
-        if (!container) return;
-        var stars = container.querySelectorAll('.star');
-        stars.forEach(function(star) {
-          star.addEventListener('click', function() {
-            var val = parseInt(this.dataset.value);
-            document.getElementById(inputId).value = val;
-            stars.forEach(function(s) {
-              s.classList.toggle('active', parseInt(s.dataset.value) <= val);
-            });
-          });
-          star.addEventListener('mouseenter', function() {
-            var val = parseInt(this.dataset.value);
-            stars.forEach(function(s) {
-              s.classList.toggle('active', parseInt(s.dataset.value) <= val);
-            });
-          });
-          star.addEventListener('mouseleave', function() {
-            var current = parseInt(document.getElementById(inputId).value);
-            stars.forEach(function(s) {
-              s.classList.toggle('active', parseInt(s.dataset.value) <= current);
-            });
-          });
-        });
-      }
-      initStars('shop-stars', 'rating-input');
-      initStars('delivery-stars', 'delivery-rating-input');
+        {# List #}
+        <div id="reviews-list" class="asp-rev__list">
+          {% include "pages/reviews_list_partial.html" %}
+        </div>
 
-      function submitReview(e) {
-        e.preventDefault();
-        var form = e.target;
-        var formData = new FormData(form);
-        fetch('/reviews/create/', {
-          method: 'POST',
-          body: formData,
-          headers: {'X-Requested-With': 'XMLHttpRequest'}
-        }).then(function(r) { return r.json(); }).then(function(data) {
-          if (data.success) {
-              form.reset();
-              document.querySelectorAll('.star').forEach(function(s) { s.classList.remove('active'); });
-              document.getElementById('rating-input').value = '0';
-              document.getElementById('delivery-rating-input').value = '';
-              document.getElementById('review-form-wrap').style.display = 'none';
-              document.getElementById('review-bar').style.display = 'none';
-              document.getElementById('moderation-notice').style.display = 'block';
-              setTimeout(function() {
-                document.getElementById('moderation-notice').style.display = 'none';
-                document.getElementById('review-bar').style.display = 'flex';
-              }, 4000);
-          } else {
-            alert(Object.values(data.errors).join('\n'));
-          }
-        });
-      }
-      </script>
-
-      {# Reviews list #}
-      {# Reviews list #}
-      {# Reviews list #}
-      <div id="reviews-list" class="reviews-list-area">
-        {% include "pages/reviews_list_partial.html" %}
       </div>
 
     </div>
@@ -659,24 +653,9 @@ function reviewFilters() {
     deliveryRatings: (JSON.parse(localStorage.getItem('reviews_filters') || '{}')).deliveryRatings || [],
     selectedOperators: (JSON.parse(localStorage.getItem('reviews_filters') || '{}')).selectedOperators || [],
     init() { if (this.query || this.ratings.length || this.deliveryRatings.length || this.selectedOperators.length) { this.$nextTick(() => this.applyFilters()); } },
-    toggleRating(val) {
-      const idx = this.ratings.indexOf(val);
-      if (idx > -1) this.ratings.splice(idx, 1);
-      else this.ratings.push(val);
-      this.applyFilters();
-    },
-    toggleDeliveryRating(val) {
-      const idx = this.deliveryRatings.indexOf(val);
-      if (idx > -1) this.deliveryRatings.splice(idx, 1);
-      else this.deliveryRatings.push(val);
-      this.applyFilters();
-    },
-    toggleOperator(val) {
-      const idx = this.selectedOperators.indexOf(val);
-      if (idx > -1) this.selectedOperators.splice(idx, 1);
-      else this.selectedOperators.push(val);
-      this.applyFilters();
-    },
+    toggleRating(val) { const i = this.ratings.indexOf(val); if (i > -1) this.ratings.splice(i, 1); else this.ratings.push(val); this.applyFilters(); },
+    toggleDeliveryRating(val) { const i = this.deliveryRatings.indexOf(val); if (i > -1) this.deliveryRatings.splice(i, 1); else this.deliveryRatings.push(val); this.applyFilters(); },
+    toggleOperator(val) { const i = this.selectedOperators.indexOf(val); if (i > -1) this.selectedOperators.splice(i, 1); else this.selectedOperators.push(val); this.applyFilters(); },
     applyFilters() {
       const params = new URLSearchParams();
       if (this.query) params.set('q', this.query);
@@ -684,29 +663,154 @@ function reviewFilters() {
       this.deliveryRatings.forEach(r => params.append('delivery_rating', r));
       this.selectedOperators.forEach(o => params.append('operator', o));
       localStorage.setItem('reviews_filters', JSON.stringify({query: this.query, ratings: this.ratings, deliveryRatings: this.deliveryRatings, selectedOperators: this.selectedOperators}));
-      const qs = params.toString();
-      fetch('/reviews/ajax/?' + qs, {
-        headers: {'X-Requested-With': 'XMLHttpRequest'}
-      }).then(r => r.text()).then(html => {
-        document.getElementById('reviews-list').innerHTML = html;
-      });
+      fetch('/reviews/ajax/?' + params.toString(), { headers: {'X-Requested-With': 'XMLHttpRequest'} })
+        .then(r => r.text())
+        .then(html => { document.getElementById('reviews-list').innerHTML = html; });
     }
   };
 }
+
+/* Stars input */
+function initStars(containerId, inputId) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var stars = container.querySelectorAll('.star');
+  stars.forEach(function(star) {
+    star.addEventListener('click', function() {
+      var val = parseInt(this.dataset.value);
+      document.getElementById(inputId).value = val;
+      stars.forEach(function(s) { s.classList.toggle('active', parseInt(s.dataset.value) <= val); });
+    });
+    star.addEventListener('mouseenter', function() {
+      var val = parseInt(this.dataset.value);
+      stars.forEach(function(s) { s.classList.toggle('active', parseInt(s.dataset.value) <= val); });
+    });
+    star.addEventListener('mouseleave', function() {
+      var current = parseInt(document.getElementById(inputId).value) || 0;
+      stars.forEach(function(s) { s.classList.toggle('active', parseInt(s.dataset.value) <= current); });
+    });
+  });
+}
+initStars('shop-stars', 'rating-input');
+initStars('delivery-stars', 'delivery-rating-input');
+
+/* Submit review */
+function submitReview(e) {
+  e.preventDefault();
+  var form = e.target;
+  var fd = new FormData(form);
+  fetch('/reviews/create/', {
+    method: 'POST',
+    body: fd,
+    headers: {'X-Requested-With': 'XMLHttpRequest'}
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (data.success) {
+      form.reset();
+      document.querySelectorAll('#shop-stars .star, #delivery-stars .star').forEach(function(s) { s.classList.remove('active'); });
+      document.getElementById('rating-input').value = '0';
+      document.getElementById('delivery-rating-input').value = '';
+      /* Переключаем view через Alpine у родителя */
+      var wrap = form.closest('[x-data]');
+      if (wrap && window.Alpine) {
+        Alpine.$data(wrap).open = false;
+        Alpine.$data(wrap).sent = true;
+        setTimeout(function() { Alpine.$data(wrap).sent = false; }, 4500);
+      }
+    } else if (data.errors) {
+      alert(Object.values(data.errors).join('\n'));
+    }
+  });
+}
 </script>
+
+{# Старые стили карточек отзывов (переопределяем точечно) #}
 <style>
-.review-card{background:#fff;border-radius:18px;padding:24px}.review-header{align-items:flex-start;background:transparent!important;display:flex;padding:0!important;position:relative}.review-avatar{align-items:center;background:var(--black-4);border-radius:50%;display:flex;font-size:22px;font-weight:700;height:48px;justify-content:center;min-width:48px;overflow:hidden;width:48px}.review-avatar img{height:100%;object-fit:cover;width:100%}.review-meta{align-items:flex-start;display:flex;flex:1;justify-content:space-between;padding-left:10px}.review-author-block strong{display:block;font-size:14px}.review-author-block>div{align-items:center;display:flex;gap:5px;margin-top:2px}.review-level,.review-city{border:0;font-size:12px;padding:0}.review-city{color:var(--black-50)}.review-meta time{color:var(--black-50);font-size:13px;margin-left:auto;white-space:nowrap}.review-menu{background:none;border:0;color:var(--black-50);cursor:pointer;font-size:20px;padding:0 0 0 10px}.review-body{padding-top:16px}.review-product-label{color:var(--black-50);font-size:12px;margin:0 0 12px}.review-rating-line{align-items:center;display:flex;gap:7px;margin:0 0 6px}.review-rating-line strong{font-size:14px}.review-stars{display:flex;gap:2px}.review-stars b{color:#ddd;font-size:19px}.review-stars b.filled{color:#ffae23}.review-text{font-size:16px;line-height:1.45;margin:0 0 20px;white-space:pre-wrap}.review-delivery{margin-top:20px}.review-comments{border-top:1px solid var(--black-5);display:flex;flex-direction:column;margin-top:26px}.review-comment-thread{background:transparent!important;border-bottom:1px solid var(--black-5);padding:18px 0}.review-comment-row{background:transparent!important;display:flex;gap:10px}.review-comment-reply{border-left:2px solid var(--black-5);margin:16px 0 0 36px;padding-left:12px}.review-comment-avatar{align-items:center;background:#f7ead3;border-radius:50%;display:flex;font-size:14px;font-weight:700;height:38px;justify-content:center;min-width:38px;overflow:hidden;width:38px}.review-comment-avatar img{height:100%;object-fit:cover;width:100%}.review-comment-content{flex:1}.review-comment-head{align-items:flex-start;display:flex;justify-content:space-between}.review-comment-head strong{display:block;font-size:12px}.review-comment-head span{color:var(--black-50);display:block;font-size:11px;margin-top:2px}.review-comment-head time{color:var(--black-50);font-size:11px;white-space:nowrap}.review-comment-content p{font-size:13px;line-height:1.45;margin:10px 0}.review-reply-btn{background:var(--black-4);border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;padding:4px 8px}.review-comment-form{display:flex;gap:10px;margin-top:18px}.review-comment-form input[name=text]{background:var(--black-4);border:1px solid transparent;border-radius:12px;flex:1;font:16px inherit;min-width:0;outline:0;padding:12px}.review-comment-form input:focus{border-color:var(--black-20)}.review-comment-form button{background:var(--black-4);border:0;border-radius:12px;cursor:pointer;font-size:22px;height:46px;width:46px}.review-empty{display:flex;flex-direction:column;gap:8px;text-align:center}@media(max-width:757px){.review-card{padding:16px}.review-meta time{font-size:11px}.review-comment-reply{margin-left:20px}.review-comment-head{display:block}.review-comment-head time{display:block;margin-top:3px}}
+.review-card { background: #FFFFFF; border: 1px solid #E5E8E5; border-radius: 18px; padding: 24px; }
+.review-header { display: flex; align-items: flex-start; }
+.review-avatar { width: 48px; height: 48px; min-width: 48px; border-radius: 50%; overflow: hidden; background: #F4F6F4; display: flex; align-items: center; justify-content: center; font-family: "Roboto Condensed", Arial, sans-serif; font-weight: 900; color: #2A4A34; }
+.review-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.review-meta { display: flex; flex: 1; justify-content: space-between; padding-left: 12px; align-items: flex-start; gap: 8px; }
+.review-author-block strong { display: block; font-size: 14px; color: #000; }
+.review-level { font-size: 12px; color: #2A4A34; font-weight: 600; }
+.review-city { font-size: 12px; color: #5A5A5A; margin-left: 6px; }
+.review-meta time { font-size: 12px; color: #5A5A5A; white-space: nowrap; }
+.review-body { padding-top: 16px; }
+.review-product-label { font-size: 12px; color: #5A5A5A; margin: 0 0 12px; }
+.review-rating-line { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; }
+.review-rating-line strong { font-size: 13px; }
+.review-stars b { color: #E5E8E5; font-size: 18px; }
+.review-stars b.filled { color: #FFB526; }
+.review-text { font-size: 15px; line-height: 1.55; color: #000; margin: 12px 0 0; white-space: pre-wrap; word-break: break-word; }
+.review-delivery { margin-top: 20px; padding: 16px; background: #F4F6F4; border-radius: 12px; }
+.review-comments { border-top: 1px solid #F0F0F0; margin-top: 20px; padding-top: 16px; }
+.review-comment-thread { padding: 14px 0; border-bottom: 1px solid #F0F0F0; }
+.review-comment-thread:last-child { border-bottom: 0; }
+.review-comment-row { display: flex; gap: 10px; }
+.review-comment-reply { margin: 12px 0 0 36px; padding-left: 12px; border-left: 2px solid #F0F0F0; }
+.review-comment-avatar { width: 36px; height: 36px; min-width: 36px; border-radius: 50%; background: #E8EEE8; color: #2A4A34; display: flex; align-items: center; justify-content: center; font-family: "Roboto Condensed", Arial, sans-serif; font-weight: 900; font-size: 14px; overflow: hidden; }
+.review-comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.review-comment-content { flex: 1; min-width: 0; }
+.review-comment-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.review-comment-head strong { font-size: 12px; color: #000; }
+.review-comment-head span { font-size: 11px; color: #5A5A5A; display: block; margin-top: 2px; }
+.review-comment-head time { font-size: 11px; color: #5A5A5A; white-space: nowrap; }
+.review-comment-content p { font-size: 13px; line-height: 1.5; color: #000; margin: 10px 0; }
+.review-reply-btn { padding: 5px 10px; border: 0; border-radius: 6px; background: #F4F6F4; font-size: 11px; font-weight: 700; color: #000; cursor: pointer; }
+.review-reply-btn:hover { background: #2A4A34; color: #FFFFFF; }
+.review-comment-form { display: flex; gap: 10px; margin-top: 16px; }
+.review-comment-form input[name=text] { flex: 1; padding: 12px 14px; border: 1px solid #E5E8E5; background: #F4F6F4; border-radius: 12px; font-size: 14px; outline: none; min-width: 0; }
+.review-comment-form input[name=text]:focus { background: #FFFFFF; border-color: #2A4A34; }
+.review-comment-form button { width: 46px; height: 46px; background: #2A4A34; color: #FFFFFF; border: 0; border-radius: 12px; font-size: 20px; cursor: pointer; }
+.review-comment-form button:hover { background: #1E3626; }
+@media (max-width: 757px) {
+  .review-card { padding: 16px; }
+  .review-comment-reply { margin-left: 16px; }
+  .review-meta { flex-direction: column; }
+}
 </style>
+
 <script>
-document.addEventListener('submit',async function(event){
-  const form=event.target.closest('.review-comment-form');if(!form)return;event.preventDefault();
-  const input=form.querySelector('input[name=text]');const value=input.value.trim();if(!value)return;
-  const token=(document.cookie.match(/(?:^|; )csrftoken=([^;]+)/)||[])[1]||'';
-  const parent=form.querySelector('input[name=parent_id]').value;const target=form.querySelector('input[name=reply_to_user_id]').value;const body=new URLSearchParams({text:value});if(parent)body.set('parent_id',parent);if(target)body.set('reply_to_user_id',target);
-  const response=await fetch('/reviews/'+form.dataset.review+'/comment/',{method:'POST',headers:{'X-CSRFToken':decodeURIComponent(token),'X-Requested-With':'XMLHttpRequest','Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
-  if(response.status===401){location.href='/login/?next=/reviews/';return}if(!response.ok)return;
-  const data=await response.json();if(data.pending_moderation){input.value='';form.querySelector('input[name=parent_id]').value='';form.querySelector('input[name=reply_to_user_id]').value='';alert(data.message||'Комментарий отправлен на модерацию.');return}location.reload();
+document.addEventListener('submit', async function(event) {
+  const form = event.target.closest('.asp-rev-reply-form');
+  if (!form) return;
+  event.preventDefault();
+  const input = form.querySelector('input[name=text]');
+  const value = input.value.trim();
+  if (!value) return;
+  const token = (document.cookie.match(/(?:^|; )csrftoken=([^;]+)/) || [])[1] || '';
+  const parent = form.querySelector('input[name=parent_id]').value;
+  const target = form.querySelector('input[name=reply_to_user_id]').value;
+  const body = new URLSearchParams({text: value});
+  if (parent) body.set('parent_id', parent);
+  if (target) body.set('reply_to_user_id', target);
+  const response = await fetch('/reviews/' + form.dataset.review + '/comment/', {
+    method: 'POST',
+    headers: {'X-CSRFToken': decodeURIComponent(token), 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded'},
+    body: body.toString()
+  });
+  if (response.status === 401) { location.href = '/login/?next=/reviews/'; return; }
+  if (!response.ok) return;
+  const data = await response.json();
+  if (data.pending_moderation) {
+    input.value = '';
+    form.querySelector('input[name=parent_id]').value = '';
+    form.querySelector('input[name=reply_to_user_id]').value = '';
+    alert(data.message || 'Комментарий отправлен на модерацию.');
+    return;
+  }
+  location.reload();
 });
-document.addEventListener('click',function(event){const btn=event.target.closest('.review-reply-btn');if(!btn)return;const card=btn.closest('[data-review-card]');const form=card.querySelector('.review-comment-form');form.querySelector('input[name=parent_id]').value=btn.dataset.reply;form.querySelector('input[name=reply_to_user_id]').value=btn.dataset.targetUser;const input=form.querySelector('input[name=text]');input.placeholder='Ответить '+btn.dataset.name;input.focus();form.scrollIntoView({behavior:'smooth',block:'center'})});
+document.addEventListener('click', function(event) {
+  const btn = event.target.closest('.asp-rev-reply');
+  if (!btn) return;
+  const card = btn.closest('[data-review-card]');
+  const form = card.querySelector('.review-comment-form');
+  form.querySelector('input[name=parent_id]').value = btn.dataset.reply;
+  form.querySelector('input[name=reply_to_user_id]').value = btn.dataset.targetUser;
+  const input = form.querySelector('input[name=text]');
+  input.placeholder = 'Ответить ' + btn.dataset.name;
+  input.focus();
+  form.scrollIntoView({behavior: 'smooth', block: 'center'});
+});
 </script>
 {% endblock %}

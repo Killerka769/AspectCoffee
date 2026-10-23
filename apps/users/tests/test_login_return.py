@@ -1,12 +1,19 @@
 from unittest.mock import patch
 
 from django.test import TestCase
+from django.conf import settings
+from django.contrib.sites.models import Site
+from allauth.socialaccount.models import SocialApp
 
 from apps.users.models import User
 
 
 class LoginReturnTests(TestCase):
     def setUp(self):
+        site, _ = Site.objects.get_or_create(pk=settings.SITE_ID, defaults={"domain": "testserver", "name": "Test"})
+        for provider in ("yandex", "vk"):
+            app = SocialApp.objects.create(provider=provider, name=provider, client_id="test-client", secret="test-secret")
+            app.sites.add(site)
         self.user = User.objects.create_user(
             email="community-member@example.com",
             password="test-password-123",
