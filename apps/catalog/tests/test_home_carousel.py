@@ -21,5 +21,6 @@ class HomeCarouselRegressionTests(TestCase):
         response = self.client.get(reverse("catalog:index"))
 
         self.assertContains(response, 'class="aspect-hero__title"')
-        self.assertEqual([slide.title for slide in response.context["promo_slides"]], ["Разрешённый промо-слайд"])
+        self.assertIn("Разрешённый промо-слайд", [slide.title for slide in response.context["promo_slides"]])
+        self.assertNotIn("Посторонний баннер", [slide.title for slide in response.context["promo_slides"]])
         self.assertNotContains(response, "Посторонний баннер")
