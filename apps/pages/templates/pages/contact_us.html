@@ -373,48 +373,7 @@
       <section class="aspect-contact__card">
         <h2 class="aspect-contact__card-title">Напишите нам</h2>
 
-        <form class="aspect-contact__form"
-              x-data="{ name: '', email: '', message: '', sent: false, loading: false }"
-              @submit.prevent="loading = true; setTimeout(() => { loading = false; sent = true }, 1200)">
-
-          <div x-show="!sent" x-transition style="display:flex;flex-direction:column;gap:18px;">
-
-            <div class="aspect-contact__field">
-              <label class="aspect-contact__label">Ваше имя</label>
-              <input type="text" x-model="name" required class="aspect-contact__input" placeholder="Как к вам обращаться"/>
-            </div>
-
-            <div class="aspect-contact__field">
-              <label class="aspect-contact__label">Email</label>
-              <input type="email" x-model="email" required class="aspect-contact__input" placeholder="email@example.com"/>
-            </div>
-
-            <div class="aspect-contact__field">
-              <label class="aspect-contact__label">Сообщение</label>
-              <textarea x-model="message" required class="aspect-contact__textarea" placeholder="Опишите ваш вопрос"></textarea>
-            </div>
-
-            <button type="submit" :disabled="loading" class="aspect-contact__submit">
-              <template x-if="loading">
-                <svg class="aspect-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" opacity="0.75"/></svg>
-              </template>
-              <span x-text="loading ? 'Отправляем…' : 'Отправить'"></span>
-            </button>
-
-          </div>
-
-          <div x-show="sent" x-cloak x-transition class="aspect-contact__success">
-            <div class="aspect-contact__success-icon">
-              <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <h3 class="aspect-contact__success-title">Спасибо за обращение!</h3>
-            <p class="aspect-contact__success-text">Мы свяжемся с вами в ближайшее время.</p>
-            <button type="button" class="aspect-contact__success-again" @click="sent = false; name = ''; email = ''; message = ''">
-              Отправить ещё
-            </button>
-          </div>
-
-        </form>
+        {% include "pages/_contact_form.html" with embedded=True %}
       </section>
 
     </div>

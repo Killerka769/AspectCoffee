@@ -504,7 +504,7 @@
             <div class="asp-od__item-body">
               <p class="asp-od__item-name">{{ item.product_name }}</p>
               <p class="asp-od__item-meta">
-                {{ item.variant.weight }} г{% if item.variant.get_grind_display %} · {{ item.variant.get_grind_display }}{% endif %}
+                {{ item.variant_description|default:"Характеристики не указаны" }}
               </p>
             </div>
             <div class="asp-od__item-price">
@@ -528,10 +528,15 @@
             </div>
             <div class="asp-od__info-body">
               <p class="asp-od__info-label">Адрес</p>
+              {% if order.cdek_pvz_address %}
+              <p class="asp-od__info-value">{{ order.cdek_pvz_address }}</p>
+              {% if order.cdek_pvz_code %}<p class="asp-od__info-note">Код ПВЗ: {{ order.cdek_pvz_code }}</p>{% endif %}
+              {% else %}
               <p class="asp-od__info-value">{{ order.delivery_address.city }}</p>
               <p class="asp-od__info-note">
-                {{ order.delivery_address.street }}{% if order.delivery_address.house %}, д. {{ order.delivery_address.house }}{% endif %}{% if order.delivery_address.apartment %}, кв. {{ order.delivery_address.apartment }}{% endif %}
+                {{ order.delivery_address.street }}{% if order.delivery_address.house %}, д. {{ order.delivery_address.house }}{% endif %}{% if order.delivery_address.apartment %}, кв. {{ order.delivery_address.apartment }}{% endif %}{% if order.delivery_address.postal_code %}, {{ order.delivery_address.postal_code }}{% endif %}
               </p>
+              {% endif %}
             </div>
           </div>
 
@@ -589,6 +594,7 @@
       {% if order.comment %}
       <div class="asp-od__comment">{{ order.comment }}</div>
       {% endif %}
+      {% if order.is_organization %}<div class="asp-od__comment"><strong>Организация:</strong> {{ order.org_name }} · ИНН {{ order.org_inn }}</div>{% endif %}
 
     </div>
 

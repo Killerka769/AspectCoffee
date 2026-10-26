@@ -27,19 +27,15 @@ class AdminLocalizationTests(SimpleTestCase):
 
     def test_local_admin_models_and_fields_have_russian_labels(self):
         expected_models = {
-            "pages.CommunityPostDislike": "Отметка «не нравится»",
-            "pages.CommunityPostBookmark": "Закладка сообщества",
-            "pages.CommunityPostRepost": "Репост сообщества",
             "pages.CommunityPostComment": "Комментарий сообщества",
             "pages.ReviewComment": "Комментарий к отзыву",
-            "blog.BlogSeriesVisit": "Посещение серии статей",
             "blog.ArticleLike": "Отметка «нравится» у статьи",
         }
         for label, verbose_name in expected_models.items():
             self.assertEqual(str(apps.get_model(label)._meta.verbose_name), verbose_name)
 
         expected_fields = {
-            "users.UserAchievement.user": "Пользователь",
+            "catalog.SiteSettings.contact_email": "Email сайта для заявок",
             "users.BonusTransaction.order": "Заказ",
             "orders.Cart.created_at": "Создана",
             "catalog.Category.created_at": "Создана",

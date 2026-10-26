@@ -39,7 +39,7 @@ class OAuthPhoneCompletionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(
             response,
-            "не передал его при OAuth-входе",
+            "не передал его при входе",
         )
         self.assertContains(response, "Яндекс")
 

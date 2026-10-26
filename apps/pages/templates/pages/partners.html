@@ -595,11 +595,12 @@
         </div>
       </div>
       <div class="aspect-partners__cta-actions">
-        <a href="/contact-us/" class="aspect-partners__cta-btn aspect-partners__cta-btn--primary">Оставить заявку</a>
+        <a href="#inquiry" class="aspect-partners__cta-btn aspect-partners__cta-btn--primary">Оставить заявку</a>
         <a href="{% url 'catalog:catalog' %}" class="aspect-partners__cta-btn aspect-partners__cta-btn--ghost">В каталог</a>
       </div>
     </section>
 
+    {% include "pages/_contact_form.html" %}
   </div>
 </main>
 {% endblock %}

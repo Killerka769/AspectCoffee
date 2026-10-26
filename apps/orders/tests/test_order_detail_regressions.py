@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from apps.orders.admin import OrderAdmin
-from apps.orders.models import Order
+from apps.orders.models import Order, OrderItem
 from apps.orders.tasks import create_cdek_waybill, send_order_confirmation
 from apps.users.models import User
 
@@ -48,12 +48,36 @@ class OrderDetailRegressionTests(TestCase):
         self.assertContains(response, "+79995554433")
         self.assertContains(response, "д. 1")
         self.assertContains(response, "Повторить заказ")
-        self.assertContains(response, "не включена в оплату")
+        self.assertContains(response, "Не включена в сумму оплаты")
 
     def test_admin_exposes_repeat_order_action(self):
         model_admin = OrderAdmin(Order, AdminSite())
         self.assertIn("repeat_in_customer_cart", model_admin.actions)
         self.assertEqual(model_admin.recipient_display(self.order), "Петр Петров")
+
+    def test_detail_preserves_item_snapshot_after_catalog_variant_is_deleted(self):
+        OrderItem.objects.create(order=self.order, variant=None, product_name="Исторический кофе", variant_description="250 г · для фильтра", qty=2, price_at_order=Decimal("500.00"))
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("users:order_detail", args=[self.order.pk]))
+        self.assertContains(response, "Исторический кофе")
+        self.assertContains(response, "250 г · для фильтра")
+        self.assertContains(response, "2 шт")
+        self.assertContains(response, "1000")
+
+    def test_detail_displays_full_pickup_address(self):
+        self.order.delivery_type = Order.DELIVERY_CDEK_PVZ
+        self.order.cdek_pvz_address = "Москва, Полная улица, 42, пункт выдачи"
+        self.order.cdek_pvz_code = "MSK-42"
+        self.order.save()
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("users:order_detail", args=[self.order.pk]))
+        self.assertContains(response, self.order.cdek_pvz_address)
+        self.assertContains(response, "MSK-42")
+
+    def test_customer_cannot_view_another_customers_order(self):
+        stranger = User.objects.create_user(email="other@example.com", password="Strongpass1")
+        self.client.force_login(stranger)
+        self.assertEqual(self.client.get(reverse("users:order_detail", args=[self.order.pk])).status_code, 404)
 
     @patch("apps.users.notifications.send_logged_email")
     def test_pending_online_payment_email_does_not_claim_success(self, send_email):

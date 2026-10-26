@@ -1,0 +1,39 @@
+#!/bin/sh
+# Renew the shared Nginx/stunnel certificate without taking HAProxy offline.
+set -eu
+
+cd /opt/aspectcoffee
+exec 9>/run/lock/aspect-vpn-cert-renew.lock
+flock -n 9 || exit 0
+
+CERT=/var/lib/docker/volumes/aspectcoffee_certbot_conf/_data/live/aspectcoffee.ru/fullchain.pem
+STATE=/var/lib/aspect-vpn-cert-renew
+mkdir -p "$STATE"
+chmod 700 "$STATE"
+
+# Only ACME paths are public in HAProxy. This dedicated firewall rule is
+# temporary; existing customer/VPN/SSH rules are not touched.
+cleanup() {
+    ufw --force delete allow in proto tcp to 45.155.52.48 port 80 >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+trap 'exit 1' INT TERM
+ufw allow in proto tcp to 45.155.52.48 port 80 comment 'Aspect ACME renewal' >/dev/null
+
+docker compose run --rm --entrypoint certbot certbot renew \
+    --cert-name aspectcoffee.ru --webroot -w /var/www/certbot \
+    --no-random-sleep-on-renew --non-interactive "$@"
+
+# Never activate staging certificates from the dry-run test.
+case " $* " in *" --dry-run "*) exit 0 ;; esac
+
+openssl x509 -in "$CERT" -noout -checkend 0
+fingerprint=$(sha256sum "$CERT" | cut -d ' ' -f 1)
+applied=$(cat "$STATE/applied.sha256" 2>/dev/null || true)
+if [ "$fingerprint" != "$applied" ]; then
+    docker compose exec -T nginx nginx -t
+    docker compose exec -T nginx nginx -s reload
+    systemctl restart stunnel4
+    systemctl is-active --quiet stunnel4
+    printf '%s\n' "$fingerprint" > "$STATE/applied.sha256"
+fi

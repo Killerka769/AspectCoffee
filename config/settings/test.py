@@ -21,6 +21,8 @@ CELERY_TASK_EAGER_PROPAGATES = True
 AXES_ENABLED = False
 YOOKASSA_SHOP_ID = "test-shop"
 YOOKASSA_SECRET_KEY = "test-secret"
+# Exercise the optional legacy checkout method; production defaults to disabled.
+PAYMENT_COD_ENABLED = True
 MEDIA_ROOT = BASE_DIR / "media_test"
 if not MEDIA_ROOT.exists():
     MEDIA_ROOT.mkdir(parents=True)

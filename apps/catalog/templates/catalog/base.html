@@ -300,7 +300,7 @@ html body .aspect-header__icons .header-cart__btn:hover * {
         }
       }">
         <button type="button" class="icon-btn" aria-label="Поиск"
-                @click.stop.prevent="searchOpen = true; setTimeout(() => { $refs.searchInput && $refs.searchInput.focus(); }, 150)"
+                @click.stop.prevent="menuOpen = false; searchOpen = true; cartOpen = false; wishlistOpen = false; notifOpen = false; setTimeout(() => { $refs.searchInput && $refs.searchInput.focus(); }, 150)"
                 x-show="!searchOpen">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-3.5-3.5"/></svg>
         </button>
@@ -387,12 +387,16 @@ html body .aspect-header__icons .header-cart__btn:hover * {
        x-transition:leave="transition ease-in duration-150"
        x-transition:leave-start="opacity-100 translate-x-0"
        x-transition:leave-end="opacity-0 translate-x-6">
-  <button type="button" class="aspect-mobile-menu__close" aria-label="Закрыть" @click="menuOpen = false">
+  <button type="button" class="aspect-mobile-menu__close" aria-label="Закрыть меню" @click="menuOpen = false">
     <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
   </button>
 
   <nav class="aspect-mobile-menu__nav">
     <a href="/catalog/" class="aspect-mobile-menu__title">Купить</a>
+    <div class="aspect-mobile-menu__section">
+      {% for section in nav_sections %}<a href="{{ section.get_absolute_url }}">{{ section.name }}</a>{% endfor %}
+      {% for item in nav_menu_items %}<a href="{{ item.url }}"{% if item.open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.title }}</a>{% endfor %}
+    </div>
     <a href="/reviews" class="aspect-mobile-menu__title">Отзывы</a>
     <a href="/community" class="aspect-mobile-menu__title">Сообщество</a>
     <a href="/blog" class="aspect-mobile-menu__title">Журнал</a>
@@ -404,12 +408,15 @@ html body .aspect-header__icons .header-cart__btn:hover * {
       <a href="/discount-system/">Система скидок</a>
       <a href="/return-money/">Возврат денег</a>
       <a href="/faq/">Частые вопросы</a>
+      <a href="/how-to-choose-coffee/">Как приготовить кофе</a>
+      <a href="{% url 'catalog:compare' %}">Сравнение</a>
     </div>
   </nav>
 
   <div class="aspect-mobile-menu__account">
     {% if request.user.is_authenticated %}
       <a href="{% url 'users:profile' %}" class="aspect-mobile-menu__title">Профиль</a>
+      <a href="{% url 'users:discount' %}" class="aspect-mobile-menu__title">Скидка</a>
       <a href="/logout/" class="aspect-mobile-menu__logout">Выйти</a>
     {% else %}
       <a href="/login" class="aspect-mobile-menu__title">Вход</a>
@@ -516,5 +523,6 @@ html body .aspect-header__icons .header-cart__btn:hover * {
 </script>
 {% endif %}
 
+{% block extra_js %}{% endblock %}
 </body>
 </html>

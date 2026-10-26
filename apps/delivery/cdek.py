@@ -36,7 +36,18 @@ class CDEKClient:
     """Client for CDEK API v2."""
 
     def __init__(self):
-        raw_url = (getattr(settings, "CDEK_API_URL", "") or "https://api.cdek.ru/v2").rstrip("/")
+        from django.core.exceptions import ImproperlyConfigured
+        from urllib.parse import urlsplit
+
+        default_url = "https://api.edu.cdek.ru/v2" if getattr(settings, "CDEK_TEST_MODE", False) else "https://api.cdek.ru/v2"
+        raw_url = (getattr(settings, "CDEK_API_URL", "") or default_url).rstrip("/")
+        endpoint = urlsplit(raw_url)
+        if endpoint.scheme != "https" or endpoint.username or endpoint.password or endpoint.query or endpoint.fragment or endpoint.path not in ("", "/v2"):
+            raise ImproperlyConfigured("CDEK_API_URL must be an HTTPS API root without credentials or query parameters")
+        if getattr(settings, "CDEK_TEST_MODE", False) and endpoint.hostname == "api.cdek.ru":
+            raise ImproperlyConfigured("CDEK_TEST_MODE=True conflicts with the live CDEK_API_URL")
+        if not getattr(settings, "CDEK_TEST_MODE", False) and endpoint.hostname == "api.edu.cdek.ru":
+            raise ImproperlyConfigured("Set CDEK_TEST_MODE=True for the sandbox CDEK_API_URL")
         # Normalize: strip /v2 suffix if present — we add it per-endpoint
         if raw_url.endswith("/v2"):
             raw_url = raw_url[:-3]

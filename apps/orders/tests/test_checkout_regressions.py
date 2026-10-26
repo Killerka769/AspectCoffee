@@ -12,6 +12,16 @@ from apps.users.models import Address, User
 
 
 class CheckoutRegressionTests(TestCase):
+    @override_settings(PAYMENT_COD_ENABLED=False)
+    def test_disabled_cod_is_hidden_and_rejected_on_server(self):
+        self._anonymous_cart()
+        response = self.client.get("/basket/")
+        self.assertNotContains(response, 'name="payment_method_radio" type="radio" value="cod"')
+        response = self._post_checkout(self._checkout_data())
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Оплата при получении недоступна", response.json()["error"])
+        self.assertFalse(Order.objects.exists())
+
     def setUp(self):
         self.site_settings = SiteSettings.load()
         self.site_settings.enable_pickup = True
@@ -300,8 +310,8 @@ class CheckoutRegressionTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["default_delivery_type"], Order.DELIVERY_CDEK_PVZ)
-        self.assertContains(response, '.delivery-options label:has(input[value="courier"]) { display: none; }')
-        self.assertContains(response, '.delivery-options label:has(input[value="pickup"]) { display: none; }')
+        self.assertNotIn(Order.DELIVERY_COURIER, self.site_settings.enabled_delivery_types())
+        self.assertNotIn(Order.DELIVERY_PICKUP, self.site_settings.enabled_delivery_types())
 
     def test_new_registration_creates_user_and_attaches_order(self):
         self._anonymous_cart()

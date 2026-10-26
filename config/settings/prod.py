@@ -12,7 +12,6 @@ DATABASES = {
         "OPTIONS": {"timeout": 20},
     }
 }
-
 ALLOWED_HOSTS = [
     "aspectcoffee.ru",
     "www.aspectcoffee.ru",
@@ -82,7 +81,3 @@ LOGGING = {
         },
     },
 }
-
-
-import ssl
-EMAIL_SSL_CERT_REQS = ssl.CERT_NONE

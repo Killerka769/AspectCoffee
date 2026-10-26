@@ -1212,14 +1212,14 @@ textarea.ckc-field { min-height: 90px; resize: none; }
                     <div class="ckc-opt__desc">Через ЮKassa</div>
                   </div>
                 </label>
-                <label class="ckc-opt">
+{% if cod_enabled %}<label class="ckc-opt">
                   <input class="ckc-opt__input" name="payment_method_radio" type="radio" value="cod" x-model="paymentMethod"/>
                   <div class="ckc-opt__icon"><svg viewBox="0 0 24 24" stroke-width="1.8" fill="none" stroke="currentColor"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
                   <div>
                     <div class="ckc-opt__label">При получении</div>
                     <div class="ckc-opt__desc">Наличными или картой</div>
                   </div>
-                </label>
+                </label>{% endif %}
                 <label class="ckc-opt" style="opacity:.5;cursor:not-allowed;">
                   <input class="ckc-opt__input" name="payment_method_radio" type="radio" value="sbp" disabled/>
                   <div class="ckc-opt__icon"><svg viewBox="0 0 24 24" stroke-width="1.8" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div>

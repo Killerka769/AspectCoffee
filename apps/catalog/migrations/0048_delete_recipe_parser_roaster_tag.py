@@ -11,14 +11,14 @@ class Migration(migrations.Migration):
         migrations.DeleteModel(name="RecipeStep"),
         migrations.DeleteModel(name="Recipe"),
 
-        migrations.DeleteModel(name="Roaster"),
-        migrations.DeleteModel(name="Tag"),
         migrations.DeleteModel(name="ParserLog"),
         migrations.DeleteModel(name="ParserSetting"),
 
         migrations.RemoveField(model_name="product", name="roaster"),
         migrations.RemoveField(model_name="product", name="tags"),
         migrations.RemoveField(model_name="product", name="roaster_machine"),
+        migrations.DeleteModel(name="Roaster"),
+        migrations.DeleteModel(name="Tag"),
 
         migrations.RemoveField(model_name="sitesettings", name="wholesale_url"),
         migrations.RemoveField(model_name="sitesettings", name="main_site_url"),

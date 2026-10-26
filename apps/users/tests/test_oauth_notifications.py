@@ -123,28 +123,10 @@ class NotificationRegressionTests(TestCase):
         self.assertTrue(log.success)
         self.assertTrue(UserNotification.objects.filter(user=user, email_log=log).exists())
 
-    def test_recipe_publication_notification_uses_canonical_email_and_bell(self):
-        from apps.catalog.models import Recipe
-        from apps.catalog.tasks import send_user_recipe_published_notification
+    def test_retired_recipe_notification_is_not_exposed(self):
+        from apps.catalog import tasks
 
-        user = User.objects.create_user(
-            email="recipe-notice@example.com",
-            password="Strongpass1",
-        )
-        recipe = Recipe.objects.create(
-            name="Рецепт уведомления",
-            slug="notice-recipe",
-            time_minutes=5,
-            author=user,
-            is_user_submitted=True,
-            is_published=True,
-        )
-
-        sent = send_user_recipe_published_notification.run(recipe.pk)
-
-        self.assertTrue(sent)
-        log = EmailLog.objects.get(recipient=user.email)
-        self.assertTrue(UserNotification.objects.filter(user=user, email_log=log).exists())
+        self.assertFalse(hasattr(tasks, "send_user_recipe_published_notification"))
 
     @override_settings(
         WEBPUSH_VAPID_PRIVATE_KEY="test-private-key",

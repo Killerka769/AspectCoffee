@@ -33,6 +33,16 @@ python manage.py runserver
 
 ## Запуск через Docker Compose
 
+Чистый локальный стенд одной командой, без VPN, TLS и рабочих секретов:
+
+```bash
+docker compose -f compose.local.yml up --build -d
+```
+
+Откройте `http://127.0.0.1:8000`. База и media создаются в отдельных named volumes; миграции и статика выполняются автоматически. Письма локально выводятся в консоль, платежные ключи пустые. Это не production-конфигурация. Подробности исправлений и приёмки: [handover](docs/09_HANDOVER_ACCEPTANCE.md).
+
+Существующий production/VPN-контур:
+
 ```bash
 cp .env.example .env.prod
 # Заполнить секреты и реквизиты в .env.prod

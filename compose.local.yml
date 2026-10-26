@@ -1,0 +1,43 @@
+services:
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  web:
+    build: .
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.local
+      SECRET_KEY: local-only-not-for-production
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
+      RUN_MIGRATIONS: "1"
+      RUN_COLLECTSTATIC: "1"
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      YOOKASSA_SHOP_ID: ""
+      YOOKASSA_SECRET_KEY: ""
+      YOOKASSA_RECURRENT_ENABLED: "False"
+      CDEK_CLIENT_ID: ""
+      CDEK_CLIENT_SECRET: ""
+      CDEK_TEST_MODE: "True"
+      CDEK_API_URL: https://api.edu.cdek.ru/v2
+      SENTRY_DSN: ""
+    ports: ["127.0.0.1:8000:8000"]
+    volumes:
+      - local-data:/app/data
+      - local-media:/app/media
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/contact-us/', timeout=5)"]
+      interval: 10s
+      timeout: 6s
+      retries: 15
+      start_period: 30s
+volumes:
+  local-data:
+  local-media:

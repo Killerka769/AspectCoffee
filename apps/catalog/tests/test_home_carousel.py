@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.urls import reverse
 
 from apps.catalog.models import PromoSlide
-from apps.pages.models import Banner
 
 
 class HomeCarouselRegressionTests(TestCase):
@@ -13,14 +12,15 @@ class HomeCarouselRegressionTests(TestCase):
             order=0,
             is_active=True,
         )
-        Banner.objects.create(
-            slot="home_weekly",
+        PromoSlide.objects.create(
+            section_label="Неактивное предложение",
             title="Посторонний баннер",
-            description="Не должен появляться в карусели промо-слайдов",
-            is_active=True,
+            is_active=False,
         )
 
         response = self.client.get(reverse("catalog:index"))
 
-        self.assertContains(response, "Разрешённый промо-слайд")
+        self.assertContains(response, 'class="aspect-hero__title"')
+        self.assertIn("Разрешённый промо-слайд", [slide.title for slide in response.context["promo_slides"]])
+        self.assertNotIn("Посторонний баннер", [slide.title for slide in response.context["promo_slides"]])
         self.assertNotContains(response, "Посторонний баннер")

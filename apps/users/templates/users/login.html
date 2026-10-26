@@ -1,7 +1,6 @@
 {% extends "catalog/base.html" %}
 {% load static %}
 {% load socialaccount %}
-{% get_providers as socialaccount_providers %}
 
 {% block title %}Вход{% endblock %}
 {% block meta_description %}Вход в личный кабинет Aspect Coffee Roasters.{% endblock %}
@@ -268,6 +267,7 @@
 
       <form method="post" action="{% url 'login' %}" class="aspect-auth__form">
         {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next_url }}">
 
         <div class="aspect-auth__field">
           <label class="aspect-auth__label" for="email-login">Электронная почта</label>
@@ -305,17 +305,18 @@
 
         <button type="submit" class="aspect-auth__submit">Войти</button>
 
+        {% get_providers as socialaccount_providers %}
         {% if socialaccount_providers %}
         <div class="aspect-auth__socials">
           <p class="aspect-auth__socials-label">Или войдите через</p>
           <div class="aspect-auth__socials-row">
             {% for provider in socialaccount_providers %}
               {% if provider.id == "yandex" %}
-              <a href="{% url 'yandex_login' %}" class="aspect-auth__social" aria-label="Войти через Яндекс">
+              <a href="{% url 'yandex_login' %}?next={{ next_url|urlencode }}" class="aspect-auth__social" aria-label="Войти через Яндекс">
                 <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="11.667" fill="#FC3F1D"/><path d="M23.54 16.944h-1.078c-1.976 0-3.016 1.001-3.016 2.477 0 1.668.719 2.45 2.195 3.452l1.219.821-3.504 5.235h-2.618l3.144-4.683c-1.808-1.296-2.823-2.555-2.823-4.684 0-2.67 1.86-4.492 5.39-4.492h3.504v13.846H23.54V16.944Z" fill="#fff"/></svg>
               </a>
               {% elif provider.id == "vk" %}
-              <a href="{% url 'vk_login' %}" class="aspect-auth__social" aria-label="Войти через VK">
+              <a href="{% url 'vk_login' %}?next={{ next_url|urlencode }}" class="aspect-auth__social" aria-label="Войти через VK">
                 <svg viewBox="0 0 44 44" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.687 11.687C10 13.374 10 16.09 10 21.52v.96c0 5.43 0 8.146 1.687 9.833C13.374 34 16.09 34 21.52 34h.96c5.43 0 8.146 0 9.833-1.687C34 30.626 34 27.91 34 22.48v-.96c0-5.43 0-8.146-1.687-9.833C30.626 10 27.91 10 22.48 10h-.96c-5.43 0-8.146 0-9.833 1.687ZM14.05 17.3c.13 6.24 3.25 9.99 8.72 9.99h.31v-3.57c2.01.2 3.53 1.67 4.14 3.57h2.84c-.78-2.84-2.83-4.41-4.11-5.01 1.28-.74 3.08-2.54 3.51-4.98h-2.58c-.56 1.98-2.22 3.78-3.8 3.95V17.3H20.5v6.92c-1.6-.4-3.62-2.34-3.71-6.92h-2.74Z" fill="#3277F6"/></svg>
               </a>
               {% endif %}
