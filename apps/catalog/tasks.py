@@ -5,7 +5,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-@shared_task
 # def run_catalog_parser_task(force=False, update_images=False, category="coffee", limit=0):
 #     from apps.catalog.models import ParserSetting
 #     settings = ParserSetting.load()
@@ -130,7 +129,6 @@ def send_user_review_rejected_notification(review_id):
     return log.success
 
 
-@shared_task
 # def send_admin_new_recipe_notification(recipe_id):
 #     from django.conf import settings
 
@@ -162,7 +160,6 @@ def send_user_review_rejected_notification(review_id):
 #     return log.success
 
 
-@shared_task
 # def send_user_recipe_published_notification(recipe_id):
 #     from apps.catalog.models import Recipe
 #     from apps.users.notifications import send_logged_email
