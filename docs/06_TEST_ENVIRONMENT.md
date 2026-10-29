@@ -62,6 +62,9 @@ Compose-проектом `aspectcoffee-test`:
 `deploy/haproxy/haproxy.cfg`; рабочий файл сервера —
 `/etc/haproxy/haproxy.cfg`.
 
+Как добавить IP и полностью открыть сайты с сохранением VPN:
+[пошаговая инструкция](10_IP_ACCESS_CONTROL.md).
+
 ## Первичное развёртывание
 
 ```bash
