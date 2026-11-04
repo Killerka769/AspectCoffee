@@ -1,0 +1,498 @@
+/**
+ * Aspect Coffee — Этап 3: главная, каталог, карточка, ЛК
+ * Только визуальный слой; классы Alpine/HTMX не трогаем.
+ */
+
+/* ——— Личный кабинет (main.aspect-account — не зависит только от body.grey-theme) ——— */
+main.aspect-account {
+  background: #f7f8f7;
+}
+
+main.aspect-account .aspect-account__container {
+  width: min(1440px, calc(100% - 32px));
+  max-width: 1440px;
+}
+
+main.aspect-account .aspect-account__heading {
+  border-bottom: 1px solid #e5e8e5;
+  padding-bottom: 20px;
+  margin-bottom: 28px;
+}
+
+@media (min-width: 1100px) {
+  main.aspect-account .aspect-account__aside {
+    position: sticky;
+    top: 96px;
+    align-self: start;
+    max-height: calc(100vh - 112px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  main.aspect-account .mob-account-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #e5e8e5;
+    border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+  }
+
+  main.aspect-account .mob-account-nav > li {
+    width: 100%;
+  }
+
+  main.aspect-account .mob-account-nav > li > a {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 14px !important;
+    border-radius: 4px;
+    font-size: 14px !important;
+    letter-spacing: 0.06em !important;
+    line-height: 1.25 !important;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  main.aspect-account .mob-account-nav > li > a:hover {
+    background: #f4f6f4;
+  }
+
+  main.aspect-account .mob-account-nav > li > a.font-din-black {
+    background: #2a4a34 !important;
+    color: #ffffff !important;
+    font-size: 14px !important;
+    letter-spacing: 0.06em !important;
+  }
+
+  main.aspect-account .aspect-account-nav__icon {
+    flex: 0 0 20px;
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px;
+    max-height: 20px;
+    color: #2a4a34;
+  }
+
+  main.aspect-account .mob-account-nav > li > a.font-din-black .aspect-account-nav__icon {
+    color: #ffffff;
+  }
+}
+
+@media (max-width: 1099px) {
+  main.aspect-account .mob-account-nav {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  main.aspect-account .mob-account-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  main.aspect-account .mob-account-nav > li > a {
+    white-space: nowrap;
+    padding: 10px 14px !important;
+    border: 1px solid #e5e8e5;
+    border-radius: 999px;
+    background: #fff;
+    font-size: 14px !important;
+  }
+
+  main.aspect-account .aspect-account-nav__icon {
+    display: none;
+  }
+}
+
+main.aspect-account .aspect-account__content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+main.aspect-account .aspect-account__content .asp-orders,
+main.aspect-account .aspect-account__content .asp-profile,
+main.aspect-account .aspect-account__content .asp-bal,
+main.aspect-account .aspect-account__content .asp-stat,
+main.aspect-account .aspect-account__content .asp-od,
+main.aspect-account .aspect-account__content .asp-disc {
+  background: #ffffff;
+  border: 1px solid #e5e8e5;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+  padding: 28px 28px 32px;
+}
+
+@media (max-width: 757px) {
+  main.aspect-account .aspect-account__content .asp-orders,
+  main.aspect-account .aspect-account__content .asp-profile,
+  main.aspect-account .aspect-account__content .asp-bal,
+  main.aspect-account .aspect-account__content .asp-stat,
+  main.aspect-account .aspect-account__content .asp-od {
+    padding: 20px 16px 24px;
+  }
+}
+
+main.aspect-account .aspect-account-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+main.aspect-account .aspect-account-table-wrap table {
+  min-width: 560px;
+}
+
+main.aspect-account .tc-btn {
+  border-radius: 4px !important;
+}
+
+html body main.aspect-account h1.aspect-account__page-title,
+html body.grey-theme main.aspect-account h1.aspect-account__page-title {
+  font-size: clamp(24px, 3vw, 40px) !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.01em !important;
+  margin: 0 !important;
+}
+
+html body main.aspect-account h1.aspect-account__page-title::after,
+html body.grey-theme main.aspect-account h1.aspect-account__page-title::after {
+  display: none !important;
+  content: none !important;
+}
+
+main.aspect-account .aspect-account__content .asp-field__input,
+main.aspect-account .aspect-account__content .asp-field__input:focus {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid #ccc !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 8px 0 10px !important;
+  min-height: 0 !important;
+  line-height: 1.45 !important;
+}
+
+main.aspect-account .aspect-account__content .asp-field__input:focus {
+  border-bottom-color: #2a4a34 !important;
+}
+
+main.aspect-account .aspect-account__content .asp-field {
+  gap: 8px !important;
+  margin-bottom: 18px !important;
+}
+
+main.aspect-account .aspect-account__content .asp-modal__form,
+main.aspect-account .aspect-account__content .asp-profile__address-form {
+  max-width: 560px;
+}
+
+main.aspect-account .aspect-account__content .asp-btn {
+  border-radius: 4px !important;
+}
+
+main.aspect-account .aspect-account__content .asp-btn--primary {
+  background: #000 !important;
+}
+
+main.aspect-account .aspect-account__content .asp-btn--primary:hover {
+  background: #2a4a34 !important;
+}
+
+html body main.aspect-account h1.asp-profile__name,
+html body.grey-theme main.aspect-account h1.asp-profile__name {
+  font-size: 24px !important;
+  line-height: 1.15 !important;
+  margin: 0 !important;
+  text-transform: uppercase !important;
+}
+
+html body main.aspect-account h1.asp-profile__name::after,
+html body.grey-theme main.aspect-account h1.asp-profile__name::after {
+  display: none !important;
+  content: none !important;
+}
+
+html body main.aspect-account h2.asp-profile__section-title,
+html body main.aspect-account h2.asp-orders__section-title,
+html body.grey-theme main.aspect-account h2.asp-profile__section-title,
+html body.grey-theme main.aspect-account h2.asp-orders__section-title {
+  font-size: 22px !important;
+  line-height: 1.15 !important;
+  margin: 0 0 4px !important;
+  padding-bottom: 0 !important;
+  border-bottom: none !important;
+}
+
+html body main.aspect-account h2.asp-profile__section-title::after,
+html body.grey-theme main.aspect-account h2.asp-profile__section-title::after {
+  content: "" !important;
+  display: block !important;
+  position: static !important;
+  width: 48px !important;
+  height: 3px !important;
+  margin-top: 12px !important;
+  background: #2a4a34 !important;
+}
+
+html body main.aspect-account h1.asp-stat__title,
+html body main.aspect-account h1.asp-bal__title,
+html body main.aspect-account h1.asp-od__title,
+html body main.aspect-account h1.asp-fav__title,
+html body main.aspect-account h1.asp-bl__title {
+  font-size: clamp(22px, 3vw, 32px) !important;
+  line-height: 1.15 !important;
+  margin: 0 0 16px !important;
+}
+
+html body main.aspect-account h1.asp-stat__title::after,
+html body main.aspect-account h1.asp-bal__title::after,
+html body main.aspect-account h1.asp-od__title::after,
+html body main.aspect-account h1.asp-fav__title::after,
+html body main.aspect-account h1.asp-bl__title::after {
+  display: none !important;
+  content: none !important;
+}
+
+html body main.aspect-account h3.asp-modal__title,
+html body.grey-theme main.aspect-account h3.asp-modal__title {
+  font-size: clamp(22px, 3vw, 28px) !important;
+  line-height: 1.15 !important;
+  margin: 0 !important;
+}
+
+html body main.aspect-account h3.asp-modal__title::after,
+html body.grey-theme main.aspect-account h3.asp-modal__title::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* ——— Каталог: сетка и фильтры ——— */
+html body .aspect-catalog__container {
+  width: min(1440px, calc(100% - 32px)) !important;
+}
+
+html body .aspect-catalog__layout {
+  gap: 32px !important;
+}
+
+html body .aspect-catalog__header {
+  margin-bottom: 28px !important;
+  padding-bottom: 24px !important;
+}
+
+html body .aspect-products {
+  gap: 16px !important;
+}
+
+@media (min-width: 1100px) {
+  html body .aspect-sidebar {
+    padding: 20px 18px;
+    border: 1px solid #e5e8e5;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  }
+}
+
+html body .aspect-filter {
+  padding: 20px 0 !important;
+  border-bottom: 1px solid #e5e8e5 !important;
+}
+
+html body .aspect-filter__title {
+  margin: 0 0 14px !important;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px !important;
+  letter-spacing: 0.1em !important;
+}
+
+html body .aspect-card {
+  border-radius: 8px !important;
+  min-height: 480px !important;
+  padding: 16px !important;
+}
+
+html body .aspect-type-card {
+  border-radius: 8px !important;
+}
+
+html body .aspect-catalog__mobile-btn {
+  border-radius: 4px !important;
+  border: 1px solid #e5e8e5;
+}
+
+/* ——— Карточка товара ——— */
+html body .aspect-pd__container {
+  width: min(1440px, calc(100% - 32px)) !important;
+}
+
+html body .aspect-pd__main {
+  border-radius: 8px !important;
+  min-height: 420px;
+}
+
+html body .aspect-pd__spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+html body .aspect-pd__spec-table th,
+html body .aspect-pd__spec-table td {
+  padding: 14px 16px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #e5e8e5;
+}
+
+html body .aspect-pd__spec-table th {
+  width: 38%;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5a5a5a;
+  background: #fafafa;
+}
+
+html body .aspect-pd__spec-table td {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #000;
+}
+
+html body .aspect-pd__spec-table tr:last-child th,
+html body .aspect-pd__spec-table tr:last-child td {
+  border-bottom: 0;
+}
+
+html body .aspect-pd__specs--table {
+  padding: 0 !important;
+  background: #ffffff !important;
+  border: 1px solid #e5e8e5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+html body .aspect-pd__related-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+@media (max-width: 1099px) {
+  html body .aspect-pd__related-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 599px) {
+  html body .aspect-pd__related-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+html body .aspect-pd__weight,
+html body .aspect-pd .tc-btn-pay,
+html body .aspect-pd .tc-weight {
+  border-radius: 4px !important;
+}
+
+html body .aspect-pd__weight.is-active,
+html body .aspect-pd .tc-btn-pay.active {
+  background: #000000 !important;
+  border-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+html body .aspect-pd__buy {
+  border-radius: 4px !important;
+}
+
+/* ——— Главная: бегущая строка (зелёная) ——— */
+html body .aspect-marquee {
+  background: #2a4a34 !important;
+  border-top: 3px solid #000000;
+  border-bottom: 3px solid #000000;
+}
+
+html body .aspect-marquee__viewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+html body .aspect-marquee__track {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0;
+  width: max-content;
+  animation: aspect-marquee-scroll 32s linear infinite;
+  padding-left: 0 !important;
+}
+
+html body .aspect-marquee__item {
+  flex: 0 0 auto;
+  padding: 0 28px;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: 15px !important;
+  letter-spacing: 0.14em !important;
+}
+
+html body .aspect-marquee__item::after {
+  content: "•";
+  margin-left: 28px;
+  color: rgba(255, 255, 255, 0.45) !important;
+  font-size: 10px;
+}
+
+@keyframes aspect-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+html body .aspect-hero__card,
+html body .aspect-banner {
+  border-radius: 8px !important;
+}
+
+html body .aspect-hero__card-arrow {
+  border-radius: 4px !important;
+}
+
+html body .aspect-hero__card-title {
+  font-size: clamp(20px, 2.2vw, 28px) !important;
+}
+
+html body .asp-jrn__sidebar-title::after {
+  max-width: 120px;
+}
+
+html body .aspect-cta__actions {
+  align-self: center;
+}
+
+html body .aspect-footer {
+  padding-bottom: 48px !important;
+}
+
+html body .aspect-footer__social {
+  border-radius: 4px !important;
+  font-weight: 700 !important;
+}

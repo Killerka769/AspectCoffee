@@ -128,7 +128,6 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    ("asset", BASE_DIR / "asset"),
 ]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -347,7 +346,7 @@ UNFOLD = {
     },
     "SIDEBAR": {
         "show_search": True,
-        "show_all_applications": True,
+        "show_all_applications": False,
         "navigation": [
             {
                 "title": _("Каталог"),
@@ -365,24 +364,14 @@ UNFOLD = {
                         "link": reverse_lazy("admin:catalog_product_changelist"),
                     },
                     {
-                        "title": _("Обжарщики"),
-                        "icon": "factory",
-                        "link": reverse_lazy("admin:catalog_roaster_changelist"),
-                    },
-                    {
-                        "title": _("Рецепты"),
-                        "icon": "menu_book",
-                        "link": reverse_lazy("admin:catalog_recipe_changelist"),
-                    },
-                    {
-                        "title": _("Отзывы"),
+                        "title": _("Отзывы о товарах"),
                         "icon": "rate_review",
                         "link": reverse_lazy("admin:catalog_review_changelist"),
                     },
                     {
-                        "title": _("Теги и фильтры"),
-                        "icon": "sell",
-                        "link": reverse_lazy("admin:catalog_tag_changelist"),
+                        "title": _("Вкусовые нотки"),
+                        "icon": "local_cafe",
+                        "link": reverse_lazy("admin:catalog_flavornote_changelist"),
                     },
                     {
                         "title": _("Способы приготовления"),
@@ -390,19 +379,14 @@ UNFOLD = {
                         "link": reverse_lazy("admin:catalog_brewmethod_changelist"),
                     },
                     {
-                        "title": _("Виды помола"),
+                        "title": _("Помол (справочник)"),
                         "icon": "grain",
                         "link": reverse_lazy("admin:catalog_grindtype_changelist"),
                     },
                     {
-                        "title": _("Виды обжарки"),
+                        "title": _("Обжарка (справочник)"),
                         "icon": "local_fire_department",
                         "link": reverse_lazy("admin:catalog_roasttype_changelist"),
-                    },
-                    {
-                        "title": _("Упаковки"),
-                        "icon": "package_2",
-                        "link": reverse_lazy("admin:catalog_productpackaging_changelist"),
                     },
                     {
                         "title": _("Кофейни"),
@@ -410,33 +394,31 @@ UNFOLD = {
                         "link": reverse_lazy("admin:catalog_cafe_changelist"),
                     },
                     {
-                        "title": _("Главное меню"),
+                        "title": _("Меню «Купить»"),
                         "icon": "menu",
                         "link": reverse_lazy("admin:catalog_navmenuitem_changelist"),
                     },
                     {
-                        "title": _("Промо-слайды"),
+                        "title": _("Промо-слайды главной"),
                         "icon": "view_carousel",
                         "link": reverse_lazy("admin:catalog_promoslide_changelist"),
                     },
+                ],
+            },
+            {
+                "title": _("Настройки магазина"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
                     {
                         "title": _("Настройки сайта"),
                         "icon": "tune",
                         "link": reverse_lazy("admin:catalog_sitesettings_changelist"),
                     },
                     {
-                        "title": _("Настройки фильтра"),
+                        "title": _("Фильтры каталога"),
                         "icon": "filter_alt",
                         "link": reverse_lazy("admin:catalog_catalogfiltersettings_changelist"),
-                    },
-                    {
-                        "title": _("Логи парсера"),
-                        "icon": "history",
-                        "link": reverse_lazy("admin:catalog_parserlog_changelist"),
-                    },
-                    {
-                        "title": _("Настройки парсера"),
-                        "link": reverse_lazy("admin:catalog_parsersetting_changelist"),
                     },
                 ],
             },
@@ -468,7 +450,7 @@ UNFOLD = {
                 ],
             },
             {
-                "title": _("Заказы и клиенты"),
+                "title": _("Заказы"),
                 "separator": True,
                 "collapsible": True,
                 "items": [
@@ -478,44 +460,56 @@ UNFOLD = {
                         "link": reverse_lazy("admin:orders_order_changelist"),
                     },
                     {
-                        "title": _("Корзины"),
-                        "icon": "shopping_bag",
-                        "link": reverse_lazy("admin:orders_cart_changelist"),
-                    },
-                    {
-                        "title": _("Избранное"),
-                        "icon": "favorite",
-                        "link": reverse_lazy("admin:orders_wishlist_changelist"),
-                    },
-                    {
                         "title": _("Промо-коды"),
                         "icon": "local_offer",
                         "link": reverse_lazy("admin:orders_promocode_changelist"),
                     },
                     {
-                        "title": _("Баннеры"),
-                        "icon": "image",
-                        "link": reverse_lazy("admin:orders_banner_changelist"),
+                        "title": _("Автоповторы заказов"),
+                        "icon": "autorenew",
+                        "link": reverse_lazy("admin:orders_recurringorder_changelist"),
                     },
                     {
-                        "title": _("Пользователи"),
-                        "icon": "person",
-                        "link": reverse_lazy("admin:users_user_changelist"),
-                    },
-                    {
-                        "title": _("Адреса"),
-                        "icon": "location_on",
-                        "link": reverse_lazy("admin:users_address_changelist"),
-                    },
-                    {
-                        "title": _("Заметки к товарам"),
+                        "title": _("Заметки покупателей к товарам"),
                         "icon": "note_alt",
                         "link": reverse_lazy("admin:orders_productnote_changelist"),
                     },
                 ],
             },
             {
-                "title": _("Сайт и сообщество"),
+                "title": _("Клиенты"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Пользователи"),
+                        "icon": "person",
+                        "link": reverse_lazy("admin:users_user_changelist"),
+                    },
+                    {
+                        "title": _("Адреса доставки"),
+                        "icon": "location_on",
+                        "link": reverse_lazy("admin:users_address_changelist"),
+                    },
+                    {
+                        "title": _("Рассылка email"),
+                        "icon": "mail",
+                        "link": reverse_lazy("admin:users_emaillog_changelist"),
+                    },
+                    {
+                        "title": _("Уведомления в ЛК"),
+                        "icon": "notifications",
+                        "link": reverse_lazy("admin:users_usernotification_changelist"),
+                    },
+                    {
+                        "title": _("Бонусные операции"),
+                        "icon": "loyalty",
+                        "link": reverse_lazy("admin:users_bonustransaction_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Контент сайта"),
                 "separator": True,
                 "collapsible": True,
                 "items": [
@@ -525,22 +519,12 @@ UNFOLD = {
                         "link": reverse_lazy("admin:pages_legaldocument_changelist"),
                     },
                     {
-                        "title": _("Ссылки сайта"),
-                        "icon": "link",
-                        "link": reverse_lazy("admin:pages_sitelink_changelist"),
-                    },
-                    {
-                        "title": _("Баннеры страниц"),
-                        "icon": "imagesmode",
-                        "link": reverse_lazy("admin:pages_banner_changelist"),
-                    },
-                    {
-                        "title": _("Публикации сообщества"),
+                        "title": _("Сообщество — публикации"),
                         "icon": "forum",
                         "link": reverse_lazy("admin:pages_communitypost_changelist"),
                     },
                     {
-                        "title": _("Комментарии сообщества"),
+                        "title": _("Сообщество — комментарии"),
                         "icon": "chat",
                         "link": reverse_lazy("admin:pages_communitypostcomment_changelist"),
                     },
@@ -552,24 +536,14 @@ UNFOLD = {
                 ],
             },
             {
-                "title": _("Оплата, склад и уведомления"),
+                "title": _("Оплата и склад"),
                 "separator": True,
                 "collapsible": True,
                 "items": [
                     {
-                        "title": _("Оплаты заказов"),
+                        "title": _("Платежи ЮKassa"),
                         "icon": "payments",
                         "link": reverse_lazy("admin:payments_payment_changelist"),
-                    },
-                    {
-                        "title": _("Автоповторы заказов"),
-                        "icon": "autorenew",
-                        "link": reverse_lazy("admin:orders_recurringorder_changelist"),
-                    },
-                    {
-                        "title": _("История автосписаний"),
-                        "icon": "receipt_long",
-                        "link": reverse_lazy("admin:orders_recurringcharge_changelist"),
                     },
                     {
                         "title": _("Пополнения баланса"),
@@ -580,31 +554,6 @@ UNFOLD = {
                         "title": _("Остатки на складе"),
                         "icon": "warehouse",
                         "link": reverse_lazy("admin:warehouse_stockitem_changelist"),
-                    },
-                    {
-                        "title": _("Логи email"),
-                        "icon": "mail",
-                        "link": reverse_lazy("admin:users_emaillog_changelist"),
-                    },
-                    {
-                        "title": _("Уведомления пользователей"),
-                        "icon": "notifications",
-                        "link": reverse_lazy("admin:users_usernotification_changelist"),
-                    },
-                    {
-                        "title": _("Push-подписки"),
-                        "icon": "notifications_active",
-                        "link": reverse_lazy("admin:users_pushsubscription_changelist"),
-                    },
-                    {
-                        "title": _("Бонусные операции"),
-                        "icon": "loyalty",
-                        "link": reverse_lazy("admin:users_bonustransaction_changelist"),
-                    },
-                    {
-                        "title": _("Уровни скидок"),
-                        "icon": "percent",
-                        "link": reverse_lazy("admin:users_discountlevel_changelist"),
                     },
                 ],
             },

@@ -1,5 +1,21 @@
 <style>
-.aspect-inquiry{font:inherit;color:#183623;max-width:100%;scroll-margin-top:100px}.aspect-inquiry-card{background:#fff;border:1px solid #dfe6de;border-radius:18px;padding:28px;margin:28px 0}.aspect-inquiry h2{font-size:26px;margin:0 0 20px}.aspect-inquiry form{display:grid;gap:18px}.aspect-inquiry label{display:block;font-weight:600;margin-bottom:6px}.aspect-inquiry input:not([type=checkbox]):not([type=hidden]),.aspect-inquiry textarea{display:block;box-sizing:border-box;width:100%;padding:13px 15px;border:1px solid #ccd8cd;border-radius:10px;background:#fff;font:inherit;color:inherit}.aspect-inquiry input:focus,.aspect-inquiry textarea:focus{outline:2px solid #2a4a34;outline-offset:2px}.aspect-inquiry .aspect-inquiry-consent{display:flex;align-items:flex-start;gap:10px;font-size:13px}.aspect-inquiry-consent input{margin-top:3px;flex:none}.aspect-inquiry button{padding:14px 22px;border:0;border-radius:10px;background:#2a4a34;color:#fff;font:inherit;font-weight:700;cursor:pointer}.aspect-inquiry button:hover{background:#1c3524}.aspect-inquiry [role=alert]{color:#a12121}.aspect-inquiry [role=status]{padding:18px;background:#edf5ed;border-radius:10px;margin-bottom:18px}.aspect-inquiry a{text-decoration:underline}.aspect-inquiry ul{margin:5px 0;padding-left:20px}@media(max-width:600px){.aspect-inquiry-card{padding:20px}.aspect-inquiry h2{font-size:22px}}
+.aspect-inquiry{font:inherit;color:#5a5a5a;max-width:100%;scroll-margin-top:100px}
+.aspect-inquiry-card{background:#fff;border:1px solid #e5e8e5;border-radius:8px;padding:32px 36px;margin:32px 0}
+.aspect-inquiry h2{font-family:"Roboto Condensed",Arial,sans-serif;font-size:22px;font-weight:900;text-transform:uppercase;color:#000;margin:0 0 20px;padding-bottom:14px;border-bottom:1px solid #f0f0f0;position:relative}
+.aspect-inquiry h2::after{content:"";position:absolute;left:0;bottom:-1px;width:48px;height:3px;background:#2a4a34}
+.aspect-inquiry form{display:grid;gap:22px}
+.aspect-inquiry label{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5a5a5a;margin-bottom:6px}
+.aspect-inquiry input:not([type=checkbox]):not([type=hidden]),.aspect-inquiry textarea{display:block;box-sizing:border-box;width:100%;padding:12px 0;border:0;border-bottom:1px solid #ccc;border-radius:0;background:transparent;font-family:"Open Sans",Arial,sans-serif;font-size:15px;color:#000}
+.aspect-inquiry input:focus,.aspect-inquiry textarea:focus{outline:none;border-bottom-color:#2a4a34}
+.aspect-inquiry .aspect-inquiry-consent{display:flex;align-items:flex-start;gap:10px;font-size:13px;text-transform:none;font-weight:400;letter-spacing:0;color:#5a5a5a}
+.aspect-inquiry-consent input{margin-top:3px;flex:none}
+.aspect-inquiry button[type=submit]{padding:14px 28px;border:0;border-radius:4px;background:#000;color:#fff;font-family:"Roboto Condensed",Arial,sans-serif;font-size:14px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;min-height:52px}
+.aspect-inquiry button[type=submit]:hover{background:#2a4a34}
+.aspect-inquiry [role=alert]{color:#b91c1c;font-size:13px}
+.aspect-inquiry [role=status]{padding:18px;background:#f4f6f4;border-radius:8px;margin-bottom:18px;color:#5a5a5a}
+.aspect-inquiry a{color:#2a4a34;text-decoration:underline}
+.aspect-inquiry ul{margin:5px 0;padding-left:20px}
+@media(max-width:600px){.aspect-inquiry-card{padding:24px 20px}.aspect-inquiry h2{font-size:20px}}
 </style>
 <section id="inquiry" class="aspect-inquiry{% if not embedded %} aspect-inquiry-card{% endif %}">
   {% if not embedded %}<h2>{{ contact_subject }}</h2>{% endif %}

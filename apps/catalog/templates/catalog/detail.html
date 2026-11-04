@@ -39,7 +39,7 @@
   padding-bottom: 80px;
 }
 .aspect-pd__container {
-  width: min(1340px, calc(100% - 32px));
+  width: min(1440px, calc(100% - 32px));
   margin: 0 auto;
 }
 
@@ -201,15 +201,47 @@
   border-radius: 3px;
 }
 
-/* ---------- ХАРАКТЕРИСТИКИ (обжарка, помол) ---------- */
+/* ---------- ХАРАКТЕРИСТИКИ ---------- */
 .aspect-pd__specs {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px 24px;
-  padding: 24px;
-  background: #F4F6F4;
-  border-radius: 20px;
+  display: block;
+  padding: 0;
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 8px;
+  overflow: hidden;
 }
+.aspect-pd__spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.aspect-pd__spec-table th,
+.aspect-pd__spec-table td {
+  padding: 14px 16px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #E5E8E5;
+}
+.aspect-pd__spec-table th {
+  width: 38%;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #5A5A5A;
+  background: #FAFAFA;
+}
+.aspect-pd__spec-table td {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #000;
+}
+.aspect-pd__spec-table tr:last-child th,
+.aspect-pd__spec-table tr:last-child td {
+  border-bottom: 0;
+}
+/* legacy grid fallback */
 .aspect-pd__spec {
   display: flex;
   flex-direction: column;
@@ -625,8 +657,8 @@
 }
 .aspect-pd__related-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 }
 @media (max-width: 1099px) {
   .aspect-pd__related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1210,31 +1242,35 @@
         {% endif %}
 
         {# Характеристики: обжарка + помол #}
-        <div class="aspect-pd__specs">
+        <div class="aspect-pd__specs aspect-pd__specs--table">
+          <table class="aspect-pd__spec-table">
+            <tbody>
           {% if product.get_roast_level_display %}
-          <div class="aspect-pd__spec">
-            <span class="aspect-pd__spec-label">Обжарка</span>
-            <span class="aspect-pd__spec-value">{{ product.get_roast_level_display }}</span>
-          </div>
+              <tr>
+                <th scope="row">Обжарка</th>
+                <td>{{ product.get_roast_level_display }}</td>
+              </tr>
           {% endif %}
           {% if product.grind_type %}
-          <div class="aspect-pd__spec">
-            <span class="aspect-pd__spec-label">Помол</span>
-            <span class="aspect-pd__spec-value">{{ product.grind_type.name }}</span>
-          </div>
+              <tr>
+                <th scope="row">Помол</th>
+                <td>{{ product.grind_type.name }}</td>
+              </tr>
           {% endif %}
           {% if product.origin_country %}
-          <div class="aspect-pd__spec">
-            <span class="aspect-pd__spec-label">Страна</span>
-            <span class="aspect-pd__spec-value">{{ product.origin_country }}</span>
-          </div>
+              <tr>
+                <th scope="row">Страна</th>
+                <td>{{ product.origin_country }}</td>
+              </tr>
           {% endif %}
           {% if product.q_score %}
-          <div class="aspect-pd__spec">
-            <span class="aspect-pd__spec-label">Q-оценка</span>
-            <span class="aspect-pd__spec-value">{{ product.q_score }}</span>
-          </div>
+              <tr>
+                <th scope="row">Q-оценка</th>
+                <td>{{ product.q_score }}</td>
+              </tr>
           {% endif %}
+            </tbody>
+          </table>
         </div>
 
         {# Покупка #}

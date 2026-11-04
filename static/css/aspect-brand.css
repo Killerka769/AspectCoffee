@@ -29,7 +29,7 @@
   html body select,
   html body td,
   html body th {
-    font-family: "Open Sans", "Gotham Pro", Arial, sans-serif;
+    font-family: "Open Sans", Arial, sans-serif;
   }
   
   /* Roboto Condensed — заголовки */
@@ -57,9 +57,17 @@
   html body [class*="text-[40px]"],
   html body [class*="text-[32px]"],
   html body [class*="text-[64px]"] {
-    font-family: "Roboto Condensed", "Arial Narrow", Arial, sans-serif;
+    font-family: "Roboto Condensed", "Arial Narrow", Arial, sans-serif !important;
   }
   
+  html body .font-din,
+  html body .font-din-light,
+  html body .font-din-medium,
+  html body .font-din-black,
+  html body .font-din-bold {
+    font-family: "Roboto Condensed", sans-serif !important;
+  }
+
   html body .font-din,
   html body .font-din-light,
   html body .font-din-medium {
@@ -71,34 +79,129 @@
   html body h2,
   html body h3 {
     font-weight: 900;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #000000;
+  }
+
+  html body h1 {
+    font-size: clamp(2.75rem, 5.5vw, 4.5rem);
+    line-height: 1.02;
+  }
+
+  html body h1.asp-comm__title,
+  html body h1.asp-jrn__title {
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+  }
+
+  html body h2 {
+    font-size: clamp(2rem, 3.8vw, 3.25rem);
+    line-height: 1.06;
+  }
+
+  html body h2.asp-jrn__sidebar-title {
+    font-size: 14px;
+    letter-spacing: 0.1em;
+  }
+
+  html body h2.asp-jrn__feed-title {
+    font-size: 22px;
+    letter-spacing: 0.02em;
+  }
+
+  html body h3 {
+    font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+    line-height: 1.1;
+  }
+
+  /* Личный кабинет — локальные размеры, без «гигантских» h1/h2 */
+  html body main.aspect-account h1.aspect-account__page-title {
+    font-size: clamp(24px, 3vw, 40px);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  html body main.aspect-account h1.asp-profile__name {
+    font-size: 24px;
+    line-height: 1.15;
+  }
+
+  html body main.aspect-account h1.asp-stat__title,
+  html body main.aspect-account h1.asp-bal__title,
+  html body main.aspect-account h1.asp-od__title {
+    font-size: clamp(22px, 3vw, 32px);
+    line-height: 1.15;
+  }
+
+  html body main.aspect-account h2.asp-profile__section-title,
+  html body main.aspect-account h2.asp-orders__section-title {
+    font-size: 22px;
+    line-height: 1.15;
+  }
+
+  html body main.aspect-account h3.asp-modal__title {
+    font-size: clamp(22px, 3vw, 28px);
+    line-height: 1.15;
+  }
+
+  html body .aspect-channel h3 {
+    font-size: 16px;
+    line-height: 1.25;
+    letter-spacing: 0.03em;
+  }
+
+  html body .aspect-post-card h3 {
+    font-size: 18px;
+    line-height: 1.2;
   }
   
-  /* Кнопки */
+  /* Адаптив */
   html body .tc-btn-pay,
   html body .tc-btn.btn-dark,
   html body .tc-auth-submit,
   html body .tc-newsletter-button,
   html body .button-basket,
   html body .tc-btn.btn-white-xs {
-    background: var(--aspect-black);
+    background: var(--aspect-green);
     color: var(--aspect-white);
     font-family: "Roboto Condensed", Arial, sans-serif;
     text-transform: uppercase;
-    border-radius: 12px;
+    border-radius: 4px;
+    border: 1px solid var(--aspect-green);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
   
   html body .tc-btn-pay:hover,
   html body .tc-btn.btn-dark:hover,
   html body .tc-auth-submit:hover,
   html body .tc-newsletter-button:hover,
+  html body .button-basket:hover,
   html body .tc-btn.btn-white-xs:hover {
-    background: var(--aspect-green);
+    background: var(--aspect-black);
+    border-color: var(--aspect-black);
     color: var(--aspect-white);
   }
   
-  html body .tc-btn-pay.active {
+  html body .tc-btn.btn-secondary,
+  html body .tc-btn.btn-white {
+    background: var(--aspect-black);
+    border: 1px solid var(--aspect-black);
+    border-radius: 4px;
+    color: var(--aspect-white);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  html body .tc-btn.btn-secondary:hover,
+  html body .tc-btn.btn-white:hover {
     background: var(--aspect-green);
+    border-color: var(--aspect-green);
+  }
+  
+  html body .tc-btn-pay.active {
+    background: var(--aspect-black);
+    border-color: var(--aspect-black);
     color: var(--aspect-white);
   }
   

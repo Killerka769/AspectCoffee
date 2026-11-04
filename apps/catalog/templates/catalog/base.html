@@ -1,8 +1,9 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="no-js">
 <head>
 <meta charset="utf-8"/>
+<script>document.documentElement.classList.replace("no-js","js");</script>
 <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -48,7 +49,7 @@
 
 <script async defer src="{% static 'asset/js/metric.20260718.js' %}"></script>
 
-{# ---- Глобальные CSS-переменные ASPECT (на случай, если Testi-стили вырезаны) ---- #}
+{# ---- Глобальные CSS-переменные бренда Aspect ---- #}
 <style id="aspect-vars">
   :root {
     --black: #000000;
@@ -73,12 +74,25 @@
     --aspect-bg-soft: #F4F6F4;
     --aspect-border: #E5E8E5;
     --aspect-radius: 18px;
+    --aspect-radius-btn: 4px;
+    --aspect-container-max: 1440px;
+    --aspect-container-pad: clamp(20px, 4vw, 56px);
+    --aspect-section-gap: clamp(56px, 7vw, 112px);
+    --aspect-heading-rule: 72px;
     --aspect-shadow: 0 8px 32px rgba(0,0,0,.06);
-    --aspect-transition: .25s cubic-bezier(.4,0,.2,1);
-    --ts: .25s;
+    --aspect-transition: .3s ease;
+    --ts: .3s;
   }
   html, body { background: var(--aspect-bg); color: var(--aspect-black); }
-  body { margin: 0; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    margin: 0;
+    font-family: "Open Sans", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--aspect-gray);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
   *, *::before, *::after { box-sizing: border-box; }
   img, svg, video { max-width: 100%; }
   .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
@@ -95,27 +109,174 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;500;700;900&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 {# ---- Подключаемые CSS-слои ---- #}
-<link href="{% static 'css/tailwind.css' %}?v=20260606-1" rel="stylesheet"/>
+<link href="{% static 'css/tailwind.css' %}?v=20261104-1" rel="stylesheet"/>
 <link href="{% static 'asset/css/custom.css' %}?v=20260729-2" rel="stylesheet"/>
 <link href="{% static 'css/theme_update.css' %}?v=20260729-1" rel="stylesheet"/>
 <link href="{% static 'css/mobile_app.css' %}?v=20260729-1" rel="stylesheet"/>
-<link href="{% static 'css/aspect-brand.css' %}?v=20261012-3" rel="stylesheet"/>
-<link href="{% static 'css/aspect-redesign.css' %}?v=20261012-2" rel="stylesheet"/>
+<link href="{% static 'css/aspect-brand.css' %}?v=20261104-2" rel="stylesheet"/>
+<link href="{% static 'css/aspect-redesign.css' %}?v=20261104-5" rel="stylesheet"/>
+<link href="{% static 'css/aspect-stage3.css' %}?v=20261104-4" rel="stylesheet"/>
+<link href="{% static 'css/aspect-motion.css' %}?v=20261104-1" rel="stylesheet"/>
+<link href="{% static 'css/aspect-forms-pages.css' %}?v=20261104-2" rel="stylesheet"/>
 
 <style id="aspect-brand-hard">
   /* Глобальный шрифт — Open Sans для текста, Roboto Condensed для заголовков */
-  body { font-family: "Open Sans", Arial, sans-serif !important; }
+  body { font-family: "Open Sans", Arial, sans-serif !important; color: #5A5A5A !important; }
   h1, h2, h3, h4, h5, h6,
   .font-din, .font-din-light, .font-din-medium, .font-din-black, .font-din-bold,
   .nav-title, .section-heading,
   .tc-card-title-link, .white-box__title,
   .home-reviews__title, .home-reviews__value,
-  .aspect-footer__name, .aspect-footer__title, .aspect-footer__phone,
   [class*="text-[40px]"], [class*="text-[32px]"], [class*="text-[64px]"] {
     font-family: "Roboto Condensed", "Arial Narrow", Arial, sans-serif !important;
+    color: #000000 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  /* Футер и CTA — свои цвета/размеры (не наследовать глобальный чёрный h2) */
+  html body .aspect-footer h2.aspect-footer__title,
+  html body .aspect-footer .aspect-footer__phone {
+    font-family: "Roboto Condensed", "Arial Narrow", Arial, sans-serif !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    text-transform: uppercase;
+  }
+  html body .aspect-footer h2.aspect-footer__title {
+    font-size: 20px !important;
+    line-height: 1.15 !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.04em !important;
+    margin: 0 0 18px !important;
+    padding-bottom: 0 !important;
+  }
+  html body .aspect-footer h2.aspect-footer__title::after {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 2px;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.45);
+  }
+  html body .aspect-cta h2.aspect-cta__title {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    font-size: clamp(36px, 4.4vw, 64px) !important;
+    line-height: 1.02 !important;
+    letter-spacing: -0.01em !important;
+    margin: 0 0 18px !important;
+  }
+  html body .aspect-hero h3.aspect-hero__card-title,
+  html body .aspect-banner h2.aspect-banner__title,
+  html body .aspect-banner h3.aspect-banner__title {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    font-size: inherit !important;
+    margin: inherit !important;
+  }
+  html body .aspect-hero h3.aspect-hero__card-title::after,
+  html body .aspect-banner h2.aspect-banner__title::after,
+  html body .aspect-banner h3.aspect-banner__title::after {
+    display: none !important;
+    content: none !important;
+  }
+  /* Журнал и сообщество — локальные размеры заголовков, без второй зелёной полосы */
+  html body h1.asp-comm__title,
+  html body h1.asp-jrn__title {
+    font-size: clamp(36px, 5vw, 64px) !important;
+    line-height: 1.02 !important;
+    letter-spacing: -0.02em !important;
+    margin: 0 !important;
+  }
+  html body h1.asp-comm__title::after,
+  html body h1.asp-jrn__title::after {
+    display: none !important;
+    content: none !important;
+  }
+  html body h2.asp-jrn__sidebar-title {
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.1em !important;
+    margin: 0 !important;
+  }
+  html body h2.asp-jrn__feed-title {
+    font-size: 22px !important;
+    line-height: 1.15 !important;
+    letter-spacing: 0.02em !important;
+    margin: 0 !important;
+  }
+  html body h2.asp-jrn__sidebar-title::after,
+  html body h2.asp-jrn__feed-title::after,
+  html body .aspect-community-panel > h2::after {
+    display: none !important;
+    content: none !important;
+  }
+  html body .aspect-community-panel > h2 {
+    font-family: "Roboto Condensed", Arial, sans-serif !important;
+    font-size: 18px !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    margin: 0 0 16px !important;
+    color: #000 !important;
+  }
+  html body .aspect-channel h3 {
+    font-size: clamp(15px, 1.6vw, 18px) !important;
+    line-height: 1.25 !important;
+    letter-spacing: 0.03em !important;
+    margin: 0 0 8px !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+  html body .aspect-post-card h3 {
+    font-size: 18px !important;
+    line-height: 1.2 !important;
+    margin: 0 0 10px !important;
+  }
+  html body .aspect-channel h3::after,
+  html body .aspect-post-card h3::after {
+    display: none !important;
+    content: none !important;
+  }
+  html body .asp-jrn__nav a.is-active,
+  html body .asp-jrn__nav a.is-active span,
+  html body .asp-jrn__nav a.is-active small {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+  }
+  h1:not(.asp-comm__title):not(.asp-jrn__title):not(.aspect-about__title):not(.aspect-faq__title):not(.aspect-doc__title):not(.aspect-discount__title):not(.aspect-contact__title):not(.aspect-partners__title):not(.aspect-auth__title):not(.asp-auth__title):not(.asp-pwd__title):not(.aspect-404__title):not(.aspect-account__page-title):not(.asp-profile__name):not(.asp-stat__title):not(.asp-bal__title):not(.asp-od__title):not(.asp-fav__title):not(.asp-bl__title) {
+    font-size: clamp(2.75rem, 5.5vw, 4.5rem) !important;
+    line-height: 1.02 !important;
+    font-weight: 900 !important;
+    margin: 0 0 0.35em !important;
+  }
+  h2:not(.aspect-about__section-title):not(.aspect-doc__section-title):not(.aspect-discount__section-title):not(.aspect-partners__section-title):not(.aspect-contact__card-title):not(.aspect-footer__title):not(.aspect-cta__title):not(.asp-jrn__sidebar-title):not(.asp-jrn__feed-title):not(.asp-profile__section-title):not(.asp-orders__section-title) {
+    font-size: clamp(2rem, 3.8vw, 3.25rem) !important;
+    line-height: 1.06 !important;
+    font-weight: 900 !important;
+    margin: 0 0 0.4em !important;
+  }
+  h3:not(.aspect-hero__card-title):not(.aspect-banner__title):not(.asp-modal__title) {
+    font-size: clamp(1.5rem, 2.6vw, 2.25rem) !important;
+    line-height: 1.1 !important;
+    font-weight: 900 !important;
+    margin: 0 0 0.45em !important;
+  }
+  h1:not(.aspect-about__title):not(.aspect-about__section-title):not(.aspect-faq__title):not(.aspect-doc__title):not(.aspect-discount__title):not(.aspect-contact__title):not(.aspect-partners__title):not(.aspect-auth__title):not(.asp-auth__title):not(.asp-pwd__title):not(.aspect-404__title):not(.aspect-account__page-title):not(.asp-profile__name):not(.asp-stat__title):not(.asp-bal__title):not(.asp-od__title):not(.asp-fav__title):not(.asp-bl__title):not(.asp-comm__title):not(.asp-jrn__title)::after,
+  h2:not(.aspect-about__section-title):not(.aspect-doc__section-title):not(.aspect-discount__section-title):not(.aspect-partners__section-title):not(.aspect-contact__card-title):not(.aspect-footer__title):not(.aspect-cta__title):not(.asp-jrn__sidebar-title):not(.asp-jrn__feed-title):not(.asp-profile__section-title):not(.asp-orders__section-title)::after,
+  h3.aspect-section-title::after,
+  .section-heading::after,
+  .tc-catalog-title::after,
+  .white-box__title::after {
+    content: "";
+    display: block;
+    width: var(--aspect-heading-rule, 72px);
+    height: 3px;
+    margin-top: 14px;
+    background: #2A4A34;
   }
   .font-din, .font-din-light, .font-din-medium { font-weight: 400 !important; }
-  .font-din-black, .font-din-bold, h1, h2, h3 { font-weight: 900 !important; letter-spacing: .01em; }
+  .font-din-black, .font-din-bold, h1, h2, h3 { font-weight: 900 !important; letter-spacing: .02em; }
   i, .fa, .fas, .far, svg, path { font-family: inherit; }
 </style>
 
@@ -189,6 +350,7 @@ html body .aspect-header__icons .header-cart__btn:hover * {
 </head>
 
 <body
+  class="{% block body_extra_class %}{% endblock %}"
   x-data="{
     menuOpen: false,
     searchOpen: false,
@@ -523,6 +685,7 @@ html body .aspect-header__icons .header-cart__btn:hover * {
 </script>
 {% endif %}
 
+<script src="{% static 'js/aspect-motion.js' %}?v=20261104-1" defer></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

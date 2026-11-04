@@ -5,31 +5,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# def run_catalog_parser_task(force=False, update_images=False, category="coffee", limit=0):
-#     from apps.catalog.models import ParserSetting
-#     settings = ParserSetting.load()
-
-#     if not settings.is_auto_update_enabled and not force:
-#         logger.info("Auto-update is disabled for catalog parser.")
-#         return "Disabled"
-
-#     logger.info("Starting catalog parser task...")
-#     try:
-#         argv = ["run_parser", f"--category={category}"]
-#         if update_images:
-#             argv.append("--update-images")
-#         if limit:
-#             argv.extend([f"--limit={limit}"])
-#         call_command(*argv)
-
-#         settings.last_run_at = timezone.now()
-#         settings.save()
-#         return "Success"
-#     except Exception as e:
-#         logger.error(f"Error running catalog parser task: {e}")
-#         return f"Error: {e}"
-
-
 # ── Review notification tasks ──
 
 @shared_task
@@ -128,59 +103,6 @@ def send_user_review_rejected_notification(review_id):
     )
     return log.success
 
-
-# def send_admin_new_recipe_notification(recipe_id):
-#     from django.conf import settings
-
-#     from apps.catalog.models import Recipe
-#     from apps.users.models import User, UserNotification
-#     from apps.users.notifications import create_notification, send_logged_email
-
-#     try:
-#         recipe = Recipe.objects.select_related("author").get(pk=recipe_id)
-#     except Recipe.DoesNotExist:
-#         return False
-
-#     subject = f"[AspectCoffee] Новый рецепт: {recipe.name}"
-#     body = (
-#         f"Пользователь {recipe.author.email if recipe.author else '—'} отправил рецепт "
-#         f"«{recipe.name}» на модерацию.\n\n"
-#         f"Перейти к модерации: /admin/catalog/recipe/{recipe.pk}/change/"
-#     )
-#     to_email = getattr(settings, "DEFAULT_FROM_EMAIL", "")
-#     log = send_logged_email(recipient=to_email, subject=subject, body=body)
-#     for staff in User.objects.filter(is_staff=True, is_active=True).exclude(email__iexact=to_email):
-#         create_notification(
-#             user=staff,
-#             title=subject,
-#             body=body,
-#             url=f"/admin/catalog/recipe/{recipe.pk}/change/",
-#             kind=UserNotification.KIND_INFO,
-#         )
-#     return log.success
-
-
-# def send_user_recipe_published_notification(recipe_id):
-#     from apps.catalog.models import Recipe
-#     from apps.users.notifications import send_logged_email
-
-#     try:
-#         recipe = Recipe.objects.select_related("author").get(pk=recipe_id)
-#     except Recipe.DoesNotExist:
-#         return False
-#     if not recipe.author or not recipe.author.email:
-#         return False
-
-#     log = send_logged_email(
-#         recipient=recipe.author.email,
-#         subject=f"[AspectCoffee] Ваш рецепт «{recipe.name}» опубликован",
-#         body=(
-#             f"Здравствуйте!\n\n"
-#             f"Ваш рецепт «{recipe.name}» прошёл модерацию и опубликован на сайте.\n\n"
-#             f"С уважением, Aspect Coffee"
-#         ),
-#     )
-#     return log.success
 
 @shared_task
 def check_product_images():

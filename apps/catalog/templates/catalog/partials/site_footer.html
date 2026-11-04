@@ -5,14 +5,18 @@
       margin-top: auto;
       background: #2A4A34;
       color: #FFFFFF;
-      padding: 56px 0 32px;
+      padding: 56px 0 48px;
     }
     .aspect-footer__inner {
-      width: min(1340px, calc(100% - 32px));
+      width: min(1440px, calc(100% - 32px));
       margin: 0 auto;
       display: grid;
-      grid-template-columns: minmax(280px, 1.3fr) repeat(3, minmax(160px, 0.85fr));
-      gap: 48px 40px;
+      grid-template-columns: minmax(260px, 1.25fr) repeat(3, minmax(0, 1fr));
+      gap: 48px clamp(28px, 3vw, 48px);
+      align-items: start;
+    }
+    .aspect-footer__inner > section {
+      min-width: 0;
     }
     .aspect-footer__brand {
       display: flex;
@@ -33,9 +37,11 @@
       font-family: "Roboto Condensed", Arial, sans-serif;
       font-size: 20px;
       font-weight: 900;
-      line-height: 1.15;
+      line-height: 1.2;
       letter-spacing: .04em;
       text-transform: uppercase;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
     .aspect-footer__copy {
       max-width: 430px;
@@ -58,7 +64,7 @@
     }
     .aspect-footer a:hover,
     .aspect-footer a:focus-visible {
-      color: #0F1B14;
+      color: rgba(255, 255, 255, 0.92);
       text-decoration: underline;
       text-underline-offset: 3px;
     }
@@ -75,7 +81,7 @@
       text-decoration: none;
     }
     .aspect-footer__phone:hover {
-      color: #0F1B14;
+      color: rgba(255, 255, 255, 0.92);
       text-decoration: none;
     }
     .aspect-footer__socials {
@@ -90,9 +96,11 @@
       justify-content: center;
       min-height: 44px;
       padding: 10px 18px;
-      border: 1px solid rgba(255,255,255,.4);
-      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: 4px;
       font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
       color: #FFFFFF;
       transition: background .2s ease, border-color .2s ease, color .2s ease;
     }
@@ -121,7 +129,7 @@
       text-underline-offset: 3px;
     }
     .aspect-footer__partners-note a:hover {
-      color: #0F1B14;
+      color: rgba(255, 255, 255, 0.92);
     }
     .aspect-footer__legal {
       grid-column: 1 / -1;
@@ -175,7 +183,7 @@
              height="34"
              loading="lazy">
       </a>
-      <p class="aspect-footer__name">Aspect Coffee Roasters</p>
+      <h2 class="aspect-footer__title">О нас</h2>
       <p class="aspect-footer__copy">
         Ваш проводник в мире спешалти. Прямые закупки, открытое ценообразование, диалог через вкус.
       </p>
@@ -186,7 +194,7 @@
     </section>
 
     <section>
-      <h2 class="aspect-footer__title">Разделы</h2>
+      <h2 class="aspect-footer__title">Каталог</h2>
       <nav class="aspect-footer__links" aria-label="Разделы каталога">
         <a href="/catalog/">Кофе</a>
         <a href="/accessories/">Аксессуары и мерч</a>
@@ -199,7 +207,7 @@
     </section>
 
     <section>
-      <h2 class="aspect-footer__title">Помощь</h2>
+      <h2 class="aspect-footer__title">Покупателям</h2>
       <nav class="aspect-footer__links" aria-label="Помощь покупателю">
         <a href="/shipment-and-payment/">Доставка и оплата</a>
         <a href="/discount-system/">Система скидок</a>

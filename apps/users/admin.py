@@ -166,42 +166,6 @@ class UserNotificationAdmin(ModelAdmin):
     readonly_fields = ["created_at"]
 
 
-@admin.register(PushSubscription)
-class PushSubscriptionAdmin(ModelAdmin):
-    list_display = ["user", "device", "is_active", "created_at", "updated_at"]
-    list_filter = ["is_active", "created_at", "updated_at"]
-    search_fields = ["user__email", "user_agent", "endpoint"]
-    readonly_fields = ["endpoint", "p256dh", "auth", "user_agent", "created_at", "updated_at"]
-
-    @admin.display(description="Устройство")
-    def device(self, obj):
-        return obj.user_agent[:80] or "—"
-
-# @admin.register(Achievement)
-# class AchievementAdmin(ModelAdmin):
-#     list_display = ["title", "condition_type", "condition_value", "sort_order", "is_active"]
-#     list_filter = ["is_active", "condition_type"]
-#     search_fields = ["title", "description"]
-#     list_editable = ["sort_order", "is_active"]
-#     ordering = ["sort_order", "pk"]
-
-# @admin.register(UserAchievement)
-# class UserAchievementAdmin(ModelAdmin):
-#     list_display = ["user", "achievement", "earned_at"]
-#     list_filter = ["achievement", "earned_at"]
-#     search_fields = ["user__email", "achievement__title"]
-#     raw_id_fields = ["user", "achievement"]
-#     readonly_fields = ["earned_at"]
-#     ordering = ["-earned_at"]
-
-# @admin.register(DiscountLevel)
-# class DiscountLevelAdmin(ModelAdmin):
-#     list_display = ["min_amount", "discount_percent", "sort_order", "is_active"]
-#     list_display_links = ["min_amount"]
-#     list_filter = ["is_active"]
-#     list_editable = ["discount_percent", "sort_order", "is_active"]
-#     ordering = ["sort_order", "min_amount"]
-
 @admin.register(BonusTransaction)
 class BonusTransactionAdmin(ModelAdmin):
     list_display = ["user", "type", "amount", "order", "created_at", "expires_at"]

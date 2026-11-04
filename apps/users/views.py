@@ -24,16 +24,6 @@ from .verification import (
     UNLOCK_RESEND_COOLDOWN_SECONDS,
 )
 
-# DEFAULT_ACHIEVEMENT_ICONS = {
-#     "Первый заказ": "asset/images/achievements/achievement-first-order-transparent.webp",
-#     "Кофеман": "asset/images/achievements/achievement-coffee-lover-transparent.webp",
-#     "Знаток кофе": "asset/images/achievements/achievement-coffee-expert-transparent.webp",
-#     "VIP-клиент": "asset/images/achievements/achievement-vip-client-transparent.webp",
-#     "Любитель скидок": "asset/images/achievements/achievement-discount-lover-transparent.webp",
-#     "Коллекционер": "asset/images/achievements/achievement-collector-transparent.webp",
-#     "Миллионер": "asset/images/achievements/achievement-millionaire-transparent.webp",
-# }
-
 @login_required
 @never_cache
 def complete_phone(request):
@@ -935,58 +925,9 @@ def community_profile_view(request):
     })
 
 
-# @login_required
-# def achievements_view(request):
-#     from django.db.models import Sum
-#     from apps.orders.models import Order
-#     from apps.users.models import Achievement, UserAchievement
-#     user = request.user
-#     filter_type = request.GET.get("filter", "all")
-#     achievements = Achievement.objects.filter(is_active=True)
-#     earned_ids = set(UserAchievement.objects.filter(user=user).values_list("achievement_id", flat=True))
-#     badges = []
-#     for ach in achievements:
-#         current_value = ach.check_user(user)
-#         if ach.condition_value > 0:
-#             progress = min(int(current_value / ach.condition_value * 100), 100)
-#         else:
-#             progress = 100 if current_value > 0 else 0
-#         achieved = ach.id in earned_ids
-#         if not achieved and progress >= 100:
-#             UserAchievement.objects.get_or_create(user=user, achievement=ach)
-#             achieved = True
-#         default_icon = DEFAULT_ACHIEVEMENT_ICONS.get(ach.title)
-#         badges.append({
-#             "icon": ach.icon.url if ach.icon else static(default_icon) if default_icon else None,
-#             "title": ach.title,
-#             "description": ach.description,
-#             "progress": progress,
-#             "achieved_at": True if achieved else None,
-#         })
-#     if filter_type == "earned":
-#         badges = [b for b in badges if b["achieved_at"]]
-#     return render(request, "users/achievements.html", {
-#         "section": "achievements",
-#         "badges": badges,
-#         "filter": filter_type,
-#     })
-
-
 @login_required
 def subscriptions_view(request):
     return redirect("users:profile")
-
-
-# @login_required
-# def blog_history_view(request):
-#     from apps.blog.models import ArticleReadHistory, ArticleBookmark
-#     reads = ArticleReadHistory.objects.filter(user=request.user).select_related("post").order_by("-read_at")
-#     bookmarked_ids = set(ArticleBookmark.objects.filter(user=request.user).values_list("post_id", flat=True))
-#     return render(request, "users/blog_history.html", {
-#         "section": "blog",
-#         "reads": reads,
-#         "bookmarked_ids": bookmarked_ids,
-#     })
 
 
 @login_required
@@ -1066,19 +1007,6 @@ def unblock_user(request, pk):
     if request.headers.get("HX-Request"):
         return HttpResponse("")
     return redirect(request.META.get("HTTP_REFERER", "users:blacklist"))
-
-
-# @login_required
-# @require_POST
-# def unsubscribe_blog(request, pk):
-#     from django.http import HttpResponse
-#     subs = request.user.blog_subscriptions.filter(pk=pk) if hasattr(request.user, "blog_subscriptions") else []
-#     if subs:
-#         subs.first().delete() if hasattr(subs.first(), "delete") else None
-#         messages.success(request, "Вы отписались от статьи")
-#     if request.headers.get("HX-Request"):
-#         return HttpResponse("")
-#     return redirect(request.META.get("HTTP_REFERER", "users:blog_history"))
 
 
 @login_required

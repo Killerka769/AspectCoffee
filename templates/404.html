@@ -1,28 +1,21 @@
 {% extends 'catalog/base.html' %}
 {% load static %}
 
+{% block title %}Страница не найдена — 404{% endblock %}
+
 {% block content %}
-<main class="w-full flex flex-col min-h-[60vh] pt-[56px] pb-[56px] flex-grow items-center justify-center">
-    <div class="container mx-auto flex flex-col items-center text-center px-4">
-        <div class="mb-8">
-            <svg class="w-24 h-24 mx-auto text-[var(--black-16)] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h1 class="font-din-black text-[100px] md:text-[140px] leading-none text-[var(--black)] tracking-tight">404</h1>
-        </div>
-        <p class="text-[24px] md:text-[32px] font-din-medium text-[var(--black)] uppercase mb-4">Страница не найдена</p>
-        <p class="text-[16px] md:text-[18px] text-[var(--black-50)] mb-10 max-w-[600px] leading-relaxed">
-            Возможно, мы удалили эту страницу, либо вы ввели неправильный адрес.
-            Попробуйте начать с главной страницы или воспользуйтесь каталогом.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4">
-            <a href="/" class="h-[52px] px-8 rounded-[12px] flex items-center justify-center font-din-medium text-[16px] uppercase tracking-[0.05em] transition duration-300 bg-black text-white hover:bg-black/80">
-                На главную
-            </a>
-            <a href="/catalog/" class="h-[52px] px-8 rounded-[12px] flex items-center justify-center font-din-medium text-[16px] uppercase tracking-[0.05em] transition duration-300 bg-[#f0f0f0] hover:bg-[#e5e5e5] text-black">
-                В каталог
-            </a>
-        </div>
+<main class="aspect-404">
+  <div class="aspect-404__inner">
+    <p class="aspect-404__code" aria-hidden="true">404</p>
+    <h1 class="aspect-404__title">Страница не найдена</h1>
+    <p class="aspect-404__text">
+      Возможно, мы удалили эту страницу, либо вы ввели неправильный адрес.
+      Попробуйте начать с главной или перейти в каталог.
+    </p>
+    <div class="aspect-404__actions">
+      <a href="/" class="aspect-404__btn aspect-404__btn--primary">На главную</a>
+      <a href="{% url 'catalog:catalog' %}" class="aspect-404__btn aspect-404__btn--ghost">В каталог</a>
     </div>
+  </div>
 </main>
 {% endblock %}

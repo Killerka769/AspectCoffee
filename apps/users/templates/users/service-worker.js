@@ -9,8 +9,8 @@ self.addEventListener("push", (event) => {
   const title = payload.title || "Aspect Coffee";
   const options = {
     body: payload.body || "",
-    icon: "/static/asset/images/favicon.svg",
-    badge: "/static/asset/images/favicon.svg",
+    icon: "/static/asset/images/favicon-aspect.svg",
+    badge: "/static/asset/images/favicon-aspect.svg",
     tag: payload.tag || "aspect-notification",
     renotify: true,
     data: {

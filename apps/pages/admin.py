@@ -32,22 +32,6 @@ class LegalDocumentAdmin(ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-# @admin.register(Banner)
-# class BannerAdmin(ModelAdmin):
-#     list_display = ("title", "slot", "is_active", "order", "created_at")
-#     list_filter = ("slot", "is_active")
-#     list_editable = ("is_active", "order")
-#     search_fields = ("title", "description", "link_url")
-
-
-# @admin.register(SiteLink)
-# class SiteLinkAdmin(ModelAdmin):
-#     list_display = ("label", "group", "url", "is_active", "order")
-#     list_filter = ("group", "is_active", "open_new_tab")
-#     list_editable = ("is_active", "order")
-#     search_fields = ("label", "url")
-
-
 class CommunityPostLikeInline(TabularInline):
     model = CommunityPostLike
     extra = 0
@@ -88,15 +72,6 @@ class CommunityPostAdmin(ModelAdmin):
     @admin.display(description="Комментарии", ordering="_comments_total")
     def comments_total(self, obj):
         return obj._comments_total
-
-
-
-@admin.register(CommunityPostLike)
-class CommunityPostLikeAdmin(ModelAdmin):
-    list_display = ("post", "user", "created_at")
-    list_filter = ("created_at",)
-    search_fields = ("post__title", "user__email", "user__username")
-    readonly_fields = ("created_at",)
 
 
 class CommentModerationAdminMixin:
@@ -199,21 +174,3 @@ class ReviewCommentAdmin(CommentModerationAdminMixin, ModelAdmin):
     @admin.display(description="Комментарий")
     def text_preview(self, obj):
         return obj.text[:100]
-
-
-# @admin.register(CommunityPostBookmark)
-# class CommunityPostBookmarkAdmin(ReadOnlyCommunityActivityAdmin):
-#     list_display = ("post", "user", "created_at")
-#     readonly_fields = ("post", "user", "created_at")
-
-
-# @admin.register(CommunityPostDislike)
-# class CommunityPostDislikeAdmin(ReadOnlyCommunityActivityAdmin):
-#     list_display = ("post", "user", "created_at")
-#     readonly_fields = ("post", "user", "created_at")
-
-
-# @admin.register(CommunityPostRepost)
-# class CommunityPostRepostAdmin(ReadOnlyCommunityActivityAdmin):
-#     list_display = ("post", "user", "created_at")
-#     readonly_fields = ("post", "user", "created_at")

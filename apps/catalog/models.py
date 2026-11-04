@@ -8,31 +8,6 @@ from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFit, ResizeToFill
 from ckeditor_uploader.fields import RichTextUploadingField
 
-# class Roaster(models.Model):
-#     name = models.CharField("Название", max_length=200, unique=True)
-#     slug = models.SlugField("Адрес в URL", max_length=200, unique=True, blank=True)
-#     description = models.TextField("Описание", blank=True)
-#     image = models.ImageField("Фото", upload_to="roasters/", blank=True)
-#     is_active = models.BooleanField("Активен", default=True)
-
-#     class Meta:
-#         verbose_name = "Ростер"
-#         verbose_name_plural = "Ростеры"
-#         ordering = ["name"]
-
-#     def __str__(self):
-#         return self.name
-
-#     def get_absolute_url(self):
-#         from django.urls import reverse
-#         return reverse("catalog:recipe_detail", kwargs={"slug": self.slug})
-
-#     def save(self, *args, **kwargs):
-#         if not self.slug:
-#             self.slug = slugify(self.name)
-#         super().save(*args, **kwargs)
-
-
 class Category(models.Model):
     name = models.CharField("Название", max_length=200)
     slug = models.SlugField("Адрес в URL", max_length=200, unique=True)
@@ -87,14 +62,6 @@ class Category(models.Model):
         if not self.slug:
             self.slug = slugify(self.name, allow_unicode=True)
         super().save(*args, **kwargs)
-# class Tag(models.Model):
-#     name = models.CharField("Название", max_length=100, unique=True)
-#     slug = models.SlugField("Адрес в URL", unique=True)
-#     class Meta:
-#         verbose_name = "Тег"
-#         verbose_name_plural = "Теги"
-#     def __str__(self):
-#         return self.name
 class FlavorNote(models.Model):
     name = models.CharField("Вкусовая нотка", max_length=100, unique=True)
     slug = models.SlugField("Адрес в URL", unique=True)
@@ -489,100 +456,7 @@ class ProductImage(models.Model):
         ordering = ["order"]
     def __str__(self):
         return f"Фото {self.product.name}"
-# class Recipe(models.Model):
-#     DIFF_EASY = "easy"
-#     DIFF_MEDIUM = "medium"
-#     DIFF_HARD = "hard"
-#     DIFFICULTY_CHOICES = [
-#         (DIFF_EASY, "Простой"),
-#         (DIFF_MEDIUM, "Средний"),
-#         (DIFF_HARD, "Сложный"),
-#     ]
-#     name = models.CharField("Название", max_length=300)
-#     slug = models.SlugField("Адрес в URL", unique=True, db_index=True)
-#     brew_method = models.ForeignKey(
-#         BrewMethod, on_delete=models.SET_NULL,
-#         null=True, blank=True,
-#         related_name="recipes",
-#         verbose_name="Способ приготовления",
-#     )
-#     difficulty = models.CharField(
-#         "Сложность", max_length=10,
-#         choices=DIFFICULTY_CHOICES, default=DIFF_MEDIUM,
-#     )
-#     time_minutes = models.PositiveIntegerField("Время (мин)")
-#     description = RichTextUploadingField("Описание", blank=True)
-#     ingredients = models.JSONField(
-#         "Ингредиенты",
-#         default=list,
-#         help_text='Введите корректный JSON, например: ["вода", "кофе", "молоко"].',
-#     )
-#     main_image = ProcessedImageField(
-#         upload_to="recipes/",
-#         processors=[ResizeToFit(1200, 800)],
-#         format="WEBP",
-#         options={"quality": 85},
-#         blank=True, null=True,
-#         verbose_name="Главное изображение",
-#     )
-#     video_url = models.URLField("Ссылка на видео", blank=True)
-#     products = models.ManyToManyField(
-#         Product, blank=True,
-#         related_name="recipes",
-#         verbose_name="Подходящие товары",
-#     )
-#     is_published = models.BooleanField("Опубликован", default=False)
-#     # 2.3 — рецепты как на исходнике: добавляет покупатель, получивший товар.
-#     # Добавление из админки заморожено до запуска MVP (см. ТЗ 2.3).
-#     author = models.ForeignKey(
-#         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
-#         null=True, blank=True,
-#         related_name="recipes",
-#         verbose_name="Автор (покупатель)",
-#     )
-#     is_user_submitted = models.BooleanField(
-#         "Добавлен покупателем", default=False,
-#         help_text="Рецепт добавлен пользователем, получившим товар (а не из админки).",
-#     )
-#     created_at = models.DateTimeField("Создан", auto_now_add=True)
-#     updated_at = models.DateTimeField("Обновлён", auto_now=True)
-#     class Meta:
-#         verbose_name = "Рецепт"
-#         verbose_name_plural = "Рецепты"
-#         ordering = ["-created_at"]
-#     def __str__(self):
-#         return self.name
-# class RecipeStep(models.Model):
-#     KIND_ACTION = "action"
-#     KIND_POUR = "pour"
-#     KIND_CHOICES = [
-#         (KIND_ACTION, "Действие"),
-#         (KIND_POUR, "Вливание"),
-#     ]
-#     recipe = models.ForeignKey(
-#         Recipe, on_delete=models.CASCADE,
-#         related_name="steps", verbose_name="Рецепт",
-#     )
-#     step_number = models.PositiveSmallIntegerField("Номер шага")
-#     kind = models.CharField("Тип шага", max_length=10, choices=KIND_CHOICES, default=KIND_ACTION)
-#     time_seconds = models.PositiveIntegerField("Время от начала, сек", default=0)
-#     water_ml = models.PositiveIntegerField("Объём воды, мл", default=0)
-#     description = models.TextField("Описание шага")
-#     image = ProcessedImageField(
-#         upload_to="recipes/steps/",
-#         processors=[ResizeToFit(800, 600)],
-#         format="WEBP",
-#         options={"quality": 80},
-#         blank=True, null=True,
-#         verbose_name="Изображение шага",
-#     )
-#     class Meta:
-#         verbose_name = "Шаг рецепта"
-#         verbose_name_plural = "Шаги рецепта"
-#         ordering = ["step_number"]
-#         unique_together = [("recipe", "step_number")]
-#     def __str__(self):
-#         return f"{self.recipe.name} — Шаг {self.step_number}"
+
 class Review(models.Model):
     STATUS_NEW = "new"
     STATUS_PUBLISHED = "published"
@@ -660,50 +534,6 @@ class Review(models.Model):
             elif self.status == self.STATUS_UNPUBLISHED:
                 from apps.catalog.tasks import send_user_review_rejected_notification
                 transaction.on_commit(lambda: send_user_review_rejected_notification.delay(self.pk))
-
-# class ParserLog(models.Model):
-#     STATUS_CHOICES = [
-#         ("running", "Запущен"),
-#         ("success", "Успешно"),
-#         ("failed", "Ошибка"),
-#     ]
-#     started_at = models.DateTimeField("Начало", auto_now_add=True)
-#     finished_at = models.DateTimeField("Конец", null=True, blank=True)
-#     status = models.CharField("Статус", max_length=20, choices=STATUS_CHOICES, default="running")
-#     total_products = models.PositiveIntegerField("Всего товаров", default=0)
-#     created_count = models.PositiveIntegerField("Создано", default=0)
-#     updated_count = models.PositiveIntegerField("Обновлено", default=0)
-#     errors = models.TextField("Ошибки", blank=True)
-
-#     class Meta:
-#         verbose_name = "Лог парсера"
-#         verbose_name_plural = "Логи парсера"
-#         ordering = ["-started_at"]
-
-#     def __str__(self):
-#         return f"Парсинг {self.started_at.strftime('%Y-%m-%d %H:%M')} — {self.get_status_display()}"
-
-# class ParserSetting(models.Model):
-#     is_auto_update_enabled = models.BooleanField("Автоматическое обновление", default=True)
-#     last_run_at = models.DateTimeField("Последний запуск", null=True, blank=True)
-#     update_interval_hours = models.PositiveIntegerField("Интервал обновления (часы)", default=24)
-
-#     class Meta:
-#         verbose_name = "Настройка парсера"
-#         verbose_name_plural = "Настройки парсера"
-
-#     def __str__(self):
-#         return "Глобальные настройки парсера"
-
-#     def save(self, *args, **kwargs):
-#         self.pk = 1 # Singleton
-#         super().save(*args, **kwargs)
-
-#     @classmethod
-#     def load(cls):
-#         obj, _ = cls.objects.get_or_create(pk=1)
-#         return obj
-
 
 class SiteSettings(models.Model):
     """Singleton model for global site settings (external links, contacts).

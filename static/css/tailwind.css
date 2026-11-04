@@ -610,29 +610,29 @@ video {
 
 @media (min-width: 1100px) {
   .\!container {
-    max-width: 1100px !important;
-    padding-right: 50px !important;
-    padding-left: 50px !important;
+    max-width: 1340px !important;
+    padding-right: clamp(24px, 4vw, 56px) !important;
+    padding-left: clamp(24px, 4vw, 56px) !important;
   }
 
   .container {
-    max-width: 1100px;
-    padding-right: 50px;
-    padding-left: 50px;
+    max-width: 1340px;
+    padding-right: clamp(24px, 4vw, 56px);
+    padding-left: clamp(24px, 4vw, 56px);
   }
 }
 
 @media (min-width: 1440px) {
   .\!container {
     max-width: 1440px !important;
-    padding-right: 50px !important;
-    padding-left: 50px !important;
+    padding-right: clamp(32px, 4vw, 56px) !important;
+    padding-left: clamp(32px, 4vw, 56px) !important;
   }
 
   .container {
     max-width: 1440px;
-    padding-right: 50px;
-    padding-left: 50px;
+    padding-right: clamp(32px, 4vw, 56px);
+    padding-left: clamp(32px, 4vw, 56px);
   }
 }
 

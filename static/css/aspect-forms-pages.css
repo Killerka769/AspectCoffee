@@ -1,0 +1,431 @@
+/**
+ * Aspect Coffee — Этап 5: формы auth/contact и статичные страницы
+ */
+
+/* ——— Поля: нижняя граница, зелёный фокус ——— */
+html body .aspect-auth__input,
+html body .asp-auth__input,
+html body .asp-pwd__input,
+html body .aspect-contact__input,
+html body .aspect-contact__textarea,
+html body .aspect-inquiry input:not([type="checkbox"]):not([type="hidden"]),
+html body .aspect-inquiry textarea {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid #cccccc !important;
+  border-radius: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  box-shadow: none !important;
+}
+
+html body .aspect-auth__input--pwd,
+html body .asp-pwd__input {
+  padding-right: 44px !important;
+}
+
+html body .aspect-auth__input:focus,
+html body .asp-auth__input:focus,
+html body .asp-pwd__input:focus,
+html body .aspect-contact__input:focus,
+html body .aspect-contact__textarea:focus,
+html body .aspect-inquiry input:not([type="checkbox"]):not([type="hidden"]):focus,
+html body .aspect-inquiry textarea:focus {
+  background: transparent !important;
+  border-bottom-color: #2a4a34 !important;
+  outline: none !important;
+}
+
+html body .aspect-auth__input:hover,
+html body .asp-auth__input:hover,
+html body .asp-pwd__input:hover,
+html body .aspect-contact__input:hover,
+html body .aspect-contact__textarea:hover {
+  border-bottom-color: #999999 !important;
+}
+
+html body .aspect-auth__input.is-error,
+html body .asp-auth__input.is-error {
+  border-bottom-color: #b91c1c !important;
+  background: transparent !important;
+}
+
+html body .aspect-auth__phone-code-btn {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid #cccccc !important;
+  border-radius: 0 !important;
+}
+
+html body .aspect-auth__phone-code-btn:hover {
+  background: #f4f6f4 !important;
+  border-bottom-color: #2a4a34 !important;
+}
+
+/* ——— Кнопки форм ——— */
+html body .aspect-auth__submit,
+html body .aspect-auth__alt,
+html body .asp-auth__submit,
+html body .asp-pwd__btn,
+html body .aspect-contact__submit,
+html body .aspect-inquiry button[type="submit"],
+html body .aspect-partners__cta {
+  border-radius: 4px !important;
+}
+
+html body .aspect-inquiry button[type="submit"] {
+  background: #000000 !important;
+  color: #ffffff !important;
+  font-family: "Roboto Condensed", Arial, sans-serif !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  min-height: 52px;
+  padding: 0 28px !important;
+}
+
+html body .aspect-inquiry button[type="submit"]:hover {
+  background: #2a4a34 !important;
+}
+
+html body .aspect-auth__submit,
+html body .asp-auth__submit,
+html body .aspect-contact__submit {
+  background: #000000 !important;
+}
+
+html body .aspect-auth__submit:hover:not(:disabled),
+html body .asp-auth__submit:hover:not(:disabled),
+html body .aspect-contact__submit:hover:not(:disabled) {
+  background: #2a4a34 !important;
+}
+
+html body .asp-pwd__btn--primary {
+  background: #2a4a34 !important;
+  border-radius: 4px !important;
+}
+
+html body .asp-pwd__btn--primary:hover {
+  background: #000000 !important;
+}
+
+html body .asp-pwd__btn--ghost {
+  border-radius: 4px !important;
+}
+
+html body .aspect-auth__social {
+  border-radius: 4px !important;
+}
+
+/* Auth card — чуть компактнее радиус */
+html body .aspect-auth__card,
+html body .asp-auth__card {
+  border-radius: 8px !important;
+}
+
+html body h1.aspect-auth__title,
+html body h1.asp-auth__title,
+html body h1.asp-pwd__title {
+  font-size: clamp(32px, 5vw, 44px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.01em !important;
+  margin: 0 0 8px !important;
+}
+
+html body h1.aspect-auth__title::after,
+html body h1.asp-auth__title::after,
+html body h1.asp-pwd__title::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* ——— Статичные страницы: типографика и ритм ——— */
+html body .aspect-about,
+html body .aspect-faq,
+html body .aspect-doc,
+html body .aspect-discount,
+html body .aspect-contact,
+html body .aspect-partners {
+  font-family: "Open Sans", Arial, sans-serif;
+  color: #5a5a5a;
+}
+
+html body .aspect-about__title,
+html body .aspect-faq__title,
+html body .aspect-doc__title,
+html body .aspect-discount__title,
+html body .aspect-contact__title,
+html body .aspect-partners__title,
+html body .aspect-about__section-title,
+html body .aspect-doc__section-title,
+html body .aspect-discount__section-title,
+html body .aspect-contact__card-title,
+html body .aspect-partners__section-title,
+html body .aspect-faq__section > summary {
+  font-family: "Roboto Condensed", Arial, sans-serif !important;
+  text-transform: uppercase !important;
+  color: #000000 !important;
+}
+
+html body h2.aspect-partners__section-title {
+  font-size: clamp(24px, 3vw, 32px) !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.02em !important;
+  margin: 0 !important;
+}
+
+html body h2.aspect-partners__section-title::after {
+  display: none !important;
+  content: none !important;
+}
+
+html body .aspect-partners__section-head {
+  padding-bottom: 16px !important;
+  margin-bottom: 28px !important;
+  border-bottom: 1px solid #f0f0f0;
+  position: relative;
+}
+
+html body .aspect-partners__section-head::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 48px;
+  height: 3px;
+  background: #2a4a34;
+}
+
+html body .aspect-faq__section > summary {
+  font-size: 18px !important;
+  letter-spacing: 0.04em !important;
+}
+
+html body .aspect-faq__section > summary::after {
+  content: "+" !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  margin-top: 0 !important;
+  background: none !important;
+}
+
+html body .aspect-faq__section[open] > summary::after {
+  content: "−" !important;
+}
+
+html body .aspect-about__hero,
+html body .aspect-faq__header,
+html body .aspect-doc__hero,
+html body .aspect-discount__hero,
+html body .aspect-contact__hero,
+html body .aspect-partners__hero {
+  padding-top: 24px !important;
+  padding-bottom: 40px !important;
+  margin-bottom: 48px !important;
+}
+
+html body .aspect-about__card,
+html body .aspect-doc__card,
+html body .aspect-discount__card {
+  border-radius: 8px !important;
+  padding: 36px 40px !important;
+  margin-bottom: 32px !important;
+}
+
+html body .aspect-faq__list {
+  gap: 20px !important;
+}
+
+html body .aspect-faq__section {
+  border-radius: 8px !important;
+  padding: 24px 28px !important;
+}
+
+html body .aspect-partners__section {
+  margin-bottom: 48px !important;
+}
+
+html body .aspect-about__text,
+html body .aspect-doc__text,
+html body .aspect-discount__text,
+html body .aspect-faq__answer,
+html body .aspect-partners__text {
+  font-family: "Open Sans", Arial, sans-serif !important;
+  font-size: 15px !important;
+  line-height: 1.7 !important;
+  color: #5a5a5a !important;
+}
+
+html body h1.aspect-about__title,
+html body h1.aspect-faq__title,
+html body h1.aspect-doc__title,
+html body h1.aspect-discount__title,
+html body h1.aspect-contact__title,
+html body h1.aspect-partners__title {
+  font-size: clamp(36px, 5vw, 64px) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.02em !important;
+}
+
+html body h1.aspect-about__title::after,
+html body h1.aspect-faq__title::after,
+html body h1.aspect-doc__title::after,
+html body h1.aspect-discount__title::after,
+html body h1.aspect-contact__title::after,
+html body h1.aspect-partners__title::after,
+html body h1.aspect-404__title::after {
+  display: none !important;
+  content: none !important;
+}
+
+html body h2.aspect-about__section-title::after,
+html body h2.aspect-doc__section-title::after,
+html body h2.aspect-discount__section-title::after {
+  display: block !important;
+}
+
+/* Contact / inquiry block */
+html body .aspect-inquiry-card {
+  border-radius: 8px !important;
+  border-color: #e5e8e5 !important;
+  padding: 32px 36px !important;
+  margin: 32px 0 !important;
+}
+
+html body .aspect-inquiry h2 {
+  font-family: "Roboto Condensed", Arial, sans-serif !important;
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  color: #000 !important;
+  margin: 0 0 20px !important;
+  padding-bottom: 14px !important;
+  border-bottom: 1px solid #f0f0f0;
+  position: relative;
+}
+
+html body .aspect-inquiry h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 48px;
+  height: 3px;
+  background: #2a4a34;
+}
+
+html body .aspect-inquiry label {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: #5a5a5a !important;
+}
+
+html body .aspect-inquiry form {
+  gap: 22px !important;
+}
+
+/* ——— 404 ——— */
+.aspect-404 {
+  background: #ffffff;
+  min-height: 60vh;
+  padding: 80px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aspect-404__inner {
+  width: min(640px, 100%);
+  text-align: center;
+}
+
+.aspect-404__code {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(88px, 18vw, 140px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: #000;
+  margin: 0 0 8px;
+}
+
+.aspect-404__code::after {
+  content: "";
+  display: block;
+  width: 72px;
+  height: 3px;
+  background: #2a4a34;
+  margin: 20px auto 0;
+}
+
+.aspect-404__title {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(22px, 4vw, 32px);
+  text-transform: uppercase;
+  color: #000;
+  margin: 28px 0 12px;
+}
+
+.aspect-404__text {
+  font-family: "Open Sans", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #5a5a5a;
+  margin: 0 0 32px;
+}
+
+.aspect-404__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.aspect-404__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 28px;
+  border-radius: 4px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.aspect-404__btn--primary {
+  background: #000;
+  color: #fff;
+}
+
+.aspect-404__btn--primary:hover {
+  background: #2a4a34;
+  color: #fff;
+}
+
+.aspect-404__btn--ghost {
+  background: #fff;
+  color: #000;
+  border: 1px solid #e5e8e5;
+}
+
+.aspect-404__btn--ghost:hover {
+  border-color: #2a4a34;
+  color: #2a4a34;
+}
+
+@media (max-width: 757px) {
+  html body .aspect-about__card,
+  html body .aspect-doc__card,
+  html body .aspect-discount__card {
+    padding: 24px 20px !important;
+  }
+}

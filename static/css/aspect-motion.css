@@ -1,0 +1,135 @@
+/**
+ * Aspect Coffee — Этап 4: motion (scroll reveal, micro-interactions)
+ */
+
+/* ——— no-js: контент всегда виден ——— */
+html.no-js .aspect-reveal {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js .aspect-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .aspect-marquee__track {
+    animation: none !important;
+  }
+
+  [data-aspect-parallax] {
+    transform: none !important;
+  }
+}
+
+/* ——— Scroll reveal ——— */
+@keyframes aspect-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+html.js .aspect-reveal {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  will-change: opacity, transform;
+}
+
+html.js .aspect-reveal.is-inview {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+html.js .aspect-reveal.is-inview {
+  will-change: auto;
+}
+
+/* Stagger для сеток (лёгкий) */
+html.js .aspect-products .aspect-reveal.is-inview:nth-child(3n + 2) {
+  transition-delay: 0.05s;
+}
+
+html.js .aspect-products .aspect-reveal.is-inview:nth-child(3n + 3) {
+  transition-delay: 0.1s;
+}
+
+/* ——— Marquee ——— */
+html body .aspect-marquee__track {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* ——— Header submenu ——— */
+html body .aspect-header__submenu {
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.28s ease !important;
+  transform-origin: top center;
+}
+
+html body .aspect-header__submenu.is-open {
+  transform: translate3d(0, 0, 0) !important;
+}
+
+html body .aspect-header__submenu:not(.is-open) {
+  transform: translate3d(0, 8px, 0) !important;
+}
+
+/* ——— Иконки шапки ——— */
+html body .aspect-header__icons .icon-btn,
+html body .aspect-header__icons .header-cart__btn {
+  transition: background 0.25s ease, color 0.25s ease !important;
+}
+
+html body .aspect-header__icons .icon-btn svg,
+html body .aspect-header__icons .header-cart__btn svg {
+  transition: color 0.25s ease, stroke 0.25s ease, transform 0.25s ease !important;
+}
+
+html body .aspect-header__icons .icon-btn:hover svg,
+html body .aspect-header__icons .header-cart__btn:hover svg {
+  transform: scale(1.06);
+}
+
+/* ——— Пульс «В корзину» ——— */
+@keyframes aspect-buy-pulse {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(0.95);
+  }
+  65% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+html body .aspect-card__buy.aspect-click-pulse:not(:disabled),
+html body .aspect-pd__buy.aspect-click-pulse:not(:disabled) {
+  animation: aspect-buy-pulse 0.32s ease;
+}
+
+/* ——— Hero parallax layer ——— */
+[data-aspect-parallax] {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@media (max-width: 767px) {
+  [data-aspect-parallax] {
+    transform: none !important;
+    will-change: auto;
+  }
+}

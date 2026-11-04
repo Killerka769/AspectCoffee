@@ -1,32 +1,19 @@
 
-import json
 from django import forms
 from django.contrib import admin
-from django.urls import path, reverse
-from django.template.response import TemplateResponse
 from django.utils.html import format_html
-from django.db.models import Count
-from unfold.admin import ModelAdmin, TabularInline, StackedInline
+from unfold.admin import ModelAdmin, TabularInline
 from unfold.decorators import action
 from import_export.admin import ImportExportModelAdmin
 from .models import (
     Category, FlavorNote, BrewMethod,
     Product, ProductVariant, ProductImage,
     Review,
-    SiteSettings, CatalogFilterSettings, ProductView,
+    SiteSettings, CatalogFilterSettings,
     GrindType, RoastType, ProductPackaging, Cafe,
     NavMenuItem, PromoSlide,
 )
-# from .tasks import run_catalog_parser_task
 from apps.pages.models import ReviewComment
-from django.contrib import messages
-from django.shortcuts import redirect
-
-# @admin.register(Roaster)
-# class RoasterAdmin(ModelAdmin):
-#     list_display = ["name", "is_active"]
-#     list_editable = ["is_active"]
-#     search_fields = ["name"]
 
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
@@ -115,26 +102,26 @@ class ProductAdmin(ImportExportModelAdmin, ModelAdmin):
             },
         ),
         (
-            "Атрибуты кофе (необязательно для остальных разделов)",
+            "Атрибуты кофе (необязательно)",
             {
+                "classes": ("collapse",),
                 "fields": (
                     "roast_level", "processing_method", "origin_country", "region",
-                    "altitude",
-                    "q_score", "harvest_year", "variety", "caffeine_content",
+                    "altitude", "q_score", "harvest_year", "variety", "caffeine_content",
                     "composition", "brew_methods", "flavor_notes",
                 ),
-                "description": "Если поле не заполнено, соответствующий элемент не выводится на фронте.",
+                "description": "Заполняйте только для кофе; пустые поля на сайте не показываются.",
             },
         ),
         (
             "Профиль вкуса (необязательно)",
             {
+                "classes": ("collapse",),
                 "fields": ("body", "acidity", "sweetness", "flavor_description_html"),
-                "description": "Плотность, кислотность и описание вкуса скрыты на фронте, если не заполнены.",
             },
         ),
         ("Флаги", {"fields": ("is_active", "is_featured", "is_new", "is_bestseller", "is_microlot", "in_stock")}),
-        ("Похожие товары", {"fields": ("related_products",)}),
+        ("Похожие товары", {"fields": ("related_products",), "classes": ("collapse",)}),
         ("Статистика", {"fields": ("rating_avg", "reviews_count", "created_at", "updated_at"), "classes": ("collapse",)}),
         ("SEO", {"fields": ("seo_title", "seo_description"), "classes": ("collapse",)}),
     )
@@ -148,106 +135,7 @@ class ProductAdmin(ImportExportModelAdmin, ModelAdmin):
         return obj.get_absolute_url()
     class Media:
         css = {"all": ("asset/css/admin_aspect.css",)}
-# class RecipeStepInline(StackedInline):
-#     model = RecipeStep
-#     extra = 1
-#     fields = ["step_number", "description", "image"]
 
-
-# class RecipeAdminForm(forms.ModelForm):
-#     ingredients = forms.CharField(
-#         label="Ингредиенты",
-#         required=False,
-#         widget=forms.Textarea,
-#         help_text='Введите JSON-массив: ["вода", "кофе"] или каждый ингредиент с новой строки.',
-#     )
-
-#     class Meta:
-#         model = Recipe
-#         fields = "__all__"
-
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         if self.instance and self.instance.pk and not self.is_bound:
-#             self.initial["ingredients"] = json.dumps(
-#                 self.instance.ingredients or [],
-#                 ensure_ascii=False,
-#                 indent=2,
-#             )
-
-#     def clean_ingredients(self):
-#         raw = (self.cleaned_data.get("ingredients") or "").strip()
-#         if not raw:
-#             return []
-#         if raw.startswith("["):
-#             try:
-#                 value = json.loads(raw)
-#             except json.JSONDecodeError as exc:
-#                 raise forms.ValidationError(
-#                     'Неверный JSON. Используйте формат ["вода", "кофе"] или строки по одной.'
-#                 ) from exc
-#             if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
-#                 raise forms.ValidationError("Ингредиенты должны быть списком строк.")
-#             return [item.strip() for item in value if item.strip()]
-
-#         if raw.startswith("{"):
-#             raise forms.ValidationError("Ингредиенты должны быть списком, не объектом.")
-
-#         items = [line.strip(" \t\r\n-•,") for line in raw.splitlines()]
-#         items = [item for item in items if item]
-#         if not items:
-#             raise forms.ValidationError("Добавьте хотя бы один ингредиент.")
-#         return items
-
-
-# @admin.register(Recipe)
-# class RecipeAdmin(ModelAdmin):
-#     form = RecipeAdminForm
-#     actions = ["publish", "unpublish"]
-#     list_display = ["name", "brew_method", "difficulty", "time_minutes", "is_published"]
-#     list_editable = ["is_published"]
-#     list_filter = ["brew_method", "difficulty", "is_published"]
-#     search_fields = ["name", "slug"]
-#     prepopulated_fields = {"slug": ("name",)}
-#     filter_horizontal = ["products"]
-#     readonly_fields = ["author", "is_user_submitted", "created_at", "updated_at"]
-#     inlines = [RecipeStepInline]
-#     fieldsets = (
-#         (None, {"fields": ("name", "slug", "brew_method", "difficulty", "time_minutes", "is_published")}),
-#         ("Контент", {"fields": ("description", "main_image", "video_url", "ingredients")}),
-#         ("Связанные товары", {"fields": ("products",)}),
-#         ("Модерация", {"fields": ("author", "is_user_submitted", "created_at", "updated_at")}),
-#     )
-
-#     def save_model(self, request, obj, form, change):
-#         was_published = False
-#         if change and obj.pk:
-#             was_published = Recipe.objects.filter(pk=obj.pk).values_list(
-#                 "is_published", flat=True
-#             ).first()
-#         super().save_model(request, obj, form, change)
-#         if not was_published and obj.is_published and obj.author_id:
-#             from apps.catalog.tasks import send_user_recipe_published_notification
-
-#             send_user_recipe_published_notification.delay(obj.pk)
-
-#     @action(description="Опубликовать")
-#     def publish(self, request, queryset):
-#         from apps.catalog.tasks import send_user_recipe_published_notification
-
-#         published = 0
-#         for recipe in queryset.filter(is_published=False):
-#             recipe.is_published = True
-#             recipe.save(update_fields=["is_published", "updated_at"])
-#             if recipe.author_id:
-#                 send_user_recipe_published_notification.delay(recipe.pk)
-#             published += 1
-#         self.message_user(request, f"Опубликовано рецептов: {published}")
-#     @action(description="Снять с публикации")
-#     def unpublish(self, request, queryset):
-#         queryset.update(is_published=False)
-#     class Media:
-#         css = {"all": ("asset/css/admin_aspect.css",)}
 class ReviewCommentInline(TabularInline):
     model = ReviewComment
     extra = 0
@@ -300,99 +188,16 @@ class ReviewAdmin(ModelAdmin):
         for pid in product_ids:
             recompute_product_reviews(pid)
         self.message_user(request, f"Отклонено отзывов: {rejected}")
-# @admin.register(Tag)
-# # class TagAdmin(ModelAdmin):
-# #     prepopulated_fields = {"slug": ("name",)}
+
 @admin.register(FlavorNote)
 class FlavorNoteAdmin(ModelAdmin):
+    list_display = ["name", "slug"]
     prepopulated_fields = {"slug": ("name",)}
+    search_fields = ["name", "slug"]
 @admin.register(BrewMethod)
 class BrewMethodAdmin(ModelAdmin):
     list_display = ["name", "slug", "guide_url"]
     prepopulated_fields = {"slug": ("name",)}
-
-# @admin.register(ParserLog)
-# class ParserLogAdmin(ModelAdmin):
-#     list_display = ["started_at", "finished_at", "status", "created_count", "updated_count"]
-#     readonly_fields = ["started_at", "finished_at", "status", "total_products", "created_count", "updated_count", "errors"]
-#     actions = ["run_parser_directly"]
-
-#     @action(description="Запустить парсинг сейчас")
-#     def run_parser_directly(self, request, queryset):
-#         run_catalog_parser_task.delay(force=True)
-#         messages.success(request, "Задача парсинга запущена в фоновом режиме.")
-#         return redirect(request.path)
-
-# @admin.register(ParserSetting)
-# class ParserSettingAdmin(ModelAdmin):
-#     list_display = ["__str__", "is_auto_update_enabled", "last_run_at", "update_interval_hours"]
-#     list_editable = ["is_auto_update_enabled", "update_interval_hours"]
-#     actions = ["run_parser_directly"]
-
-#     @action(description="Запустить парсинг сейчас")
-#     def run_parser_directly(self, request, queryset):
-#         run_catalog_parser_task.delay(force=True)
-#         messages.success(request, "Задача парсинга запущена в фоновом режиме.")
-#         return redirect(request.path)
-
-#     def has_add_permission(self, request):
-#         return not ParserSetting.objects.exists()
-
-#     def has_delete_permission(self, request, obj=None):
-#         return False
-
-#     def get_urls(self):
-#         from django.urls import path
-#         urls = super().get_urls()
-#         custom = [
-#             path("run-parser/", self.admin_site.admin_view(self.run_parser_view), name="catalog_parsersetting_run_parser"),
-#             path("run-parser-result/", self.admin_site.admin_view(self.run_parser_result_view), name="catalog_parsersetting_run_parser_result"),
-#         ]
-#         return custom + urls
-
-#     def changelist_view(self, request, extra_context=None):
-#         extra_context = extra_context or {}
-#         extra_context["parser_url"] = reverse("admin:catalog_parsersetting_run_parser")
-#         extra_context["parser_result"] = ParserLog.objects.order_by("-started_at").first()
-#         return super().changelist_view(request, extra_context=extra_context)
-
-#     def render_change_form(self, request, context, *args, **kwargs):
-#         context = context or {}
-#         obj = context.get("original")
-#         extra = {
-#             "parser_url": reverse("admin:catalog_parsersetting_run_parser"),
-#             "parser_result": ParserLog.objects.order_by("-started_at").first(),
-#         }
-#         context.update(extra)
-#         return super().render_change_form(request, context, *args, **kwargs)
-
-#     def run_parser_view(self, request):
-#         context = {
-#             "title": "Запуск парсера каталога",
-#             "opts": self.model._meta,
-#             "parser_result": ParserLog.objects.order_by("-started_at").first(),
-#         }
-#         if request.method == "POST":
-#             category = request.POST.get("category", "coffee")
-#             update_images = request.POST.get("update_images") == "on"
-#             limit = request.POST.get("limit", 0)
-#             try:
-#                 limit = int(limit)
-#             except (ValueError, TypeError):
-#                 limit = 0
-#             run_catalog_parser_task.delay(force=True, update_images=update_images, category=category, limit=limit)
-#             messages.success(request, f"Парсер запущен (категория: {category}, обновлять изображения: {'да' if update_images else 'нет'}). Результат появится в логах через некоторое время.")
-#             return redirect("admin:catalog_parsersetting_run_parser_result")
-#         return TemplateResponse(request, "admin/catalog/parsersetting/run_parser.html", context)
-
-#     def run_parser_result_view(self, request):
-#         from .models import ParserLog
-#         context = {
-#             "title": "Результаты парсера",
-#             "opts": self.model._meta,
-#             "logs": ParserLog.objects.order_by("-started_at")[:20],
-#         }
-#         return TemplateResponse(request, "admin/catalog/parsersetting/parser_result.html", context)
 
 
 @admin.register(SiteSettings)
@@ -415,16 +220,6 @@ class SiteSettingsAdmin(ModelAdmin):
             "description": "Включённые варианты отображаются в корзине и принимаются сервером. Для работы без собственной доставки оставьте только варианты СДЭК.",
         }),
         ("Шаблонные описания", {"fields": ("default_storage_description", "default_delivery_description")}),
-        # ("Баннер обжарки", {"fields": ("roast_banner_is_active", "roast_banner_title", "roast_banner_subtitle")}),
-        # ("Блок «Открытость» (Трансляции)", {
-        #     "fields": (
-        #         "openness_title", "openness_description",
-        #         "openness_stream_1_title", "openness_stream_1_url", "openness_stream_1_image",
-        #         "openness_stream_2_title", "openness_stream_2_url", "openness_stream_2_image",
-        #         "openness_stream_3_title", "openness_stream_3_url", "openness_stream_3_image",
-        #     )
-        # }),
-        # ("Рецепты", {"fields": ("allow_recipe_without_order",)}),
     )
 
     def has_add_permission(self, request):
@@ -455,17 +250,6 @@ class CatalogFilterSettingsAdmin(ModelAdmin):
         return False
 
 
-@admin.register(ProductView)
-class ProductViewAdmin(ModelAdmin):
-    list_display = ["product", "session_key", "created_at"]
-    list_filter = ["created_at"]
-    search_fields = ["product__name"]
-    readonly_fields = ["product", "session_key", "created_at"]
-
-    def has_add_permission(self, request):
-        return False
-
-
 @admin.register(GrindType)
 class GrindTypeAdmin(ModelAdmin):
     list_display = ["name", "slug", "order", "is_active"]
@@ -480,14 +264,6 @@ class RoastTypeAdmin(ModelAdmin):
     list_editable = ["order", "is_active"]
     search_fields = ["name", "slug"]
     prepopulated_fields = {"slug": ("name",)}
-
-
-@admin.register(ProductPackaging)
-class ProductPackagingAdmin(ModelAdmin):
-    list_display = ["product", "weight", "price", "old_price", "order", "is_active"]
-    list_editable = ["price", "old_price", "order", "is_active"]
-    list_filter = ["is_active", "weight"]
-    search_fields = ["product__name"]
 
 
 @admin.register(Cafe)

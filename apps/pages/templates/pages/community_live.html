@@ -26,7 +26,7 @@
         {% if show_channels %}
         <section class="aspect-community-panel order-2"><h2>Каналы сообщества</h2><div class="aspect-channel-grid">{% for channel in community_channels %}<a class="aspect-channel" href="{% url 'pages:community_new' %}"><h3>{{ channel.title }}</h3><p>{{ channel.description }}</p></a>{% endfor %}</div></section>
         {% else %}
-        <div class="order-1 xl:order-2 relative community-posts-filters" data-v-27020d61=""><form method="get" action="{{ request.path }}" class="tc-search-wrap community-ajax-search" data-v-a96cfdc9=""><input type="hidden" name="scope" value="{{ selected_scope }}" data-community-scope-input><div class="tc-search" data-v-a96cfdc9=""><button type="submit" class="w-6 h-6 min-w-[24px] ml-3 aspect-search-submit" aria-label="Поиск" data-v-a96cfdc9=""><svg class="h-full w-full"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--search"></use></svg></button><input class="input-search flex-1 placeholder:text-[var(--black-50)] px-[5px] bg-[inherit]" type="search" placeholder="Поиск" name="q" value="{{ query }}" autocomplete="off" data-v-a96cfdc9=""><a data-community-clear class="cross-btn w-6 h-6 min-w-[24px] mr-3" href="{{ request.path }}?scope={{ selected_scope }}" aria-label="Очистить" data-v-a96cfdc9=""><svg class="h-full w-full"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--x"></use></svg></a><div class="aspect-scope-wrap"><button type="button" class="aspect-search-scope" data-community-scope-toggle aria-expanded="false" data-v-a96cfdc9=""><span data-community-scope-label>{{ selected_scope_label }}</span><svg class="h-4 w-4"><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--arr-bottom"></use></svg></button><div class="aspect-scope-menu" data-community-scope-menu hidden><button type="button" data-scope="all" class="{% if selected_scope == 'all' %}active{% endif %}">Везде</button><button type="button" data-scope="authors" class="{% if selected_scope == 'authors' %}active{% endif %}">По авторам</button><button type="button" data-scope="products" class="{% if selected_scope == 'products' %}active{% endif %}">По сортам</button></div></div></div></form></div>
+        <div class="order-1 xl:order-2 relative community-posts-filters" data-v-27020d61=""><form method="get" action="{{ request.path }}" class="tc-search-wrap community-ajax-search" data-v-a96cfdc9=""><input type="hidden" name="scope" value="{{ selected_scope }}" data-community-scope-input><div class="tc-search" data-v-a96cfdc9=""><button type="submit" class="w-6 h-6 min-w-[24px] ml-3 aspect-search-submit" aria-label="Поиск" data-v-a96cfdc9=""><svg class="h-full w-full"><use href="/static/asset/sprites/community-sprite.svg#icons--search"></use></svg></button><input class="input-search flex-1 placeholder:text-[var(--black-50)] px-[5px] bg-[inherit]" type="search" placeholder="Поиск" name="q" value="{{ query }}" autocomplete="off" data-v-a96cfdc9=""><a data-community-clear class="cross-btn w-6 h-6 min-w-[24px] mr-3" href="{{ request.path }}?scope={{ selected_scope }}" aria-label="Очистить" data-v-a96cfdc9=""><svg class="h-full w-full"><use href="/static/asset/sprites/community-sprite.svg#icons--x"></use></svg></a><div class="aspect-scope-wrap"><button type="button" class="aspect-search-scope" data-community-scope-toggle aria-expanded="false" data-v-a96cfdc9=""><span data-community-scope-label>{{ selected_scope_label }}</span><svg class="h-4 w-4"><use href="/static/asset/sprites/community-sprite.svg#icons--arr-bottom"></use></svg></button><div class="aspect-scope-menu" data-community-scope-menu hidden><button type="button" data-scope="all" class="{% if selected_scope == 'all' %}active{% endif %}">Везде</button><button type="button" data-scope="authors" class="{% if selected_scope == 'authors' %}active{% endif %}">По авторам</button><button type="button" data-scope="products" class="{% if selected_scope == 'products' %}active{% endif %}">По сортам</button></div></div></div></form></div>
         <div class="order-2 xl:order-3 community-posts-post-add aspect-community-add" data-v-27020d61="" data-v-0ef7abc1="">
           {% if user.is_authenticated %}<details class="aspect-compose"><summary><span class="aspect-compose-avatar">{% if user.avatar %}<img src="{{ user.avatar.url }}" alt="">{% else %}{{ user.first_name|first|default:user.email|first|upper }}{% endif %}</span><span>Написать пост</span></summary><form method="post" enctype="multipart/form-data" action="{% url 'pages:community' %}">{% csrf_token %}{% if form.errors %}<p class="aspect-form-error">Проверьте заполнение формы.</p>{% endif %}{{ form.title }}{{ form.text }}<div class="aspect-form-row"><label>{{ form.image }}</label><button type="submit">Опубликовать</button></div></form></details>{% else %}<div class="aspect-login-note"><a href="/login/?next=/community/">Войдите</a>, чтобы написать пост.</div>{% endif %}
         </div>
@@ -41,18 +41,18 @@
                         data-action="like" data-post="{{ post.pk }}"
                         data-active="{{ post.liked_by_me|yesno:'true,false' }}"
                         {% if user.is_authenticated and post.user == user %}disabled title="Нельзя оценивать свой пост"{% endif %}>
-                  <svg><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--like-stroke"></use></svg>
+                  <svg><use href="/static/asset/sprites/community-sprite.svg#icons--like-stroke"></use></svg>
                   <span>{{ post.like_count }}</span>
                 </button>
                 <button type="button" class="aspect-action" data-action="comments-toggle">
-                  <svg><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--comments-stroke"></use></svg>
+                  <svg><use href="/static/asset/sprites/community-sprite.svg#icons--comments-stroke"></use></svg>
                   <span data-comment-count>{{ post.comment_count }}</span>
                 </button>
               </div>
               <div class="aspect-action-right">
                 <button type="button" class="aspect-action" data-action="share"
                         data-url="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}#post-{{ post.pk }}">
-                  <svg><use href="/static/community-source/assets/sprite/sprite_v%3D594f5d47.svg#icons--share"></use></svg>
+                  <svg><use href="/static/asset/sprites/community-sprite.svg#icons--share"></use></svg>
                 </button>
               </div>
             </div>
@@ -551,6 +551,55 @@
       color: #5A5A5A !important;
       font-size: 14px !important;
     }
+
+    /* Каналы */
+    html body .aspect-community-panel {
+      background: #F4F6F4 !important;
+      border: 1px solid #E5E8E5 !important;
+      border-radius: 8px !important;
+      padding: 22px 24px !important;
+    }
+    html body .aspect-channel-grid {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 16px !important;
+    }
+    html body .aspect-channel {
+      display: flex !important;
+      flex-direction: column !important;
+      min-width: 0 !important;
+      overflow: hidden !important;
+      background: #FFFFFF !important;
+      border: 1px solid #E5E8E5 !important;
+      border-radius: 8px !important;
+      padding: 18px 16px !important;
+      text-decoration: none !important;
+      color: inherit !important;
+      transition: border-color .2s ease, transform .2s ease !important;
+    }
+    html body .aspect-channel:hover {
+      border-color: #2A4A34 !important;
+      transform: translateY(-2px) !important;
+    }
+    html body .aspect-channel h3 {
+      font-family: "Roboto Condensed", Arial, sans-serif !important;
+      font-weight: 900 !important;
+      font-size: 15px !important;
+      line-height: 1.25 !important;
+      letter-spacing: 0.04em !important;
+      text-transform: uppercase !important;
+      color: #000 !important;
+      margin: 0 0 8px !important;
+      word-break: break-word !important;
+      overflow-wrap: anywhere !important;
+      hyphens: auto !important;
+    }
+    html body .aspect-channel p {
+      margin: 0 !important;
+      font-size: 13px !important;
+      line-height: 1.5 !important;
+      color: #5A5A5A !important;
+    }
     
     @media (max-width: 757px) {
       .aspect-post-card { padding: 16px !important; }
@@ -565,6 +614,7 @@
       .aspect-comment-head { display: block !important; }
       .aspect-comment-head time { display: block !important; margin-top: 3px !important; }
       .aspect-replies { margin-left: 18px !important; }
+      html body .aspect-channel-grid { grid-template-columns: 1fr !important; }
     }
   </style>
       </div>  

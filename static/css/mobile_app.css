@@ -140,7 +140,7 @@
   }
   .aspect-mobile-menu__title {
     color: #000 !important;
-    font-family: "DIN Pro Black", "DIN Pro Bold Fallback", sans-serif;
+    font-family: "Roboto Condensed", sans-serif !important;
     font-size: 21px;
     line-height: 1.1;
     letter-spacing: 0.015em;
