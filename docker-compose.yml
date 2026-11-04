@@ -11,7 +11,7 @@ services:
   web:
     build: .
     image: aspectcoffee-site
-    restart: build
+    restart: always
     env_file: .env.prod
     volumes:
       - ./media:/app/media
@@ -27,7 +27,7 @@ services:
   celery:
     build: .
     image: aspectcoffee-site
-    restart: build
+    restart: always
     env_file: .env.prod
     volumes:
       - ./media:/app/media
@@ -42,7 +42,7 @@ services:
   celery-beat:
     build: .
     image: aspectcoffee-site
-    restart: build
+    restart: always
     env_file: .env.prod
     volumes:
       - ./media:/app/media
