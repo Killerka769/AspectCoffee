@@ -3,8 +3,8 @@
 
   {# FILTER TABS #}
   <div class="flex bg-[var(--white)] p-1 rounded-2xl w-fit">
-    <a href="?filter=all" class="px-4 py-2 rounded-xl text-[12px] font-din-black uppercase tracking-[0.04em] transition-all {% if filter == 'all' or not filter %}bg-[var(--black)] text-[var(--white)]{% else %}text-[var(--black-50)] hover:text-[var(--black)]{% endif %}">Мои достижения</a>
-    <a href="?filter=earned" class="px-4 py-2 rounded-xl text-[12px] font-din-black uppercase tracking-[0.04em] transition-all {% if filter == 'earned' %}bg-[var(--black)] text-[var(--white)]{% else %}text-[var(--black-50)] hover:text-[var(--black)]{% endif %}">Полученные</a>
+    <a href="?filter=all" class="px-4 py-2 rounded-xl text-[12px] aspect-display-black uppercase tracking-[0.04em] transition-all {% if filter == 'all' or not filter %}bg-[var(--black)] text-[var(--white)]{% else %}text-[var(--black-50)] hover:text-[var(--black)]{% endif %}">Мои достижения</a>
+    <a href="?filter=earned" class="px-4 py-2 rounded-xl text-[12px] aspect-display-black uppercase tracking-[0.04em] transition-all {% if filter == 'earned' %}bg-[var(--black)] text-[var(--white)]{% else %}text-[var(--black-50)] hover:text-[var(--black)]{% endif %}">Полученные</a>
   </div>
 
   {% if badges %}
@@ -26,7 +26,7 @@
         </div>
         <div class="space-y-2">
           <div class="space-y-1">
-            <p class="text-[24px] font-din-black uppercase leading-[1.2] md:tracking-[0.02em] mb-0">{{ badge.title }}</p>
+            <p class="text-[24px] aspect-display-black uppercase leading-[1.2] md:tracking-[0.02em] mb-0">{{ badge.title }}</p>
             <p class="text-[13px] text-[var(--black-50)] m-0">{{ badge.description }}</p>
           </div>
           {% if badge.progress is not None %}
@@ -46,9 +46,9 @@
         <div class="w-20 h-20 bg-[var(--white)] rounded-full flex items-center justify-center mb-6">
           <svg class="w-10 h-10 text-[var(--black-30)]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5" /><path d="M8.21 13.89L7 21l5-3 5 3-1.21-7.12" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </div>
-        <p class="text-[24px] font-din-black uppercase leading-[1.2] mb-2 m-0">Нет достижений</p>
+        <p class="text-[24px] aspect-display-black uppercase leading-[1.2] mb-2 m-0">Нет достижений</p>
         <p class="text-[14px] text-[var(--black-50)] mb-6 m-0">Сделайте первый заказ, чтобы получить награду</p>
-        <a href="{% url 'catalog:catalog' %}" class="tc-btn btn-dark">В каталог</a>
+        <a href="{% url 'catalog:catalog' %}" class="aspect-btn btn-dark">В каталог</a>
       </div>
     </div>
   {% endif %}
@@ -59,7 +59,7 @@
 {% if new_achievement %}
 <div class="fixed inset-0 z-[99999] bg-[var(--black-30)] flex items-center justify-center p-4" onclick="this.remove()">
   <div class="bg-[var(--white)] rounded-2xl p-8 max-w-[408px] w-full text-center relative" onclick="event.stopPropagation()">
-    <p class="text-[40px] font-din-black uppercase leading-[1.2] md:tracking-[0.01em] mb-4">Вы получили<br><span class="block">новую награду!</span></p>
+    <p class="text-[40px] aspect-display-black uppercase leading-[1.2] md:tracking-[0.01em] mb-4">Вы получили<br><span class="block">новую награду!</span></p>
     <div class="space-y-6">
       <div class="w-full">
         <div class="w-[195px] mx-auto relative -z-10 img-wrap">
@@ -67,11 +67,11 @@
           <img src="{{ new_achievement.icon }}" alt="{{ new_achievement.title }}" class="w-full object-contain m-0 relative">
           {% endif %}
         </div>
-        <p class="text-[24px] font-din-black uppercase leading-[1.2] md:tracking-[0.02em] mb-2">{{ new_achievement.title }}</p>
+        <p class="text-[24px] aspect-display-black uppercase leading-[1.2] md:tracking-[0.02em] mb-2">{{ new_achievement.title }}</p>
       </div>
       <div class="space-y-4">
         <p class="text-[12px] text-[var(--black-50)] m-0">{{ new_achievement.description }}</p>
-        <a href="#" class="tc-btn btn-dark w-full max-w-[203px] mx-auto">Поделиться</a>
+        <a href="#" class="aspect-btn btn-dark w-full max-w-[203px] mx-auto">Поделиться</a>
       </div>
     </div>
   </div>

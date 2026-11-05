@@ -1,5 +1,4 @@
 {% extends "catalog/base.html" %}
-{% load static %}
 
 {% block title %}Aspect Coffee Roasters — свежеобжаренный спешалти-кофе{% endblock %}
 {% block meta_description %}Aspect Coffee Roasters — интернет-магазин свежеобжаренного спешалти-кофе. Прямые закупки, открытое ценообразование, доставка от 3 до 5 дней.{% endblock %}
@@ -21,9 +20,9 @@
   width: min(1440px, calc(100% - 32px));
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-  gap: 64px;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
 }
 .aspect-hero__title {
   font-family: "Roboto Condensed", Arial, sans-serif;
@@ -79,63 +78,55 @@
   letter-spacing: 0.06em;
 }
 
-/* Плитки-категории справа */
+/* Три типографические карточки: эспрессо / фильтр / аксессуары */
 .aspect-hero__cards {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
-  height: min(680px, 72vh);
-  min-height: 520px;
+  min-width: 0;
 }
 .aspect-hero__card {
-  position: relative;
-  display: block;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  min-width: 0;
+  min-height: 220px;
+  padding: 24px;
   border-radius: 8px;
-  background: #000;
+  background: #2A4A34;
   color: #fff;
   text-decoration: none;
   transition: transform .3s ease, box-shadow .3s ease;
 }
-.aspect-hero__card--wide { grid-column: 1 / -1; }
+.aspect-hero__card--wide { grid-column: auto; }
 .aspect-hero__card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 18px 48px rgba(0,0,0,.18);
+  box-shadow: 0 18px 48px rgba(42, 74, 52, .18);
 }
-.aspect-hero__card img,
-.aspect-hero__card video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity .35s ease, transform .8s ease;
+.aspect-hero__card-index {
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .72);
 }
-.aspect-hero__card video { opacity: 0; }
-.aspect-hero__card:hover video { opacity: 1; }
-.aspect-hero__card:hover img { transform: scale(1.04); }
-.aspect-hero__card::after {
+.aspect-hero__card-index::after {
   content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.55) 100%);
-  z-index: 1;
-  transition: background .35s ease;
-}
-.aspect-hero__card:hover::after {
-  background: linear-gradient(180deg, rgba(42,74,52,.4) 0%, rgba(42,74,52,.78) 100%);
+  display: block;
+  width: 48px;
+  height: 2px;
+  margin-top: 14px;
+  background: #fff;
 }
 .aspect-hero__card-body {
-  position: absolute;
-  left: 22px;
-  right: 22px;
-  bottom: 22px;
-  z-index: 3;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
+  min-width: 0;
 }
 .aspect-hero__card-title {
   font-family: "Roboto Condensed", Arial, sans-serif !important;
@@ -153,7 +144,6 @@
   transition: transform .3s ease;
   position: relative;
   z-index: 3;
-  text-shadow: 0 2px 12px rgba(0,0,0,.45);
 }
 .aspect-hero__card:hover .aspect-hero__card-title {
   transform: translateY(-4px);
@@ -173,7 +163,7 @@
   flex: 0 0 auto;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 4px;
   background: #FFFFFF !important;
   color: #2A4A34 !important;
   -webkit-text-fill-color: #2A4A34 !important;
@@ -818,7 +808,7 @@
 /* ---------- АДАПТИВ ---------- */
 @media (max-width: 1099px) {
   .aspect-hero__inner { grid-template-columns: 1fr; gap: 40px; }
-  .aspect-hero__cards { height: 520px; }
+  .aspect-hero__cards { height: auto; min-height: 0; }
   .aspect-promo { grid-template-columns: 1fr; padding: 32px 28px; }
   .aspect-promo__actions { flex-direction: row; flex-wrap: wrap; }
   .aspect-reviews__grid { grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -832,9 +822,9 @@
 @media (max-width: 757px) {
   .aspect-hero { padding: 12px 0 32px; }
   .aspect-hero__stats { grid-template-columns: 1fr 1fr; gap: 16px; }
-  .aspect-hero__cards { height: 420px; gap: 10px; }
+  .aspect-hero__cards { grid-template-columns: 1fr; }
+  .aspect-hero__card { min-height: 0; gap: 24px; padding: 20px; }
   .aspect-hero__card-title { font-size: 18px; }
-  .aspect-hero__card-body { left: 16px; right: 16px; bottom: 16px; }
   .aspect-marquee { padding: 12px 0; }
   .aspect-marquee__item { font-size: 14px; gap: 28px; }
   .aspect-marquee__track { gap: 28px; }
@@ -901,51 +891,36 @@
       </div>
 
       <div class="aspect-hero__cards" data-aspect-parallax>
-        <a href="{% url 'catalog:catalog' %}?category=kofe&roast=espresso" class="aspect-hero__card aspect-hero__card--wide" x-data="{ hovered: false }" @mouseenter="hovered = true; $refs.v1 && ($refs.v1.currentTime = 0, $refs.v1.play())" @mouseleave="hovered = false; $refs.v1 && $refs.v1.pause()">
-          <picture>
-            <img src="{% static 'asset/images/1b.jpg' %}" alt="Кофе для эспрессо" loading="lazy">
-          </picture>
-          <video x-ref="v1" muted loop playsinline preload="none">
-            <source src="https://coffee-static.storage.yandexcloud.net/files/shares/home/espresso.mp4" type="video/mp4">
-          </video>
+        <a href="{% url 'catalog:catalog' %}?category=kofe&roast=espresso" class="aspect-hero__card">
+          <span class="aspect-hero__card-index">01 / Эспрессо</span>
           <div class="aspect-hero__card-body">
             <h3 class="aspect-hero__card-title">
               Для эспрессо
-              <small>{{ espresso_count }} сортов</small>
+              <small>{% if espresso_count %}{{ espresso_count }} сортов{% else %}Автоматическая и рожковая{% endif %}</small>
             </h3>
-            <span class="aspect-hero__card-arrow">→</span>
+            <span class="aspect-hero__card-arrow" aria-hidden="true">→</span>
           </div>
         </a>
 
-        <a href="{% url 'catalog:catalog' %}?category=kofe&roast=light,medium" class="aspect-hero__card" x-data="{ hovered: false }" @mouseenter="hovered = true; $refs.v2 && ($refs.v2.currentTime = 0, $refs.v2.play())" @mouseleave="hovered = false; $refs.v2 && $refs.v2.pause()">
-          <picture>
-            <img src="{% static 'asset/images/3b.jpg' %}" alt="Кофе для фильтра" loading="lazy">
-          </picture>
-          <video x-ref="v2" muted loop playsinline preload="none">
-            <source src="https://coffee-static.storage.yandexcloud.net/files/shares/home/filter.mp4" type="video/mp4">
-          </video>
+        <a href="{% url 'catalog:catalog' %}?category=kofe&roast=light,medium" class="aspect-hero__card">
+          <span class="aspect-hero__card-index">02 / Фильтр</span>
           <div class="aspect-hero__card-body">
             <h3 class="aspect-hero__card-title">
               Для фильтра
-              <small>{{ filter_count }} сортов</small>
+              <small>{% if filter_count %}{{ filter_count }} сортов{% else %}Воронка, аэропресс, френч{% endif %}</small>
             </h3>
-            <span class="aspect-hero__card-arrow">→</span>
+            <span class="aspect-hero__card-arrow" aria-hidden="true">→</span>
           </div>
         </a>
 
-        <a href="{% url 'catalog:catalog' %}?category=aksessuary" class="aspect-hero__card" x-data="{ hovered: false }" @mouseenter="hovered = true; $refs.v3 && ($refs.v3.currentTime = 0, $refs.v3.play())" @mouseleave="hovered = false; $refs.v3 && $refs.v3.pause()">
-          <picture>
-            <img src="{% static 'asset/images/accessories.jpg' %}" alt="Аксессуары и мерч" loading="lazy">
-          </picture>
-          <video x-ref="v3" muted loop playsinline preload="none">
-            <source src="https://coffee-static.storage.yandexcloud.net/files/shares/home/acsr.mp4" type="video/mp4">
-          </video>
+        <a href="{% url 'catalog:catalog' %}?category=aksessuary" class="aspect-hero__card">
+          <span class="aspect-hero__card-index">03 / Аксессуары</span>
           <div class="aspect-hero__card-body">
             <h3 class="aspect-hero__card-title">
-              Аксессуары и мерч
-              <small>{{ accessories_count }} позиций</small>
+              Аксессуары
+              <small>{% if accessories_count %}{{ accessories_count }} позиций{% else %}Для приготовления и сервировки{% endif %}</small>
             </h3>
-            <span class="aspect-hero__card-arrow">→</span>
+            <span class="aspect-hero__card-arrow" aria-hidden="true">→</span>
           </div>
         </a>
       </div>

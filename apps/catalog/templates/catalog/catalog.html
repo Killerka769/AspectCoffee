@@ -20,12 +20,6 @@
   margin-bottom: 40px;
   position: relative;
 }
-.aspect-catalog__header::after {
-  content: "";
-  position: absolute; left: 0; bottom: -1px;
-  width: 72px; height: 3px;
-  background: #2A4A34;
-}
 .aspect-catalog__title {
   font-family: "Roboto Condensed", Arial, sans-serif;
   font-weight: 900;
@@ -51,110 +45,71 @@
 .aspect-catalog__breadcrumbs a:hover { color: #2A4A34; }
 .aspect-catalog__breadcrumbs span { color: rgba(0,0,0,.3); }
 
-/* ---------- 3 ПЛИТКИ ТИПА КОФЕ ---------- */
+/* ---------- СПОСОБ ПРИГОТОВЛЕНИЯ: текстовый ряд, не видеомозаика ---------- */
 .aspect-type-cards {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 18px;
-  margin-bottom: 36px;
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
 }
 .aspect-type-card {
   position: relative;
-  display: block;
-  border-radius: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
   overflow: hidden;
-  background: #000;
+  background: #F4F6F4;
   cursor: pointer;
-  padding-top: 58%;
+  padding: 10px 14px;
   text-decoration: none;
-  transition: transform .3s ease, box-shadow .3s ease;
-  border: 2px solid transparent;
+  border: 1px solid #E5E8E5;
 }
 .aspect-type-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 22px 52px rgba(0,0,0,.18);
+  border-color: #2A4A34;
+  background: #E8EEE8;
 }
 .aspect-type-card--active {
   border-color: #2A4A34;
-  box-shadow: 0 0 0 4px rgba(42,74,52,.15);
+  background: #2A4A34;
 }
-.aspect-type-card__media {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  opacity: .85;
-  transition: opacity .35s ease, transform .8s ease;
-}
-.aspect-type-card:hover .aspect-type-card__media { opacity: .95; transform: scale(1.05); }
-.aspect-type-card__overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.5) 45%, rgba(0,0,0,.9) 100%);
-  transition: background .35s ease;
-  z-index: 1;
-}
-.aspect-type-card:hover .aspect-type-card__overlay {
-  background: linear-gradient(180deg, rgba(42,74,52,.25) 0%, rgba(42,74,52,.7) 45%, rgba(42,74,52,1) 100%);
-}
-.aspect-type-card__badge {
-  position: absolute;
-  top: 18px; left: 18px;
-  background: rgba(255,255,255,.95);
-  color: #2A4A34;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 11px; font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  z-index: 3;
+.aspect-type-card__media,
+.aspect-type-card__overlay,
+.aspect-type-card__badge,
+.aspect-type-card__arrow {
+  display: none;
 }
 .aspect-type-card__label {
-  position: absolute;
-  left: 24px; right: 24px; bottom: 22px;
-  z-index: 3;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
+  position: static;
+  display: block;
+  z-index: 1;
 }
 .aspect-type-card__name {
   font-family: "Roboto Condensed", Arial, sans-serif;
-  font-weight: 900;
-  font-size: 24px;
-  line-height: 1.1;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
   text-transform: uppercase;
-  letter-spacing: .02em;
+  letter-spacing: .04em;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  text-shadow: none;
+}
+.aspect-type-card--active .aspect-type-card__name,
+.aspect-type-card--active .aspect-type-card__name small {
   color: #FFFFFF !important;
   -webkit-text-fill-color: #FFFFFF !important;
-  text-shadow: 0 2px 12px rgba(0,0,0,.4);
 }
 .aspect-type-card__name small {
   display: block;
   font-family: "Open Sans", Arial, sans-serif;
-  font-size: 12px; font-weight: 500;
-  letter-spacing: .06em;
-  color: rgba(255,255,255,.75) !important;
-  -webkit-text-fill-color: rgba(255,255,255,.75) !important;
-  margin-top: 6px;
-  text-transform: uppercase;
-}
-.aspect-type-card__arrow {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  background: #FFFFFF !important;
-  color: #2A4A34 !important;
-  -webkit-text-fill-color: #2A4A34 !important;
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px; font-weight: 700;
-  flex-shrink: 0;
-  transition: background .25s ease, color .25s ease, transform .25s ease;
-}
-.aspect-type-card:hover .aspect-type-card__arrow {
-  background: #2A4A34 !important;
-  color: #FFFFFF !important;
-  -webkit-text-fill-color: #FFFFFF !important;
-  transform: translate(3px, -3px);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .04em;
+  color: rgba(0,0,0,.55) !important;
+  -webkit-text-fill-color: rgba(0,0,0,.55) !important;
+  margin-top: 2px;
+  text-transform: none;
 }
 .aspect-type-card__checkbox { position: absolute; opacity: 0; pointer-events: none; }
 
@@ -387,7 +342,7 @@
   scrollbar-width: none;
 }
 .aspect-sidebar::-webkit-scrollbar { display: none; }
-html.tc-filter-scroll-lock,body.tc-filter-scroll-lock{overflow:hidden!important;overscroll-behavior:none}
+html.aspect-filter-scroll-lock,body.aspect-filter-scroll-lock{overflow:hidden!important;overscroll-behavior:none}
 .aspect-sidebar{overscroll-behavior-y:contain}
 .aspect-sidebar-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
 .aspect-sidebar-reset{color:#2a4a34;text-decoration:underline;font-size:13px}
@@ -674,30 +629,32 @@ html.tc-filter-scroll-lock,body.tc-filter-scroll-lock{overflow:hidden!important;
 
 @media (max-width: 1099px) {
   .aspect-catalog__layout { grid-template-columns: 1fr; gap: 24px; }
+  /* Панель фильтров в потоке страницы: выезжающий drawer на телефоне не был виден. */
   .aspect-sidebar {
-    position: fixed;
-    top: 0; right: 0;
-    height: 100dvh;
-    width: min(400px, 100%);
-    background: #fff;
-    padding: 24px;
-    z-index: 220;
-    overflow-y: auto;
-    transform: translateX(100%);
-    transition: transform .25s ease;
-    box-shadow: -12px 0 48px rgba(0,0,0,.12);
+    position: relative;
+    top: auto;
+    right: auto;
+    height: auto;
+    width: 100%;
     max-height: none;
-    border-radius: 0;
+    background: #fff;
+    padding: 20px 16px 8px;
+    overflow: visible;
+    transform: none;
+    box-shadow: none;
+    border: 1px solid #e5e8e5;
+    border-radius: 8px;
   }
-  .aspect-sidebar.is-open { transform: translateX(0); }
-  .aspect-catalog__mobile-controls { display: flex; }
-  .aspect-type-cards { grid-template-columns: 1fr 1fr !important; }
+  .aspect-sidebar-close { display: none !important; }
+  .aspect-catalog__mobile-controls { display: none; }
 }
 @media (max-width: 599px) {
-  .aspect-type-cards { grid-template-columns: 1fr !important; }
   .aspect-catalog__header { padding: 32px 0 24px; }
   .aspect-products { gap: 12px; }
   .aspect-sidebar { width: 100%; }
+  .aspect-tabs { align-items: stretch; }
+  .aspect-tabs__sort { margin-left: 0 !important; width: 100%; }
+  .aspect-card__footer { flex-wrap: wrap; align-items: flex-start; }
 }
 
 .aspect-sidebar-backdrop {
@@ -1313,10 +1270,7 @@ html.tc-filter-scroll-lock,body.tc-filter-scroll-lock{overflow:hidden!important;
       </nav>
       {% endif %}
       <h1 class="aspect-catalog__title">
-        {% if current_category_obj %}{% if current_category_obj.h1 %}{{ current_category_obj.h1 }}{% else %}{{ current_category_obj.name }}{% endif %}
-        {% elif current_category %}
-          {% for cat in categories %}{% if cat.slug == current_category %}{{ cat.name }}{% endif %}{% endfor %}
-        {% else %}Каталог кофе{% endif %}
+        {% if current_category_obj %}{% if current_category_obj.h1 %}{{ current_category_obj.h1 }}{% else %}{{ current_category_obj.name }}{% endif %}{% else %}Каталог{% endif %}
       </h1>
       {% if current_category_obj and current_category_obj.description %}
       <p class="aspect-catalog__desc">{{ current_category_obj.description }}</p>
@@ -1328,9 +1282,6 @@ html.tc-filter-scroll-lock,body.tc-filter-scroll-lock{overflow:hidden!important;
     <div class="aspect-type-cards">
       <label class="aspect-type-card {% if 'espresso' in current_methods %}aspect-type-card--active{% endif %}">
         <input type="checkbox" name="methods" value="espresso" data-filter="methods" class="aspect-type-card__checkbox" {% if 'espresso' in current_methods %}checked{% endif %}>
-        <video class="aspect-type-card__media" width="1" height="1" preload="none" playsinline muted loop poster="https://coffee-static.storage.yandexcloud.net/filters/coffee/1b.jpg" src="https://coffee-static.storage.yandexcloud.net/files/shares/home/espresso.mp4"></video>
-        <span class="aspect-type-card__overlay"></span>
-        <span class="aspect-type-card__badge">01 / Для кофемашины</span>
         <span class="aspect-type-card__label">
           <span class="aspect-type-card__name">
             Кофе для эспрессо
@@ -1342,9 +1293,6 @@ html.tc-filter-scroll-lock,body.tc-filter-scroll-lock{overflow:hidden!important;
 
       <label class="aspect-type-card {% if 'filter' in current_methods %}aspect-type-card--active{% endif %}">
         <input type="checkbox" name="methods" value="filter" data-filter="methods" class="aspect-type-card__checkbox" {% if 'filter' in current_methods %}checked{% endif %}>
-        <video class="aspect-type-card__media" width="1" height="1" preload="none" playsinline muted loop poster="https://coffee-static.storage.yandexcloud.net/filters/coffee/3b.jpg" src="https://coffee-static.storage.yandexcloud.net/files/shares/home/filter.mp4"></video>
-        <span class="aspect-type-card__overlay"></span>
-        <span class="aspect-type-card__badge">02 / Ручное заваривание</span>
         <span class="aspect-type-card__label">
           <span class="aspect-type-card__name">
             Кофе для фильтра
@@ -1356,9 +1304,6 @@ html.tc-filter-scroll-lock,body.tc-filter-scroll-lock{overflow:hidden!important;
 
       <label class="aspect-type-card {% if 'capsules' in current_methods %}aspect-type-card--active{% endif %}">
         <input type="checkbox" name="methods" value="capsules" data-filter="methods" class="aspect-type-card__checkbox" {% if 'capsules' in current_methods %}checked{% endif %}>
-        <video class="aspect-type-card__media" width="1" height="1" preload="none" playsinline muted loop poster="https://coffee-static.storage.yandexcloud.net/filters/coffee/5a.jpg" src="https://coffee-static.storage.yandexcloud.net/files/shares/home/capsules.mp4"></video>
-        <span class="aspect-type-card__overlay"></span>
-        <span class="aspect-type-card__badge">03 / Формат Nespresso</span>
         <span class="aspect-type-card__label">
           <span class="aspect-type-card__name">
             Капсулы
@@ -1486,7 +1431,7 @@ html.tc-filter-scroll-lock,body.tc-filter-scroll-lock{overflow:hidden!important;
       {# ---------- САЙДБАР ---------- #}
       <aside class="aspect-sidebar" id="sidebar-filters">
         <div class="aspect-sidebar-tools">
-          {% if request.GET %}<a class="aspect-sidebar-reset" href="{{ request.path }}" data-testid="mobile-catalog-reset">Сбросить фильтры</a>{% endif %}
+          {% if request.GET %}<a class="aspect-sidebar-reset" href="{{ request.path }}" data-catalog-reset="1">Сбросить фильтры</a>{% endif %}
           <button type="button" class="aspect-sidebar-close" id="mobile-filter-close" aria-label="Закрыть фильтры">×</button>
         </div>
         <div class="aspect-sidebar__count">
@@ -1732,16 +1677,16 @@ html.tc-filter-scroll-lock,body.tc-filter-scroll-lock{overflow:hidden!important;
       backdrop.addEventListener('click', closeSidebar);
       document.body.appendChild(backdrop);
     }
-    document.documentElement.classList.add('tc-filter-scroll-lock');
-    document.body.classList.add('tc-filter-scroll-lock');
+    document.documentElement.classList.add('aspect-filter-scroll-lock');
+    document.body.classList.add('aspect-filter-scroll-lock');
   }
   function closeSidebar() {
     if (!sidebar) return;
     sidebar.classList.remove('is-open');
     if (btn) btn.setAttribute('aria-expanded','false');
     if (backdrop) { backdrop.remove(); backdrop = null; }
-    document.documentElement.classList.remove('tc-filter-scroll-lock');
-    document.body.classList.remove('tc-filter-scroll-lock');
+    document.documentElement.classList.remove('aspect-filter-scroll-lock');
+    document.body.classList.remove('aspect-filter-scroll-lock');
   }
   btn && btn.addEventListener('click', openSidebar);
   var closeBtn = document.getElementById('mobile-filter-close');
@@ -1824,10 +1769,10 @@ function qzFinish(taste) {
 (function() {
   function bindVideos(root) {
     root.querySelectorAll('.aspect-type-card').forEach(function(card) {
-      if (card.dataset.tcVideoBound === 'true') return;
+      if (card.dataset.aspectVideoBound === 'true') return;
       var video = card.querySelector('.aspect-type-card__media');
       if (!video || video.tagName !== 'VIDEO') return;
-      card.dataset.tcVideoBound = 'true';
+      card.dataset.aspectVideoBound = 'true';
       card.addEventListener('mouseenter', function() { video.play().catch(function(){}); });
       card.addEventListener('mouseleave', function() { video.pause(); video.currentTime = 0; });
     });

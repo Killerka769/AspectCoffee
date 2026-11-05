@@ -1,17 +1,13 @@
 from pathlib import Path
-from bs4 import BeautifulSoup
 from django.conf import settings
 from django.test import TestCase
 
 
 class MobileShellRegressionTests(TestCase):
-    def test_bottom_navigation_matches_accepted_four_tab_redesign(self):
+    def test_bottom_navigation_is_not_duplicated_under_the_header(self):
         response = self.client.get("/")
-        nav = BeautifulSoup(response.content, "html.parser").select_one("#mob-bottom-nav")
-        self.assertIsNotNone(nav)
-        labels = [link.get_text(" ", strip=True) for link in nav.select("a")]
-        self.assertEqual(labels, ["Главная", "Каталог", "Избранное", "Вход"])
-        self.assertFalse(any("basket" in link.get("href", "") for link in nav.select("a")))
+        self.assertNotContains(response, 'id="mob-bottom-nav"')
+        self.assertNotContains(response, "mob-bottom-nav__item")
 
     def test_search_closes_other_mobile_panels(self):
         response = self.client.get("/")
@@ -30,8 +26,8 @@ class MobileShellRegressionTests(TestCase):
         self.assertContains(response, "logo-aspect.svg")
 
     def test_catalog_reset_is_bound_to_active_query(self):
-        self.assertNotContains(self.client.get("/catalog/"), 'data-testid="mobile-catalog-reset"')
-        self.assertContains(self.client.get("/catalog/?acidity=medium"), 'data-testid="mobile-catalog-reset"')
+        self.assertNotContains(self.client.get("/catalog/"), 'data-catalog-reset="1"')
+        self.assertContains(self.client.get("/catalog/?acidity=medium"), 'data-catalog-reset="1"')
 
     def test_product_tabs_allow_horizontal_scrolling(self):
         template = (Path(settings.BASE_DIR) / "apps/catalog/templates/catalog/detail.html").read_text(encoding="utf-8")

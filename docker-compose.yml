@@ -16,6 +16,7 @@ services:
     volumes:
       - ./media:/app/media
       - ./db.sqlite3:/app/data/db.sqlite3
+      - ./staticfiles:/app/staticfiles
     depends_on:
       redis:
         condition: service_healthy

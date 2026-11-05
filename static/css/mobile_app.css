@@ -285,104 +285,7 @@
   }
 }
 
-/* ═══════════════════════════════════════════════════
-   1. MOBILE BOTTOM NAVIGATION BAR
-   ═══════════════════════════════════════════════════ */
-@media (max-width: 1099px) {
-  .mob-bottom-nav {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: calc(var(--mob-nav-h) + var(--mob-safe-bottom)) !important;
-    padding-bottom: var(--mob-safe-bottom) !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    backdrop-filter: saturate(180%) blur(20px);
-    border-top: 0.5px solid rgba(0, 0, 0, 0.08) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-around !important;
-    z-index: 9990 !important;
-    transform: translateY(0);
-    transition: transform 0.3s var(--mob-ease);
-  }
-  .mob-bottom-nav.nav-hidden {
-    transform: translateY(0) !important;
-  }
-  .mob-bottom-nav__item {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    flex: 1 !important;
-    height: 100% !important;
-    text-decoration: none !important;
-    color: rgba(0, 0, 0, 0.4) !important;
-    font-size: 10px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.02em;
-    gap: 2px !important;
-    position: relative !important;
-    -webkit-tap-highlight-color: transparent;
-    transition: color 0.2s var(--mob-ease);
-    min-height: unset !important;
-    min-width: unset !important;
-    padding: 0 0 2px !important;
-    margin: 0 !important;
-    background: none !important;
-    border: none !important;
-  }
-  .mob-bottom-nav__item.active {
-    color: #000 !important;
-  }
-  .mob-bottom-nav__item svg {
-    width: 24px !important;
-    height: 24px !important;
-    min-width: unset !important;
-    min-height: unset !important;
-    transition: transform 0.2s var(--mob-spring);
-  }
-  .mob-bottom-nav__item:active svg {
-    transform: scale(0.85);
-  }
-  .mob-bottom-nav__item.active svg {
-    transform: scale(1.05);
-  }
-  .mob-bottom-nav__badge {
-    position: absolute;
-    top: 9px;
-    right: calc(50% - 18px);
-    min-width: 16px;
-    height: 16px;
-    border-radius: 8px;
-    background: #000;
-    color: #fff;
-    font-size: 9px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4px;
-    line-height: 1;
-    border: 2px solid #fff;
-    transform: scale(0);
-    transition: transform 0.25s var(--mob-spring);
-  }
-  .mob-bottom-nav__badge.has-items {
-    transform: scale(1);
-  }
-  /* Body padding for bottom nav */
-  body {
-    padding-bottom: calc(var(--mob-nav-h) + var(--mob-safe-bottom)) !important;
-  }
-  /* Notifications above bottom nav */
-  .fixed.bottom-6 {
-    bottom: calc(var(--mob-nav-h) + var(--mob-safe-bottom) + 12px) !important;
-  }
-}
 @media (min-width: 1100px) {
-  .mob-bottom-nav { display: none !important; }
   .header-mobile-cart-count { display: none !important; }
 }
 
@@ -423,8 +326,6 @@
   /* ── C. Hide desktop-only items ── */
   #header:not(.open-menu) .mob-header-hide { display: none !important; } /* still hidden closed; group-[.open-menu]:flex reveals notif/pickup-count when drawer opens */
   #header:not(.open-menu) .header-enter { display: none !important; } /* reveal login/logout auth block when drawer opens, matches reference group-[.open-menu]:block */
-  #header hr[data-v-fb25dd5c] { display: none !important; }
-
   /* Logo + burger placement */
   #header .app-header-logo {
     order: 1 !important;
@@ -485,7 +386,6 @@
   #header .header-nav-list {
     display: none !important;
   }
-  #header.open-menu .header-nav-list[data-v-fb25dd5c],
   #header.open-menu .header-nav-list {
     display: block !important;
     position: fixed !important;
@@ -557,7 +457,6 @@
 
   /* City selector at bottom of drawer */
   #header .header-select-city { display: none !important; }
-  #header.open-menu .header-select-city[data-v-fb25dd5c],
   #header.open-menu .header-select-city {
     display: block !important;
     position: fixed !important;
@@ -619,24 +518,6 @@
 
   /* Pickup-point count — pull out of the cramped icon row (was overflowing off-screen
      under flex-wrap:nowrap) and anchor it just above the city selector, matching reference */
-  #header.open-menu [data-v-52f27e61].mob-header-hide {
-    display: block !important;
-    position: fixed !important;
-    bottom: calc(var(--mob-nav-h) + 81px) !important;
-    left: 0 !important;
-    width: 82vw !important;
-    max-width: 320px !important;
-    background: #fff !important;
-    padding: 6px 20px !important;
-    z-index: 187 !important;
-    margin: 0 !important;
-  }
-  #header.open-menu [data-v-52f27e61].mob-header-hide button {
-    color: rgba(0,0,0,0.5) !important;
-    font-size: 13px !important;
-    width: auto !important;
-  }
-
   /* Original close/backdrop buttons — keep them for click-outside-to-close */
   #header.open-menu button[aria-label="close"] {
     z-index: 181 !important;
@@ -746,86 +627,86 @@
    ═══════════════════════════════════════════════════ */
 @media (max-width: 767px) {
   /* Product grid */
-  .tc-product-grid {
+  .aspect-product-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
   }
   /* Product card */
-  .tc-tile {
+  .aspect-tile {
     padding: 10px !important;
     border-radius: 16px !important;
     display: flex !important;
     flex-direction: column !important;
   }
   /* Product image */
-  .tc-tile__picture {
+  .aspect-tile__picture {
     margin-bottom: 6px !important;
     border-radius: 12px !important;
     overflow: hidden !important;
   }
-  .tc-tile__picture img {
+  .aspect-tile__picture img {
     width: 100% !important;
     height: auto !important;
     aspect-ratio: 1 / 1;
     object-fit: contain !important;
   }
   /* Product title */
-  .tc-tile__title {
+  .aspect-tile__title {
     min-height: auto !important;
   }
-  .tc-tile__title .text-\[20px\],
-  .tc-tile__title [class*="text-[20px]"] {
+  .aspect-tile__title .text-\[20px\],
+  .aspect-tile__title [class*="text-[20px]"] {
     font-size: 13px !important;
     line-height: 1.3 !important;
   }
   /* Product subtitle/category */
-  .tc-tile__category,
-  .tc-tile .text-\[12px\] {
+  .aspect-tile__category,
+  .aspect-tile .text-\[12px\] {
     font-size: 11px !important;
   }
   /* Price + action buttons */
-  .tc-tile__actions,
-  .tc-tile__footer {
+  .aspect-tile__actions,
+  .aspect-tile__footer {
     margin-top: auto !important;
   }
-  .tc-tile__price {
+  .aspect-tile__price {
     font-size: 14px !important;
   }
   /* Action icons row — smaller */
-  .tc-tile .tc-card-actions {
+  .aspect-tile .aspect-card-actions {
     gap: 4px !important;
   }
-  .tc-tile .tc-card-actions button,
-  .tc-tile .tc-card-actions a {
+  .aspect-tile .aspect-card-actions button,
+  .aspect-tile .aspect-card-actions a {
     width: 32px !important;
     height: 32px !important;
     min-width: 32px !important;
     min-height: 32px !important;
   }
-  .tc-tile .tc-card-actions svg {
+  .aspect-tile .aspect-card-actions svg {
     width: 16px !important;
     height: 16px !important;
   }
   /* Taste notes */
-  .tc-tile .tc-taste-tags {
+  .aspect-tile .aspect-taste-tags {
     display: none !important; /* hide on 2-col to save space */
   }
   /* Flavor bars (Плотность, Кислотность) */
-  .tc-tile .tc-flavor-bar,
-  .tc-tile .tc-characteristic-bar {
+  .aspect-tile .aspect-flavor-bar,
+  .aspect-tile .aspect-characteristic-bar {
     display: none !important; /* hide on 2-col grid */
   }
   /* Weekly badge */
-  .tc-tile .tc-badge-weekly {
+  .aspect-tile .aspect-badge-weekly {
     font-size: 10px !important;
     padding: 2px 6px !important;
   }
 }
 @media (max-width: 400px) {
-  .tc-product-grid {
+  .aspect-product-grid {
     gap: 6px !important;
   }
-  .tc-tile {
+  .aspect-tile {
     padding: 8px !important;
     border-radius: 14px !important;
   }
@@ -835,14 +716,14 @@
    5b. HOMEPAGE PRODUCT CARDS (weekly specials etc.)
    ═══════════════════════════════════════════════════ */
 @media (max-width: 767px) {
-  .tc-weekly-grid {
+  .aspect-weekly-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
   }
   /* Individual product cards on homepage (not in catalog grid) */
-  .tc-weekly-grid .tc-tile .tc-taste-tags,
-  .tc-weekly-grid .tc-tile .tc-flavor-bar,
-  .tc-weekly-grid .tc-tile .tc-characteristic-bar {
+  .aspect-weekly-grid .aspect-tile .aspect-taste-tags,
+  .aspect-weekly-grid .aspect-tile .aspect-flavor-bar,
+  .aspect-weekly-grid .aspect-tile .aspect-characteristic-bar {
     display: none !important;
   }
 }
@@ -851,36 +732,36 @@
    6. CATALOG PAGE — MOBILE
    ═══════════════════════════════════════════════════ */
 @media (max-width: 767px) {
-  .tc-catalog-page {
+  .aspect-catalog-page {
     padding-top: 8px !important;
   }
-  .tc-container {
+  .aspect-container {
     padding-left: 12px !important;
     padding-right: 12px !important;
   }
-  .tc-catalog-header {
+  .aspect-catalog-header {
     flex-direction: row !important;
     align-items: center !important;
     margin-bottom: 12px !important;
   }
-  .tc-catalog-h1 {
+  .aspect-catalog-h1 {
     font-size: 22px !important;
   }
   /* Horizontal scrolling filters */
-  .tc-catalog-toolbar,
-  .tc-hashtag-row {
+  .aspect-catalog-toolbar,
+  .aspect-hashtag-row {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
-  .tc-catalog-toolbar::-webkit-scrollbar,
-  .tc-hashtag-row::-webkit-scrollbar {
+  .aspect-catalog-toolbar::-webkit-scrollbar,
+  .aspect-hashtag-row::-webkit-scrollbar {
     display: none;
   }
   /* Sidebar — hidden on mobile */
-  .tc-catalog-sidebar {
+  .aspect-catalog-sidebar {
     display: none !important;
   }
-  .tc-catalog-sidebar.mob-sheet-open {
+  .aspect-catalog-sidebar.mob-sheet-open {
     display: flex !important;
     position: fixed !important;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -888,13 +769,13 @@
     background: rgba(0,0,0,0.4);
     align-items: flex-end;
   }
-  .tc-catalog-sidebar.mob-sheet-open > * {
+  .aspect-catalog-sidebar.mob-sheet-open > * {
     background: #fff;
     border-radius: 24px 24px 0 0;
     max-height: 85dvh;
     overflow-y: auto;
     width: 100%;
-    padding: 24px 16px calc(24px + var(--mob-nav-h));
+    padding: 24px 16px calc(24px + var(--mob-safe-bottom));
     animation: sheetSlideUp 0.35s var(--mob-ease) forwards;
   }
 }
@@ -904,7 +785,7 @@
    ═══════════════════════════════════════════════════ */
 @media (max-width: 767px) {
   footer {
-    padding-bottom: calc(40px + var(--mob-nav-h) + var(--mob-safe-bottom)) !important;
+    padding-bottom: calc(32px + var(--mob-safe-bottom)) !important;
   }
   footer .container {
     padding-left: 16px !important;
@@ -925,7 +806,7 @@
     max-width: 100% !important;
     border-radius: 24px 24px 0 0 !important;
     max-height: 80dvh !important;
-    padding-bottom: calc(16px + var(--mob-nav-h)) !important;
+    padding-bottom: calc(16px + var(--mob-safe-bottom)) !important;
   }
   [x-show="wishlistOpen"] {
     top: auto !important;
@@ -942,13 +823,13 @@
    9. PROFILE / ACCOUNT PAGES — MOBILE
    ═══════════════════════════════════════════════════ */
 @media (max-width: 767px) {
-  .tc-account-page,
-  .tc-profile-section {
+  .aspect-account-page,
+  .aspect-profile-section {
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
   /* Account nav → horizontal scrollable */
-  .tc-account-nav,
+  .aspect-account-nav,
   [class*="base_account"] nav {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -958,7 +839,7 @@
     display: flex !important;
     gap: 8px;
   }
-  .tc-account-nav::-webkit-scrollbar {
+  .aspect-account-nav::-webkit-scrollbar {
     display: none;
   }
 }
@@ -967,7 +848,7 @@
    10. BLOG / COMMUNITY — MOBILE
    ═══════════════════════════════════════════════════ */
 @media (max-width: 767px) {
-  .tc-blog-grid {
+  .aspect-blog-grid {
     grid-template-columns: 1fr !important;
     gap: 16px !important;
   }
@@ -977,12 +858,12 @@
    11. BANNER SLIDER — MOBILE
    ═══════════════════════════════════════════════════ */
 @media (max-width: 767px) {
-  .tc-banner-slider {
+  .aspect-banner-slider {
     border-radius: 20px !important;
   }
-  .tc-banner-slider h2,
-  .tc-banner-slider .text-3xl,
-  .tc-banner-slider .text-4xl {
+  .aspect-banner-slider h2,
+  .aspect-banner-slider .text-3xl,
+  .aspect-banner-slider .text-4xl {
     font-size: 22px !important;
     line-height: 1.2 !important;
   }
@@ -992,14 +873,14 @@
    12. PRODUCT DETAIL PAGE — MOBILE
    ═══════════════════════════════════════════════════ */
 @media (max-width: 767px) {
-  .tc-product-detail {
+  .aspect-product-detail {
     padding: 0 !important;
   }
-  .tc-product-detail .tc-product-images {
+  .aspect-product-detail .aspect-product-images {
     border-radius: 0 !important;
     margin: 0 !important;
   }
-  .tc-product-detail .tc-product-info {
+  .aspect-product-detail .aspect-product-info {
     padding: 16px !important;
   }
 }
@@ -1008,14 +889,14 @@
    13. BASKET PAGE — MOBILE
    ═══════════════════════════════════════════════════ */
 @media (max-width: 767px) {
-  .tc-basket-page {
+  .aspect-basket-page {
     padding-left: 12px !important;
     padding-right: 12px !important;
   }
-  .tc-basket-page .tc-basket-items {
+  .aspect-basket-page .aspect-basket-items {
     gap: 8px !important;
   }
-  .tc-basket-page .tc-checkout-summary {
+  .aspect-basket-page .aspect-checkout-summary {
     border-radius: 20px !important;
     padding: 16px !important;
   }
@@ -1025,25 +906,25 @@
    14. COMPARE PAGE — MOBILE
    ═══════════════════════════════════════════════════ */
 @media (max-width: 767px) {
-  .tc-compare-wrapper {
+  .aspect-compare-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding-bottom: 16px;
   }
-  .tc-compare-wrapper::-webkit-scrollbar { display: none; }
+  .aspect-compare-wrapper::-webkit-scrollbar { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════
    15. AUTH PAGES — MOBILE
    ═══════════════════════════════════════════════════ */
 @media (max-width: 767px) {
-  .tc-auth-page,
-  .tc-login-page {
+  .aspect-auth-page,
+  .aspect-login-page {
     padding: 24px 16px !important;
   }
-  .tc-auth-page .tc-auth-card,
-  .tc-auth-page form {
+  .aspect-auth-page .aspect-auth-card,
+  .aspect-auth-page form {
     max-width: 100% !important;
   }
 }
@@ -1079,22 +960,22 @@
     -webkit-overflow-scrolling: touch;
   }
   /* No tap highlight */
-  a, button, .tc-btn, .tc-tile, .mob-bottom-nav__item {
+  a, button, .aspect-btn, .aspect-tile {
     -webkit-tap-highlight-color: transparent;
   }
   /* Card press animation */
-  .tc-tile,
-  .tc-hero-tiles > a,
+  .aspect-tile,
+  .aspect-hero-tiles > a,
   main > .w-full:first-child .grid > a {
     transition: transform 0.15s var(--mob-ease) !important;
   }
-  .tc-tile:active,
-  .tc-hero-tiles > a:active,
+  .aspect-tile:active,
+  .aspect-hero-tiles > a:active,
   main > .w-full:first-child .grid > a:active {
     transform: scale(0.97) !important;
   }
   /* Button press animation */
-  .tc-btn:active,
+  .aspect-btn:active,
   button:active {
     transform: scale(0.96);
     transition: transform 0.1s ease;
@@ -1115,8 +996,8 @@
     overflow-y: visible !important;
   }
   /* Better touch targets — only for standalone buttons/links */
-  button:not(.mob-bottom-nav__item):not(nav *):not(footer *):not(.tc-tile *):not(.header-nav-list *):not([class*="text-["]),
-  a:not(.mob-bottom-nav__item):not(nav *):not(footer *):not(.tc-tile *):not(.header-nav-list *):not([class*="text-["]):not(p a):not(span a):not(li a) {
+  button:not(nav *):not(footer *):not(.aspect-tile *):not(.header-nav-list *):not([class*="text-["]),
+  a:not(nav *):not(footer *):not(.aspect-tile *):not(.header-nav-list *):not([class*="text-["]):not(p a):not(span a):not(li a) {
     min-height: 44px;
     min-width: 44px;
   }
@@ -1210,7 +1091,6 @@
   }
   #header.open-menu .header-group::after,
   #header.open-menu .app-header-burger,
-  #header.open-menu .header-nav-list[data-v-fb25dd5c],
   #header.open-menu .header-nav-list,
   #header.open-menu .header-cdek-location,
   #header.open-menu .header-enter,
@@ -1239,26 +1119,26 @@
    purchase row safe for long prices and three-digit quantities.
    ===================================================== */
 @media (max-width: 1099px) {
-  .tc-tile.product-card {
+  .aspect-tile.product-card {
     box-sizing: border-box !important;
     contain: layout paint !important;
     overflow: visible !important;
   }
 
-  .tc-tile.product-card > .tc-tile__top { order: 1 !important; }
-  .tc-tile.product-card > .tc-tile__title { order: 2 !important; }
-  .tc-tile.product-card > .tc-tile__picture { order: 3 !important; }
-  .tc-tile.product-card > .tc-tile__description { order: 4 !important; }
-  .tc-tile.product-card > .tc-tile__scale { order: 5 !important; }
-  .tc-tile.product-card > .tc-tile__option { order: 6 !important; }
-  .tc-tile.product-card > .tc-variant-msg { order: 7 !important; }
-  .tc-tile.product-card > .tc-tile__bottom { order: 8 !important; }
+  .aspect-tile.product-card > .aspect-tile__top { order: 1 !important; }
+  .aspect-tile.product-card > .aspect-tile__title { order: 2 !important; }
+  .aspect-tile.product-card > .aspect-tile__picture { order: 3 !important; }
+  .aspect-tile.product-card > .aspect-tile__description { order: 4 !important; }
+  .aspect-tile.product-card > .aspect-tile__scale { order: 5 !important; }
+  .aspect-tile.product-card > .aspect-tile__option { order: 6 !important; }
+  .aspect-tile.product-card > .aspect-variant-msg { order: 7 !important; }
+  .aspect-tile.product-card > .aspect-tile__bottom { order: 8 !important; }
 
-  .tc-tile.product-card .tc-tile__scale {
+  .aspect-tile.product-card .aspect-tile__scale {
     display: grid !important;
   }
 
-  .tc-tile.product-card .tc-tile__option {
+  .aspect-tile.product-card .aspect-tile__option {
     align-items: center !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
@@ -1266,7 +1146,7 @@
     min-width: 0 !important;
   }
 
-  .tc-tile.product-card .tc-card-weights {
+  .aspect-tile.product-card .aspect-card-weights {
     align-items: center !important;
     display: flex !important;
     flex: 1 1 auto !important;
@@ -1278,29 +1158,29 @@
     scrollbar-width: none;
   }
 
-  .tc-tile.product-card .tc-card-weights::-webkit-scrollbar {
+  .aspect-tile.product-card .aspect-card-weights::-webkit-scrollbar {
     display: none;
   }
 
-  .tc-tile.product-card .tc-weight {
+  .aspect-tile.product-card .aspect-weight {
     flex: 0 0 auto !important;
   }
 
-  .tc-tile.product-card .tc-tile__option--select {
+  .aspect-tile.product-card .aspect-tile__option--select {
     flex: 0 1 142px !important;
     margin: 0 0 8px !important;
     max-width: 48% !important;
     min-width: 0 !important;
   }
 
-  .tc-tile.product-card .tc-select,
-  .tc-tile.product-card .tc-select__field,
-  .tc-tile.product-card .tc-select__field--select {
+  .aspect-tile.product-card .aspect-select,
+  .aspect-tile.product-card .aspect-select__field,
+  .aspect-tile.product-card .aspect-select__field--select {
     min-width: 0 !important;
     width: 100% !important;
   }
 
-  .tc-tile.product-card .tc-tile__bottom {
+  .aspect-tile.product-card .aspect-tile__bottom {
     align-items: center !important;
     display: grid !important;
     gap: 8px !important;
@@ -1308,7 +1188,7 @@
     min-width: 0 !important;
   }
 
-  .tc-tile.product-card .tc-card-buy-zone {
+  .aspect-tile.product-card .aspect-card-buy-zone {
     align-items: center !important;
     display: flex !important;
     gap: 4px !important;
@@ -1316,7 +1196,7 @@
     overflow: hidden !important;
   }
 
-  .tc-tile.product-card .tc-btn-pay {
+  .aspect-tile.product-card .aspect-btn-pay {
     box-sizing: border-box !important;
     flex: 1 1 auto !important;
     height: 40px !important;
@@ -1327,31 +1207,31 @@
     padding: 0 8px !important;
   }
 
-  .tc-tile.product-card .tc-btn-pay .text-nowrap {
+  .aspect-tile.product-card .aspect-btn-pay .text-nowrap {
     display: block !important;
     min-width: 0 !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
 
-  .tc-tile.product-card .tc-btn-pay--added {
+  .aspect-tile.product-card .aspect-btn-pay--added {
     justify-content: space-between !important;
   }
 
-  .tc-tile.product-card .tc-cart-step {
+  .aspect-tile.product-card .aspect-cart-step {
     flex: 0 0 28px !important;
     height: 28px !important;
     width: 28px !important;
   }
 
-  .tc-tile.product-card .tc-card-cart-qty {
+  .aspect-tile.product-card .aspect-card-cart-qty {
     flex: 0 0 auto !important;
     font-size: 12px !important;
     min-width: 0 !important;
     overflow: visible !important;
   }
 
-  .tc-tile.product-card .tc-card-actions {
+  .aspect-tile.product-card .aspect-card-actions {
     align-items: center !important;
     display: flex !important;
     flex: 0 0 auto !important;
@@ -1361,8 +1241,8 @@
     width: auto !important;
   }
 
-  .tc-tile.product-card .tc-card-actions .tc-tile__bottom--btn,
-  .tc-tile.product-card .tc-card-note {
+  .aspect-tile.product-card .aspect-card-actions .aspect-tile__bottom--btn,
+  .aspect-tile.product-card .aspect-card-note {
     display: flex !important;
     flex: 0 0 40px !important;
     height: 40px !important;
@@ -1372,24 +1252,24 @@
     width: 40px !important;
   }
 
-  .tc-tile.product-card .tc-card-actions .tc-tile__bottom--btn + .tc-tile__bottom--btn {
+  .aspect-tile.product-card .aspect-card-actions .aspect-tile__bottom--btn + .aspect-tile__bottom--btn {
     margin-left: 0 !important;
   }
 
-  .tc-tile.product-card .tc-btn-pay:active,
-  .tc-tile.product-card .press-container,
-  .tc-tile.product-card:hover .press-container {
+  .aspect-tile.product-card .aspect-btn-pay:active,
+  .aspect-tile.product-card .press-container,
+  .aspect-tile.product-card:hover .press-container {
     transform: none !important;
   }
 }
 
 @media (max-width: 757px) {
-  .tc-product-grid {
+  .aspect-product-grid {
     grid-template-columns: minmax(0, 1fr) !important;
     gap: 16px !important;
   }
 
-  .tc-tile.product-card {
+  .aspect-tile.product-card {
     display: flex !important;
     flex-direction: column !important;
     height: auto !important;
@@ -1399,47 +1279,47 @@
     width: 100% !important;
   }
 
-  .tc-tile.product-card .tc-tile__top,
-  .tc-tile.product-card .tc-tile__title,
-  .tc-tile.product-card .tc-tile__picture,
-  .tc-tile.product-card .tc-tile__description,
-  .tc-tile.product-card .tc-tile__scale {
+  .aspect-tile.product-card .aspect-tile__top,
+  .aspect-tile.product-card .aspect-tile__title,
+  .aspect-tile.product-card .aspect-tile__picture,
+  .aspect-tile.product-card .aspect-tile__description,
+  .aspect-tile.product-card .aspect-tile__scale {
     width: 100% !important;
   }
 }
 
 @media (min-width: 758px) and (max-width: 899px) {
-  #product-grid.tc-product-grid,
-  .tc-product-grid {
+  #product-grid.aspect-product-grid,
+  .aspect-product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 20px !important;
   }
 }
 
 @media (max-width: 360px) {
-  .tc-tile.product-card {
+  .aspect-tile.product-card {
     padding: 16px !important;
   }
 
-  .tc-tile.product-card .tc-tile__bottom {
+  .aspect-tile.product-card .aspect-tile__bottom {
     gap: 6px !important;
   }
 
-  .tc-tile.product-card .tc-btn-pay {
+  .aspect-tile.product-card .aspect-btn-pay {
     font-size: 14px !important;
     height: 36px !important;
     min-height: 36px !important;
     padding: 0 4px !important;
   }
 
-  .tc-tile.product-card .tc-cart-step {
+  .aspect-tile.product-card .aspect-cart-step {
     flex-basis: 24px !important;
     height: 24px !important;
     width: 24px !important;
   }
 
-  .tc-tile.product-card .tc-card-actions .tc-tile__bottom--btn,
-  .tc-tile.product-card .tc-card-note {
+  .aspect-tile.product-card .aspect-card-actions .aspect-tile__bottom--btn,
+  .aspect-tile.product-card .aspect-card-note {
     flex-basis: 36px !important;
     height: 36px !important;
     min-height: 36px !important;
@@ -1695,12 +1575,12 @@
     line-height: 1.08 !important;
   }
 
-  .tc-weekly-grid {
+  .aspect-weekly-grid {
     grid-template-columns: minmax(0, 1fr) !important;
     gap: 16px !important;
   }
 
-  .tc-tile.product-card {
+  .aspect-tile.product-card {
     display: grid !important;
     grid-template-areas:
       "top"
@@ -1717,23 +1597,23 @@
     isolation: isolate;
   }
 
-  .tc-tile.product-card > .tc-tile__top { grid-area: top !important; }
-  .tc-tile.product-card > .tc-tile__title { grid-area: title !important; }
-  .tc-tile.product-card > .tc-tile__picture { grid-area: picture !important; }
-  .tc-tile.product-card > .tc-tile__description { grid-area: description !important; }
-  .tc-tile.product-card > .tc-tile__scale { grid-area: scale !important; }
-  .tc-tile.product-card > .tc-tile__option { grid-area: option !important; }
-  .tc-tile.product-card > .tc-variant-msg { grid-area: message !important; }
-  .tc-tile.product-card > .tc-tile__bottom { grid-area: bottom !important; }
+  .aspect-tile.product-card > .aspect-tile__top { grid-area: top !important; }
+  .aspect-tile.product-card > .aspect-tile__title { grid-area: title !important; }
+  .aspect-tile.product-card > .aspect-tile__picture { grid-area: picture !important; }
+  .aspect-tile.product-card > .aspect-tile__description { grid-area: description !important; }
+  .aspect-tile.product-card > .aspect-tile__scale { grid-area: scale !important; }
+  .aspect-tile.product-card > .aspect-tile__option { grid-area: option !important; }
+  .aspect-tile.product-card > .aspect-variant-msg { grid-area: message !important; }
+  .aspect-tile.product-card > .aspect-tile__bottom { grid-area: bottom !important; }
 
-  .tc-tile.product-card > .tc-tile__top,
-  .tc-tile.product-card > .tc-tile__title,
-  .tc-tile.product-card > .tc-tile__picture,
-  .tc-tile.product-card > .tc-tile__description,
-  .tc-tile.product-card > .tc-tile__scale,
-  .tc-tile.product-card > .tc-tile__option,
-  .tc-tile.product-card > .tc-variant-msg,
-  .tc-tile.product-card > .tc-tile__bottom {
+  .aspect-tile.product-card > .aspect-tile__top,
+  .aspect-tile.product-card > .aspect-tile__title,
+  .aspect-tile.product-card > .aspect-tile__picture,
+  .aspect-tile.product-card > .aspect-tile__description,
+  .aspect-tile.product-card > .aspect-tile__scale,
+  .aspect-tile.product-card > .aspect-tile__option,
+  .aspect-tile.product-card > .aspect-variant-msg,
+  .aspect-tile.product-card > .aspect-tile__bottom {
     position: relative !important;
     inset: auto !important;
     float: none !important;
@@ -1741,19 +1621,19 @@
     transform: none !important;
   }
 
-  .tc-tile.product-card .flavor-badges-container {
+  .aspect-tile.product-card .flavor-badges-container {
     line-height: 1.55 !important;
   }
 
-  .tc-tile.product-card .descriptor-badge {
+  .aspect-tile.product-card .descriptor-badge {
     display: inline-block !important;
     margin: 2px 1px !important;
     line-height: 1.35 !important;
     vertical-align: middle !important;
   }
 
-  .tc-catalog-page.non-coffee-section .tc-icon-btn,
-  .tc-catalog-page.non-coffee-section .tc-nav-tabs-list {
+  .aspect-catalog-page.non-coffee-section .aspect-icon-btn,
+  .aspect-catalog-page.non-coffee-section .aspect-nav-tabs-list {
     display: none !important;
   }
 

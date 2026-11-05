@@ -22,18 +22,13 @@ html body .body-wrap {
 html body .body-wrap > main {
   flex: 1 1 auto;
 }
-@media (max-width: 1099px) {
-  html body .body-wrap {
-    padding-bottom: calc(64px + env(safe-area-inset-bottom));
-  }
-}
 
 /* ---------- 0b. ГЛОБАЛЬНАЯ СЕТКА И ТИПОГРАФИКА (Brandbook) ---------- */
 html body .container,
 html body .\!container,
 html body .header-group,
-html body .tc-reviews-section .container,
-html body .tc-newsletter-section .container {
+html body .aspect-reviews-section .container,
+html body .aspect-newsletter-section .container {
   max-width: var(--aspect-container-max, 1440px) !important;
   padding-left: var(--aspect-container-pad, clamp(20px, 4vw, 56px)) !important;
   padding-right: var(--aspect-container-pad, clamp(20px, 4vw, 56px)) !important;
@@ -58,20 +53,20 @@ html body .body-wrap > main > section:last-child {
 
 html body p,
 html body li,
-html body .tc-card-desc,
+html body .aspect-card-desc,
 html body .aspect-about__text {
   color: #5A5A5A;
   line-height: 1.65;
 }
 
 /* Кнопки: прямоугольные, без «пузырей» и градиентов */
-html body .tc-btn,
+html body .aspect-btn,
 html body .btn,
 html body .button,
 html body .button-basket,
-html body .tc-btn-pay,
-html body .tc-auth-submit,
-html body .tc-newsletter-button,
+html body .aspect-btn-pay,
+html body .aspect-auth-submit,
+html body .aspect-newsletter-button,
 html body .aspect-about__btn,
 html body .aspect-card__buy,
 html body a[class*="btn-"],
@@ -86,10 +81,10 @@ html body button[type="submit"]:not(.aspect-search-submit):not(.icon-btn) {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease !important;
 }
 
-html body .tc-btn.btn-dark,
+html body .aspect-btn.btn-dark,
 html body .button-basket,
-html body .tc-btn-pay:not(.active),
-html body .tc-auth-submit,
+html body .aspect-btn-pay:not(.active),
+html body .aspect-auth-submit,
 html body .aspect-about__btn--primary,
 html body .aspect-card__buy {
   background: #2A4A34 !important;
@@ -97,10 +92,10 @@ html body .aspect-card__buy {
   border: 1px solid #2A4A34 !important;
 }
 
-html body .tc-btn.btn-dark:hover,
+html body .aspect-btn.btn-dark:hover,
 html body .button-basket:hover,
-html body .tc-btn-pay:not(.active):hover,
-html body .tc-auth-submit:hover,
+html body .aspect-btn-pay:not(.active):hover,
+html body .aspect-auth-submit:hover,
 html body .aspect-about__btn--primary:hover,
 html body .aspect-card__buy:hover {
   background: #000000 !important;
@@ -108,33 +103,33 @@ html body .aspect-card__buy:hover {
   color: #FFFFFF !important;
 }
 
-html body .tc-btn.btn-secondary,
-html body .tc-btn.btn-white,
-html body .tc-btn.btn-white-xs,
+html body .aspect-btn.btn-secondary,
+html body .aspect-btn.btn-white,
+html body .aspect-btn.btn-white-xs,
 html body .aspect-about__btn--ghost {
   background: #000000 !important;
   color: #FFFFFF !important;
   border: 1px solid #000000 !important;
 }
 
-html body .tc-btn.btn-secondary:hover,
-html body .tc-btn.btn-white:hover,
-html body .tc-btn.btn-white-xs:hover,
+html body .aspect-btn.btn-secondary:hover,
+html body .aspect-btn.btn-white:hover,
+html body .aspect-btn.btn-white-xs:hover,
 html body .aspect-about__btn--ghost:hover {
   background: #2A4A34 !important;
   border-color: #2A4A34 !important;
   color: #FFFFFF !important;
 }
 
-html body .tc-promo-slider .tc-btn.btn-white,
-html body [class*="gradient"] .tc-btn {
+html body .aspect-promo-slider .aspect-btn.btn-white,
+html body [class*="gradient"] .aspect-btn {
   background: #2A4A34 !important;
   background-image: none !important;
   color: #FFFFFF !important;
   border-radius: 4px !important;
 }
 
-html body .tc-promo-slider .tc-btn.btn-white:hover {
+html body .aspect-promo-slider .aspect-btn.btn-white:hover {
   background: #000000 !important;
   opacity: 1 !important;
 }
@@ -644,29 +639,32 @@ html body .aspect-mobile-menu__nav {
 }
 html body .aspect-mobile-menu__title {
   display: block;
-  padding: 12px 0;
-  color: #000 !important;
+  margin-top: 14px;
+  padding: 10px 0 6px;
+  color: #2A4A34 !important;
   font-family: "Roboto Condensed", Arial, sans-serif;
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: .04em;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .12em;
   text-transform: uppercase;
   text-decoration: none;
-  border-bottom: 1px solid #F0F0F0;
+  border-bottom: 0;
 }
-html body .aspect-mobile-menu__title:hover { color: #2A4A34 !important; }
+html body .aspect-mobile-menu__title:hover { color: #1E3626 !important; }
 html body .aspect-mobile-menu__section {
-  padding: 16px 0 8px;
-  border-top: 1px solid #E5E8E5;
-  margin-top: 16px;
+  padding: 4px 0 8px 12px;
+  border-top: 0;
+  border-left: 2px solid #2A4A34;
+  margin: 0 0 8px;
 }
 html body .aspect-mobile-menu__subtitle {
-  font-size: 12px;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: .08em;
+  letter-spacing: .12em;
   text-transform: uppercase;
-  color: rgba(0,0,0,.45);
-  margin-bottom: 8px;
+  color: #2A4A34;
+  margin: 14px 0 6px -12px;
 }
 html body .aspect-mobile-menu__section a {
   display: block;
@@ -761,7 +759,6 @@ html body .aspect-footer__legal a:hover {
 
 /* ---------- 11. Скрытие устаревших элементов шапки ---------- */
 html body #header .mob-header-hide > nav:not(.aspect-header__nav),
-html body #header .mob-header-hide > div[data-v-fb25dd5c]:not(.aspect-header__icons),
 html body #header .header-notice__btn,
 html body #header .header-compare-shell,
 html body #header .header-enter {
@@ -815,7 +812,7 @@ html body #header .header-enter {
   html body .aspect-toast-stack {
     left: 12px;
     right: 12px;
-    bottom: calc(76px + env(safe-area-inset-bottom));
+    bottom: calc(16px + env(safe-area-inset-bottom));
   }
   html body .aspect-toast { min-width: 0; width: 100%; }
 }
@@ -1260,36 +1257,36 @@ html body #header.aspect-header.search-open {
   box-shadow: 0 6px 28px rgba(0, 0, 0, 0.1);
 }
 
-/* Legacy tc-tile cards (partial templates) */
-html body .tc-tile {
+/* Legacy aspect-tile cards (partial templates) */
+html body .aspect-tile {
   background: #FFFFFF !important;
   border: 1px solid #E5E8E5 !important;
   border-radius: 8px !important;
   box-shadow: none !important;
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
 }
-html body .tc-tile:hover {
+html body .aspect-tile:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08) !important;
   border-color: #CCCCCC !important;
 }
-html body .tc-tile__picture img,
-html body .tc-tile__picture .tc-tile__img {
+html body .aspect-tile__picture img,
+html body .aspect-tile__picture .aspect-tile__img {
   object-fit: cover !important;
   width: 100%;
   height: 100%;
 }
 
 /* Активная кнопка веса/варианта — чёрная (по брендбуку) */
-html body .tc-btn-pay.active,
-html body .tc-weight.active {
+html body .aspect-btn-pay.active,
+html body .aspect-weight.active {
   background: #000000 !important;
   border-color: #000000 !important;
   color: #FFFFFF !important;
 }
 
 /* ——— Минималистичные поля ввода ——— */
-html body .tc-input:not(.tc-input-gift-card):not(.tc-input-dark):not(.tc-input-dark-xl) .tc-input__field--input,
+html body .aspect-input:not(.aspect-input-gift-card):not(.aspect-input-dark):not(.aspect-input-dark-xl) .aspect-input__field--input,
 html body .asp-auth__input,
 html body .asp-field input:not([type="checkbox"]):not([type="radio"]),
 html body .asp-field textarea,
@@ -1312,7 +1309,7 @@ html body select.form-control {
   transition: border-color 0.3s ease, color 0.3s ease;
 }
 
-html body .tc-input:not(.tc-input-gift-card):not(.tc-input-dark):not(.tc-input-dark-xl) .tc-input__field--input:focus,
+html body .aspect-input:not(.aspect-input-gift-card):not(.aspect-input-dark):not(.aspect-input-dark-xl) .aspect-input__field--input:focus,
 html body .asp-auth__input:focus,
 html body .asp-field input:focus,
 html body .asp-field textarea:focus,
@@ -1324,12 +1321,12 @@ html body select.form-control:focus {
   background: transparent !important;
 }
 
-html body .tc-input:not(.tc-input-gift-card):not(.tc-input-dark) .tc-input__field--input:hover {
+html body .aspect-input:not(.aspect-input-gift-card):not(.aspect-input-dark) .aspect-input__field--input:hover {
   background: transparent !important;
   border-bottom-color: #999999 !important;
 }
 
-html body .tc-input.error:not(.tc-input-gift-card) .tc-input__field--input {
+html body .aspect-input.error:not(.aspect-input-gift-card) .aspect-input__field--input {
   border-bottom-color: #B91C1C !important;
 }
 
@@ -1338,10 +1335,10 @@ html body .header-search__input,
 html body .header-search__scope,
 html body .input-search,
 html body .community-posts-filters .input-search,
-html body .tc-checkbox__input,
-html body .tc-input-gift-card .tc-input__field--input,
-html body .tc-input.tc-input-dark .tc-input__field--input,
-html body .tc-input.tc-input-dark-xl .tc-input__field--input {
+html body .aspect-checkbox__input,
+html body .aspect-input-gift-card .aspect-input__field--input,
+html body .aspect-input.aspect-input-dark .aspect-input__field--input,
+html body .aspect-input.aspect-input-dark-xl .aspect-input__field--input {
   border-bottom: 0 !important;
 }
 

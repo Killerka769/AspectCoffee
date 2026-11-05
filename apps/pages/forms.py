@@ -32,14 +32,14 @@ class CommunityPostForm(forms.ModelForm):
             "title": forms.TextInput(
                 attrs={
                     "placeholder": "Тема записи",
-                    "class": "tc-community-input",
+                    "class": "aspect-community-input",
                 }
             ),
             "text": forms.Textarea(
                 attrs={
                     "placeholder": "Поделитесь рецептом, впечатлением или вопросом",
                     "rows": 4,
-                    "class": "tc-community-textarea",
+                    "class": "aspect-community-textarea",
                 }
             ),
         }

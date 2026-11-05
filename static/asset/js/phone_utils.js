@@ -58,10 +58,10 @@
 
     function countryForInput(input, fallback) {
         var group = input && input.closest
-            ? input.closest("[data-tc-phone-group]")
+            ? input.closest("[data-aspect-phone-group]")
             : null;
         var hidden = group
-            ? group.querySelector("[data-tc-phone-code]")
+            ? group.querySelector("[data-aspect-phone-code]")
             : null;
         var inputCode = input && input.getAttribute
             ? input.getAttribute("data-phone-code")
@@ -73,9 +73,9 @@
     function applyCountry(group, code, options) {
         if (!group) return;
         var country = byCode(code);
-        var hidden = group.querySelector("[data-tc-phone-code]");
-        var label = group.querySelector("[data-tc-phone-code-label]");
-        var inputs = group.querySelectorAll("[data-tc-phone-input]");
+        var hidden = group.querySelector("[data-aspect-phone-code]");
+        var label = group.querySelector("[data-aspect-phone-code-label]");
+        var inputs = group.querySelectorAll("[data-aspect-phone-input]");
 
         if (hidden) hidden.value = country.code;
         if (label) label.textContent = country.code;
@@ -92,15 +92,15 @@
             validateInput(input, country, false);
         });
 
-        group.querySelectorAll("[data-tc-phone-option]").forEach(function (option) {
+        group.querySelectorAll("[data-aspect-phone-option]").forEach(function (option) {
             option.classList.toggle(
                 "is-active",
                 option.getAttribute("data-code") === country.code
             );
         });
 
-        var menu = group.querySelector("[data-tc-phone-menu]");
-        var trigger = group.querySelector("[data-tc-phone-trigger]");
+        var menu = group.querySelector("[data-aspect-phone-menu]");
+        var trigger = group.querySelector("[data-aspect-phone-trigger]");
         if (menu) menu.hidden = true;
         if (trigger) trigger.setAttribute("aria-expanded", "false");
 
@@ -129,20 +129,20 @@
     }
 
     function renderMenu(group) {
-        var menu = group.querySelector("[data-tc-phone-menu]");
+        var menu = group.querySelector("[data-aspect-phone-menu]");
         if (!menu || menu.childElementCount) return;
 
         codes.forEach(function (country) {
             var option = document.createElement("button");
             option.type = "button";
-            option.className = "tc-phone-country-option";
-            option.setAttribute("data-tc-phone-option", "");
+            option.className = "aspect-phone-country-option";
+            option.setAttribute("data-aspect-phone-option", "");
             option.setAttribute("data-code", country.code);
             option.innerHTML =
-                '<span class="tc-phone-country-option__code"></span>' +
-                '<span class="tc-phone-country-option__name"></span>';
-            option.querySelector(".tc-phone-country-option__code").textContent = country.code;
-            option.querySelector(".tc-phone-country-option__name").textContent = country.country;
+                '<span class="aspect-phone-country-option__code"></span>' +
+                '<span class="aspect-phone-country-option__name"></span>';
+            option.querySelector(".aspect-phone-country-option__code").textContent = country.code;
+            option.querySelector(".aspect-phone-country-option__name").textContent = country.country;
             option.addEventListener("click", function () {
                 applyCountry(group, country.code, {focus: true});
             });
@@ -151,12 +151,12 @@
     }
 
     function mount(group) {
-        if (!group || group.getAttribute("data-tc-phone-mounted") === "true") return;
-        group.setAttribute("data-tc-phone-mounted", "true");
+        if (!group || group.getAttribute("data-aspect-phone-mounted") === "true") return;
+        group.setAttribute("data-aspect-phone-mounted", "true");
         renderMenu(group);
 
-        var hidden = group.querySelector("[data-tc-phone-code]");
-        var firstInput = group.querySelector("[data-tc-phone-input]");
+        var hidden = group.querySelector("[data-aspect-phone-code]");
+        var firstInput = group.querySelector("[data-aspect-phone-input]");
         var initialCode = hidden && hidden.value ? hidden.value : group.getAttribute("data-phone-code");
         var detected = firstInput && firstInput.value
             ? TCPhone.detectCode(firstInput.value)
@@ -166,7 +166,7 @@
         if (detected && firstInput) firstInput.value = detected.local;
         applyCountry(group, code);
 
-        group.querySelectorAll("[data-tc-phone-input]").forEach(function (input) {
+        group.querySelectorAll("[data-aspect-phone-input]").forEach(function (input) {
             input.addEventListener("input", function () {
                 var country = countryForInput(input, code);
                 input.value = formatNational(nationalDigits(input.value, country), country);
@@ -177,15 +177,15 @@
             });
         });
 
-        var trigger = group.querySelector("[data-tc-phone-trigger]");
-        var menu = group.querySelector("[data-tc-phone-menu]");
+        var trigger = group.querySelector("[data-aspect-phone-trigger]");
+        var menu = group.querySelector("[data-aspect-phone-menu]");
         if (trigger && menu) {
             trigger.addEventListener("click", function () {
                 var willOpen = menu.hidden;
-                document.querySelectorAll("[data-tc-phone-menu]").forEach(function (other) {
+                document.querySelectorAll("[data-aspect-phone-menu]").forEach(function (other) {
                     other.hidden = true;
                 });
-                document.querySelectorAll("[data-tc-phone-trigger]").forEach(function (other) {
+                document.querySelectorAll("[data-aspect-phone-trigger]").forEach(function (other) {
                     other.setAttribute("aria-expanded", "false");
                 });
                 menu.hidden = !willOpen;
@@ -239,7 +239,7 @@
                 input,
                 typeof codeOrLength === "string" ? codeOrLength : "+7"
             );
-            if (typeof codeOrLength === "number" && !input.closest("[data-tc-phone-group]")) {
+            if (typeof codeOrLength === "number" && !input.closest("[data-aspect-phone-group]")) {
                 country = Object.assign({}, country, {length: codeOrLength});
             }
             input.value = formatNational(nationalDigits(input.value, country), country);
@@ -255,7 +255,7 @@
                 alpineData.recipientPhoneCodeOpen = false;
             }
             if (root) {
-                root.querySelectorAll("[data-tc-phone-group]").forEach(function (group) {
+                root.querySelectorAll("[data-aspect-phone-group]").forEach(function (group) {
                     applyCountry(group, country.code);
                 });
             }
@@ -274,14 +274,14 @@
                     alpineData.phoneLength = detected.length;
                 }
                 input.value = detected.local;
-                var group = input.closest("[data-tc-phone-group]");
+                var group = input.closest("[data-aspect-phone-group]");
                 if (group) applyCountry(group, detected.code);
                 else this.mask(input, detected.code);
             }
         },
         mount: mount,
         mountAll: function (root) {
-            (root || document).querySelectorAll("[data-tc-phone-group]").forEach(mount);
+            (root || document).querySelectorAll("[data-aspect-phone-group]").forEach(mount);
         },
         applyCountry: applyCountry
     };
@@ -293,10 +293,10 @@
     window.tcProfilePhoneMask = window.tcPhoneMask;
 
     function closeMenus(event) {
-        document.querySelectorAll("[data-tc-phone-group]").forEach(function (group) {
+        document.querySelectorAll("[data-aspect-phone-group]").forEach(function (group) {
             if (group.contains(event.target)) return;
-            var menu = group.querySelector("[data-tc-phone-menu]");
-            var trigger = group.querySelector("[data-tc-phone-trigger]");
+            var menu = group.querySelector("[data-aspect-phone-menu]");
+            var trigger = group.querySelector("[data-aspect-phone-trigger]");
             if (menu) menu.hidden = true;
             if (trigger) trigger.setAttribute("aria-expanded", "false");
         });

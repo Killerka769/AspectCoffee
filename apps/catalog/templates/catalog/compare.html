@@ -19,7 +19,7 @@
             </div>
             <div class="text-center py-16">
                 <p class="text-xl text-[var(--black-50)] mb-6">Нет товаров для сравнения</p>
-                <a href="{% url 'catalog:catalog' %}" class="tc-btn-pay buy-btn inline-block" style="text-decoration:none;">Перейти в каталог</a>
+                <a href="{% url 'catalog:catalog' %}" class="aspect-btn-pay buy-btn inline-block" style="text-decoration:none;">Перейти в каталог</a>
             </div>
         </div>
         <script>
@@ -45,9 +45,9 @@
                             Очистить
                         </button>
                     </div>
-                    <label class="tc-checkbox cursor-pointer checkbox-white inline-flex items-center select-none">
-                        <input type="checkbox" class="tc-checkbox__input cursor-pointer" x-model="onlyDiff">
-                        <span class="tc-checkbox__text">Показывать только различия</span>
+                    <label class="aspect-checkbox cursor-pointer checkbox-white inline-flex items-center select-none">
+                        <input type="checkbox" class="aspect-checkbox__input cursor-pointer" x-model="onlyDiff">
+                        <span class="aspect-checkbox__text">Показывать только различия</span>
                     </label>
                 </div>
             </div>
@@ -104,14 +104,14 @@
                                                             ]
                                                         </script>
                                                         <template x-if="!justAdded">
-                                                            <button type="button" class="tc-btn-pay w-full flex items-center justify-between" :disabled="!inStock || !currentVariant" @click.stop="addToCart()">
+                                                            <button type="button" class="aspect-btn-pay w-full flex items-center justify-between" :disabled="!inStock || !currentVariant" @click.stop="addToCart()">
                                                                 <span x-show="currentVariant && currentVariant.old_price" x-text="currentVariant ? Math.round(currentVariant.old_price) : ''" style="text-decoration:line-through;color:#7C8074;font-size:14px;font-weight:600;margin-right:4px"></span>
                                                                 <span class="leading-none" x-text="currentPrice + ' ₽'"></span>
                                                                 <svg class="w-5 h-5"><use href="{% static 'asset/images/sprite.svg' %}#icons--shop"></use></svg>
                                                             </button>
                                                         </template>
                                                         <template x-if="justAdded">
-                                                            <button type="button" class="tc-btn-pay tc-btn-pay--added active w-full flex items-center justify-center gap-1" :style="'background: radial-gradient(157.14% 133.98% at -41.6% 65.41%, #f4f1b9 0%, #bff3df 46%, #c8dcff 65.5%, #da8fdd 83%, #f4f1b9 97%); color: #000; box-shadow: none;'">
+                                                            <button type="button" class="aspect-btn-pay aspect-btn-pay--added active w-full flex items-center justify-center gap-1" :style="'background: radial-gradient(157.14% 133.98% at -41.6% 65.41%, #f4f1b9 0%, #bff3df 46%, #c8dcff 65.5%, #da8fdd 83%, #f4f1b9 97%); color: #000; box-shadow: none;'">
                                                                 <span class="w-6 h-6 flex m-0 cursor-pointer" @click.stop="decrementCart()"><svg class="w-3 h-3 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="{% static 'asset/images/sprite.svg' %}#icons--minus"></use></svg></span>
                                                                 <span class="text-nowrap" x-text="currentPrice + ' ₽'"></span>
                                                                 <span class="w-6 h-6 flex m-0 cursor-pointer" @click.stop="incrementCart()"><svg class="w-3 h-3 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="{% static 'asset/images/sprite.svg' %}#icons--plus"></use></svg></span>
@@ -120,7 +120,7 @@
                                                         </template>
                                                     </div>
                                                     {% else %}
-                                                    <a href="{{ product.get_absolute_url }}" class="tc-btn-pay buy-btn w-full text-center block" style="text-decoration:none;">Подробнее</a>
+                                                    <a href="{{ product.get_absolute_url }}" class="aspect-btn-pay buy-btn w-full text-center block" style="text-decoration:none;">Подробнее</a>
                                                     {% endif %}
                                                     {% endwith %}
                                                 </div>
@@ -154,7 +154,7 @@
                                                     {{ value|floatformat:1 }}
                                                 </span>
                                             {% elif row.kind == 'scale' %}
-                                                <div class="tc-progress"><span class="tc-progress__object" style="width: {% widthratio value 10 100 %}%"></span></div>
+                                                <div class="aspect-progress"><span class="aspect-progress__object" style="width: {% widthratio value 10 100 %}%"></span></div>
                                             {% else %}
                                                 {{ value }}
                                             {% endif %}

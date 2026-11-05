@@ -20,26 +20,26 @@
   --white: #fff;
   --ts: all 0.3s ease;
 }
-.font-din-black { font-family: 'Roboto Condensed', sans-serif !important; }
-.font-din-medium { font-family: 'Roboto Condensed', sans-serif !important; }
-.tc-btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; border: none; transition: var(--ts); font-family: "Roboto Condensed", Arial, sans-serif; }
-.tc-btn.btn-dark { background: #000; color: #fff; }
-.tc-btn.btn-dark:hover { background: #2a4a34; color: #fff; }
-.tc-btn.btn-white { background: var(--white); color: var(--black); }
-.tc-btn.btn-secondary { background: var(--black-4); color: var(--black); }
-.tc-btn.btn-secondary:hover { background: var(--black-5); }
-.tc-btn.btn-xs { font-size: 11px; padding: 0.5rem 1rem; min-height: 32px; }
-.tc-btn.btn-xs:hover { background: var(--black-80); color: var(--white); }
-.tc-input { display: block; position: relative; width: 100%; }
-.tc-input__field { display: block; position: relative; width: 100%; }
-.tc-input__field--input { display: block; position: relative; width: 100%; background: transparent; border: 0; border-bottom: 1px solid #ccc; border-radius: 0; font-size: 15px; min-height: 44px; line-height: 1.4; padding: 10px 0; text-overflow: ellipsis; transition: border-color var(--ts); outline: none; font-family: "Open Sans", Arial, sans-serif; box-sizing: border-box; }
-.tc-input__field--input:not([class*="pr-"]) { padding-right: 0; }
-.tc-input__field--input::placeholder { color: rgba(0,0,0,.4); opacity: 1; }
-.tc-input__field--input:hover { border-bottom-color: #999; }
-.tc-input__field--input:focus { border-bottom-color: #2a4a34; }
-.tc-input__field--input[type=password] { letter-spacing: 4px; }
-.tc-input__field--input[type=password]::placeholder { letter-spacing: 0; }
-.tc-input__field--btn-right { align-items: center; display: flex; height: 40px; justify-content: center; inset: 0 0 0 auto; margin: auto 0; position: absolute; width: 40px; }
+.aspect-display-black { font-family: 'Roboto Condensed', sans-serif !important; }
+.aspect-display-medium { font-family: 'Roboto Condensed', sans-serif !important; }
+.aspect-btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; border: none; transition: var(--ts); font-family: "Roboto Condensed", Arial, sans-serif; }
+.aspect-btn.btn-dark { background: #000; color: #fff; }
+.aspect-btn.btn-dark:hover { background: #2a4a34; color: #fff; }
+.aspect-btn.btn-white { background: var(--white); color: var(--black); }
+.aspect-btn.btn-secondary { background: var(--black-4); color: var(--black); }
+.aspect-btn.btn-secondary:hover { background: var(--black-5); }
+.aspect-btn.btn-xs { font-size: 11px; padding: 0.5rem 1rem; min-height: 32px; }
+.aspect-btn.btn-xs:hover { background: var(--black-80); color: var(--white); }
+.aspect-input { display: block; position: relative; width: 100%; }
+.aspect-input__field { display: block; position: relative; width: 100%; }
+.aspect-input__field--input { display: block; position: relative; width: 100%; background: transparent; border: 0; border-bottom: 1px solid #ccc; border-radius: 0; font-size: 15px; min-height: 44px; line-height: 1.4; padding: 10px 0; text-overflow: ellipsis; transition: border-color var(--ts); outline: none; font-family: "Open Sans", Arial, sans-serif; box-sizing: border-box; }
+.aspect-input__field--input:not([class*="pr-"]) { padding-right: 0; }
+.aspect-input__field--input::placeholder { color: rgba(0,0,0,.4); opacity: 1; }
+.aspect-input__field--input:hover { border-bottom-color: #999; }
+.aspect-input__field--input:focus { border-bottom-color: #2a4a34; }
+.aspect-input__field--input[type=password] { letter-spacing: 4px; }
+.aspect-input__field--input[type=password]::placeholder { letter-spacing: 0; }
+.aspect-input__field--btn-right { align-items: center; display: flex; height: 40px; justify-content: center; inset: 0 0 0 auto; margin: auto 0; position: absolute; width: 40px; }
 @media (max-width: 1099px) {
   .account-heading-row {
     justify-content: flex-end;
@@ -51,14 +51,14 @@
     width: auto;
     margin-left: auto;
   }
-  .account-heading-row .tc-btn.btn-xs,
+  .account-heading-row .aspect-btn.btn-xs,
   .mob-account-nav a {
     min-height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
   }
-  .account-heading-row .tc-btn.btn-xs {
+  .account-heading-row .aspect-btn.btn-xs {
     box-sizing: border-box;
     height: 34px !important;
     min-height: 34px !important;
@@ -88,15 +88,15 @@
 
   {# === HEADER: Личный кабинет + Пополнить + Баланс === #}
   <div class="account-heading-row aspect-account__heading group flex items-center flex-wrap min-h-[38px] mb-6 py-1 border-b border-[var(--black-5)] px-4 -mx-4 sm:mx-0 sm:p-0 xl:border-0 xl:min-h-[auto]">
-    <h1 class="aspect-account__page-title text-[24px] m-0 xl:text-[40px] pr-3 relative font-din-black" style="text-transform:uppercase;line-height:1.2;letter-spacing:-0.01em;">
+    <h1 class="aspect-account__page-title text-[24px] m-0 xl:text-[40px] pr-3 relative aspect-display-black" style="text-transform:uppercase;line-height:1.2;letter-spacing:-0.01em;">
       Личный кабинет
       <svg class="h-[10px] w-[10px] inline rotate-90 xl:hidden absolute top-0 bottom-0 right-[-4px] my-auto"><use href="#arr-right-bold"></use></svg>
     </h1>
     <div class="ml-auto flex items-center gap-3 flex-wrap">
-      <a href="{% url 'users:balance' %}" class="tc-btn btn-dark btn-xs inline-flex hover:opacity-80 duration-200" style="text-decoration:none; color:#fff !important;">
+      <a href="{% url 'users:balance' %}" class="aspect-btn btn-dark btn-xs inline-flex hover:opacity-80 duration-200" style="text-decoration:none; color:#fff !important;">
         <span>Пополнить</span>
       </a>
-      <div class="account-balance-summary text-[24px] xl:text-[40px] font-din-black uppercase leading-[1.2] md:tracking-[0.01em] text-right whitespace-nowrap">
+      <div class="account-balance-summary text-[24px] xl:text-[40px] aspect-display-black uppercase leading-[1.2] md:tracking-[0.01em] text-right whitespace-nowrap">
         <span class="text-[var(--black-50)]">Баланс </span>
         {{ user.balance|default:0 }}&nbsp;<span class="rub">₽</span>
       </div>
@@ -109,19 +109,19 @@
     {# SIDEBAR #}
     <div class="col-span-12 xl:col-span-3 2xl:col-span-3 -mt-4 xl:mt-0 aspect-account__aside">
       <ul class="mob-account-nav w-full space-y-4 list-none m-0 p-0" aria-label="Разделы личного кабинета">
-        <li><a href="{% url 'users:statistics' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'statistics' %} font-din-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19V5M4 19h16M8 17V9M12 17V7M16 17v-5"/></svg><span>Статистика</span></a></li>
-        <li><a href="{% url 'users:orders' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'orders' %} font-din-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h12v14a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/><path d="M9 21v-4h6v4"/></svg><span>Заказы</span></a></li>
-        <li><a href="{% url 'users:notifications' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'notifications' %} font-din-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span>Уведомления</span></a></li>
-        <li><a href="{% url 'users:community_profile' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'community' %} font-din-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg><span>Профиль в сообществе</span></a></li>
-        <li><a href="{% url 'users:profile' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'profile' %} font-din-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3 15.4a1.65 1.65 0 0 0-1.51-1H1a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 3 8.6a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.36 0 .71.07 1.03.2H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Мои данные</span></a></li>
-        <li><a href="{% url 'users:discount' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'discount' %} font-din-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4H6a2 2 0 0 1 0-4h14V6"/></svg><span>Мои скидки</span></a></li>
-        <li><a href="{% url 'users:balance' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] font-din-medium tracking-[0.04em]{% if section == 'balance' %} font-din-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Внутренний счёт</span></a></li>
+        <li><a href="{% url 'users:statistics' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] aspect-display-medium tracking-[0.04em]{% if section == 'statistics' %} aspect-display-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19V5M4 19h16M8 17V9M12 17V7M16 17v-5"/></svg><span>Статистика</span></a></li>
+        <li><a href="{% url 'users:orders' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] aspect-display-medium tracking-[0.04em]{% if section == 'orders' %} aspect-display-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h12v14a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/><path d="M9 21v-4h6v4"/></svg><span>Заказы</span></a></li>
+        <li><a href="{% url 'users:notifications' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] aspect-display-medium tracking-[0.04em]{% if section == 'notifications' %} aspect-display-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span>Уведомления</span></a></li>
+        <li><a href="{% url 'users:community_profile' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] aspect-display-medium tracking-[0.04em]{% if section == 'community' %} aspect-display-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg><span>Профиль в сообществе</span></a></li>
+        <li><a href="{% url 'users:profile' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] aspect-display-medium tracking-[0.04em]{% if section == 'profile' %} aspect-display-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3 15.4a1.65 1.65 0 0 0-1.51-1H1a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 3 8.6a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.36 0 .71.07 1.03.2H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Мои данные</span></a></li>
+        <li><a href="{% url 'users:discount' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] aspect-display-medium tracking-[0.04em]{% if section == 'discount' %} aspect-display-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4H6a2 2 0 0 1 0-4h14V6"/></svg><span>Мои скидки</span></a></li>
+        <li><a href="{% url 'users:balance' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] aspect-display-medium tracking-[0.04em]{% if section == 'balance' %} aspect-display-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Внутренний счёт</span></a></li>
       </ul>
       <script>
       (function () {
         function revealCurrentAccountTab() {
           var nav = document.querySelector('.mob-account-nav');
-          var active = nav && nav.querySelector('a.font-din-black');
+          var active = nav && nav.querySelector('a.aspect-display-black');
           if (!nav || !active || window.matchMedia('(min-width: 1100px)').matches) return;
           var left = active.offsetLeft - ((nav.clientWidth - active.offsetWidth) / 2);
           nav.scrollTo({ left: Math.max(0, left), behavior: 'auto' });

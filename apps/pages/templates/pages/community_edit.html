@@ -15,7 +15,7 @@
     </nav>
 
     <div class="bg-white rounded-[24px] p-6 md:p-10 border border-gray-100 shadow-sm">
-      <h1 class="text-[24px] font-din-black uppercase mb-6">Редактировать запись</h1>
+      <h1 class="text-[24px] aspect-display-black uppercase mb-6">Редактировать запись</h1>
 
       <form method="post" enctype="multipart/form-data" class="flex flex-col gap-4">
         {% csrf_token %}
@@ -47,7 +47,7 @@
 </main>
 
 <style>
-  .tc-community-input, .tc-community-textarea {
+  .aspect-community-input, .aspect-community-textarea {
     width: 100%;
     border: 1.5px solid #ebebeb;
     border-radius: 12px;
@@ -57,7 +57,7 @@
     font-family: inherit;
     box-sizing: border-box;
   }
-  .tc-community-input:focus, .tc-community-textarea:focus {
+  .aspect-community-input:focus, .aspect-community-textarea:focus {
     border-color: #000;
   }
 </style>

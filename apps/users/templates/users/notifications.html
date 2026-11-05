@@ -1,6 +1,6 @@
 {% extends "users/base_account.html" %}{% load static %}{% block account_content %}
 <div class="space-y-8">
-  <h2 class="text-[24px] font-din-black uppercase leading-[1.2] m-0">Уведомления</h2>
+  <h2 class="text-[24px] aspect-display-black uppercase leading-[1.2] m-0">Уведомления</h2>
 
   {% if notifications %}
   <div class="space-y-2">
@@ -30,7 +30,7 @@
     <div class="w-20 h-20 bg-[var(--white)] rounded-full flex items-center justify-center mb-6">
       <svg class="w-10 h-10 text-[var(--black-16)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
     </div>
-    <p class="text-[24px] font-din-black uppercase leading-[1.2] mb-2 m-0">Нет уведомлений</p>
+    <p class="text-[24px] aspect-display-black uppercase leading-[1.2] mb-2 m-0">Нет уведомлений</p>
     <p class="text-[14px] text-[var(--black-50)] mb-6 m-0">Уведомления о заказах, скидках и новостях будут приходить сюда</p>
   </div>
   {% endif %}

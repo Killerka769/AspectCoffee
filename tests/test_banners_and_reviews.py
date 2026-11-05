@@ -49,8 +49,8 @@ def test_rating_hidden_when_no_reviews(client):
 
     # The link to the product reviews/details should not show rating star/counter on tiles
     # In index page, for this product card:
-    # Since reviews_count is 0, the tc-card-meta wrapper shouldn't be rendered for it.
-    # We can check that the product name is present, but "tc-tile-rating" is not associated with this product's page.
+    # Since reviews_count is 0, the aspect-card-meta wrapper shouldn't be rendered for it.
+    # We can check that the product name is present, but "aspect-tile-rating" is not associated with this product's page.
     # In fact, we can verify product attributes:
     assert product.reviews_count == 0
     assert product.rating_avg == 0

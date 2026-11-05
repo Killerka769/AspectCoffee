@@ -117,15 +117,15 @@
 <link href="{% static 'css/aspect-redesign.css' %}?v=20261104-5" rel="stylesheet"/>
 <link href="{% static 'css/aspect-stage3.css' %}?v=20261104-4" rel="stylesheet"/>
 <link href="{% static 'css/aspect-motion.css' %}?v=20261104-1" rel="stylesheet"/>
-<link href="{% static 'css/aspect-forms-pages.css' %}?v=20261104-2" rel="stylesheet"/>
+<link href="{% static 'css/aspect-forms-pages.css' %}?v=20261105-1" rel="stylesheet"/>
 
 <style id="aspect-brand-hard">
   /* Глобальный шрифт — Open Sans для текста, Roboto Condensed для заголовков */
   body { font-family: "Open Sans", Arial, sans-serif !important; color: #5A5A5A !important; }
   h1, h2, h3, h4, h5, h6,
-  .font-din, .font-din-light, .font-din-medium, .font-din-black, .font-din-bold,
+  .aspect-display, .aspect-display-light, .aspect-display-medium, .aspect-display-black, .aspect-display-bold,
   .nav-title, .section-heading,
-  .tc-card-title-link, .white-box__title,
+  .aspect-card-title-link, .white-box__title,
   .home-reviews__title, .home-reviews__value,
   [class*="text-[40px]"], [class*="text-[32px]"], [class*="text-[64px]"] {
     font-family: "Roboto Condensed", "Arial Narrow", Arial, sans-serif !important;
@@ -266,7 +266,7 @@
   h2:not(.aspect-about__section-title):not(.aspect-doc__section-title):not(.aspect-discount__section-title):not(.aspect-partners__section-title):not(.aspect-contact__card-title):not(.aspect-footer__title):not(.aspect-cta__title):not(.asp-jrn__sidebar-title):not(.asp-jrn__feed-title):not(.asp-profile__section-title):not(.asp-orders__section-title)::after,
   h3.aspect-section-title::after,
   .section-heading::after,
-  .tc-catalog-title::after,
+  .aspect-catalog-title::after,
   .white-box__title::after {
     content: "";
     display: block;
@@ -275,8 +275,8 @@
     margin-top: 14px;
     background: #2A4A34;
   }
-  .font-din, .font-din-light, .font-din-medium { font-weight: 400 !important; }
-  .font-din-black, .font-din-bold, h1, h2, h3 { font-weight: 900 !important; letter-spacing: .02em; }
+  .aspect-display, .aspect-display-light, .aspect-display-medium { font-weight: 400 !important; }
+  .aspect-display-black, .aspect-display-bold, h1, h2, h3 { font-weight: 900 !important; letter-spacing: .02em; }
   i, .fa, .fas, .far, svg, path { font-family: inherit; }
 </style>
 
@@ -382,7 +382,7 @@ html body .aspect-header__icons .header-cart__btn:hover * {
 
         <li class="aspect-header__nav-item" x-data="{ subOpen: false }" @mouseenter="subOpen = true" @mouseleave="subOpen = false">
           <a href="/catalog/" class="nav-title">
-            Купить
+            Каталог
             <svg class="nav-chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="M10.388 4.51 6.006 8.891 1.623 4.509" stroke="currentColor" stroke-width="1.7" fill="none" stroke-miterlimit="10"/></svg>
           </a>
           <ul class="aspect-header__submenu" :class="{ 'is-open': subOpen }">
@@ -390,26 +390,25 @@ html body .aspect-header__icons .header-cart__btn:hover * {
               <li><a href="{{ section.get_absolute_url }}">{{ section.name }}</a></li>
             {% endfor %}
             {% for item in nav_menu_items %}
+              {% if item.url and item.url != "#" %}
               <li><a href="{{ item.url }}"{% if item.open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.title }}{% if item.show_external_icon %} ↗{% endif %}</a></li>
+              {% endif %}
             {% endfor %}
+            <li><a href="/partners/">Партнёрам</a></li>
           </ul>
         </li>
 
         <li class="aspect-header__nav-item">
-          <a href="/reviews" class="nav-title">Отзывы{% if published_reviews_count %} <span class="nav-count">{{ published_reviews_count|floatformat:0 }}</span>{% endif %}</a>
+          <a href="/blog/" class="nav-title">Журнал</a>
         </li>
 
         <li class="aspect-header__nav-item">
-          <a href="/community" class="nav-title">Сообщество</a>
-        </li>
-
-        <li class="aspect-header__nav-item">
-          <a href="/blog" class="nav-title">Журнал</a>
+          <a href="/community/" class="nav-title">Сообщество</a>
         </li>
 
         <li class="aspect-header__nav-item" x-data="{ condOpen: false }" @mouseenter="condOpen = true" @mouseleave="condOpen = false">
-          <a href="/faq/" class="nav-title">
-            Условия
+          <a href="/shipment-and-payment/" class="nav-title">
+            Покупателям
             <svg class="nav-chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="M10.388 4.51 6.006 8.891 1.623 4.509" stroke="currentColor" stroke-width="1.7" fill="none" stroke-miterlimit="10"/></svg>
           </a>
           <ul class="aspect-header__submenu" :class="{ 'is-open': condOpen }">
@@ -417,6 +416,10 @@ html body .aspect-header__icons .header-cart__btn:hover * {
             <li><a href="/discount-system/">Система скидок</a></li>
             <li><a href="/return-money/">Возврат денег</a></li>
             <li><a href="/faq/">Частые вопросы</a></li>
+            <li><a href="/how-to-choose-coffee/">Как выбрать кофе</a></li>
+            <li><a href="/reviews/">Отзывы{% if published_reviews_count %} ({{ published_reviews_count|floatformat:0 }}){% endif %}</a></li>
+            <li><a href="{% url 'catalog:compare' %}">Сравнение</a></li>
+            <li><a href="/contact-us/">Контакты</a></li>
           </ul>
         </li>
 
@@ -554,24 +557,25 @@ html body .aspect-header__icons .header-cart__btn:hover * {
   </button>
 
   <nav class="aspect-mobile-menu__nav">
-    <a href="/catalog/" class="aspect-mobile-menu__title">Купить</a>
+    <a href="/catalog/" class="aspect-mobile-menu__title">Каталог</a>
     <div class="aspect-mobile-menu__section">
       {% for section in nav_sections %}<a href="{{ section.get_absolute_url }}">{{ section.name }}</a>{% endfor %}
-      {% for item in nav_menu_items %}<a href="{{ item.url }}"{% if item.open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.title }}</a>{% endfor %}
+      {% for item in nav_menu_items %}{% if item.url and item.url != "#" %}<a href="{{ item.url }}"{% if item.open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.title }}</a>{% endif %}{% endfor %}
+      <a href="/partners/">Партнёрам</a>
     </div>
-    <a href="/reviews" class="aspect-mobile-menu__title">Отзывы</a>
-    <a href="/community" class="aspect-mobile-menu__title">Сообщество</a>
-    <a href="/blog" class="aspect-mobile-menu__title">Журнал</a>
-    <a href="/faq/" class="aspect-mobile-menu__title">Условия</a>
+    <a href="/blog/" class="aspect-mobile-menu__title">Журнал</a>
+    <a href="/community/" class="aspect-mobile-menu__title">Сообщество</a>
 
     <div class="aspect-mobile-menu__section">
-      <div class="aspect-mobile-menu__subtitle">Помощь</div>
+      <div class="aspect-mobile-menu__subtitle">Покупателям</div>
       <a href="/shipment-and-payment/">Доставка и оплата</a>
       <a href="/discount-system/">Система скидок</a>
       <a href="/return-money/">Возврат денег</a>
       <a href="/faq/">Частые вопросы</a>
-      <a href="/how-to-choose-coffee/">Как приготовить кофе</a>
+      <a href="/how-to-choose-coffee/">Как выбрать кофе</a>
+      <a href="/reviews/">Отзывы</a>
       <a href="{% url 'catalog:compare' %}">Сравнение</a>
+      <a href="/contact-us/">Контакты</a>
     </div>
   </nav>
 
@@ -581,8 +585,8 @@ html body .aspect-header__icons .header-cart__btn:hover * {
       <a href="{% url 'users:discount' %}" class="aspect-mobile-menu__title">Скидка</a>
       <a href="/logout/" class="aspect-mobile-menu__logout">Выйти</a>
     {% else %}
-      <a href="/login" class="aspect-mobile-menu__title">Вход</a>
-      <a href="/register" class="aspect-mobile-menu__title">Регистрация</a>
+      <a href="/login/" class="aspect-mobile-menu__title">Вход</a>
+      <a href="/register/" class="aspect-mobile-menu__title">Регистрация</a>
     {% endif %}
   </div>
 </aside>
@@ -594,26 +598,6 @@ html body .aspect-header__icons .header-cart__btn:hover * {
 {% block body_modal %}{% endblock %}
 
 {% include "catalog/partials/site_footer.html" %}
-
-{# ---- Мобильная нижняя навигация ---- #}
-<nav class="mob-bottom-nav" id="mob-bottom-nav" x-data="{ path: window.location.pathname }">
-  <a :class="{ 'active': path === '/' }" class="mob-bottom-nav__item" href="/">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    <span>Главная</span>
-  </a>
-  <a :class="{ 'active': path.startsWith('/catalog') || path.startsWith('/coffee') }" class="mob-bottom-nav__item" href="{% url 'catalog:catalog' %}">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-    <span>Каталог</span>
-  </a>
-  <a :class="{ 'active': path.startsWith('/my-favorites') }" class="mob-bottom-nav__item" href="{% url 'my_favorites' %}">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-    <span>Избранное</span>
-  </a>
-  <a :class="{ 'active': path.startsWith('/profile') || path.startsWith('/account') || path === '/login' }" class="mob-bottom-nav__item" href="{% if request.user.is_authenticated %}{% url 'users:profile' %}{% else %}/login{% endif %}">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <span>{% if request.user.is_authenticated %}Профиль{% else %}Вход{% endif %}</span>
-  </a>
-</nav>
 </div>
 
 {# ---- Тосты ---- #}

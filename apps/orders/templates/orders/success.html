@@ -18,7 +18,7 @@
             {% endif %}
 
             {% if payment_unpaid %}
-            <h1 class="text-3xl md:text-4xl font-din-black uppercase mb-3 tracking-tight">{% if payment_expired %}Время оплаты истекло{% else %}Заказ ожидает оплаты{% endif %}</h1>
+            <h1 class="text-3xl md:text-4xl aspect-display-black uppercase mb-3 tracking-tight">{% if payment_expired %}Время оплаты истекло{% else %}Заказ ожидает оплаты{% endif %}</h1>
             <p class="text-black/40 text-lg mb-5 font-medium tracking-tight">{% if payment_expired %}Оплата не подтверждена, заказ не передан в работу.{% else %}Оплата пока не подтверждена. Заказ сохранён, но ещё не передан в работу.{% endif %}</p>
             {% if payment_can_resume %}
             <div class="mb-10 text-[13px] font-bold text-amber-700"
@@ -31,7 +31,7 @@
             <div class="mb-10"></div>
             {% endif %}
             {% else %}
-            <h1 class="text-3xl md:text-4xl font-din-black uppercase mb-3 tracking-tight">{{ site_settings.success_title|default:"Заказ оформлен!" }}</h1>
+            <h1 class="text-3xl md:text-4xl aspect-display-black uppercase mb-3 tracking-tight">{{ site_settings.success_title|default:"Заказ оформлен!" }}</h1>
             <p class="text-black/40 text-lg mb-10 font-medium tracking-tight">{{ site_settings.success_message|default:"Спасибо за ваш выбор. Мы уже начали готовить посылку." }}</p>
             {% endif %}
 
@@ -40,7 +40,7 @@
                 <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
                 
                 <p class="text-[11px] font-black uppercase text-black/30 tracking-[0.2em] mb-2 leading-none">Номер заказа</p>
-                <p class="text-5xl font-din-black mb-10 tracking-tighter">#{{ order.pk }}</p>
+                <p class="text-5xl aspect-display-black mb-10 tracking-tighter">#{{ order.pk }}</p>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 relative z-10">
                     <div class="px-2">
@@ -74,12 +74,12 @@
             <div class="flex flex-col gap-3">
                 {% if payment_can_resume %}
                 <a href="{% url 'orders:resume_payment' order.pk %}"
-                   class="w-full bg-black text-white hover:bg-gray-800 py-4 px-4 rounded-2xl font-din-black text-[13px] sm:text-[15px] uppercase tracking-widest transition-all shadow-lg shadow-black/10 text-center">
+                   class="w-full bg-black text-white hover:bg-gray-800 py-4 px-4 rounded-2xl aspect-display-black text-[13px] sm:text-[15px] uppercase tracking-widest transition-all shadow-lg shadow-black/10 text-center">
                     Вернуться к оплате
                 </a>
                 {% endif %}
                 <a href="{% url 'catalog:catalog' %}"
-                   class="w-full {% if payment_can_resume %}bg-gray-100 text-black hover:bg-gray-200{% else %}bg-black text-white hover:bg-gray-800{% endif %} py-4 px-4 rounded-2xl font-din-black text-[13px] sm:text-[15px] uppercase tracking-widest transition-all text-center">
+                   class="w-full {% if payment_can_resume %}bg-gray-100 text-black hover:bg-gray-200{% else %}bg-black text-white hover:bg-gray-800{% endif %} py-4 px-4 rounded-2xl aspect-display-black text-[13px] sm:text-[15px] uppercase tracking-widest transition-all text-center">
                     Вернуться в каталог
                 </a>
                 {% if user.is_authenticated %}

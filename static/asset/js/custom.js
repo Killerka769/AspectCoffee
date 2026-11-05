@@ -618,7 +618,7 @@ document.addEventListener('alpine:init', () => {
             if (this.grindOpen || this.noteOpen || this.tooltipOpen) return;
             // If user clicked any interactive element inside the card, do nothing.
             let interactive = false;
-            const interactiveSelector = 'a, button, select, input, textarea, label, [data-no-card-nav], .tc-tooltip, .tc-card-process';
+            const interactiveSelector = 'a, button, select, input, textarea, label, [data-no-card-nav], .aspect-tooltip, .aspect-card-process';
             if (typeof e.composedPath === 'function') {
                 interactive = e.composedPath().some(el => {
                     if (el && el.matches) {
@@ -754,7 +754,7 @@ function initSearchSuggest() {
         if (!wrap) return;
         wrap.style.position = wrap.style.position || 'relative';
         const dropdown = document.createElement('div');
-        dropdown.className = 'tc-search-suggest';
+        dropdown.className = 'aspect-search-suggest';
         dropdown.style.display = 'none';
         wrap.appendChild(dropdown);
 
@@ -798,32 +798,32 @@ function renderSearchSuggest(dropdown, data) {
     let html = '';
 
     if (products.length) {
-        html += '<div class="tc-search-suggest__group"><div class="tc-search-suggest__title">Каталог</div>';
+        html += '<div class="aspect-search-suggest__group"><div class="aspect-search-suggest__title">Каталог</div>';
         for (const p of products) {
             const imgHtml = p.image
-                ? `<img src="${escapeHtml(p.image)}" alt="" class="tc-search-suggest__img">`
-                : `<div class="tc-search-suggest__img tc-search-suggest__img--placeholder"></div>`;
+                ? `<img src="${escapeHtml(p.image)}" alt="" class="aspect-search-suggest__img">`
+                : `<div class="aspect-search-suggest__img aspect-search-suggest__img--placeholder"></div>`;
             const priceHtml = p.price
-                ? `<span class="tc-search-suggest__price">${Number(p.price).toLocaleString('ru-RU')} \u20BD</span>`
+                ? `<span class="aspect-search-suggest__price">${Number(p.price).toLocaleString('ru-RU')} \u20BD</span>`
                 : '';
-            html += `<a class="tc-search-suggest__item" href="${p.url}">${imgHtml}<span class="tc-search-suggest__info"><span class="tc-search-suggest__name">${escapeHtml(p.name)}</span>${p.category ? `<small class="tc-search-suggest__cat">${escapeHtml(p.category)}</small>` : ''}</span>${priceHtml}</a>`;
+            html += `<a class="aspect-search-suggest__item" href="${p.url}">${imgHtml}<span class="aspect-search-suggest__info"><span class="aspect-search-suggest__name">${escapeHtml(p.name)}</span>${p.category ? `<small class="aspect-search-suggest__cat">${escapeHtml(p.category)}</small>` : ''}</span>${priceHtml}</a>`;
         }
         html += '</div>';
     }
     if (posts.length) {
-        html += '<div class="tc-search-suggest__group"><div class="tc-search-suggest__title">Журнал</div>';
+        html += '<div class="aspect-search-suggest__group"><div class="aspect-search-suggest__title">Журнал</div>';
         for (const post of posts) {
             const imgHtml = post.image
-                ? `<img src="${escapeHtml(post.image)}" alt="" class="tc-search-suggest__img">`
-                : `<div class="tc-search-suggest__img tc-search-suggest__img--placeholder"></div>`;
-            html += `<a class="tc-search-suggest__item" href="${post.url}">${imgHtml}<span class="tc-search-suggest__info"><span class="tc-search-suggest__name">${escapeHtml(post.title)}</span><small class="tc-search-suggest__cat">Журнал</small></span></a>`;
+                ? `<img src="${escapeHtml(post.image)}" alt="" class="aspect-search-suggest__img">`
+                : `<div class="aspect-search-suggest__img aspect-search-suggest__img--placeholder"></div>`;
+            html += `<a class="aspect-search-suggest__item" href="${post.url}">${imgHtml}<span class="aspect-search-suggest__info"><span class="aspect-search-suggest__name">${escapeHtml(post.title)}</span><small class="aspect-search-suggest__cat">Журнал</small></span></a>`;
         }
         html += '</div>';
     }
     if (!products.length && !posts.length) {
-        html = '<div class="tc-search-suggest__empty">Ничего не найдено</div>';
+        html = '<div class="aspect-search-suggest__empty">Ничего не найдено</div>';
     } else if (query) {
-        html += `<a class="tc-search-suggest__view-all" href="/catalog/?q=${encodeURIComponent(query)}">Смотреть всё</a>`;
+        html += `<a class="aspect-search-suggest__view-all" href="/catalog/?q=${encodeURIComponent(query)}">Смотреть всё</a>`;
     }
 
     dropdown.innerHTML = html;

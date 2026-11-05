@@ -2,7 +2,7 @@
 {# AJAX append: items go into #product-grid (OOB), load-more trigger replaces itself #}
 <div id="product-grid-append" hx-swap-oob="beforeend:#product-grid">
     {% for product in products %}
-        <div class="tc-product-cell flex">
+        <div class="aspect-product-cell flex">
             {% include "catalog/_product_card.html" with product=product %}
         </div>
     {% endfor %}

@@ -62,7 +62,7 @@ main.aspect-account .aspect-account__heading {
     background: #f4f6f4;
   }
 
-  main.aspect-account .mob-account-nav > li > a.font-din-black {
+  main.aspect-account .mob-account-nav > li > a.aspect-display-black {
     background: #2a4a34 !important;
     color: #ffffff !important;
     font-size: 14px !important;
@@ -78,7 +78,7 @@ main.aspect-account .aspect-account__heading {
     color: #2a4a34;
   }
 
-  main.aspect-account .mob-account-nav > li > a.font-din-black .aspect-account-nav__icon {
+  main.aspect-account .mob-account-nav > li > a.aspect-display-black .aspect-account-nav__icon {
     color: #ffffff;
   }
 }
@@ -152,7 +152,7 @@ main.aspect-account .aspect-account-table-wrap table {
   min-width: 560px;
 }
 
-main.aspect-account .tc-btn {
+main.aspect-account .aspect-btn {
   border-radius: 4px !important;
 }
 
@@ -404,13 +404,13 @@ html body .aspect-pd__related-grid {
 }
 
 html body .aspect-pd__weight,
-html body .aspect-pd .tc-btn-pay,
-html body .aspect-pd .tc-weight {
+html body .aspect-pd .aspect-btn-pay,
+html body .aspect-pd .aspect-weight {
   border-radius: 4px !important;
 }
 
 html body .aspect-pd__weight.is-active,
-html body .aspect-pd .tc-btn-pay.active {
+html body .aspect-pd .aspect-btn-pay.active {
   background: #000000 !important;
   border-color: #000000 !important;
   color: #ffffff !important;

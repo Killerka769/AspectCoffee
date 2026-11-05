@@ -20,20 +20,21 @@ class MobileMenuTests(TestCase):
         menu = html[start:end]
 
         ordered_labels = (
-            "Купить",
+            "Каталог",
             "Первая категория",
             "Вторая категория",
             "Первая ссылка",
             "Вторая ссылка",
-            "Отзывы",
-            "Сообщество",
+            "Партнёрам",
             "Журнал",
-            "Условия",
+            "Сообщество",
+            "Покупателям",
             "Доставка и оплата",
             "Система скидок",
             "Возврат денег",
             "Частые вопросы",
-            "Как приготовить кофе",
+            "Как выбрать кофе",
+            "Отзывы",
         )
         positions = [menu.index(label) for label in ordered_labels]
         self.assertEqual(positions, sorted(positions))

@@ -46,7 +46,7 @@ class CartHeaderRegressionTests(TestCase):
         self.assertEqual(self.cart.total, Decimal("532.67"))
         self.assertContains(response, "window.__CART_TOTAL_PRICE__ = 627;")
         self.assertNotContains(response, 'id="mob-nav-cart-badge"')
-        self.assertContains(response, 'id="mob-bottom-nav"')
+        self.assertNotContains(response, 'id="mob-bottom-nav"')
 
     def test_cart_api_returns_subtotal_separately_from_discounted_total(self):
         response = self.client.post(

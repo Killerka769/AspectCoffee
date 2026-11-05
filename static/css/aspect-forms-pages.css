@@ -429,3 +429,87 @@ html body .aspect-inquiry form {
     padding: 24px 20px !important;
   }
 }
+
+/* Узкие экраны: футер больше не держит 4 колонки, текст не рвётся по буквам. */
+html body .aspect-footer__inner {
+  min-width: 0;
+}
+
+html body .aspect-footer h2.aspect-footer__title,
+html body .aspect-footer__title {
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+
+@media (max-width: 1099px) {
+  html body .aspect-footer__inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 40px 28px !important;
+  }
+}
+
+@media (max-width: 757px) {
+  html body .aspect-footer {
+    padding: 40px 0 calc(32px + env(safe-area-inset-bottom)) !important;
+  }
+
+  html body .aspect-footer__inner {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  html body .aspect-footer .aspect-footer__phone {
+    font-size: 28px !important;
+    white-space: normal !important;
+    line-height: 1.15 !important;
+  }
+
+  html body .aspect-footer__socials {
+    align-items: flex-start;
+  }
+
+  html body #header-cart-badge > .pl-2 {
+    display: none !important;
+  }
+
+  html body .aspect-card {
+    min-height: 0 !important;
+  }
+
+  html body h1.aspect-hero__title,
+  html body h1.aspect-pd__title,
+  html body h2.aspect-empty__title {
+    font-size: clamp(28px, 8vw, 40px) !important;
+    overflow-wrap: break-word;
+  }
+
+  html body .aspect-pd__buy-row,
+  html body .aspect-card__footer,
+  html body .aspect-auth__phone-row,
+  html body .aspect-auth__socials-row {
+    flex-wrap: wrap;
+  }
+
+  html body .ckc-item__name,
+  html body .aspect-pd__title,
+  html body .aspect-card__title {
+    overflow-wrap: break-word;
+  }
+}
+
+@media (max-width: 480px) {
+  html body .aspect-header__inner {
+    gap: 8px;
+  }
+
+  html body .aspect-header__logo img {
+    height: 26px;
+    width: auto;
+    max-width: none;
+  }
+
+  html body .aspect-header__icons .icon-btn {
+    width: 34px;
+    height: 34px;
+  }
+}

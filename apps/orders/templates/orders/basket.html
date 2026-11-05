@@ -786,7 +786,7 @@ textarea.ckc-field { min-height: 90px; resize: none; }
                     <button type="button" {% if item.qty > 1 %}onclick="tcUpdateCart({{ item.variant.id }}, {{ item.qty|add:'-1' }})"{% else %}disabled{% endif %}>
                       <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
-                    <span class="tc-counter__value">{{ item.qty }}</span>
+                    <span class="aspect-counter__value">{{ item.qty }}</span>
                     <button type="button" onclick="tcUpdateCart({{ item.variant.id }}, {{ item.qty|add:'1' }})">
                       <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
@@ -863,7 +863,7 @@ textarea.ckc-field { min-height: 90px; resize: none; }
                         </div>
                       </div>
                       <input name="phone_code" type="hidden" :value="phoneCode"/>
-                      <input autocomplete="tel" class="ckc-field__input" inputmode="tel" name="phone" oninput="tcPhoneMask(event)" placeholder="(900) 000-00-00" type="tel" value="{{ user.phone|default:'' }}" data-tc-phone-input x-bind:data-phone-code="phoneCode" x-bind:data-phone-length="phoneLength"/>
+                      <input autocomplete="tel" class="ckc-field__input" inputmode="tel" name="phone" oninput="tcPhoneMask(event)" placeholder="(900) 000-00-00" type="tel" value="{{ user.phone|default:'' }}" data-aspect-phone-input x-bind:data-phone-code="phoneCode" x-bind:data-phone-length="phoneLength"/>
                     </div>
                     <template x-if="errors.phone"><p class="ckc-field__error" x-text="errors.phone"></p></template>
                   </div>
@@ -894,7 +894,7 @@ textarea.ckc-field { min-height: 90px; resize: none; }
                       </template>
                     </div>
                   </div>
-                  <input class="ckc-field__input" name="phone_m" oninput="tcPhoneMask(event)" inputmode="tel" placeholder="(900) 000-00-00" type="tel" value="{{ user.phone|default:'' }}" data-tc-phone-input x-bind:data-phone-code="phoneCode" x-bind:data-phone-length="phoneLength"/>
+                  <input class="ckc-field__input" name="phone_m" oninput="tcPhoneMask(event)" inputmode="tel" placeholder="(900) 000-00-00" type="tel" value="{{ user.phone|default:'' }}" data-aspect-phone-input x-bind:data-phone-code="phoneCode" x-bind:data-phone-length="phoneLength"/>
                 </div>
                 <p style="font-size:13px;color:var(--ck-text-muted);margin:0;" x-cloak x-show="existingAccountHasPhone">
                   Телефон будет использован из найденной учётной записи после входа.
@@ -911,7 +911,7 @@ textarea.ckc-field { min-height: 90px; resize: none; }
                 <label class="ckc-check"><input type="checkbox" name="other_recipient" x-model="isOtherRecipient"/><span>Другой получатель</span></label>
                 <div x-show="isOtherRecipient" x-cloak x-transition style="display:flex;flex-direction:column;gap:10px;">
                   <input class="ckc-field__input" name="recipient_name" placeholder="Имя и фамилия получателя" type="text"/>
-                  <input class="ckc-field__input" autocomplete="tel" inputmode="tel" name="recipient_phone" oninput="tcPhoneMask(event)" placeholder="(900) 000-00-00" type="tel" data-tc-phone-input x-bind:data-phone-code="phoneCode"/>
+                  <input class="ckc-field__input" autocomplete="tel" inputmode="tel" name="recipient_phone" oninput="tcPhoneMask(event)" placeholder="(900) 000-00-00" type="tel" data-aspect-phone-input x-bind:data-phone-code="phoneCode"/>
                 </div>
               </div>
 
@@ -1398,7 +1398,7 @@ function tcUpdateCart(variantId, qty) {
     var itemRow = document.querySelector('[data-variant-id="' + variantId + '"]');
     var serverQty = data.item_qty !== null && data.item_qty !== undefined ? data.item_qty : qty;
     if (itemRow) {
-      var counterEl = itemRow.querySelector('.tc-counter__value');
+      var counterEl = itemRow.querySelector('.aspect-counter__value');
       if (counterEl) counterEl.textContent = serverQty;
       var priceEl = itemRow.querySelector('.item-total-price');
       if (priceEl && data.item_total !== null && data.item_total !== undefined) priceEl.innerHTML = Math.round(Number(data.item_total) || 0) + '<span class="rub"> ₽</span>';

@@ -200,9 +200,9 @@
       </div>
       {% endif %}
 
-      <form method="post" class="asp-auth__form" data-tc-phone-group x-ref="phoneGroup">
+      <form method="post" class="asp-auth__form" data-aspect-phone-group x-ref="phoneGroup">
         {% csrf_token %}
-        <input type="hidden" name="phone_code" :value="phoneCode" data-tc-phone-code>
+        <input type="hidden" name="phone_code" :value="phoneCode" data-aspect-phone-code>
 
         <div class="asp-auth__field">
           <label class="asp-auth__label">Номер телефона</label>
@@ -223,7 +223,7 @@
             </div>
             <input type="tel" name="phone" value="{{ phone_value }}" required
                    autocomplete="tel" inputmode="tel" placeholder="(900) 000-00-00"
-                   class="asp-auth__input" data-tc-phone-input
+                   class="asp-auth__input" data-aspect-phone-input
                    :data-phone-code="phoneCode" :data-phone-length="phoneLength"
                    style="flex:1;">
           </div>
@@ -233,7 +233,7 @@
           <label class="asp-auth__label">Повторите номер</label>
           <input type="tel" name="phone_repeat" value="{{ phone_repeat }}" required
                  autocomplete="off" inputmode="tel" placeholder="(900) 000-00-00"
-                 class="asp-auth__input" data-tc-phone-input
+                 class="asp-auth__input" data-aspect-phone-input
                  :data-phone-code="phoneCode" :data-phone-length="phoneLength">
         </div>
 

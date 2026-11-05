@@ -646,7 +646,7 @@
     <form method="post" action="{% url 'users:profile' %}" class="asp-modal__form" id="edit-profile-form" autocomplete="off">
       {% csrf_token %}
 
-      <div class="asp-field" id="profile-phone-group" data-tc-phone-group>
+      <div class="asp-field" id="profile-phone-group" data-aspect-phone-group>
         <label class="asp-field__label">Имя и фамилия</label>
         <input type="text" name="full_name" value="{{ user.first_name }} {{ user.last_name }}" placeholder="Имя и фамилия" class="asp-field__input">
       </div>
@@ -656,13 +656,13 @@
         <div class="asp-phone-row">
           <div class="asp-phone-code" id="phone-code-wrapper">
             <button type="button" class="asp-phone-code__btn" onclick="toggleProfilePhoneCode()">
-              <span id="profile-phone-code-text" data-tc-phone-code-label>+7</span>
+              <span id="profile-phone-code-text" data-aspect-phone-code-label>+7</span>
               <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
             </button>
             <div class="asp-phone-code__drop" id="profile-phone-code-dropdown"></div>
           </div>
-          <input type="hidden" name="phone_code" id="profile-phone-code-hidden" value="+7" data-tc-phone-code>
-          <input type="tel" name="phone" id="profile-phone-input" value="{{ user.phone }}" placeholder="(900) 000-00-00" class="asp-field__input" style="flex:1;" data-tc-phone-input data-phone-code="+7" data-phone-length="10">
+          <input type="hidden" name="phone_code" id="profile-phone-code-hidden" value="+7" data-aspect-phone-code>
+          <input type="tel" name="phone" id="profile-phone-input" value="{{ user.phone }}" placeholder="(900) 000-00-00" class="asp-field__input" style="flex:1;" data-aspect-phone-input data-phone-code="+7" data-phone-length="10">
         </div>
       </div>
 
