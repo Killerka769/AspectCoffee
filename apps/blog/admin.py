@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db.models import Count, Q
 from unfold.admin import ModelAdmin, TabularInline
 from .models import (
-    BlogCategory, BlogPost, BlogPostView, BlogSeries, BlogSeriesPost,
+    BlogCategory, BlogPost, BlogPostView,
     ArticleComment, ArticleLike,
 )
 
@@ -12,12 +12,6 @@ class BlogCategoryAdmin(ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     list_display = ("name", "slug", "description")
     search_fields = ("name", "slug", "description")
-
-
-class BlogSeriesPostInline(TabularInline):
-    model = BlogSeriesPost
-    extra = 1
-    autocomplete_fields = ("post",)
 
 
 class BlogPostViewInline(TabularInline):
@@ -51,19 +45,6 @@ class ArticleCommentInline(TabularInline):
     extra = 0
     fields = ("user", "text", "is_approved", "created_at")
     readonly_fields = ("created_at",)
-
-
-@admin.register(BlogSeries)
-class BlogSeriesAdmin(ModelAdmin):
-    prepopulated_fields = {"slug": ("title",)}
-    list_display = ("title", "order", "is_active", "article_count")
-    list_editable = ("order", "is_active")
-    search_fields = ("title", "description")
-    inlines = (BlogSeriesPostInline,)
-
-    @admin.display(description="Статей")
-    def article_count(self, obj):
-        return obj.posts.count()
 
 
 @admin.register(BlogPost)

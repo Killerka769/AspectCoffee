@@ -17,28 +17,6 @@ class BlogCategory(models.Model):
         return self.name
 
 
-class BlogSeries(models.Model):
-    title = models.CharField(max_length=255, verbose_name="Название")
-    slug = models.SlugField(max_length=255, unique=True, verbose_name="Адрес в URL")
-    image = models.ImageField(upload_to="blog/series/", verbose_name="Обложка")
-    description = models.TextField(blank=True, verbose_name="Описание")
-    reading_minutes = models.PositiveIntegerField(default=5, verbose_name="Время чтения, мин")
-    is_active = models.BooleanField(default=True, verbose_name="Активна")
-    order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
-    created_at = models.DateTimeField("Создана", auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Серия статей"
-        verbose_name_plural = "Серии статей"
-        ordering = ["order", "id"]
-
-    def __str__(self):
-        return self.title
-
-    def get_absolute_url(self):
-        return reverse("blog:index")
-
-
 class BlogPost(models.Model):
     category = models.ForeignKey(
         BlogCategory, on_delete=models.SET_NULL, null=True, blank=True,
@@ -51,7 +29,6 @@ class BlogPost(models.Model):
     content = RichTextField(verbose_name="Содержание")
     is_published = models.BooleanField(default=True, verbose_name="Опубликовано")
     is_featured = models.BooleanField(default=False, verbose_name="На главной")
-    series = models.ManyToManyField(BlogSeries, through="BlogSeriesPost", related_name="posts", blank=True, verbose_name="Серии")
     views_count = models.PositiveIntegerField(default=0, verbose_name="Просмотры")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлён")
@@ -109,32 +86,6 @@ class BlogPostView(models.Model):
     def __str__(self):
         viewer = self.user or f"Гость {self.session_key[:8]}"
         return f"{viewer} → {self.post}"
-
-
-class BlogSeriesPost(models.Model):
-    series = models.ForeignKey(BlogSeries, on_delete=models.CASCADE, related_name="series_items", verbose_name="Серия")
-    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name="series_items", verbose_name="Статья")
-    order = models.PositiveIntegerField(default=0, verbose_name="Порядок статьи")
-
-    class Meta:
-        verbose_name = "Статья в серии"
-        verbose_name_plural = "Статьи в серии"
-        unique_together = [("series", "post")]
-        ordering = ["order", "id"]
-
-    def __str__(self):
-        return f"{self.series}: {self.post}"
-
-
-# class BlogSeriesVisit(models.Model):
-#     series = models.ForeignKey(BlogSeries, on_delete=models.CASCADE, related_name="visits", verbose_name="Серия")
-#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="blog_series_visits", verbose_name="Пользователь")
-#     visited_at = models.DateTimeField("Посещено", auto_now=True)
-
-#     class Meta:
-#         verbose_name = "Посещение серии статей"
-#         verbose_name_plural = "Посещения серий статей"
-#         unique_together = [("series", "user")]
 
 
 class ArticleLike(models.Model):

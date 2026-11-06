@@ -80,6 +80,27 @@
     padding-top: 0 !important;
     padding-bottom: 0 !important;
   }
+  .asp-account-logout {
+    height: 44px;
+    min-height: 44px;
+  }
+}
+.asp-account-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #2A4A34;
+  border-radius: 4px;
+  background: #2A4A34;
+  color: #FFFFFF;
+  text-decoration: none;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 </style>
 
@@ -116,6 +137,7 @@
         <li><a href="{% url 'users:profile' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] aspect-display-medium tracking-[0.04em]{% if section == 'profile' %} aspect-display-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3 15.4a1.65 1.65 0 0 0-1.51-1H1a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 3 8.6a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.36 0 .71.07 1.03.2H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Мои данные</span></a></li>
         <li><a href="{% url 'users:discount' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] aspect-display-medium tracking-[0.04em]{% if section == 'discount' %} aspect-display-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4H6a2 2 0 0 1 0-4h14V6"/></svg><span>Мои скидки</span></a></li>
         <li><a href="{% url 'users:balance' %}" class="duration-0 inline-block uppercase text-[var(--black)] text-[18px] xl:text-[16px] aspect-display-medium tracking-[0.04em]{% if section == 'balance' %} aspect-display-black{% endif %}" style="text-decoration:none"><svg class="aspect-account-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Внутренний счёт</span></a></li>
+        <li><a class="asp-account-logout" href="/logout/">Выйти из аккаунта</a></li>
       </ul>
       <script>
       (function () {

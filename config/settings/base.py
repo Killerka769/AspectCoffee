@@ -433,11 +433,6 @@ UNFOLD = {
                         "link": reverse_lazy("admin:blog_blogpost_changelist"),
                     },
                     {
-                        "title": _("Серии статей"),
-                        "icon": "layers",
-                        "link": reverse_lazy("admin:blog_blogseries_changelist"),
-                    },
-                    {
                         "title": _("Категории журнала"),
                         "icon": "topic",
                         "link": reverse_lazy("admin:blog_blogcategory_changelist"),
@@ -513,6 +508,16 @@ UNFOLD = {
                 "separator": True,
                 "collapsible": True,
                 "items": [
+                    {
+                        "title": _("Медиатека"),
+                        "icon": "photo_library",
+                        "link": reverse_lazy("admin:pages_mediafile_changelist"),
+                    },
+                    {
+                        "title": _("Шортсы"),
+                        "icon": "smart_display",
+                        "link": reverse_lazy("admin:pages_reel_changelist"),
+                    },
                     {
                         "title": _("Юридические документы"),
                         "icon": "gavel",

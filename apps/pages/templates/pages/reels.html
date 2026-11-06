@@ -1,0 +1,185 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Шортсы{% endblock %}
+{% block meta_description %}Короткие вертикальные видео Aspect Coffee.{% endblock %}
+{% block body_extra_class %}asp-reels-page{% endblock %}
+
+{% block extra_css %}
+<style>
+body.asp-reels-page { overflow: hidden; }
+body.asp-reels-page .aspect-footer { display: none; }
+
+.asp-feed {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  width: 100%;
+  max-width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior: contain;
+  background: #000;
+  -webkit-overflow-scrolling: touch;
+}
+.asp-feed__slide {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  overflow: hidden;
+  background: #000;
+}
+.asp-feed__slide video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  object-fit: cover;
+  object-position: center;
+  background: #000;
+}
+.asp-feed__title {
+  position: absolute;
+  top: 96px;
+  left: 16px;
+  right: 88px;
+  margin: 0;
+  color: #fff;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 8px rgba(0,0,0,.65);
+  pointer-events: none;
+}
+.asp-feed__btn {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0,0,0,.45);
+  color: #fff;
+  cursor: pointer;
+}
+.asp-feed__btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; }
+.asp-feed__play { left: 16px; bottom: calc(24px + env(safe-area-inset-bottom)); }
+.asp-feed__mute { right: 16px; bottom: calc(24px + env(safe-area-inset-bottom)); }
+.asp-feed__play .is-pause,
+.asp-feed__mute .is-on { display: none; }
+.asp-feed__play[aria-pressed="true"] .is-play { display: none; }
+.asp-feed__play[aria-pressed="true"] .is-pause { display: block; }
+.asp-feed__mute[aria-pressed="false"] .is-off { display: none; }
+.asp-feed__mute[aria-pressed="false"] .is-on { display: block; }
+.asp-feed__empty {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #111;
+  color: #fff;
+  text-align: center;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+@media (max-width: 375px) {
+  .asp-feed,
+  .asp-feed__slide,
+  .asp-feed__slide video { max-width: 100%; }
+  .asp-feed__title { font-size: 18px; right: 16px; top: 84px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% if reels %}
+<div class="asp-feed" data-reel-feed>
+  {% for reel in reels %}
+  <section class="asp-feed__slide" data-reel>
+    <video playsinline muted loop preload="none"{% if reel.cover %} poster="{{ reel.cover.url }}"{% endif %}>
+      <source src="{{ reel.video.url }}" type="{{ reel.video_content_type }}">
+    </video>
+    <p class="asp-feed__title">{{ reel.title }}</p>
+    <button type="button" class="asp-feed__btn asp-feed__play" data-reel-play aria-pressed="false" aria-label="Смотреть">
+      <svg class="is-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/></svg>
+      <svg class="is-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor" stroke="none"/></svg>
+    </button>
+    <button type="button" class="asp-feed__btn asp-feed__mute" data-reel-mute aria-pressed="true" aria-label="Включить звук">
+      <svg class="is-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5zM22 9l-6 6M16 9l6 6"/></svg>
+      <svg class="is-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5zM16 9a5 5 0 0 1 0 6M19 7a8 8 0 0 1 0 10"/></svg>
+    </button>
+  </section>
+  {% endfor %}
+</div>
+<script>
+(function () {
+  var root = document.querySelector("[data-reel-feed]");
+  if (!root) return;
+  var slides = root.querySelectorAll("[data-reel]");
+
+  function paint(video) {
+    var slide = video.closest("[data-reel]");
+    var play = slide.querySelector("[data-reel-play]");
+    var mute = slide.querySelector("[data-reel-mute]");
+    var playing = !video.paused && !video.ended;
+    play.setAttribute("aria-pressed", playing ? "true" : "false");
+    play.setAttribute("aria-label", playing ? "Пауза" : "Смотреть");
+    mute.setAttribute("aria-pressed", video.muted ? "true" : "false");
+    mute.setAttribute("aria-label", video.muted ? "Включить звук" : "Выключить звук");
+  }
+
+  var watcher = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      var video = entry.target.querySelector("video");
+      if (!video) return;
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+        var started = video.play();
+        if (started && started.catch) started.catch(function () {});
+      } else {
+        video.pause();
+      }
+      paint(video);
+    });
+  }, { root: root, threshold: [0.6] });
+
+  slides.forEach(function (slide) {
+    var video = slide.querySelector("video");
+    watcher.observe(slide);
+    slide.querySelector("[data-reel-play]").addEventListener("click", function () {
+      if (video.paused) {
+        var started = video.play();
+        if (started && started.catch) started.catch(function () {});
+      } else {
+        video.pause();
+      }
+    });
+    slide.querySelector("[data-reel-mute]").addEventListener("click", function () {
+      video.muted = !video.muted;
+      paint(video);
+    });
+    video.addEventListener("play", function () { paint(video); });
+    video.addEventListener("pause", function () { paint(video); });
+  });
+})();
+</script>
+{% else %}
+<div class="asp-feed__empty">Роликов пока нет</div>
+{% endif %}
+{% endblock %}

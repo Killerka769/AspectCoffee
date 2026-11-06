@@ -24,6 +24,11 @@ class MobileBlogDetailRegressionTests(TestCase):
         self.assertNotIn(self.post.title, breadcrumb)
         self.assertContains(response, self.post.created_at.strftime("%d.%m.%Y"))
         self.assertContains(response, "asp-art__")
+        self.assertNotContains(response, "Серия статей")
+        self.assertNotContains(response, "asp-art__series")
+
+        with_series = self.client.get(self.post.get_absolute_url() + "?series=missing")
+        self.assertEqual(with_series.status_code, 200)
 
     def test_update_date_is_hidden_for_same_day_and_shown_for_later_day(self):
         response = self.client.get(self.post.get_absolute_url())
@@ -42,3 +47,5 @@ class MobileBlogDetailRegressionTests(TestCase):
         self.assertContains(response, "asp-jrn__container")
         self.assertContains(response, "@media")
         self.assertContains(response, self.post.title)
+        self.assertNotContains(response, "Серии статей")
+        self.assertNotContains(response, "asp-jrn__series")

@@ -1074,7 +1074,8 @@ textarea.ckc-field { min-height: 90px; resize: none; }
                     </div>
                   </div>
 
-                  <div x-show="cdekCityQuery.length >= 2 && !cdekCityLoading && cdekCities.length === 0 && !cdekSelectedCity" x-cloak style="margin-top:10px;padding:12px 14px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:12px;font-size:13px;color:#B91C1C;line-height:1.5;">
+                  <div x-show="cdekNotice" x-cloak style="margin-top:10px;padding:12px 14px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:12px;font-size:13px;color:#B91C1C;line-height:1.5;" x-text="cdekNotice"></div>
+                  <div x-show="!cdekNotice && cdekCityQuery.length >= 2 && !cdekCityLoading && cdekCities.length === 0 && !cdekSelectedCity" x-cloak style="margin-top:10px;padding:12px 14px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:12px;font-size:13px;color:#B91C1C;line-height:1.5;">
                     Город «<strong x-text="cdekCityQuery"></strong>» не найден в справочнике СДЭК.<br>
                     Проверьте название или выберите из популярных ниже.
                   </div>
@@ -1489,17 +1490,27 @@ function checkoutApp() {
     cdekLoading: false,
     cdekCityLoading: false,
     cdekCalcLoading: false,
+    cdekNotice: '',
     cartWeight: Number('{{ total_weight|default:"500"|escapejs }}') || 500,
     _cityTimeout: null,
 
     async cdekSearchCities() {
-      if (this.cdekCityQuery.length < 2) { this.cdekCities = []; return; }
+      if (this.cdekCityQuery.length < 2) { this.cdekCities = []; this.cdekNotice = ''; return; }
       this.cdekCityLoading = true;
       try {
         const r = await fetch('/api/cdek/cities/?q=' + encodeURIComponent(this.cdekCityQuery));
         const d = await r.json();
-        this.cdekCities = d.cities || [];
-      } catch(e) { this.cdekCities = []; }
+        if (!r.ok || d.error) {
+          this.cdekCities = [];
+          this.cdekNotice = d.error || 'СДЭК временно недоступен';
+        } else {
+          this.cdekNotice = '';
+          this.cdekCities = d.cities || [];
+        }
+      } catch(e) {
+        this.cdekCities = [];
+        this.cdekNotice = 'СДЭК временно недоступен';
+      }
       this.cdekCityLoading = false;
     },
     cdekCityInput() {
@@ -1507,6 +1518,7 @@ function checkoutApp() {
       this._cityTimeout = setTimeout(() => this.cdekSearchCities(), 350);
     },
     async cdekSelectCity(city) {
+      this.cdekNotice = '';
       this.cdekSelectedCity = city;
       this.cdekCityQuery = city.city + (city.region && city.region !== city.city ? ', ' + city.region : '');
       this.cdekCities = [];
@@ -1527,9 +1539,17 @@ function checkoutApp() {
       try {
         const r = await fetch('/api/cdek/offices/?city_code=' + this.cdekSelectedCity.code);
         const d = await r.json();
-        this.cdekOffices = d.offices || [];
-        if (this.preferredPvzQuery) this.cdekOfficeFilter = this.preferredPvzQuery;
-      } catch(e) { this.cdekOffices = []; }
+        if (!r.ok || d.error) {
+          this.cdekOffices = [];
+          this.cdekNotice = d.error || 'Не удалось загрузить пункты выдачи СДЭК';
+        } else {
+          this.cdekOffices = d.offices || [];
+          if (this.preferredPvzQuery) this.cdekOfficeFilter = this.preferredPvzQuery;
+        }
+      } catch(e) {
+        this.cdekOffices = [];
+        this.cdekNotice = 'Не удалось загрузить пункты выдачи СДЭК';
+      }
       this.cdekLoading = false;
     },
     async cdekCalcCost() {
@@ -1549,14 +1569,20 @@ function checkoutApp() {
           })
         });
         const d = await r.json();
-        if (d.cost !== undefined) {
+        if (r.ok && d.cost !== undefined) {
+          this.cdekNotice = '';
           this.cdekDeliveryCost = Math.round(d.cost);
           this.cdekDeliveryDays = d.period_min === d.period_max ? d.period_min + ' дн.' : d.period_min + '–' + d.period_max + ' дн.';
         } else {
           this.cdekDeliveryCost = null;
           this.cdekDeliveryDays = '';
+          this.cdekNotice = d.error || 'СДЭК не смог рассчитать доставку';
         }
-      } catch(e) { this.cdekDeliveryCost = null; this.cdekDeliveryDays = ''; }
+      } catch(e) {
+        this.cdekDeliveryCost = null;
+        this.cdekDeliveryDays = '';
+        this.cdekNotice = 'СДЭК временно недоступен';
+      }
       this.cdekCalcLoading = false;
       this.checkValidation();
     },

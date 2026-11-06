@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.contrib import messages
 from datetime import timedelta
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.utils import timezone
 from unfold.admin import ModelAdmin, TabularInline
 from unfold.decorators import action
@@ -143,13 +144,50 @@ class CartItemInline(TabularInline):
     def line_total(self, obj):
         return f"{obj.total_price} ₽"
 class OrderItemInline(TabularInline):
-    model = OrderItem
-    extra = 0
-    readonly_fields = ["product_name", "variant_description", "qty", "price_at_order", "line_total"]
-    fields = ["product_name", "variant_description", "qty", "price_at_order", "line_total"]
+    """Состав заказа. Позиции фиксируются при оформлении и здесь только смотрятся."""
 
-    @admin.display(description="Сумма")
+    model = OrderItem
+    fk_name = "order"
+    extra = 0
+    can_delete = False
+    show_change_link = False
+    verbose_name = "Позиция"
+    verbose_name_plural = "Состав заказа"
+    fields = ("product_title", "variant_label", "qty", "unit_price", "line_total")
+    readonly_fields = ("product_title", "variant_label", "qty", "unit_price", "line_total")
+    ordering = ["pk"]
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("variant__product")
+
+    @admin.display(description="Товар")
+    def product_title(self, obj):
+        if not getattr(obj, "pk", None):
+            return "—"
+        if obj.product_name:
+            return obj.product_name
+        product = getattr(getattr(obj, "variant", None), "product", None)
+        return product.name if product else "—"
+
+    @admin.display(description="Вариант")
+    def variant_label(self, obj):
+        if not getattr(obj, "pk", None):
+            return "—"
+        return obj.variant_description or "—"
+
+    @admin.display(description="Цена за штуку")
+    def unit_price(self, obj):
+        if not getattr(obj, "pk", None) or obj.price_at_order is None:
+            return "—"
+        return f"{obj.price_at_order} ₽"
+
+    @admin.display(description="Итого")
     def line_total(self, obj):
+        if not getattr(obj, "pk", None):
+            return "—"
         return f"{obj.total_price} ₽"
 STATUS_COLORS = {
     "new": "#71717a",
@@ -164,22 +202,22 @@ STATUS_COLORS = {
 class OrderAdmin(ImportExportModelAdmin, ModelAdmin):
     resource_classes = [OrderResource]
     list_display = [
-        "pk", "colored_status", "user", "recipient_display",
-        "contact_phone", "delivery_type", "payment_method",
+        "pk", "colored_status", "status", "user", "recipient_display",
+        "contact_phone", "items_summary", "delivery_type", "payment_method",
         "payment_status", "total_amount", "cdek_track_number", "created_at",
     ]
-    list_editable = ["cdek_track_number"]
+    list_editable = ["status", "cdek_track_number"]
     list_filter = ["status", "delivery_type", "payment_method", "payment_status", "created_at"]
     search_fields = ["pk", "contact_name", "contact_phone", "contact_email", "cdek_track_number"]
     readonly_fields = [
-        "created_at", "updated_at", "total_amount", "discount_amount",
+        "composition_table", "created_at", "updated_at", "total_amount", "discount_amount",
         "payment_id", "repeat_order_available",
     ]
     inlines = [OrderItemInline]
     date_hierarchy = "created_at"
     ordering = ["-created_at"]
     fieldsets = (
-        ("Основное", {"fields": ("status", "user", "comment", "created_at", "updated_at")}),
+        ("Основное", {"fields": ("composition_table", "status", "user", "comment", "created_at", "updated_at")}),
         ("Контакты", {"fields": ("contact_name", "contact_phone", "contact_email", "phone_code")}),
         ("Получатель", {"fields": ("recipient_name", "recipient_phone")}),
         ("Повтор заказа", {"fields": ("repeat_order_available",)}),
@@ -188,6 +226,87 @@ class OrderAdmin(ImportExportModelAdmin, ModelAdmin):
         ("Оплата", {"fields": ("payment_method", "payment_status", "payment_id")}),
         ("Суммы", {"fields": ("promo_code", "discount_amount", "total_amount")}),
     )
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("items__variant__product")
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        status_field = form.base_fields.get("status")
+        if status_field is not None:
+            status_field.help_text = (
+                "Поле редактируется. Смена статуса отправляет покупателю то же письмо, "
+                "что и сохранение этой карточки. Статус оплаты, ЮKassa и СДЭК при этом не меняются. "
+                "Чтобы отметить оплату, используйте действие «Отметить как оплачено и уведомить покупателя»."
+            )
+        return form
+
+    def get_changelist_formset(self, request, **kwargs):
+        FormSet = super().get_changelist_formset(request, **kwargs)
+
+        class OrderStatusFormSet(FormSet):
+            def save(self, commit=True):
+                previous = {}
+                if commit:
+                    previous = dict(
+                        Order.objects.filter(
+                            pk__in=[form.instance.pk for form in self.forms if form.instance.pk]
+                        ).values_list("pk", "status")
+                    )
+                saved = super().save(commit=commit)
+                if commit:
+                    for order in saved:
+                        old_status = previous.get(order.pk)
+                        if old_status is not None and old_status != order.status:
+                            OrderAdmin._queue_status_email(order.pk, order.status)
+                return saved
+
+        return OrderStatusFormSet
+
+    @admin.display(description="Состав")
+    def items_summary(self, obj):
+        parts = []
+        for item in obj.items.all():
+            name = item.product_name
+            if not name and item.variant_id and item.variant and item.variant.product_id:
+                name = item.variant.product.name
+            parts.append(f"{name or 'Товар'} × {item.qty}")
+        return ", ".join(parts) if parts else "—"
+
+    @admin.display(description="Состав заказа")
+    def composition_table(self, obj):
+        if not obj or not obj.pk:
+            return "—"
+        rows = []
+        for item in obj.items.all():
+            name = item.product_name
+            if not name and item.variant_id and item.variant and item.variant.product_id:
+                name = item.variant.product.name
+            variant = item.variant_description or "—"
+            rows.append(format_html(
+                "<tr><td style='padding:4px 12px 4px 0'>{}</td>"
+                "<td style='padding:4px 12px 4px 0'>{}</td>"
+                "<td style='padding:4px 12px 4px 0'>{}</td>"
+                "<td style='padding:4px 12px 4px 0'>{} ₽</td>"
+                "<td>{} ₽</td></tr>",
+                name or "—",
+                variant,
+                item.qty,
+                item.price_at_order if item.price_at_order is not None else "—",
+                item.total_price,
+            ))
+        if not rows:
+            return "В заказе нет позиций"
+        return format_html(
+            "<table><thead><tr>"
+            "<th style='text-align:left;padding-right:12px'>Товар</th>"
+            "<th style='text-align:left;padding-right:12px'>Вариант</th>"
+            "<th style='text-align:left;padding-right:12px'>Количество</th>"
+            "<th style='text-align:left;padding-right:12px'>Цена за штуку</th>"
+            "<th style='text-align:left'>Итого</th>"
+            "</tr></thead><tbody>{}</tbody></table>",
+            mark_safe("".join(rows)),
+        )
+
     def colored_status(self, obj):
         color = STATUS_COLORS.get(obj.status, "#71717a")
         return format_html(
@@ -209,6 +328,14 @@ class OrderAdmin(ImportExportModelAdmin, ModelAdmin):
             "<b>«Повторить заказ в корзину покупателя»</b>."
         )
 
+    @staticmethod
+    def _queue_status_email(order_id, new_status):
+        try:
+            from .tasks import send_order_status_email
+            send_order_status_email.delay(order_id, new_status)
+        except Exception:
+            pass
+
     def save_model(self, request, obj, form, change):
         previous_status = None
         if change and obj.pk:
@@ -221,11 +348,7 @@ class OrderAdmin(ImportExportModelAdmin, ModelAdmin):
         super().save_model(request, obj, form, change)
 
         if change and previous_status != obj.status:
-            try:
-                from .tasks import send_order_status_email
-                send_order_status_email.delay(obj.id, obj.status)
-            except Exception:
-                pass
+            self._queue_status_email(obj.id, obj.status)
 
     @action(description="Отметить как оплачено и уведомить покупателя")
     def mark_paid(self, request, queryset):

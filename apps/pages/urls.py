@@ -22,6 +22,7 @@ urlpatterns = [
     path("cookies/", views.legal_document, {"slug": "cookies"}, name="cookies"),
     path("doc/<slug:slug>/", views.legal_document, name="legal_document"),
     path("sitemap/", views.sitemap_page, name="sitemap"),
+    path("reels/", views.reels, name="reels"),
     path("reviews/", views.reviews_page, name="reviews"),
     path("reviews/ajax/", views.reviews_ajax, name="reviews_ajax"),
     path("reviews/create/", views.reviews_create, name="reviews_create"),

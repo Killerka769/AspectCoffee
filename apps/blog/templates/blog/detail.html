@@ -11,8 +11,8 @@
    ASPECT ARTICLE (detail)
    ========================================================== */
 
-.asp-art { background: #FFFFFF; padding-bottom: 80px; }
-.asp-art__container { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
+.asp-art { background: #FFFFFF; padding-bottom: 80px; overflow-x: clip; }
+.asp-art__container { width: min(1100px, calc(100% - 32px)); margin: 0 auto; min-width: 0; }
 
 .asp-art__crumbs {
   display: flex;
@@ -62,6 +62,18 @@
   text-transform: uppercase;
   color: #000;
   margin: 0 0 20px;
+  padding-bottom: 16px;
+  position: relative;
+  overflow-wrap: anywhere;
+}
+.asp-art__title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 72px;
+  height: 3px;
+  background: #2A4A34;
 }
 
 .asp-art__meta {
@@ -191,72 +203,6 @@
   border-radius: 6px;
   font-family: monospace;
   font-size: 14px;
-}
-
-/* Series */
-.asp-art__series {
-  margin-top: 48px;
-  padding: 28px 32px;
-  background: #F4F6F4;
-  border-radius: 20px;
-}
-.asp-art__series-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: #5A5A5A;
-  margin: 0 0 6px;
-}
-.asp-art__series-title {
-  font-family: "Roboto Condensed", Arial, sans-serif;
-  font-weight: 900;
-  font-size: 20px;
-  line-height: 1.15;
-  text-transform: uppercase;
-  color: #000;
-  margin: 0 0 20px;
-}
-.asp-art__series-list {
-  list-style: none;
-  margin: 0; padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.asp-art__series-item {
-  display: flex;
-  gap: 14px;
-  text-decoration: none;
-  align-items: center;
-  transition: transform .2s ease;
-}
-.asp-art__series-item:hover { transform: translateX(4px); }
-.asp-art__series-thumb {
-  width: 56px; height: 56px;
-  border-radius: 12px;
-  background: #FFFFFF;
-  overflow: hidden;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #2A4A34;
-}
-.asp-art__series-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.asp-art__series-body { flex: 1; min-width: 0; }
-.asp-art__series-name {
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.35;
-  color: #000;
-  margin: 0;
-}
-.asp-art__series-item:hover .asp-art__series-name { color: #2A4A34; }
-.asp-art__series-date {
-  font-size: 11px;
-  color: #5A5A5A;
-  margin: 4px 0 0;
 }
 
 /* Comments */
@@ -486,6 +432,18 @@
 }
 .asp-art__side-cat:hover { background: #FFFFFF; color: #000; }
 .asp-art__side-cat span:last-child { font-size: 11px; color: rgba(0,0,0,.3); }
+
+@media (max-width: 757px) {
+  .asp-art { padding-bottom: 48px; }
+  .asp-art__title { font-size: 32px; }
+  .asp-art__meta { gap: 10px 16px; }
+  .asp-art__actions { margin-left: 0; width: 100%; }
+  .asp-art__cover { border-radius: 12px; }
+  .asp-art__content { font-size: 15px; }
+  .asp-art__content h2 { font-size: 24px; }
+  .asp-art__side-card { padding: 18px; }
+  .asp-art__comment-submit { align-self: stretch; text-align: center; }
+}
 </style>
 {% endblock %}
 
@@ -559,29 +517,6 @@
         <div class="asp-art__content">
           {{ post.content|safe }}
         </div>
-
-        {# Series #}
-        {% if active_series and series_posts %}
-        <div class="asp-art__series">
-          <p class="asp-art__series-label">Серия статей</p>
-          <h3 class="asp-art__series-title">{{ active_series.title }}</h3>
-          <ul class="asp-art__series-list">
-            {% for sp in series_posts %}
-            <li>
-              <a href="{{ sp.get_absolute_url }}?series={{ active_series.slug }}" class="asp-art__series-item">
-                <div class="asp-art__series-thumb">
-                  {% if sp.image %}<img src="{{ sp.image.url }}" alt="">{% endif %}
-                </div>
-                <div class="asp-art__series-body">
-                  <p class="asp-art__series-name">{{ sp.title }}</p>
-                  <p class="asp-art__series-date">{{ sp.created_at|date:"d F Y" }}</p>
-                </div>
-              </a>
-            </li>
-            {% endfor %}
-          </ul>
-        </div>
-        {% endif %}
 
         {# Comments #}
         <div class="asp-art__comments" id="comments">

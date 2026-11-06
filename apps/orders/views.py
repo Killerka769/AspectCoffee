@@ -336,10 +336,12 @@ def basket_view(request):
                     to_postal_code=postal_code or None,
                 )
                 if "error" in cdek_result:
-                    raise ValueError(
-                        "СДЭК не смог проверить адрес и стоимость доставки. "
-                        "Проверьте адрес и попробуйте ещё раз"
-                    )
+                    reason = str(cdek_result["error"])
+                    if "не настроен" in reason.lower() or "not configured" in reason.lower():
+                        raise ValueError(
+                            "СДЭК не настроен. Нужны тестовые ключи и CDEK_TEST_MODE, затем перезапуск сайта."
+                        )
+                    raise ValueError("СДЭК не смог рассчитать доставку: " + reason)
                 cdek_delivery_cost = cdek_result["cost"]
 
             other_recipient = request.POST.get("other_recipient") == "on"

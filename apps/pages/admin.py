@@ -1,10 +1,115 @@
 from django.contrib import admin
 from django.db.models import Count, Q
+from django.utils.html import format_html
 from unfold.admin import ModelAdmin, TabularInline
 from .models import (
     CommunityPost, CommunityPostComment,
-    CommunityPostLike, ReviewComment, LegalDocument,
+    CommunityPostLike, Inquiry, MediaFile, Reel, ReviewComment, LegalDocument,
 )
+
+
+@admin.register(Inquiry)
+class InquiryAdmin(ModelAdmin):
+    list_display = ("created_at", "form_type", "name", "phone", "email", "is_processed")
+    list_filter = ("form_type", "is_processed", "created_at")
+    search_fields = ("name", "phone", "email", "message")
+    readonly_fields = ("created_at",)
+    date_hierarchy = "created_at"
+    ordering = ("-created_at",)
+    actions = ("mark_processed",)
+    fieldsets = (
+        ("Откуда", {"fields": ("form_type", "created_at", "is_processed")}),
+        ("Контакты", {"fields": ("name", "phone", "email")}),
+        ("Сообщение", {"fields": ("message",)}),
+    )
+
+    @admin.action(description="Отметить как обработанные")
+    def mark_processed(self, request, queryset):
+        updated = queryset.update(is_processed=True)
+        self.message_user(request, f"Отмечено обработанными: {updated}")
+
+
+@admin.register(MediaFile)
+class MediaFileAdmin(ModelAdmin):
+    list_display = ("preview", "title", "copy_link", "created_at")
+    list_display_links = ("title",)
+    search_fields = ("title", "file")
+    readonly_fields = ("created_at", "preview", "copy_link")
+    date_hierarchy = "created_at"
+    ordering = ("-created_at",)
+    fieldsets = (
+        (None, {
+            "fields": ("title", "file", "preview", "copy_link", "created_at"),
+            "description": "После сохранения скопируйте ссылку и вставьте её в редактор статей: кнопка «Изображение» → вкладка с адресом.",
+        }),
+    )
+
+    @admin.display(description="Превью")
+    def preview(self, obj):
+        if not obj or not obj.file or not obj.is_image:
+            return "—"
+        return format_html(
+            '<img src="{}" alt="" style="height:48px;width:72px;object-fit:cover;border-radius:4px;">',
+            obj.file.url,
+        )
+
+    @admin.display(description="Ссылка")
+    def copy_link(self, obj):
+        if not obj or not obj.file:
+            return "Ссылка появится после сохранения"
+        return format_html(
+            '<input type="text" readonly value="{}" onclick="this.select()" '
+            'style="width:min(420px,100%);font:12px/1.4 sans-serif;">',
+            obj.file.url,
+        )
+
+
+@admin.register(Reel)
+class ReelAdmin(ModelAdmin):
+    list_display = ("preview", "title", "is_active", "order")
+    list_display_links = ("title",)
+    list_editable = ("is_active", "order")
+    list_filter = ("is_active",)
+    search_fields = ("title",)
+    readonly_fields = ("preview", "player")
+    ordering = ("order", "id")
+    fieldsets = (
+        (None, {
+            "fields": ("title", "video", "cover", "is_active", "order", "player"),
+            "description": "На сайте показываются только включённые ролики. Принимаются mp4 и webm.",
+        }),
+    )
+
+    @admin.display(description="Превью")
+    def preview(self, obj):
+        if not obj or not obj.pk:
+            return "—"
+        if obj.cover:
+            return format_html(
+                '<img src="{}" alt="" style="height:72px;width:40px;object-fit:cover;border-radius:4px;background:#111;">',
+                obj.cover.url,
+            )
+        if obj.video:
+            return format_html(
+                '<video src="{}" muted preload="metadata" style="height:72px;width:40px;object-fit:cover;border-radius:4px;background:#111;"></video>',
+                obj.video.url,
+            )
+        return "—"
+
+    @admin.display(description="Просмотр")
+    def player(self, obj):
+        if not obj or not obj.video:
+            return "Видео появится после сохранения"
+        if obj.cover:
+            return format_html(
+                '<video src="{}" poster="{}" controls playsinline preload="metadata" style="width:180px;max-height:320px;background:#000;"></video>',
+                obj.video.url,
+                obj.cover.url,
+            )
+        return format_html(
+            '<video src="{}" controls playsinline preload="metadata" style="width:180px;max-height:320px;background:#000;"></video>',
+            obj.video.url,
+        )
 
 
 @admin.register(LegalDocument)

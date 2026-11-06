@@ -7,7 +7,7 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.html import strip_tags
 from .models import (
-    BlogPost, BlogCategory, BlogSeries,
+    BlogPost, BlogCategory,
     ArticleLike, ArticleComment, BlogPostView,
 )
 
@@ -54,37 +54,11 @@ def _liked_ids(request):
 
 
 def _decorate_posts(page_items, liked_ids):
-    """Attach card presentation data: reading time, short views and
-    the repeating feed pattern [wide + narrow] -> [3 columns]."""
-    for idx, post in enumerate(page_items):
+    """Attach reading time and view count used by the journal cards."""
+    for post in page_items:
         post.reading_minutes = _reading_minutes(post)
         post.views_display = _short_count(post.unique_views_count)
-        post.is_wide = idx % 5 == 0
         post.is_liked = post.id in liked_ids
-
-
-def _journal_series(request):
-    """Return all active journal series.
-
-    Note: BlogSeriesVisit was removed — we no longer hide series the user has
-    already opened. All active series are always shown.
-    """
-    series_list = list(
-        BlogSeries.objects.filter(is_active=True)
-        .prefetch_related("series_items__post")
-        .order_by("order", "id")
-    )
-    result = []
-    for series in series_list:
-        items = [item for item in series.series_items.all() if item.post.is_published]
-        if not items:
-            continue
-        series.lead_post = items[0].post
-        series.article_count = len(items)
-        series.count_label = f"{len(items)} {_ru_plural(len(items), 'статья', 'статьи', 'статей')}"
-        series.card_url = f"{series.lead_post.get_absolute_url()}?series={series.slug}"
-        result.append(series)
-    return result
 
 
 def index(request):
@@ -109,7 +83,6 @@ def index(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     categories = BlogCategory.objects.all()
-    journal_series = _journal_series(request)
 
     liked_ids = _liked_ids(request)
     _decorate_posts(page_obj.object_list, liked_ids)
@@ -121,7 +94,6 @@ def index(request):
         "current_category": current_category,
         "search_query": search_query,
         "selected_sort": selected_sort,
-        "journal_series": journal_series,
         "liked_ids": liked_ids,
         "posts_count_label": f"{paginator.count} {_ru_plural(paginator.count, 'статья', 'статьи', 'статей')}",
     }
@@ -174,16 +146,6 @@ def detail(request, slug):
     post = get_object_or_404(_posts_with_stats().prefetch_related("comments__user"), slug=slug)
     _track_unique_view(request, post)
 
-    active_series = None
-    series_posts = []
-    series_slug = request.GET.get("series", "").strip()
-    if series_slug:
-        active_series = get_object_or_404(BlogSeries, slug=series_slug, is_active=True)
-        # BlogSeriesVisit tracking was removed — no per-user visited flag.
-        series_posts = [
-            item.post for item in active_series.series_items.select_related("post").all()
-            if item.post.is_published and item.post_id != post.id
-        ]
     recent_posts = BlogPost.objects.filter(is_published=True).exclude(id=post.id)[:5]
     categories = BlogCategory.objects.all()
 
@@ -202,8 +164,6 @@ def detail(request, slug):
         "categories": categories,
         "is_liked": is_liked,
         "article_comments": post.comments.filter(is_approved=True),
-        "active_series": active_series,
-        "series_posts": series_posts,
     }
     return render(request, "blog/detail.html", context)
 
@@ -222,7 +182,6 @@ def category(request, slug):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     categories = BlogCategory.objects.all()
-    journal_series = _journal_series(request)
 
     liked_ids = _liked_ids(request)
     _decorate_posts(page_obj.object_list, liked_ids)
@@ -233,7 +192,6 @@ def category(request, slug):
         "categories": categories,
         "current_category": slug,
         "selected_sort": selected_sort,
-        "journal_series": journal_series,
         "liked_ids": liked_ids,
         "posts_count_label": f"{paginator.count} {_ru_plural(paginator.count, 'статья', 'статьи', 'статей')}",
     }

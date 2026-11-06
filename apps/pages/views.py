@@ -11,7 +11,7 @@ from apps.catalog.models import Product, Category, Review
 from .forms import CommunityPostForm, ContactForm
 from .models import (
     CommunityPost, CommunityPostLike,
-    CommunityPostComment, ReviewComment,
+    CommunityPostComment, Inquiry, ReviewComment,
 )
 from django.db.models import Count, Exists, OuterRef, Prefetch, Q
 
@@ -64,7 +64,7 @@ def return_money(request):
 
 
 def coffee_in_office(request):
-    return _static_page(request, "coffee_in_office")
+    return _inquiry_page(request, "coffee_in_office", "Кофе в офис", Inquiry.FormType.COFFEE_OFFICE)
 
 
 def disabled(request):
@@ -73,14 +73,14 @@ def disabled(request):
 
 
 def contact_us(request):
-    return _inquiry_page(request, "contact_us", "Контактная форма")
+    return _inquiry_page(request, "contact_us", "Контактная форма", Inquiry.FormType.CONTACT)
 
 
 def partners(request):
-    return _inquiry_page(request, "partners", "Партнёрство")
+    return _inquiry_page(request, "partners", "Партнёрство", Inquiry.FormType.PARTNER)
 
 
-def _inquiry_page(request, template, subject):
+def _inquiry_page(request, template, subject, form_type):
     import logging
     from django.core.cache import cache
     from django.core.mail import EmailMessage
@@ -93,8 +93,8 @@ def _inquiry_page(request, template, subject):
     sent = request.session.pop(sent_key, False) if request.method != "POST" else False
     if request.method == "POST" and form.is_valid():
         throttle = None
+        saved = False
         try:
-            recipient = recipient_address()
             if request.session.session_key is None:
                 request.session.create()
             throttle = "contact:" + salted_hmac("contact-form", request.session.session_key + ":" + template).hexdigest()
@@ -102,12 +102,30 @@ def _inquiry_page(request, template, subject):
                 form.add_error(None, "Пожалуйста, подождите минуту перед повторной отправкой.")
                 status = 429
             else:
+                cleaned = form.cleaned_data
+                phone = (cleaned.get("phone") or "").strip()
+                Inquiry.objects.create(
+                    form_type=form_type,
+                    name=cleaned["name"].strip(),
+                    phone=phone,
+                    email=cleaned["email"],
+                    message=cleaned["message"],
+                )
+                saved = True
+                recipient = recipient_address()
+                lines = [
+                    "Тема: " + subject,
+                    "Имя: " + cleaned["name"].strip(),
+                    "Email: " + cleaned["email"],
+                ]
+                if phone:
+                    lines.append("Телефон: " + phone)
+                lines.extend(["", cleaned["message"]])
                 email = EmailMessage(
                     subject="Заявка с сайта: " + subject,
-                    body="\n".join(("Тема: " + subject, "Имя: " + form.cleaned_data["name"],
-                                     "Email: " + form.cleaned_data["email"], "", form.cleaned_data["message"])),
+                    body="\n".join(lines),
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[recipient], reply_to=[form.cleaned_data["email"]],
+                    to=[recipient], reply_to=[cleaned["email"]],
                 )
                 if email.send(fail_silently=False) != 1:
                     raise ContactDeliveryError("Mail backend did not accept the message")
@@ -120,7 +138,10 @@ def _inquiry_page(request, template, subject):
                 except Exception:
                     logging.getLogger(__name__).warning("Contact throttle cleanup failed")
             logging.getLogger(__name__).error("Contact delivery failed: %s", type(error).__name__)
-            form.add_error(None, "Письмо не отправлено. Попробуйте позже или свяжитесь с нами по телефону.")
+            if saved:
+                form.add_error(None, "Заявка сохранена. Письмо не отправлено. Попробуйте позже или свяжитесь с нами по телефону.")
+            else:
+                form.add_error(None, "Заявку не удалось сохранить. Попробуйте позже или свяжитесь с нами по телефону.")
             status = 503
     elif request.method == "POST":
         status = 400
@@ -139,6 +160,16 @@ def public_offer(request):
     return _static_page(request, "public_offer")
 
 
+def reels(request):
+    from .models import Reel
+
+    return render(
+        request,
+        "pages/reels.html",
+        {"reels": Reel.objects.filter(is_active=True)},
+    )
+
+
 def sitemap_page(request):
     categories = Category.objects.filter(is_active=True, parent__isnull=True).order_by("order")
     pages_list = [
@@ -150,6 +181,7 @@ def sitemap_page(request):
         ("Подарочные наборы", "/giftbox/"),
         ("Отзывы", "/reviews/"),
         ("Блог", "/blog/"),
+        ("Шортсы", "/reels/"),
         ("Сообщество", "/community/"),
         ("FAQ", "/faq/"),
         ("Как выбрать кофе", "/how-to-choose-coffee/"),
@@ -230,7 +262,7 @@ def sitemap_xml(request):
     return HttpResponse(xml, content_type="application/xml")
 
 def subscription(request):
-    return _inquiry_page(request, "subscription", "Подписка на кофе")
+    return _inquiry_page(request, "subscription", "Подписка на кофе", Inquiry.FormType.SUBSCRIPTION)
 
 
 def reviews_page(request):

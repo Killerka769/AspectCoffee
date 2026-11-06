@@ -1,6 +1,19 @@
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+
+
+def library_upload_to(instance, filename):
+    return f"library/{filename}"
+
+
+def reel_video_upload_to(instance, filename):
+    return f"reels/{filename}"
+
+
+def reel_cover_upload_to(instance, filename):
+    return f"reels/covers/{filename}"
 
 
 class LegalDocument(models.Model):
@@ -56,6 +69,38 @@ class LegalDocument(models.Model):
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse("pages:legal_document", kwargs={"slug": self.slug})
+
+
+class Inquiry(models.Model):
+    """Обращение с публичной формы. Пишется в базу до отправки письма."""
+
+    class FormType(models.TextChoices):
+        CONTACT = "contact", _("Контакты")
+        PARTNER = "partner", _("Партнёры")
+        SUBSCRIPTION = "subscription", _("Подписка")
+        COFFEE_OFFICE = "coffee_office", _("Кофе в офис")
+
+    form_type = models.CharField(
+        _("Откуда"),
+        max_length=20,
+        choices=FormType.choices,
+        db_index=True,
+    )
+    name = models.CharField(_("Имя"), max_length=120, blank=True, default="")
+    phone = models.CharField(_("Телефон"), max_length=32, blank=True, default="")
+    email = models.EmailField(_("Email"), blank=True, default="")
+    message = models.TextField(_("Сообщение"))
+    created_at = models.DateTimeField(_("Создана"), auto_now_add=True)
+    is_processed = models.BooleanField(_("Обработана"), default=False, db_index=True)
+
+    class Meta:
+        verbose_name = _("Заявка")
+        verbose_name_plural = _("Заявки")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        who = self.name or self.email or self.phone or "без контакта"
+        return f"{self.get_form_type_display()}: {who}"
 
 
 # class Banner(models.Model):
@@ -205,6 +250,83 @@ class CommunityPostComment(models.Model):
         verbose_name = _("Комментарий сообщества")
         verbose_name_plural = _("Комментарии сообщества")
         ordering = ["created_at"]
+
+
+class MediaFile(models.Model):
+    """Файл медиатеки. Ссылку копируют и вставляют в редактор статей."""
+
+    IMAGE_EXTENSIONS = ("jpg", "jpeg", "png", "gif", "webp")
+
+    title = models.CharField(_("Название"), max_length=200)
+    file = models.FileField(
+        _("Файл"),
+        upload_to=library_upload_to,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=[*IMAGE_EXTENSIONS, "pdf"],
+            ),
+        ],
+        help_text=_("Картинка (jpg, png, webp, gif) или PDF. Файл попадает в media/library/."),
+    )
+    created_at = models.DateTimeField(_("Загружен"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Файл медиатеки")
+        verbose_name_plural = _("Медиатека")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def is_image(self):
+        name = (self.file.name or "").lower()
+        return name.endswith(tuple(f".{ext}" for ext in self.IMAGE_EXTENSIONS))
+
+
+class Reel(models.Model):
+    """Короткое вертикальное видео. Загружается из админки и показывается на главной."""
+
+    title = models.CharField(_("Заголовок"), max_length=200)
+    video = models.FileField(
+        _("Видео"),
+        upload_to=reel_video_upload_to,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=["mp4", "webm"],
+                message=_("Можно загрузить только MP4 или WebM."),
+            ),
+        ],
+        help_text=_("Только mp4 или webm. Файл попадает в media/reels/."),
+    )
+    cover = models.ImageField(
+        _("Обложка"),
+        upload_to=reel_cover_upload_to,
+        blank=True,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=["jpg", "jpeg", "png", "webp", "gif"],
+            ),
+        ],
+        help_text=_("Необязательное превью, пока видео не запущено."),
+    )
+    is_active = models.BooleanField(_("На сайте"), default=True, db_index=True)
+    order = models.PositiveIntegerField(_("Порядок"), default=0)
+
+    class Meta:
+        verbose_name = _("Шортс")
+        verbose_name_plural = _("Шортсы")
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def video_content_type(self):
+        name = (self.video.name or "").lower()
+        if name.endswith(".webm"):
+            return "video/webm"
+        return "video/mp4"
 
 
 class ReviewComment(models.Model):
