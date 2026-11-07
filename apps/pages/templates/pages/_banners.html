@@ -1,0 +1,160 @@
+{% if page_banners %}
+<section class="asp-banners" data-banners aria-label="Баннеры">
+  <div class="asp-banners__frame">
+    <div class="asp-banners__track" data-banner-track>
+      {% for banner in page_banners %}
+      <div class="asp-banners__slide">
+        {% if banner.link %}<a href="{{ banner.link }}">{% endif %}
+          <img src="{{ banner.image.url }}" alt="{{ banner.title }}">
+        {% if banner.link %}</a>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% if page_banners|length > 1 %}
+    <button type="button" class="asp-banners__arrow asp-banners__arrow--prev" data-banner-prev aria-label="Предыдущий баннер">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+    </button>
+    <button type="button" class="asp-banners__arrow asp-banners__arrow--next" data-banner-next aria-label="Следующий баннер">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+    </button>
+    <div class="asp-banners__dots">
+      {% for banner in page_banners %}
+      <button type="button" class="asp-banners__dot{% if forloop.first %} is-on{% endif %}" data-banner-dot aria-label="Баннер {{ forloop.counter }}"{% if forloop.first %} aria-current="true"{% endif %}></button>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+<style>
+.asp-banners {
+  width: min(1440px, calc(100% - 32px));
+  margin: 28px auto;
+}
+.asp-banners__frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: transparent;
+}
+.asp-banners__track {
+  display: flex;
+  transform: translateX(0);
+}
+.asp-banners__slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+}
+.asp-banners__slide a { display: block; }
+.asp-banners__slide img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.asp-banners__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,.92);
+  color: #2A4A34;
+  cursor: pointer;
+}
+.asp-banners__arrow svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+.asp-banners__arrow--prev { left: 12px; }
+.asp-banners__arrow--next { right: 12px; }
+.asp-banners__dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.asp-banners__dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,.55);
+  cursor: pointer;
+}
+.asp-banners__dot.is-on { background: #fff; transform: scale(1.25); }
+@media (max-width: 375px) {
+  .asp-banners { width: 100%; margin: 0; }
+  .asp-banners__frame { border-radius: 0; }
+  .asp-banners__arrow { width: 36px; height: 36px; margin-top: -18px; }
+}
+</style>
+{% if page_banners|length > 1 %}
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  while (root && !root.hasAttribute("data-banners")) root = root.previousElementSibling;
+  if (!root) root = document.querySelector("[data-banners]");
+  var track = root.querySelector("[data-banner-track]");
+  var originals = track.children.length;
+  if (originals < 2) return;
+  track.appendChild(track.children[0].cloneNode(true));
+  var index = 0;
+  var timer = null;
+
+  function paint(dotIndex) {
+    root.querySelectorAll("[data-banner-dot]").forEach(function (dot, i) {
+      var on = i === dotIndex;
+      dot.classList.toggle("is-on", on);
+      if (on) dot.setAttribute("aria-current", "true");
+      else dot.removeAttribute("aria-current");
+    });
+  }
+
+  function move(next, animate) {
+    index = next;
+    track.style.transition = animate ? "transform .6s ease" : "none";
+    track.style.transform = "translateX(" + (-index * 100) + "%)";
+    paint(index % originals);
+  }
+
+  track.addEventListener("transitionend", function () {
+    if (index === originals) move(0, false);
+  });
+
+  function next() { move(index + 1, true); }
+
+  function prev() {
+    if (index === 0) {
+      move(originals, false);
+      window.requestAnimationFrame(function () {
+        window.requestAnimationFrame(function () { move(originals - 1, true); });
+      });
+      return;
+    }
+    move(index - 1, true);
+  }
+
+  function start() {
+    window.clearInterval(timer);
+    timer = window.setInterval(next, 5000);
+  }
+
+  root.querySelector("[data-banner-next]").addEventListener("click", function () { next(); start(); });
+  root.querySelector("[data-banner-prev]").addEventListener("click", function () { prev(); start(); });
+  root.querySelectorAll("[data-banner-dot]").forEach(function (dot, i) {
+    dot.addEventListener("click", function () { move(i, true); start(); });
+  });
+  root.addEventListener("mouseenter", function () { window.clearInterval(timer); });
+  root.addEventListener("mouseleave", start);
+  move(0, false);
+  start();
+})();
+</script>
+{% endif %}
+{% endif %}

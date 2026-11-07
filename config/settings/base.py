@@ -519,6 +519,16 @@ UNFOLD = {
                         "link": reverse_lazy("admin:pages_reel_changelist"),
                     },
                     {
+                        "title": _("Баннеры"),
+                        "icon": "view_carousel",
+                        "link": reverse_lazy("admin:pages_pagebanner_changelist"),
+                    },
+                    {
+                        "title": _("Всплывающие окна"),
+                        "icon": "campaign",
+                        "link": reverse_lazy("admin:pages_popupmessage_changelist"),
+                    },
+                    {
                         "title": _("Юридические документы"),
                         "icon": "gavel",
                         "link": reverse_lazy("admin:pages_legaldocument_changelist"),

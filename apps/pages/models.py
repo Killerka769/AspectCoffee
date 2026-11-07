@@ -16,6 +16,14 @@ def reel_cover_upload_to(instance, filename):
     return f"reels/covers/{filename}"
 
 
+def popup_image_upload_to(instance, filename):
+    return f"popups/{filename}"
+
+
+def page_banner_upload_to(instance, filename):
+    return f"banners/{filename}"
+
+
 class LegalDocument(models.Model):
     """Юридический документ, управляемый через админку.
 
@@ -327,6 +335,105 @@ class Reel(models.Model):
         if name.endswith(".webm"):
             return "video/webm"
         return "video/mp4"
+
+
+class PopupMessage(models.Model):
+    """Мотивационное окно. На сайте рисуется только активное и подходящее к странице."""
+
+    class ShowOn(models.TextChoices):
+        HOME = "home", _("Главная")
+        CATALOG = "catalog", _("Каталог")
+        ALL = "all", _("Все страницы")
+
+    class Placement(models.TextChoices):
+        SCREEN = "screen", _("На весь экран")
+        EDGE = "edge", _("На странице")
+
+    class Side(models.TextChoices):
+        RIGHT = "right", _("Справа")
+        LEFT = "left", _("Слева")
+        TOP = "top", _("Сверху")
+        BOTTOM = "bottom", _("Снизу")
+
+    title = models.CharField(_("Заголовок"), max_length=200)
+    text = models.TextField(_("Текст сообщения"))
+    button_text = models.CharField(_("Текст кнопки"), max_length=80, blank=True)
+    button_link = models.URLField(_("Ссылка кнопки"), blank=True)
+    image = models.ImageField(
+        _("Картинка"),
+        upload_to=popup_image_upload_to,
+        blank=True,
+        validators=[
+            FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png", "webp", "gif"]),
+        ],
+    )
+    delay_seconds = models.PositiveIntegerField(_("Показать через, сек"), default=5)
+    is_active = models.BooleanField(_("Включено"), default=True, db_index=True)
+    show_on_pages = models.CharField(
+        _("Где показывать"),
+        max_length=16,
+        choices=ShowOn.choices,
+        default=ShowOn.ALL,
+    )
+    placement = models.CharField(
+        _("Как показывать"),
+        max_length=16,
+        choices=Placement.choices,
+        default=Placement.SCREEN,
+    )
+    side = models.CharField(
+        _("Сторона"),
+        max_length=16,
+        choices=Side.choices,
+        default=Side.RIGHT,
+        help_text=_("Используется, когда окно показывается на странице, а не на весь экран."),
+    )
+    created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("Обновлено"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("Всплывающее окно")
+        verbose_name_plural = _("Всплывающие окна")
+        ordering = ["-updated_at"]
+
+    def __str__(self):
+        return self.title
+
+
+class PageBanner(models.Model):
+    """Баннер карусели. На странице выводятся только активные слайды выбранного раздела."""
+
+    class Page(models.TextChoices):
+        HOME = "home", _("Главная")
+        CATALOG = "catalog", _("Каталог")
+        JOURNAL = "journal", _("Журнал")
+
+    title = models.CharField(_("Название"), max_length=200)
+    image = models.ImageField(
+        _("Изображение"),
+        upload_to=page_banner_upload_to,
+        validators=[
+            FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png", "webp", "gif"]),
+        ],
+    )
+    link = models.URLField(_("Ссылка"), blank=True)
+    page = models.CharField(
+        _("Страница"),
+        max_length=16,
+        choices=Page.choices,
+        default=Page.HOME,
+        db_index=True,
+    )
+    order = models.IntegerField(_("Порядок"), default=0)
+    is_active = models.BooleanField(_("На сайте"), default=True, db_index=True)
+
+    class Meta:
+        verbose_name = _("Баннер")
+        verbose_name_plural = _("Баннеры-слайдеры")
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return self.title
 
 
 class ReviewComment(models.Model):

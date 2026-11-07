@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from unfold.admin import ModelAdmin, TabularInline
 from .models import (
     CommunityPost, CommunityPostComment,
-    CommunityPostLike, Inquiry, MediaFile, Reel, ReviewComment, LegalDocument,
+    CommunityPostLike, Inquiry, MediaFile, PageBanner, PopupMessage, Reel, ReviewComment, LegalDocument,
 )
 
 
@@ -61,6 +61,65 @@ class MediaFileAdmin(ModelAdmin):
             '<input type="text" readonly value="{}" onclick="this.select()" '
             'style="width:min(420px,100%);font:12px/1.4 sans-serif;">',
             obj.file.url,
+        )
+
+
+@admin.register(PageBanner)
+class PageBannerAdmin(ModelAdmin):
+    list_display = ("preview", "title", "page", "order", "is_active")
+    list_display_links = ("title",)
+    list_editable = ("order", "is_active")
+    list_filter = ("page", "is_active")
+    search_fields = ("title", "link")
+    readonly_fields = ("preview",)
+    ordering = ("order", "id")
+    fieldsets = (
+        (None, {
+            "fields": ("title", "image", "preview", "link", "page", "order", "is_active"),
+            "description": "Главная — страница /. Каталог — /catalog/. Журнал — /blog/ и разделы журнала.",
+        }),
+    )
+
+    @admin.display(description="Превью")
+    def preview(self, obj):
+        if not obj or not obj.image:
+            return "—"
+        return format_html(
+            '<img src="{}" alt="" style="height:48px;width:96px;object-fit:cover;border-radius:4px;">',
+            obj.image.url,
+        )
+
+
+@admin.register(PopupMessage)
+class PopupMessageAdmin(ModelAdmin):
+    list_display = ("preview", "title", "placement", "side", "show_on_pages", "delay_seconds", "is_active", "updated_at")
+    list_display_links = ("title",)
+    list_editable = ("is_active",)
+    list_filter = ("is_active", "show_on_pages", "placement", "side")
+    search_fields = ("title", "text", "button_text")
+    readonly_fields = ("preview", "created_at", "updated_at")
+    ordering = ("-updated_at",)
+    fieldsets = (
+        (None, {"fields": ("title", "text", "is_active", "show_on_pages", "delay_seconds")}),
+        ("Вид", {
+            "fields": ("placement", "side"),
+            "description": (
+                "«На весь экран» закрывает страницу карточкой по центру. "
+                "«На странице» выезжает с выбранной стороны, сайт можно листать дальше."
+            ),
+        }),
+        ("Кнопка", {"fields": ("button_text", "button_link")}),
+        ("Картинка", {"fields": ("image", "preview")}),
+        ("Даты", {"fields": ("created_at", "updated_at")}),
+    )
+
+    @admin.display(description="Превью")
+    def preview(self, obj):
+        if not obj or not obj.image:
+            return "—"
+        return format_html(
+            '<img src="{}" alt="" style="height:56px;width:56px;object-fit:cover;border-radius:8px;">',
+            obj.image.url,
         )
 
 
