@@ -1,0 +1,350 @@
+/* Кинематографичный слой: шум, герой, курсор. Жесты мыши — в aspect-cinematic.js */
+
+html body .aspect-noise {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+html body .aspect-hero {
+  padding: 72px 0 80px;
+  background-image: linear-gradient(120deg, #000 0%, #2A4A34 42%, #07140c 68%, #000 100%);
+  background-size: 200% 200%;
+  background-position: 0% 50%;
+  animation: aspect-hero-flow 18s ease-in-out infinite;
+  color: #fff;
+}
+
+html body .aspect-hero__title,
+html body .aspect-hero__title .accent {
+  color: #fff;
+}
+
+html body .aspect-hero__subtitle {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* Класс повторён: глобальное правило ссылок с цепочкой :not() иначе перекрывает цвет. */
+html body a.aspect-hero__cta.aspect-hero__cta.aspect-hero__cta.aspect-hero__cta.aspect-hero__cta.aspect-hero__cta.aspect-hero__cta.aspect-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  margin: 0 0 32px;
+  padding: 0 28px;
+  background: #fff;
+  color: #000;
+  -webkit-text-fill-color: #000;
+  text-decoration: none;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+html body a.aspect-hero__cta.aspect-hero__cta.aspect-hero__cta.aspect-hero__cta.aspect-hero__cta.aspect-hero__cta.aspect-hero__cta.aspect-hero__cta:hover {
+  background: #2A4A34;
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+}
+
+html body .aspect-hero__stats {
+  border-top-color: rgba(255, 255, 255, 0.22);
+}
+
+html body .aspect-hero__stat-num,
+html body .aspect-hero__stat-label {
+  color: #fff;
+}
+
+html body .aspect-hero__stat-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+html body .aspect-hero__card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: none;
+}
+
+html body .aspect-hero__card:hover {
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: none;
+}
+
+@keyframes aspect-hero-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+html body .aspect-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10050;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+html body .aspect-cursor__dot,
+html body .aspect-cursor__ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+html body .aspect-cursor__dot {
+  width: 6px;
+  height: 6px;
+  background: #000;
+  box-shadow: 0 0 0 1px #fff;
+}
+
+html body .aspect-cursor__ring {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  background: transparent;
+  transition: width 0.28s ease, height 0.28s ease, border-color 0.28s ease, background-color 0.28s ease;
+}
+
+html body .aspect-cursor.is-hot .aspect-cursor__ring {
+  width: 64px;
+  height: 64px;
+  border-color: #2A4A34;
+  background: rgba(42, 74, 52, 0.14);
+}
+
+html.aspect-cursor-on .aspect-cursor.is-on.is-hidden {
+  opacity: 0;
+}
+
+@media (pointer: fine) and (hover: hover) {
+  html.aspect-cursor-on,
+  html.aspect-cursor-on body,
+  html.aspect-cursor-on body * {
+    cursor: none;
+  }
+
+  html.aspect-cursor-on body input,
+  html.aspect-cursor-on body textarea,
+  html.aspect-cursor-on body select,
+  html.aspect-cursor-on body option {
+    cursor: auto;
+  }
+
+  html.aspect-cursor-on .aspect-cursor.is-on {
+    opacity: 1;
+  }
+
+  html body .aspect-card.is-tilting {
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    transform-style: preserve-3d;
+  }
+
+  html body .aspect-card.is-tilting .aspect-card__media img {
+    transition: none;
+  }
+}
+
+html body .aspect-cursor__label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: #2A4A34;
+  white-space: nowrap;
+  opacity: 0;
+}
+
+html body .aspect-cursor.is-view .aspect-cursor__ring,
+html body .aspect-cursor.is-read .aspect-cursor__ring {
+  width: 96px;
+  height: 96px;
+  border-color: #2A4A34;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+html body .aspect-cursor.is-buy .aspect-cursor__ring {
+  width: 64px;
+  height: 64px;
+  border-color: #2A4A34;
+  background: rgba(42, 74, 52, 0.16);
+}
+
+html body .aspect-cursor.is-view .aspect-cursor__label,
+html body .aspect-cursor.is-read .aspect-cursor__label,
+html body .aspect-cursor.is-buy .aspect-cursor__label {
+  opacity: 1;
+}
+
+html body .aspect-cursor.is-buy .aspect-cursor__label {
+  font-size: 26px;
+  letter-spacing: 0;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+@media (pointer: fine) and (hover: hover) {
+  html::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  html::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  html::-webkit-scrollbar-thumb {
+    background: linear-gradient(#2A4A34, #000);
+    border-radius: 6px;
+  }
+
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #2A4A34 transparent;
+  }
+}
+
+@media (pointer: coarse) {
+  html {
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+}
+
+html body .header-cart__btn.is-cart-ack {
+  animation: aspect-cart-bounce 0.55s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+html body .aspect-header__icons .header-cart__btn .aspect-cart-tick {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232A4A34' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E") center / 14px 14px no-repeat;
+  /* В шапке уже стоит opacity: 1 !important на всех потомках кнопки. */
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+html body .aspect-header__icons .header-cart__btn.is-cart-ack .aspect-cart-tick {
+  opacity: 1 !important;
+  animation: aspect-tick-pop 0.78s ease;
+}
+
+@media (max-width: 480px) {
+  html body .aspect-header__inner {
+    gap: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  html body .aspect-header__logo img {
+    height: 26px;
+    width: auto;
+    max-width: 108px;
+  }
+
+  html body .aspect-header__icons {
+    gap: 0;
+    min-width: 0;
+  }
+}
+
+@keyframes aspect-cart-bounce {
+  0% { transform: scale(1); }
+  32% { transform: scale(1.16); }
+  52% { transform: scale(0.94); }
+  72% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes aspect-tick-pop {
+  0% { opacity: 0; transform: scale(0.45); }
+  24% { opacity: 1; transform: scale(1); }
+  68% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.8); }
+}
+
+html body .aspect-card__action,
+html body .aspect-pd__action {
+  position: relative;
+}
+
+html body .aspect-card__action.is-heartbeat svg,
+html body .aspect-pd__action.is-heartbeat svg {
+  animation: aspect-heartbeat 0.62s ease;
+  transform-origin: center;
+}
+
+html body .aspect-heart-bit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: #2A4A34;
+  pointer-events: none;
+  animation: aspect-heart-fly 0.65s ease-out forwards;
+}
+
+@keyframes aspect-heartbeat {
+  0%, 100% { transform: scale(1); }
+  22% { transform: scale(1.34); }
+  42% { transform: scale(0.9); }
+  64% { transform: scale(1.16); }
+}
+
+@keyframes aspect-heart-fly {
+  to {
+    transform: translate3d(var(--dx), var(--dy), 0) scale(0.3);
+    opacity: 0;
+  }
+}
+
+html body .ckc-cdek__dropdown,
+html body .ckc-pvz-list {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .aspect-hero,
+  html body .header-cart__btn.is-cart-ack,
+  html body .header-cart__btn.is-cart-ack .aspect-cart-tick,
+  html body .aspect-card__action.is-heartbeat svg,
+  html body .aspect-pd__action.is-heartbeat svg,
+  html body .aspect-heart-bit {
+    animation: none;
+  }
+}

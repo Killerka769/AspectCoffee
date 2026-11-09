@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2A4A34">
+  <title>Ошибка сервера — Aspect Coffee</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      color: #000;
+      font-family: "Open Sans", Arial, sans-serif;
+    }
+    main {
+      width: min(640px, calc(100% - 32px));
+      text-align: center;
+      padding: 48px 0;
+    }
+    .code {
+      margin: 0;
+      font-family: "Roboto Condensed", Arial, sans-serif;
+      font-weight: 900;
+      font-size: clamp(88px, 18vw, 140px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+    .code::after {
+      content: "";
+      display: block;
+      width: 72px;
+      height: 3px;
+      margin: 20px auto 0;
+      background: #2A4A34;
+    }
+    h1 {
+      margin: 28px 0 12px;
+      font-family: "Roboto Condensed", Arial, sans-serif;
+      font-weight: 900;
+      font-size: clamp(22px, 4vw, 32px);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    p {
+      margin: 0 0 32px;
+      color: #5A5A5A;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 0 28px;
+      background: #2A4A34;
+      color: #fff;
+      text-decoration: none;
+      font-family: "Roboto Condensed", Arial, sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="code">500</p>
+    <h1>Что-то пошло не так</h1>
+    <p>Мы уже видим эту ошибку. Обновите страницу чуть позже или вернитесь на главную.</p>
+    <a href="/">На главную</a>
+  </main>
+</body>
+</html>

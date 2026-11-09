@@ -516,9 +516,14 @@ document.addEventListener('alpine:init', () => {
             }).catch(() => this.checkCartState());
         },
 
-        async toggleWishlist() {
+        async toggleWishlist(ev) {
+            const heart = ev && ev.currentTarget ? ev.currentTarget : null;
             const wasInWishlist = this.inWishlist;
             this.inWishlist = !this.inWishlist;
+            const celebrate = () => {
+                if (!heart || !this.inWishlist) return;
+                document.body.dispatchEvent(new CustomEvent('wishlistAdded', { detail: { el: heart } }));
+            };
 
             if (!document.body.dataset.authenticated) {
                 // Guest: toggle wishlist in localStorage (no redirect to login)
@@ -533,6 +538,7 @@ document.addEventListener('alpine:init', () => {
                 }
                 setLocalWishlist(localWish);
                 updateWishlistBadge(localWish.length);
+                celebrate();
                 return;
             }
 
@@ -563,6 +569,7 @@ document.addEventListener('alpine:init', () => {
                     const data = await resp.json();
                     updateWishlistBadge(data.total_count);
                     document.body.dispatchEvent(new CustomEvent('wishlistUpdated', { detail: { count: data.total_count } }));
+                    celebrate();
                 }
             } catch (e) {
                 this.inWishlist = wasInWishlist;

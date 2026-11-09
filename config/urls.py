@@ -6,7 +6,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
 from apps.users.forms import AspectCoffeePasswordResetForm
-from apps.users.views import register, custom_logout, profile, wishlist_view, my_favorites_view, login_view, unlock_account, resend_unlock_code, service_worker
+from apps.users.views import register, custom_logout, profile, wishlist_view, my_favorites_view, login_view, unlock_account, resend_unlock_code, service_worker, pwa_worker
 from apps.users.oauth_views import (
     vkid_callback,
     vkid_login,
@@ -36,6 +36,7 @@ from drf_spectacular.views import SpectacularAPIView
 from apps.pages.views_webhook import webhook_deploy
 urlpatterns = [
     path("service-worker.js", service_worker, name="service_worker"),
+    path("sw.js", pwa_worker, name="pwa_worker"),
     path("admin/", admin.site.urls),
     path("", include("apps.catalog.urls", namespace="catalog")),
     path("account/", include("apps.users.urls", namespace="users")),
@@ -122,4 +123,12 @@ def custom_404(request, exception=None):
     from django.shortcuts import render
     return render(request, "404.html", status=404)
 
-handler404 = custom_404
+
+def custom_500(request):
+    from django.http import HttpResponseServerError
+    from django.template.loader import get_template
+    return HttpResponseServerError(get_template("500.html").render({}))
+
+
+handler404 = "config.urls.custom_404"
+handler500 = "config.urls.custom_500"

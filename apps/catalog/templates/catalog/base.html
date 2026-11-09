@@ -10,14 +10,20 @@
 <meta http-equiv="Expires" content="0">
 <meta name="description" content="{% block meta_description %}Aspect Coffee Roasters — интернет-магазин свежеобжаренного спешалти-кофе. Прямые закупки, открытое ценообразование, честная обжарка.{% endblock %}">
 <meta name="keywords" content="{% block meta_keywords %}кофе, интернет-магазин кофе, свежеобжаренный кофе, aspect coffee, купить кофе{% endblock %}">
-<link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+<link rel="canonical" href="{% block canonical_url %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="{{ site_settings.site_name|default:'Aspect Coffee' }}">
 <meta property="og:title" content="{% block og_title %}Aspect Coffee — Интернет-магазин свежеобжаренного кофе{% endblock %}">
 <meta property="og:description" content="{% block og_description %}Aspect Coffee Roasters — проводник в мире спешалти-кофе. Свежая обжарка, прямые закупки, диалог через вкус.{% endblock %}">
-<meta property="og:type" content="website">
-<meta property="og:url" content="{{ request.build_absolute_uri }}">
-<meta property="og:image" content="{% static 'asset/images/og-image.png' %}">
+<meta property="og:type" content="{% block og_type %}website{% endblock %}">
+<meta property="og:url" content="{% block og_url %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
+<meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'asset/images/og-image.png' %}{% endblock %}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{% block twitter_title %}Aspect Coffee — Интернет-магазин свежеобжаренного кофе{% endblock %}">
+<meta name="twitter:description" content="{% block twitter_description %}Aspect Coffee Roasters — проводник в мире спешалти-кофе. Свежая обжарка, прямые закупки, диалог через вкус.{% endblock %}">
+<meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'asset/images/og-image.png' %}{% endblock %}">
 {% block extra_meta %}{% endblock %}
 
 <script type="application/ld+json">
@@ -27,9 +33,24 @@
   "name": "{{ site_settings.site_name|default:'Aspect Coffee' }}",
   "url": "{{ request.scheme }}://{{ request.get_host }}/",
   "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'asset/images/favicon-aspect.svg' %}"{% if site_settings.contact_phone %},
-  "contactPoint": {"@type": "ContactPoint", "telephone": "{{ site_settings.contact_phone }}", "contactType": "customer service"}{% endif %}
+  "contactPoint": {"@type": "ContactPoint", "telephone": "{{ site_settings.contact_phone }}", "contactType": "customer service", "availableLanguage": "Russian"}{% endif %}{% if site_settings.contact_email %},
+  "email": "{{ site_settings.contact_email }}"{% endif %}{% if site_settings.contact_whatsapp|slice:":4" == "http" or site_settings.contact_telegram|slice:":4" == "http" %},
+  "sameAs": [{% if site_settings.contact_telegram|slice:":4" == "http" %}"{{ site_settings.contact_telegram }}"{% endif %}{% if site_settings.contact_telegram|slice:":4" == "http" and site_settings.contact_whatsapp|slice:":4" == "http" %}, {% endif %}{% if site_settings.contact_whatsapp|slice:":4" == "http" %}"{{ site_settings.contact_whatsapp }}"{% endif %}]{% endif %}
 }
 </script>
+{% block breadcrumb_json %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {% for crumb in seo_breadcrumbs %}
+    {"@type": "ListItem", "position": {{ forloop.counter }}, "name": "{{ crumb.name|escapejs }}", "item": "{{ request.scheme }}://{{ request.get_host }}{{ crumb.path }}"}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -45,7 +66,13 @@
 </script>
 <title>{% block title %}Aspect Coffee Roasters — свежеобжаренный спешалти-кофе{% endblock %} — {{ site_settings.site_name|default:"Aspect Coffee" }}</title>
 <link rel="icon" type="image/svg+xml" href="{% static 'asset/images/favicon-aspect.svg' %}">
-<link rel="apple-touch-icon" href="{% static 'asset/images/favicon-aspect.svg' %}">
+<link rel="manifest" href="{% static 'manifest.json' %}">
+<meta name="theme-color" content="#2A4A34">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Aspect">
+<link rel="apple-touch-icon" href="{% static 'pwa/icon-180.png' %}">
 
 <script async defer src="{% static 'asset/js/metric.20260718.js' %}"></script>
 
@@ -114,15 +141,15 @@
 <link href="{% static 'css/theme_update.css' %}?v=20260729-1" rel="stylesheet"/>
 <link href="{% static 'css/mobile_app.css' %}?v=20260729-1" rel="stylesheet"/>
 <link href="{% static 'css/aspect-brand.css' %}?v=20261104-2" rel="stylesheet"/>
-<link href="{% static 'css/aspect-redesign.css' %}?v=20261104-5" rel="stylesheet"/>
+<link href="{% static 'css/aspect-redesign.css' %}?v=20261109-1" rel="stylesheet"/>
 <link href="{% static 'css/aspect-stage3.css' %}?v=20261104-4" rel="stylesheet"/>
 <link href="{% static 'css/aspect-motion.css' %}?v=20261104-1" rel="stylesheet"/>
-<link href="{% static 'css/aspect-forms-pages.css' %}?v=20261105-1" rel="stylesheet"/>
+<link href="{% static 'css/aspect-forms-pages.css' %}?v=20261109-2" rel="stylesheet"/>
 
 <style id="aspect-brand-hard">
   /* Глобальный шрифт — Open Sans для текста, Roboto Condensed для заголовков */
   body { font-family: "Open Sans", Arial, sans-serif !important; color: #5A5A5A !important; }
-  h1, h2, h3, h4, h5, h6,
+  h1:not(.aspect-hero__title), h2, h3, h4, h5, h6,
   .aspect-display, .aspect-display-light, .aspect-display-medium, .aspect-display-black, .aspect-display-bold,
   .nav-title, .section-heading,
   .aspect-card-title-link, .white-box__title,
@@ -164,6 +191,18 @@
     line-height: 1.02 !important;
     letter-spacing: -0.01em !important;
     margin: 0 0 18px !important;
+  }
+  /* Тёмные CTA: глобальный чёрный h2 иначе прячет заголовок и обрезает строку */
+  html body h2.aspect-discount__cta-title,
+  html body h2.aspect-return__cta-title,
+  html body h2.aspect-guide__cta-title,
+  html body h2.aspect-partners__cta-title,
+  html body h2.asp-rules__cta-title,
+  html body h2.aspect-grind__cta-title {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    max-width: 100%;
+    white-space: normal;
   }
   html body .aspect-hero h3.aspect-hero__card-title,
   html body .aspect-banner h2.aspect-banner__title,
@@ -250,7 +289,7 @@
     font-weight: 900 !important;
     margin: 0 0 0.35em !important;
   }
-  h2:not(.aspect-about__section-title):not(.aspect-doc__section-title):not(.aspect-discount__section-title):not(.aspect-partners__section-title):not(.aspect-contact__card-title):not(.aspect-footer__title):not(.aspect-cta__title):not(.asp-jrn__sidebar-title):not(.asp-jrn__feed-title):not(.asp-profile__section-title):not(.asp-orders__section-title) {
+  h2:not(.aspect-about__section-title):not(.aspect-doc__section-title):not(.aspect-discount__section-title):not(.aspect-partners__section-title):not(.aspect-contact__card-title):not(.aspect-footer__title):not(.aspect-cta__title):not(.aspect-discount__cta-title):not(.aspect-return__cta-title):not(.aspect-guide__cta-title):not(.aspect-partners__cta-title):not(.asp-rules__cta-title):not(.aspect-grind__cta-title):not(.aspect-faq__cta-title):not(.asp-jrn__sidebar-title):not(.asp-jrn__feed-title):not(.asp-profile__section-title):not(.asp-orders__section-title) {
     font-size: clamp(2rem, 3.8vw, 3.25rem) !important;
     line-height: 1.06 !important;
     font-weight: 900 !important;
@@ -262,8 +301,8 @@
     font-weight: 900 !important;
     margin: 0 0 0.45em !important;
   }
-  h1:not(.aspect-about__title):not(.aspect-about__section-title):not(.aspect-faq__title):not(.aspect-doc__title):not(.aspect-discount__title):not(.aspect-contact__title):not(.aspect-partners__title):not(.aspect-auth__title):not(.asp-auth__title):not(.asp-pwd__title):not(.aspect-404__title):not(.aspect-account__page-title):not(.asp-profile__name):not(.asp-stat__title):not(.asp-bal__title):not(.asp-od__title):not(.asp-fav__title):not(.asp-bl__title):not(.asp-comm__title):not(.asp-jrn__title)::after,
-  h2:not(.aspect-about__section-title):not(.aspect-doc__section-title):not(.aspect-discount__section-title):not(.aspect-partners__section-title):not(.aspect-contact__card-title):not(.aspect-footer__title):not(.aspect-cta__title):not(.asp-jrn__sidebar-title):not(.asp-jrn__feed-title):not(.asp-profile__section-title):not(.asp-orders__section-title)::after,
+  h1:not(.aspect-about__title):not(.aspect-about__section-title):not(.aspect-faq__title):not(.aspect-doc__title):not(.aspect-discount__title):not(.aspect-contact__title):not(.aspect-partners__title):not(.aspect-auth__title):not(.asp-auth__title):not(.asp-pwd__title):not(.aspect-404__title):not(.aspect-account__page-title):not(.asp-profile__name):not(.asp-stat__title):not(.asp-bal__title):not(.asp-od__title):not(.asp-fav__title):not(.asp-bl__title):not(.asp-comm__title):not(.asp-jrn__title):not(.aspect-hero__title)::after,
+  h2:not(.aspect-about__section-title):not(.aspect-doc__section-title):not(.aspect-discount__section-title):not(.aspect-partners__section-title):not(.aspect-contact__card-title):not(.aspect-footer__title):not(.aspect-cta__title):not(.aspect-discount__cta-title):not(.aspect-return__cta-title):not(.aspect-guide__cta-title):not(.aspect-partners__cta-title):not(.asp-rules__cta-title):not(.aspect-grind__cta-title):not(.aspect-faq__cta-title):not(.asp-jrn__sidebar-title):not(.asp-jrn__feed-title):not(.asp-profile__section-title):not(.asp-orders__section-title)::after,
   h3.aspect-section-title::after,
   .section-heading::after,
   .aspect-catalog-title::after,
@@ -288,6 +327,7 @@
 </script>
 
 {% block extra_css %}{% endblock %}
+<link href="{% static 'css/aspect-cinematic.css' %}?v=20261109-7" rel="stylesheet"/>
 <style>
   /* --- СНАЙПЕРСКИЙ ФИКС ШАПКИ НАПРЯМУЮ В HTML --- */
   
@@ -363,6 +403,12 @@ html body .aspect-header__icons .header-cart__btn:hover * {
   @click="wishlistOpen = false"
   @keydown.escape.window="menuOpen = false; searchOpen = false; cartOpen = false; wishlistOpen = false; notifOpen = false"
   {% if request.user.is_authenticated %}data-authenticated="1"{% endif %}>
+
+<div class="aspect-noise" aria-hidden="true"></div>
+<div class="aspect-cursor" aria-hidden="true">
+  <span class="aspect-cursor__dot"></span>
+  <span class="aspect-cursor__ring"><span class="aspect-cursor__label"></span></span>
+</div>
 
 <div id="top-progress" class="top-progress"><div class="top-progress__bar"></div></div>
 
@@ -518,6 +564,7 @@ html body .aspect-header__icons .header-cart__btn:hover * {
               @click.stop.prevent="cartOpen = !cartOpen; menuOpen = false; searchOpen = false"
               :aria-expanded="cartOpen.toString()">
         {% include "orders/partials/cart_badge.html" %}
+        <span class="aspect-cart-tick" aria-hidden="true"></span>
       </button>
 
       {# Профиль (ИСПРАВЛЕНО: возвращен fill="none", добавлен мягкий цвет контура text-zinc-900) #}
@@ -585,6 +632,7 @@ html body .aspect-header__icons .header-cart__btn:hover * {
   </nav>
 
   <div class="aspect-mobile-menu__account">
+    <button type="button" class="aspect-pwa-install">Установить приложение</button>
     {% if request.user.is_authenticated %}
       <a href="{% url 'users:profile' %}" class="aspect-mobile-menu__title">Профиль</a>
       <a href="{% url 'users:discount' %}" class="aspect-mobile-menu__title">Скидка</a>
@@ -627,8 +675,43 @@ html body .aspect-header__icons .header-cart__btn:hover * {
 
 <script>window.TC_PHONE_COUNTRIES = {{ phone_countries_json|safe }};</script>
 <script src="{% static 'asset/js/phone_utils.js' %}?v=20260729-4"></script>
-<script src="{% static 'asset/js/custom.js' %}?v=20260729-2"></script>
+<script src="{% static 'asset/js/custom.js' %}?v=20261109-5"></script>
 
+<script>
+(function () {
+  var deferred = null;
+  var buttons = document.querySelectorAll(".aspect-pwa-install");
+  function installed() {
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  }
+  function showButtons() {
+    if (installed() || !deferred) return;
+    buttons.forEach(function (button) { button.classList.add("is-ready"); });
+  }
+  function hideButtons() {
+    deferred = null;
+    buttons.forEach(function (button) { button.classList.remove("is-ready"); });
+  }
+  window.addEventListener("beforeinstallprompt", function (event) {
+    event.preventDefault();
+    deferred = event;
+    showButtons();
+  });
+  window.addEventListener("appinstalled", hideButtons);
+  buttons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      if (!deferred) return;
+      deferred.prompt();
+      deferred.userChoice.then(hideButtons, hideButtons);
+    });
+  });
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(function () {});
+    });
+  }
+})();
+</script>
 {% if request.user.is_authenticated %}
 <script>
 (function () {
@@ -654,7 +737,7 @@ html body .aspect-header__icons .header-cart__btn:hover * {
     if (!cfg.ok) return false;
     var config = await cfg.json();
     if (!config.public_key) return false;
-    var reg = await navigator.serviceWorker.register('/service-worker.js', {scope: '/'});
+    var reg = await navigator.serviceWorker.register('/sw.js', {scope: '/'});
     var sub = await reg.pushManager.getSubscription();
     if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(config.public_key) });
     await fetch('{% url "users:push_subscribe" %}', {
@@ -667,7 +750,7 @@ html body .aspect-header__icons .header-cart__btn:hover * {
   }
   window.aspectEnablePush = function() { syncPushSubscription(true).catch(()=>{}); };
   window.addEventListener('load', function() {
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/service-worker.js', {scope: '/'}).catch(()=>{});
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js', {scope: '/'}).catch(()=>{});
     if ('Notification' in window && Notification.permission === 'granted') syncPushSubscription(false).catch(()=>{});
   });
 })();
@@ -675,6 +758,7 @@ html body .aspect-header__icons .header-cart__btn:hover * {
 {% endif %}
 
 <script src="{% static 'js/aspect-motion.js' %}?v=20261104-1" defer></script>
+<script src="{% static 'js/aspect-cinematic.js' %}?v=20261109-5" defer></script>
 {% block extra_js %}{% endblock %}
 {% include "pages/_popup.html" %}
 </body>

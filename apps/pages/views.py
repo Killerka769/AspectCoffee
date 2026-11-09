@@ -198,13 +198,20 @@ def sitemap_page(request):
     return render(request, "pages/sitemap.html", {"categories": categories, "pages_list": pages_list})
 
 
+def offline(request):
+    return render(request, "pages/offline.html")
+
+
 def robots_txt(request):
     lines = [
         "User-agent: *",
         "Disallow: /admin/",
+        "Disallow: /basket/",
+        "Disallow: /users/",
         "Disallow: /account/",
         "Disallow: /api/",
         "Disallow: /warehouse/",
+        "Allow: /",
         "",
         f"Sitemap: {request.scheme}://{request.get_host()}/sitemap.xml",
     ]
@@ -212,8 +219,7 @@ def robots_txt(request):
 
 
 def sitemap_xml(request):
-    from django.contrib.sitemaps import Sitemap
-    from django.contrib.sites.shortcuts import get_current_site
+    from xml.sax.saxutils import escape
 
     pages = [
         (1.0, "weekly", request.build_absolute_uri("/")),
@@ -238,7 +244,8 @@ def sitemap_xml(request):
         (0.4, "monthly", request.build_absolute_uri("/public-offer/")),
     ]
 
-    products = Product.objects.filter(is_active=True)
+    products = Product.objects.filter(is_active=True).select_related("category")
+    categories = Category.objects.filter(is_active=True)
     blog_posts = []
     try:
         from apps.blog.models import BlogPost
@@ -249,14 +256,27 @@ def sitemap_xml(request):
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
 
+    def url_tag(loc, changefreq, priority):
+        safe = escape(request.build_absolute_uri(loc) if loc.startswith("/") else loc)
+        return (
+            "  <url>\n"
+            f"    <loc>{safe}</loc>\n"
+            f"    <changefreq>{changefreq}</changefreq>\n"
+            f"    <priority>{priority}</priority>\n"
+            "  </url>\n"
+        )
+
     for priority, changefreq, loc in pages:
-        xml += f"  <url>\n    <loc>{loc}</loc>\n    <changefreq>{changefreq}</changefreq>\n    <priority>{priority}</priority>\n  </url>\n"
+        xml += url_tag(loc, changefreq, priority)
+
+    for category in categories:
+        xml += url_tag(category.get_absolute_url(), "weekly", "0.8")
 
     for product in products:
-        xml += f"  <url>\n    <loc>{request.build_absolute_uri(product.get_absolute_url())}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n"
+        xml += url_tag(product.get_absolute_url(), "weekly", "0.7")
 
     for post in blog_posts:
-        xml += f"  <url>\n    <loc>{request.build_absolute_uri(post.get_absolute_url())}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n"
+        xml += url_tag(post.get_absolute_url(), "weekly", "0.6")
 
     xml += "</urlset>"
     return HttpResponse(xml, content_type="application/xml")
@@ -363,6 +383,11 @@ def community(request, active_tab="best"):
         if not request.user.is_authenticated:
             messages.error(request, "Войдите в аккаунт, чтобы добавить запись.")
             return redirect("/login/?next=/community/")
+        if request.user.is_banned_now:
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({"error": "Вы забанены"}, status=403)
+            messages.error(request, request.user.ban_message())
+            return redirect("pages:community")
         form = CommunityPostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
@@ -509,6 +534,8 @@ def community_post_comment_create(request, pk):
     denied = _community_action_login_required(request)
     if denied:
         return denied
+    if request.user.is_banned_now:
+        return JsonResponse({"error": "Вы забанены"}, status=403)
     post = get_object_or_404(CommunityPost, pk=pk, is_published=True)
     text = request.POST.get("text", "").strip()
     if not text:
@@ -563,6 +590,8 @@ def community_post_comment_create(request, pk):
 def review_comment_create(request, pk):
     if not request.user.is_authenticated:
         return JsonResponse({"error": "login_required", "redirect": "/login/?next=/reviews/"}, status=401)
+    if request.user.is_banned_now:
+        return JsonResponse({"error": "Вы забанены"}, status=403)
     review = get_object_or_404(Review, pk=pk, is_approved=True)
     text = request.POST.get("text", "").strip()
     if not text:
@@ -617,6 +646,9 @@ def review_comment_create(request, pk):
 def reviews_create(request):
     import json
     from apps.catalog.models import Review, Product
+
+    if request.user.is_banned_now:
+        return JsonResponse({"error": "Вы забанены"}, status=403)
 
     rating = int(request.POST.get("rating", 0))
     delivery_rating = request.POST.get("delivery_rating")

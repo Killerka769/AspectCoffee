@@ -24,6 +24,60 @@
   gap: 32px;
   align-items: start;
 }
+.aspect-hero__stage {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.aspect-hero__stage-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.aspect-hero__seal {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  flex: 0 0 96px;
+}
+.aspect-hero__seal svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: aspect-seal-spin 28s linear infinite;
+}
+.aspect-hero__seal text {
+  fill: rgba(255, 255, 255, 0.88);
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-weight: 700;
+}
+.aspect-hero__seal-core {
+  position: absolute;
+  inset: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.aspect-hero__stage-kicker {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+@keyframes aspect-seal-spin {
+  to { transform: rotate(360deg); }
+}
 .aspect-hero__title {
   font-family: "Roboto Condensed", Arial, sans-serif;
   font-weight: 900;
@@ -223,121 +277,6 @@
 @keyframes aspect-marquee-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
-}
-
-/* ---------- ПРОМО ---------- */
-.aspect-promo {
-  width: min(1440px, calc(100% - 32px));
-  margin: 56px auto;
-  background: #2A4A34;
-  color: #fff;
-  border-radius: 26px;
-  padding: 40px 44px;
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-  gap: 32px;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-}
-.aspect-promo::before {
-  content: "";
-  position: absolute;
-  top: -100px;
-  right: -100px;
-  width: 320px;
-  height: 320px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,.12) 0%, rgba(42,74,52,0) 70%);
-  pointer-events: none;
-}
-.aspect-promo__title,
-.aspect-promo__text,
-.aspect-promo__actions {
-  position: relative;
-  z-index: 2;
-}
-.aspect-promo__title {
-  font-family: "Roboto Condensed", Arial, sans-serif;
-  font-weight: 900;
-  font-size: 36px;
-  line-height: 1.1;
-  text-transform: uppercase;
-  letter-spacing: 0.01em;
-  margin: 0 0 10px;
-  color: #fff;
-}
-.aspect-promo__text {
-  font-size: 15px;
-  line-height: 1.55;
-  color: rgba(255,255,255,.75);
-  margin: 0;
-}
-.aspect-promo__actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.aspect-promo__code {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 14px;
-  padding: 14px 18px;
-}
-.aspect-promo__code-value {
-  font-family: "Roboto Condensed", Arial, sans-serif;
-  font-weight: 900;
-  font-size: 22px;
-  letter-spacing: 0.12em;
-  color: #fff;
-}
-.aspect-promo__copy {
-  background: #fff;
-  color: #2A4A34;
-  border: 0;
-  border-radius: 10px;
-  width: 40px;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-.aspect-promo__copy:hover { background: #E8EEE8; }
-.aspect-promo__copy svg { width: 18px; height: 18px; }
-
-.aspect-promo__btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 52px;
-  padding: 0 24px;
-  border-radius: 14px;
-  background: #FFFFFF !important;
-  color: #2A4A34 !important;
-  font-family: "Roboto Condensed", Arial, sans-serif;
-  font-weight: 900;
-  font-size: 14px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  text-decoration: none;
-  border: 0;
-  cursor: pointer;
-  transition: background .2s ease, color .2s ease;
-}
-.aspect-promo__btn:hover {
-  background: #E8EEE8 !important;
-  color: #1E3626 !important;
-}
-.aspect-promo__applied {
-  background: rgba(255,255,255,.15) !important;
-  color: rgba(255,255,255,.7) !important;
-  cursor: not-allowed;
 }
 
 /* ---------- СЕКЦИЯ ---------- */
@@ -805,12 +744,30 @@
   max-width: 420px;
 }
 
+@media (min-width: 1100px) {
+  .aspect-hero__inner {
+    grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.82fr);
+    gap: 56px;
+    align-items: center;
+  }
+  .aspect-hero__cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .aspect-hero__card {
+    min-height: 0;
+    gap: 18px;
+    padding: 18px 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aspect-hero__seal svg { animation: none; }
+}
+
 /* ---------- АДАПТИВ ---------- */
 @media (max-width: 1099px) {
   .aspect-hero__inner { grid-template-columns: 1fr; gap: 40px; }
   .aspect-hero__cards { height: auto; min-height: 0; }
-  .aspect-promo { grid-template-columns: 1fr; padding: 32px 28px; }
-  .aspect-promo__actions { flex-direction: row; flex-wrap: wrap; }
   .aspect-reviews__grid { grid-template-columns: 1fr 1fr; gap: 20px; }
   .aspect-reviews__metric--big { grid-column: 1 / -1; }
   .aspect-reviews__list { grid-template-columns: 1fr; }
@@ -821,6 +778,7 @@
 }
 @media (max-width: 757px) {
   .aspect-hero { padding: 12px 0 32px; }
+  .aspect-hero__seal { display: none; }
   .aspect-hero__stats { grid-template-columns: 1fr 1fr; gap: 16px; }
   .aspect-hero__cards { grid-template-columns: 1fr; }
   .aspect-hero__card { min-height: 0; gap: 24px; padding: 20px; }
@@ -828,7 +786,6 @@
   .aspect-marquee { padding: 12px 0; }
   .aspect-marquee__item { font-size: 14px; gap: 28px; }
   .aspect-marquee__track { gap: 28px; }
-  .aspect-promo__title { font-size: 26px; }
   .aspect-reviews__grid { grid-template-columns: 1fr; }
   .aspect-section__head { flex-direction: column; align-items: flex-start; gap: 12px; }
   .aspect-section { padding: 36px 0; }
@@ -873,6 +830,7 @@
         <p class="aspect-hero__subtitle">
           Между фермером, обжарщиком, бариста и вами. Прямые закупки, свежая обжарка, открытое ценообразование — всё, чтобы каждая чашка была осознанной.
         </p>
+        <a class="aspect-hero__cta" href="{% url 'catalog:catalog' %}">Смотреть кофе</a>
 
         <div class="aspect-hero__stats">
           <div class="aspect-hero__stat">
@@ -890,6 +848,23 @@
         </div>
       </div>
 
+      <aside class="aspect-hero__stage">
+        <div class="aspect-hero__stage-head">
+          <div class="aspect-hero__seal" aria-hidden="true">
+            <svg viewBox="0 0 100 100">
+              <defs>
+                <path id="aspect-seal-path" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"/>
+              </defs>
+              <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="0.6"/>
+              <circle cx="50" cy="50" r="24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="0.6"/>
+              <text font-size="7.4" letter-spacing="2.85">
+                <textPath href="#aspect-seal-path">СВЕЖАЯ ОБЖАРКА · ПРЯМОЙ КОНТРАКТ · </textPath>
+              </text>
+            </svg>
+            <span class="aspect-hero__seal-core">сегодня</span>
+          </div>
+          <p class="aspect-hero__stage-kicker">Выберите,<br>как вы пьёте</p>
+        </div>
       <div class="aspect-hero__cards" data-aspect-parallax>
         <a href="{% url 'catalog:catalog' %}?category=kofe&roast=espresso" class="aspect-hero__card">
           <span class="aspect-hero__card-index">01 / Эспрессо</span>
@@ -924,6 +899,7 @@
           </div>
         </a>
       </div>
+      </aside>
 
     </div>
   </section>
@@ -943,47 +919,6 @@
       </div>
     </div>
   </div>
-
-  {# ===== ПРОМО-БЛОК ===== #}
-  {% if request.user.is_authenticated and home_promo %}
-  <div class="aspect-promo">
-    <div>
-      <h2 class="aspect-promo__title">
-        Скидка
-        {% if home_promo.discount_type == "percent" %}{{ home_promo.discount_value|floatformat:"-2" }}%{% else %}{{ home_promo.discount_value|floatformat:"-2" }} ₽{% endif %}
-        по промокоду
-      </h2>
-      <p class="aspect-promo__text">
-        {% if home_promo.min_order_amount %}При заказе от {{ home_promo.min_order_amount|floatformat:0 }} ₽. {% endif %}
-        Действует до {{ home_promo.valid_to|date:"d.m.Y" }}.
-      </p>
-      {% if home_discount_percent %}
-      <p class="aspect-promo__text" style="margin-top:12px">
-        Ваша накопительная скидка — <strong style="color:#fff">{{ home_discount_percent }}%</strong>.
-        Оплачено покупок на {{ home_paid_total|floatformat:0 }} ₽.
-      </p>
-      {% endif %}
-    </div>
-    <div class="aspect-promo__actions">
-      <div class="aspect-promo__code">
-        <span class="aspect-promo__code-value">{{ home_promo.code }}</span>
-        <button type="button" class="aspect-promo__copy" data-copy-promo="{{ home_promo.code }}" onclick="tcCopyPromo(this)" aria-label="Скопировать промокод">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        </button>
-      </div>
-      {% if cart_promo_code == home_promo.code %}
-        <button type="button" class="aspect-promo__btn aspect-promo__applied" disabled>Применён</button>
-      {% else %}
-        <form method="POST" action="{% url 'orders:apply_promo' %}" style="width:100%">
-          {% csrf_token %}
-          <input type="hidden" name="code" value="{{ home_promo.code }}">
-          <input type="hidden" name="next" value="{{ request.path }}">
-          <button type="submit" class="aspect-promo__btn" style="width:100%">Применить</button>
-        </form>
-      {% endif %}
-    </div>
-  </div>
-  {% endif %}
 
   {# ===== USP ===== #}
   <section class="aspect-section">

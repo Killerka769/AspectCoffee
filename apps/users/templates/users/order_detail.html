@@ -206,6 +206,18 @@
   color: #5A5A5A;
   margin: 2px 0 0;
 }
+.asp-od__track {
+  display: inline-block;
+  margin-top: 8px;
+  color: #2A4A34;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 
 /* Comment */
 .asp-od__comment {
@@ -557,7 +569,8 @@
             </div>
             <div class="asp-od__info-body">
               <p class="asp-od__info-label">Трек СДЭК</p>
-              <p class="asp-od__info-value" style="color:#2A4A34;">{{ order.cdek_track_number }}</p>
+              <p class="asp-od__info-value">{{ order.cdek_track_number }}</p>
+              <a class="asp-od__track" href="https://www.cdek.ru/ru/tracking?order_id={{ order.cdek_track_number|urlencode }}" target="_blank" rel="noopener">Отследить посылку в СДЭК</a>
             </div>
           </div>
           {% endif %}

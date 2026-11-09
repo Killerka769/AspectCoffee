@@ -63,6 +63,15 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     """
 
     def pre_social_login(self, request, sociallogin):
+        if sociallogin.is_existing and getattr(sociallogin.user, "pk", None):
+            from django.contrib import messages
+            from django.shortcuts import redirect
+            from apps.users.models import User
+
+            account = User.objects.filter(pk=sociallogin.user.pk).first()
+            if account and account.is_banned_now:
+                messages.error(request, account.ban_message())
+                raise ImmediateHttpResponse(redirect("login"))
         if sociallogin.is_existing:
             self._sync_social_phone(
                 sociallogin.user,

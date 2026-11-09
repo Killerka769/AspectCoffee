@@ -242,7 +242,7 @@
                         body: 'variant_id=' + variantId + '&qty=1'
                     });
                     if (resp.ok) {
-                        document.body.dispatchEvent(new CustomEvent('cartUpdated'));
+                        document.body.dispatchEvent(new CustomEvent('cartUpdated', { detail: { added: true } }));
                         window.dispatchEvent(new CustomEvent('notify', { detail: { message: 'Товар добавлен в корзину', type: 'success' } }));
                         if (btn) {
                             const priceSpan = btn.querySelector('span:first-child');

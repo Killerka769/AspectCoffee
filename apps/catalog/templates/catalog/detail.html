@@ -3,10 +3,33 @@
 {% load catalog_extras %}
 
 {% block title %}{% if product.seo_title %}{{ product.seo_title }}{% else %}{{ product.name }}{% endif %}{% endblock %}
+{% block meta_description %}{{ product.seo_description|default:product.short_description|default:product.name|striptags }}{% endblock %}
+{% block canonical_url %}{{ request.scheme }}://{{ request.get_host }}{{ product.get_absolute_url }}{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}{{ product.get_absolute_url }}{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_title %}{{ product.name }} — {% with v0=product.variants.all.0 pkg0=product.priced_packagings.0 %}{% if v0 and v0.price %}{{ v0.price|floatformat:0 }}{% elif pkg0 and pkg0.price %}{{ pkg0.price|floatformat:0 }}{% else %}0{% endif %}{% endwith %} ₽{% endblock %}
+{% block og_description %}{{ product.short_description|default:product.seo_description|default:product.name|striptags }} Цена от {% with v0=product.variants.all.0 pkg0=product.priced_packagings.0 %}{% if v0 and v0.price %}{{ v0.price|floatformat:0 }}{% elif pkg0 and pkg0.price %}{{ pkg0.price|floatformat:0 }}{% else %}0{% endif %}{% endwith %} ₽.{% endblock %}
+{% block og_image %}{% if primary_image %}{{ request.scheme }}://{{ request.get_host }}{{ primary_image.url }}{% else %}{{ block.super }}{% endif %}{% endblock %}
+{% block twitter_title %}{{ product.name }} — {% with v0=product.variants.all.0 pkg0=product.priced_packagings.0 %}{% if v0 and v0.price %}{{ v0.price|floatformat:0 }}{% elif pkg0 and pkg0.price %}{{ pkg0.price|floatformat:0 }}{% else %}0{% endif %}{% endwith %} ₽{% endblock %}
+{% block twitter_description %}{{ product.short_description|default:product.seo_description|default:product.name|striptags }} Цена от {% with v0=product.variants.all.0 pkg0=product.priced_packagings.0 %}{% if v0 and v0.price %}{{ v0.price|floatformat:0 }}{% elif pkg0 and pkg0.price %}{{ pkg0.price|floatformat:0 }}{% else %}0{% endif %}{% endwith %} ₽.{% endblock %}
+{% block twitter_image %}{% if primary_image %}{{ request.scheme }}://{{ request.get_host }}{{ primary_image.url }}{% else %}{{ block.super }}{% endif %}{% endblock %}
+
+{% block breadcrumb_json %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Главная", "item": "{{ request.scheme }}://{{ request.get_host }}/"},
+    {"@type": "ListItem", "position": 2, "name": "Каталог", "item": "{{ request.scheme }}://{{ request.get_host }}/catalog/"}{% if product.category %},
+    {"@type": "ListItem", "position": 3, "name": "{{ product.category.name|escapejs }}", "item": "{{ request.scheme }}://{{ request.get_host }}{{ product.category.get_absolute_url }}"}{% endif %},
+    {"@type": "ListItem", "position": {% if product.category %}4{% else %}3{% endif %}, "name": "{{ product.name|escapejs }}", "item": "{{ request.scheme }}://{{ request.get_host }}{{ product.get_absolute_url }}"}
+  ]
+}
+</script>
+{% endblock %}
 
 {% block extra_meta %}
-{% if primary_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ primary_image.url }}">{% endif %}
-<meta property="og:type" content="product">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -15,13 +38,13 @@
   {% if primary_image %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ primary_image.url }}",{% endif %}
   "description": "{{ product.short_description|default:product.seo_description|default:product.name|striptags|escapejs }}",
   "sku": "{{ product.slug }}",
-  "brand": {"@type": "Brand", "name": "{{ site_settings.site_name|default:'Aspect Coffee' }}"},
-  {% if product.reviews_count %}"aggregateRating": {"@type": "AggregateRating", "ratingValue": "{{ product.rating_avg|floatformat:1 }}", "reviewCount": "{{ product.reviews_count }}"},{% endif %}
+  "brand": {"@type": "Brand", "name": "{{ site_settings.site_name|default:'Aspect Coffee'|escapejs }}"},
+  {% if product.reviews_count %}"aggregateRating": {"@type": "AggregateRating", "ratingValue": "{{ product.rating_avg|stringformat:'.1f' }}", "reviewCount": "{{ product.reviews_count }}"},{% endif %}
   "offers": {
     "@type": "Offer",
-    "url": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{{ product.get_absolute_url }}",
     "priceCurrency": "RUB",
-    "price": "{% with v0=product.variants.all.0 pkg0=product.priced_packagings.0 %}{% if v0 and v0.price %}{{ v0.price|floatformat:0 }}{% elif pkg0 and pkg0.price %}{{ pkg0.price|floatformat:0 }}{% else %}0{% endif %}{% endwith %}",
+    "price": "{% with v0=product.variants.all.0 pkg0=product.priced_packagings.0 %}{% if v0 and v0.price %}{{ v0.price|stringformat:'.2f' }}{% elif pkg0 and pkg0.price %}{{ pkg0.price|stringformat:'.2f' }}{% else %}0.00{% endif %}{% endwith %}",
     "availability": "{% if product.in_stock %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
   }
 }
@@ -1355,7 +1378,7 @@
 
             <button type="button" class="aspect-pd__action"
                     :class="{ 'is-active': inWishlist }"
-                    @click.stop="toggleWishlist()"
+                    @click.stop="toggleWishlist($event)"
                     :title="inWishlist ? 'Убрать из избранного' : 'В избранное'">
               <svg viewBox="0 0 24 24" :fill="inWishlist ? 'currentColor' : 'none'" :stroke="inWishlist ? 'none' : 'currentColor'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>

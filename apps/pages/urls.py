@@ -35,6 +35,7 @@ urlpatterns = [
     path("community/post/<int:pk>/like/", views.community_post_like_toggle, name="community_post_like_toggle"),
     path("community/post/<int:pk>/comment/", views.community_post_comment_create, name="community_post_comment_create"),
     path("community-rules/", views.community_rules, name="community_rules"),
+    path("offline/", views.offline, name="offline"),
     path("robots.txt", views.robots_txt, name="robots_txt"),
     path("sitemap.xml", views.sitemap_xml, name="sitemap_xml"),
 ]

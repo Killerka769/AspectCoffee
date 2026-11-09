@@ -213,6 +213,8 @@ def toggle_like(request, slug):
 def add_comment(request, slug):
     if not request.user.is_authenticated:
         return JsonResponse({"ok": False, "error": "login_required"}, status=401)
+    if request.user.is_banned_now:
+        return JsonResponse({"error": "Вы забанены"}, status=403)
     post = get_object_or_404(BlogPost, slug=slug, is_published=True)
     text = request.POST.get("text", "").strip()
     if not text:

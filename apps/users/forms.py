@@ -3,6 +3,12 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 
 class AspectCoffeePasswordResetForm(PasswordResetForm):
+    def save(self, domain_override=None, request=None, **kwargs):
+        # django_site в базе сейчас example.com, поэтому ссылка берётся из адреса запроса.
+        if not domain_override and request is not None:
+            domain_override = request.get_host()
+        return super().save(domain_override=domain_override, request=request, **kwargs)
+
     def send_mail(self, subject_template_name, email_template_name,
                   context, from_email, to_email, html_email_template_name=None):
         subject = render_to_string(subject_template_name, context).strip()

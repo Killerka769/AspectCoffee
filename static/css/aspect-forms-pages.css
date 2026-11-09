@@ -402,12 +402,12 @@ html body .aspect-inquiry form {
 }
 
 .aspect-404__btn--primary {
-  background: #000;
+  background: #2A4A34;
   color: #fff;
 }
 
 .aspect-404__btn--primary:hover {
-  background: #2a4a34;
+  background: #1e3626;
   color: #fff;
 }
 

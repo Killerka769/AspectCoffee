@@ -95,6 +95,13 @@ class User(AbstractUser):
     viber = models.CharField("Viber", max_length=255, blank=True, help_text="Номер или ссылка")
     telegram_id = models.CharField("Telegram ID", max_length=100, blank=True, help_text="Числовой ID для уведомлений")
     viber_id = models.CharField("Viber ID", max_length=100, blank=True, help_text="Числовой ID для уведомлений")
+    ban_reason = models.TextField("Причина бана", blank=True, default="")
+    banned_until = models.DateTimeField(
+        "Забанен до",
+        null=True,
+        blank=True,
+        help_text="Пусто — блокировка без срока. Когда дата наступает, аккаунт открывается сам при следующей попытке входа.",
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -116,6 +123,35 @@ class User(AbstractUser):
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}".strip() or self.email
+
+    def ban_message(self):
+        """Текст, который видит заблокированный человек."""
+        reason = (self.ban_reason or "").strip() or "не указана"
+        if self.banned_until:
+            from django.utils import timezone
+            until = timezone.localtime(self.banned_until).strftime("%d.%m.%Y %H:%M")
+            return f"Ваш аккаунт заблокирован до {until}. Причина: {reason}"
+        return f"Ваш аккаунт заблокирован. Причина: {reason}"
+
+    @property
+    def is_banned_now(self):
+        """True, пока блокировка действует.
+
+        Если срок ``banned_until`` уже прошёл, снимает бан и возвращает False.
+        Активный пользователь не считается забаненным.
+        """
+        if self.is_active:
+            return False
+        if self.banned_until:
+            from django.utils import timezone
+            if timezone.now() >= self.banned_until:
+                self.is_active = True
+                self.ban_reason = ""
+                self.banned_until = None
+                if self.pk:
+                    self.save(update_fields=["is_active", "ban_reason", "banned_until"])
+                return False
+        return True
 
     def get_level(self):
         """Community level derived from the user's real activity."""

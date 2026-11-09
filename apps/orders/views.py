@@ -285,6 +285,8 @@ def basket_view(request):
                         raise ValueError("Неверный пароль от существующего аккаунта")
                     order_user = registered_users[0]
                     login_after_order = registered_users[0]
+                    if order_user.is_banned_now:
+                        raise ValueError(order_user.ban_message())
                     if not order_user.phone:
                         owner = phone_owner(phone, exclude_user_id=order_user.pk)
                         if owner:
@@ -387,6 +389,9 @@ def basket_view(request):
                 "recipient_name": recipient_name,
                 "recipient_phone": recipient_phone,
             }
+            if order_user is not None and order_user.is_banned_now:
+                raise ValueError(order_user.ban_message())
+
             order = checkout.place_order(data, order_user=order_user)
             _remember_checkout_order(request, order.pk)
 

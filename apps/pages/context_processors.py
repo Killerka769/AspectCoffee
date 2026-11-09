@@ -46,8 +46,47 @@ def _page_banners(request):
         return []
 
 
+def _seo_breadcrumbs(request):
+    """Хлебные крошки для JSON-LD. Карточка товара и статья подменяют блок в шаблоне."""
+    path = request.path or "/"
+    crumbs = [{"name": "Главная", "path": "/"}]
+    if path in ("/", ""):
+        return crumbs
+    sections = (
+        ("/catalog", "Каталог"),
+        ("/coffee", "Кофе"),
+        ("/tea", "Чай"),
+        ("/chocolate", "Шоколад"),
+        ("/accessories", "Аксессуары"),
+        ("/giftbox", "Подарочные наборы"),
+        ("/blog", "Журнал"),
+        ("/reviews", "Отзывы"),
+        ("/community", "Сообщество"),
+        ("/reels", "Шортсы"),
+        ("/faq", "FAQ"),
+        ("/how-to-choose-coffee", "Как выбрать кофе"),
+        ("/shipment-and-payment", "Доставка и оплата"),
+        ("/discount-system", "Система скидок"),
+        ("/return-money", "Возврат денег"),
+        ("/coffee-in-office", "Кофе в офис"),
+        ("/contact-us", "Контакты"),
+        ("/partners", "Партнёрам"),
+        ("/about", "О компании"),
+        ("/privacy", "Политика конфиденциальности"),
+        ("/user-agreement", "Пользовательское соглашение"),
+        ("/public-offer", "Публичная оферта"),
+        ("/sitemap", "Карта сайта"),
+    )
+    for prefix, name in sections:
+        if path == prefix or path == prefix + "/" or path.startswith(prefix + "/"):
+            crumbs.append({"name": name, "path": prefix + "/"})
+            break
+    return crumbs
+
+
 def site_chrome(request):
     ctx = {
+        "seo_breadcrumbs": _seo_breadcrumbs(request),
         "footer_links_company": [],
         "footer_links_help": [],
         "footer_links_catalog": [],

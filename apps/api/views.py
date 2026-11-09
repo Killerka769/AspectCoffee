@@ -206,6 +206,8 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(serializer.data)
         if not request.user.is_authenticated:
             return Response({"detail": "Необходима авторизация"}, status=status.HTTP_401_UNAUTHORIZED)
+        if request.user.is_banned_now:
+            return Response({"error": "Вы забанены"}, status=status.HTTP_403_FORBIDDEN)
         serializer = ReviewSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         serializer.save(product=product)
@@ -282,6 +284,8 @@ class OrderViewSet(
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user).prefetch_related("items").order_by("-created_at")
     def create(self, request):
+        if request.user.is_banned_now:
+            return Response({"error": request.user.ban_message()}, status=status.HTTP_403_FORBIDDEN)
         cart = get_or_create_cart(request)
         if not request.user.email_confirmed:
             return Response({"detail": "Для оформления заказа необходимо подтвердить email."}, status=status.HTTP_403_FORBIDDEN)

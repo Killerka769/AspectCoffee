@@ -415,6 +415,16 @@ def login_view(request):
                 "field_errors": errors,
                 "next_url": next_url,
             })
+        from apps.users.models import User
+        candidate = User.objects.filter(email__iexact=email).first()
+        if candidate is not None and candidate.check_password(password) and candidate.is_banned_now:
+            ban_text = candidate.ban_message()
+            messages.error(request, ban_text)
+            return render(request, "users/login.html", {
+                "post_data": request.POST,
+                "field_errors": {"password": ban_text},
+                "next_url": next_url,
+            })
         user = authenticate(request, username=email, password=password)
         if user is None:
             messages.error(request, "Неверный email или пароль")
@@ -857,7 +867,26 @@ def mini_notifications(request):
 
 @never_cache
 def service_worker(request):
-    response = render(request, "users/service-worker.js", content_type="application/javascript")
+    """Старый адрес воркера. Снимает прошлую регистрацию, чтобы не спорил с /sw.js."""
+    body = (
+        "self.addEventListener('install', function () { self.skipWaiting(); });\n"
+        "self.addEventListener('activate', function (event) {\n"
+        "  event.waitUntil(self.registration.unregister());\n"
+        "});\n"
+    )
+    response = HttpResponse(body, content_type="application/javascript")
+    response["Service-Worker-Allowed"] = "/"
+    response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
+
+
+@never_cache
+def pwa_worker(request):
+    from django.conf import settings
+    from pathlib import Path
+
+    script = Path(settings.BASE_DIR) / "static" / "sw.js"
+    response = HttpResponse(script.read_bytes(), content_type="application/javascript")
     response["Service-Worker-Allowed"] = "/"
     response["Cache-Control"] = "no-cache, no-store, must-revalidate"
     return response
