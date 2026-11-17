@@ -149,6 +149,36 @@
       text-decoration: underline;
       text-underline-offset: 3px;
     }
+    .aspect-footer__pay {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 12px;
+      max-width: 100%;
+    }
+    .aspect-footer__pay-note {
+      color: rgba(255,255,255,.7);
+      font-size: 13px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .aspect-footer__pay-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      max-width: 100%;
+      padding: 6px 12px;
+      border-radius: 4px;
+      background: #FFFFFF;
+      color: #2A4A34;
+      font-family: "Roboto Condensed", Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      line-height: 1;
+    }
     @media (max-width: 1099px) {
       .aspect-footer__inner {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -244,6 +274,12 @@
         <a href="/partners/">Условия и договор →</a>
       </div>
     </section>
+
+    <div class="aspect-footer__pay" aria-label="Способы оплаты">
+      <span class="aspect-footer__pay-note">Оплата</span>
+      {# Заглушка. Заменить на официальный знак СБП из брендбука НСПК: static/asset/images/sbp.svg #}
+      <span class="aspect-footer__pay-badge">СБП</span>
+    </div>
 
     <nav class="aspect-footer__legal" aria-label="Юридическая информация">
       <a href="/privacy/">Политика обработки персональных данных</a>
