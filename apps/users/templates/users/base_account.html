@@ -47,7 +47,7 @@
   .account-heading-row > h1 {
     display: none !important;
   }
-  .account-heading-row > div {
+  .account-heading-row > .account-heading-tools {
     width: auto;
     margin-left: auto;
   }
@@ -85,22 +85,167 @@
     min-height: 44px;
   }
 }
+html body main.aspect-account .aspect-account__aside {
+  background: transparent;
+  padding: 0;
+}
+html body main.aspect-account .aspect-account__heading {
+  margin-top: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding: 20px 0 16px !important;
+}
+html body main.aspect-account .aspect-account__container {
+  padding-top: 8px;
+}
+.account-heading-tools {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.account-balance-summary {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.account-balance-summary > span:not(.rub) {
+  font-family: "Roboto Condensed", Arial, sans-serif !important;
+}
+.account-balance-summary .rub {
+  display: inline-block;
+  margin: 0;
+  font-family: "Open Sans", Arial, sans-serif !important;
+  font-weight: 700;
+  letter-spacing: 0 !important;
+  line-height: 1;
+}
 .asp-account-logout {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   min-height: 44px;
   padding: 0 16px;
-  border: 1px solid #2A4A34;
-  border-radius: 4px;
-  background: #2A4A34;
-  color: #FFFFFF;
+  border: 1px solid #1E3626;
+  border-radius: 999px;
+  background: transparent;
+  color: #1E3626;
+  -webkit-text-fill-color: #1E3626;
   text-decoration: none;
   font-family: "Roboto Condensed", Arial, sans-serif;
   font-weight: 900;
-  font-size: 14px;
-  letter-spacing: .08em;
+  font-size: 13px;
+  letter-spacing: .06em;
   text-transform: uppercase;
+  white-space: nowrap;
+}
+@media (max-width: 1099px) {
+  html body main.aspect-account .aspect-account__heading {
+    padding-top: 18px !important;
+  }
+  html body main.aspect-account .account-heading-tools {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 12px 16px;
+  }
+  html body main.aspect-account .mob-account-nav {
+    gap: 8px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+@media (max-width: 420px) {
+  html body main.aspect-account .account-balance-summary {
+    font-size: 20px !important;
+    gap: 6px !important;
+  }
+  html body main.aspect-account .account-heading-tools {
+    gap: 10px;
+  }
+}
+@media (max-width: 1099px) {
+  html body main.aspect-account .mob-account-nav {
+    gap: 8px !important;
+  }
+  html body main.aspect-account .mob-account-nav > li > a {
+    background: #1E3626 !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    box-shadow: none !important;
+  }
+  html body main.aspect-account .mob-account-nav > li > a.aspect-display-black {
+    background: #F4F1EA !important;
+    color: #1E3626 !important;
+    -webkit-text-fill-color: #1E3626 !important;
+    box-shadow: inset 0 0 0 1px #1E3626 !important;
+  }
+  html body main.aspect-account .asp-account-logout {
+    background: transparent !important;
+    color: #1E3626 !important;
+    -webkit-text-fill-color: #1E3626 !important;
+    border: 1px solid #1E3626 !important;
+  }
+}
+@media (min-width: 1100px) {
+  html body main.aspect-account .aspect-account__container {
+    padding-top: 0;
+  }
+  html body main.aspect-account .aspect-account__heading {
+    padding-top: 4px !important;
+  }
+  html body main.aspect-account .aspect-account__container > .grid {
+    grid-template-columns: minmax(240px, 280px) minmax(0, 1fr) !important;
+    align-items: start;
+  }
+  html body main.aspect-account .aspect-account__aside,
+  html body main.aspect-account .aspect-account__content {
+    grid-column: auto !important;
+    width: auto;
+    min-width: 0;
+  }
+  html body main.aspect-account .mob-account-nav {
+    background: #1E3626 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 10px !important;
+  }
+  html body main.aspect-account .mob-account-nav > li > a {
+    color: rgba(255,255,255,.86) !important;
+    -webkit-text-fill-color: rgba(255,255,255,.86) !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+  }
+  html body main.aspect-account .mob-account-nav > li > a:hover {
+    background: rgba(255,255,255,.08) !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+  }
+  html body main.aspect-account .mob-account-nav > li > a.aspect-display-black {
+    background: #F4F1EA !important;
+    color: #1E3626 !important;
+    -webkit-text-fill-color: #1E3626 !important;
+  }
+  html body main.aspect-account .aspect-account-nav__icon {
+    color: currentColor !important;
+    stroke: currentColor;
+  }
+  html body main.aspect-account .asp-account-logout {
+    width: 100%;
+    margin-top: 8px;
+    justify-content: flex-start;
+    border-radius: 0 !important;
+    border: 1px solid rgba(255,255,255,.4) !important;
+    background: transparent !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+  }
 }
 </style>
 
@@ -113,13 +258,14 @@
       Личный кабинет
       <svg class="h-[10px] w-[10px] inline rotate-90 xl:hidden absolute top-0 bottom-0 right-[-4px] my-auto"><use href="#arr-right-bold"></use></svg>
     </h1>
-    <div class="ml-auto flex items-center gap-3 flex-wrap">
+    <div class="account-heading-tools">
       <a href="{% url 'users:balance' %}" class="aspect-btn btn-dark btn-xs inline-flex hover:opacity-80 duration-200" style="text-decoration:none; color:#fff !important;">
         <span>Пополнить</span>
       </a>
-      <div class="account-balance-summary text-[24px] xl:text-[40px] aspect-display-black uppercase leading-[1.2] md:tracking-[0.01em] text-right whitespace-nowrap">
-        <span class="text-[var(--black-50)]">Баланс </span>
-        {{ user.balance|default:0 }}&nbsp;<span class="rub">₽</span>
+      <div class="account-balance-summary text-[24px] xl:text-[40px] aspect-display-black uppercase leading-[1.2] text-right whitespace-nowrap">
+        <span class="text-[var(--black-50)]">Баланс</span>
+        <span>{{ user.balance|default:0 }}</span>
+        <span class="rub">₽</span>
       </div>
     </div>
   </div>

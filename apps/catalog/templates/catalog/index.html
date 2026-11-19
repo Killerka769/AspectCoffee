@@ -101,7 +101,7 @@
 }
 .aspect-hero__stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
   padding-top: 32px;
   border-top: 1px solid #E5E8E5;
@@ -123,6 +123,7 @@
   line-height: 1;
   color: #2A4A34;
   letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 .aspect-hero__stat-label {
   font-size: 13px;
@@ -349,6 +350,66 @@
 }
 .aspect-section__link:hover { opacity: 1; gap: 12px; color: #2A4A34; }
 .aspect-section__link svg { width: 14px; height: 14px; }
+
+.aspect-home-journal {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px 20px;
+}
+.aspect-home-journal__card { display: flex; flex-direction: column; min-width: 0; }
+.aspect-home-journal__media {
+  display: block;
+  position: relative;
+  aspect-ratio: 1.55;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #2A4A34;
+}
+.aspect-home-journal__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  transition: transform .35s ease;
+}
+.aspect-home-journal__card:hover .aspect-home-journal__media img { transform: scale(1.04); }
+.aspect-home-journal__meta {
+  margin: 14px 0 8px;
+  color: #5A5A5A;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.aspect-home-journal__title {
+  color: #000000;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-size: clamp(18px, 2.2vw, 22px);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: .01em;
+  text-transform: uppercase;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+html body a.aspect-home-journal__title,
+html body a.aspect-home-journal__title:visited {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+html body a.aspect-home-journal__title:hover {
+  color: #2A4A34 !important;
+  -webkit-text-fill-color: #2A4A34 !important;
+}
+.aspect-home-journal__text {
+  margin: 10px 0 0;
+  color: #5A5A5A;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
 
 /* ---------- USP ---------- */
 .aspect-usp {
@@ -615,8 +676,8 @@
   z-index: 2;
 }
 .aspect-cta__actions {
-  display: flex;
-  gap: 12px;
+  display: flex !important;
+  gap: 16px !important;
   flex-wrap: wrap;
   justify-content: flex-end;
   position: relative;
@@ -762,6 +823,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .aspect-hero__seal svg { animation: none; }
+  .aspect-home-journal__media img { transition: none; }
 }
 
 /* ---------- АДАПТИВ ---------- */
@@ -779,7 +841,9 @@
 @media (max-width: 757px) {
   .aspect-hero { padding: 12px 0 32px; }
   .aspect-hero__seal { display: none; }
-  .aspect-hero__stats { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .aspect-hero__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .aspect-hero__stat { padding-left: 10px; }
+  .aspect-hero__stat-num { font-size: 28px; }
   .aspect-hero__cards { grid-template-columns: 1fr; }
   .aspect-hero__card { min-height: 0; gap: 24px; padding: 20px; }
   .aspect-hero__card-title { font-size: 18px; }
@@ -789,9 +853,32 @@
   .aspect-reviews__grid { grid-template-columns: 1fr; }
   .aspect-section__head { flex-direction: column; align-items: flex-start; gap: 12px; }
   .aspect-section { padding: 36px 0; }
-  .aspect-cta { padding: 40px 24px; margin: 48px auto; }
+  .aspect-cta { padding: 32px 20px; margin: 32px auto; }
+  .aspect-cta__actions { flex-direction: column; align-items: stretch; gap: 12px !important; }
   .aspect-cta__btn { width: 100%; }
   .aspect-banners { grid-template-columns: 1fr; }
+  .aspect-home-journal { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .aspect-home-journal__media { border-radius: 14px; }
+  .aspect-home-journal__title { font-size: 20px; }
+}
+@media (max-width: 389px) {
+  .aspect-home-journal__title { font-size: 18px; }
+  .aspect-home-journal__text { font-size: 13px; }
+}
+@media (min-width: 758px) and (max-width: 1099px) {
+  .aspect-home-journal { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .aspect-home-journal__card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    column-gap: 22px;
+    align-items: center;
+  }
+  .aspect-home-journal__card:last-child:nth-child(odd) .aspect-home-journal__media {
+    grid-row: 1 / span 3;
+    margin: 0;
+  }
+  .aspect-home-journal__card:last-child:nth-child(odd) .aspect-home-journal__meta { margin-top: 0; }
 }
 </style>
 {% endblock %}
@@ -834,16 +921,12 @@
 
         <div class="aspect-hero__stats">
           <div class="aspect-hero__stat">
-            <span class="aspect-hero__stat-num">{{ espresso_count|default:"42" }}</span>
-            <span class="aspect-hero__stat-label">Сортов для эспрессо</span>
+            <span class="aspect-hero__stat-num">{{ coffee_count }}</span>
+            <span class="aspect-hero__stat-label">Сортов кофе</span>
           </div>
           <div class="aspect-hero__stat">
-            <span class="aspect-hero__stat-num">{{ filter_count|default:"30" }}</span>
-            <span class="aspect-hero__stat-label">Сортов для фильтра</span>
-          </div>
-          <div class="aspect-hero__stat">
-            <span class="aspect-hero__stat-num">{{ reviews_count|default:"0" }}</span>
-            <span class="aspect-hero__stat-label">Отзывов клиентов</span>
+            <span class="aspect-hero__stat-num">{{ catalog_count }}</span>
+            <span class="aspect-hero__stat-label">Всего товаров</span>
           </div>
         </div>
       </div>
@@ -1033,12 +1116,47 @@
   </section>
   {% endif %}
 
+  {# ===== ЖУРНАЛ ===== #}
+  {% if blog_posts %}
+  <section class="aspect-section">
+    <div class="aspect-section__inner">
+      <div class="aspect-section__head">
+        <h2 class="aspect-section__title">
+          <span class="num">05</span> Журнал
+        </h2>
+        <a class="aspect-section__link" href="{% url 'blog:index' %}">
+          Читать все
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m8 4 8 8-8 8"/></svg>
+        </a>
+      </div>
+      <div class="aspect-home-journal">
+        {% for post in blog_posts %}
+        <article class="aspect-home-journal__card">
+          <a class="aspect-home-journal__media" href="{{ post.get_absolute_url }}">
+            {% if post.image %}
+              <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
+            {% endif %}
+          </a>
+          <p class="aspect-home-journal__meta">
+            {% if post.category %}{{ post.category.name }} · {% endif %}{{ post.created_at|date:"j E Y" }}
+          </p>
+          <a class="aspect-home-journal__title" href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+          {% if post.short_description %}
+          <p class="aspect-home-journal__text">{{ post.short_description|truncatechars:140 }}</p>
+          {% endif %}
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
   {# ===== ОТЗЫВЫ ===== #}
   <section class="aspect-section aspect-reviews aspect-section--soft">
     <div class="aspect-section__inner">
       <div class="aspect-section__head">
         <h2 class="aspect-section__title">
-          <span class="num">05</span> Отзывы
+          <span class="num">06</span> Отзывы
         </h2>
         <a class="aspect-section__link" href="{% url 'pages:reviews' %}">
           Читать все

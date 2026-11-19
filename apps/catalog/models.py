@@ -116,8 +116,6 @@ class Product(models.Model):
     harvest_year = models.CharField("Урожай", max_length=20, blank=True)
     variety = models.CharField("Разновидность", max_length=200, blank=True)
     caffeine_content = models.DecimalField("Содержание кофеина (%)", max_digits=4, decimal_places=2, null=True, blank=True)
-    # roaster_machine = models.CharField("Ростер для обжарки", max_length=100, blank=True)
-    # roaster = models.ForeignKey(Roaster, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Ростер")
     body = models.PositiveIntegerField(
         "Плотность (Тельце)", null=True, blank=True, default=None,
         validators=[MinValueValidator(0), MaxValueValidator(10)]

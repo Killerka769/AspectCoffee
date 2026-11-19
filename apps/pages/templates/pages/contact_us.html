@@ -10,43 +10,20 @@
    ASPECT CONTACT
    ========================================================== */
 
-.aspect-contact { background: #FFFFFF; padding-bottom: 80px; }
+.aspect-contact { background: #F4F6F4; padding-bottom: 80px; }
 .aspect-contact__container { width: min(1100px, calc(100% - 32px)); margin: 0 auto; }
+.aspect-contact__sheet { position: relative; z-index: 2; margin-top: -48px; }
+.aspect-pagehero__inner { width: min(1100px, calc(100% - 32px)); }
 
-/* ---------- BREADCRUMBS ---------- */
 .aspect-contact__crumbs {
-  display: flex; align-items: center; gap: 8px;
-  padding: 24px 0;
-  font-size: 13px; color: #5A5A5A;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  padding: 0 0 22px;
+  font-size: 13px; color: rgba(255,255,255,.7);
 }
-.aspect-contact__crumbs a { color: #5A5A5A; text-decoration: none; transition: color .2s ease; }
-.aspect-contact__crumbs a:hover { color: #2A4A34; }
-.aspect-contact__crumbs span { color: rgba(0,0,0,.3); }
-.aspect-contact__crumbs .current { color: #000; font-weight: 500; }
-
-/* ---------- HERO ---------- */
-.aspect-contact__hero {
-  padding: 16px 0 40px;
-  border-bottom: 1px solid #E5E8E5;
-  margin-bottom: 48px;
-  position: relative;
-}
-.aspect-contact__hero::after {
-  content: ""; position: absolute;
-  left: 0; bottom: -1px;
-  width: 72px; height: 3px;
-  background: #2A4A34;
-}
-.aspect-contact__title {
-  font-family: "Roboto Condensed", Arial, sans-serif;
-  font-weight: 900;
-  font-size: clamp(36px, 5vw, 64px);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-  color: #000;
-  margin: 0;
-}
+.aspect-contact__crumbs a { color: rgba(255,255,255,.7); text-decoration: none; }
+.aspect-contact__crumbs a:hover { color: #FFFFFF; }
+.aspect-contact__crumbs span { color: rgba(255,255,255,.35); }
+.aspect-contact__crumbs .current { color: #FFFFFF; font-weight: 600; }
 
 /* ---------- LAYOUT ---------- */
 .aspect-contact__layout {
@@ -67,6 +44,42 @@
 }
 @media (max-width: 757px) {
   .aspect-contact__card { padding: 24px 20px; border-radius: 18px; }
+  .aspect-contact__sheet { margin-top: -36px; }
+}
+.aspect-contact__card--dark {
+  background: #1B3324;
+  border-color: #1B3324;
+}
+html body .aspect-contact__card--dark h2.aspect-contact__card-title {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  border-bottom-color: rgba(255,255,255,.16);
+}
+.aspect-contact__card--dark .aspect-contact__card-title::after { background: rgba(255,255,255,.55); }
+.aspect-contact__card--dark .aspect-contact__icon { background: rgba(255,255,255,.1); color: #FFFFFF; }
+.aspect-contact__card--dark .aspect-contact__item:hover .aspect-contact__icon { background: #FFFFFF; color: #1B3324; }
+.aspect-contact__card--dark .aspect-contact__item-label,
+.aspect-contact__card--dark .aspect-contact__item-hint,
+.aspect-contact__card--dark .aspect-contact__socials-title { color: rgba(255,255,255,.62); }
+html body .aspect-contact__card--dark .aspect-contact__item-value,
+html body .aspect-contact__card--dark a.aspect-contact__item-value {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+html body .aspect-contact__card--dark a.aspect-contact__item-value:hover {
+  color: #D7E6DA !important;
+  -webkit-text-fill-color: #D7E6DA !important;
+}
+.aspect-contact__card--dark .aspect-contact__socials { border-top-color: rgba(255,255,255,.16); }
+html body .aspect-contact__card--dark a.aspect-contact__social {
+  background: rgba(255,255,255,.1);
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+html body .aspect-contact__card--dark a.aspect-contact__social:hover {
+  background: #FFFFFF;
+  color: #1B3324 !important;
+  -webkit-text-fill-color: #1B3324 !important;
 }
 .aspect-contact__card-title {
   font-family: "Roboto Condensed", Arial, sans-serif;
@@ -290,22 +303,24 @@
 
 {% block content %}
 <main class="aspect-contact">
-  <div class="aspect-contact__container">
-
-    <nav class="aspect-contact__crumbs" aria-label="Хлебные крошки">
-      <a href="/">Главная</a>
-      <span>/</span>
-      <span class="current">Контакты</span>
-    </nav>
-
-    <header class="aspect-contact__hero">
+  <header class="aspect-pagehero">
+    <div class="aspect-pagehero__inner">
+      <nav class="aspect-contact__crumbs" aria-label="Хлебные крошки">
+        <a href="/">Главная</a>
+        <span>/</span>
+        <span class="current">Контакты</span>
+      </nav>
+      <p class="aspect-pagehero__kicker">На связи</p>
       <h1 class="aspect-contact__title">Контакты</h1>
-    </header>
+      <p class="aspect-pagehero__lead">Позвоните или напишите — ответим в рабочий день.</p>
+    </div>
+  </header>
 
+  <div class="aspect-contact__container aspect-contact__sheet">
     <div class="aspect-contact__layout">
 
       {# ---------- ЛЕВАЯ: контакты ---------- #}
-      <section class="aspect-contact__card">
+      <section class="aspect-contact__card aspect-contact__card--dark">
         <h2 class="aspect-contact__card-title">Наши контакты</h2>
 
         <div class="aspect-contact__list">
@@ -329,17 +344,6 @@
               <p class="aspect-contact__item-label">Email</p>
               <a href="mailto:hello@aspectcoffee.ru" class="aspect-contact__item-value">hello@aspectcoffee.ru</a>
               <p class="aspect-contact__item-hint">Ответим в течение рабочего дня</p>
-            </div>
-          </div>
-
-          <div class="aspect-contact__item">
-            <div class="aspect-contact__icon">
-              <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            </div>
-            <div class="aspect-contact__item-body">
-              <p class="aspect-contact__item-label">Адрес</p>
-              <p class="aspect-contact__item-value" style="font-weight:600;">Ижевск, ул. Баранова, д. 26</p>
-              <p class="aspect-contact__item-hint">Пункт самовывоза</p>
             </div>
           </div>
 

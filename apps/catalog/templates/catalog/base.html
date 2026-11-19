@@ -141,10 +141,10 @@
 <link href="{% static 'css/theme_update.css' %}?v=20260729-1" rel="stylesheet"/>
 <link href="{% static 'css/mobile_app.css' %}?v=20260729-1" rel="stylesheet"/>
 <link href="{% static 'css/aspect-brand.css' %}?v=20261104-2" rel="stylesheet"/>
-<link href="{% static 'css/aspect-redesign.css' %}?v=20261109-1" rel="stylesheet"/>
+<link href="{% static 'css/aspect-redesign.css' %}?v=20261119-6" rel="stylesheet"/>
 <link href="{% static 'css/aspect-stage3.css' %}?v=20261104-4" rel="stylesheet"/>
 <link href="{% static 'css/aspect-motion.css' %}?v=20261104-1" rel="stylesheet"/>
-<link href="{% static 'css/aspect-forms-pages.css' %}?v=20261109-2" rel="stylesheet"/>
+<link href="{% static 'css/aspect-forms-pages.css' %}?v=20261119-7" rel="stylesheet"/>
 
 <style id="aspect-brand-hard">
   /* Глобальный шрифт — Open Sans для текста, Roboto Condensed для заголовков */
@@ -295,7 +295,7 @@
     font-weight: 900 !important;
     margin: 0 0 0.4em !important;
   }
-  h3:not(.aspect-hero__card-title):not(.aspect-banner__title):not(.asp-modal__title) {
+  h3:not(.aspect-hero__card-title):not(.aspect-banner__title):not(.asp-modal__title):not(.asp-rev__filter-title):not(.asp-rev-card__empty-title) {
     font-size: clamp(1.5rem, 2.6vw, 2.25rem) !important;
     line-height: 1.1 !important;
     font-weight: 900 !important;
@@ -318,12 +318,78 @@
   .aspect-display-black, .aspect-display-bold, h1, h2, h3 { font-weight: 900 !important; letter-spacing: .02em; }
   i, .fa, .fas, .far, svg, path { font-family: inherit; }
 </style>
+<style id="aspect-pagehero">
+  .aspect-pagehero {
+    background: linear-gradient(155deg, #2A4A34 0%, #101c14 78%);
+    color: #FFFFFF;
+    padding: 28px 0 84px;
+  }
+  .aspect-pagehero__inner {
+    width: min(1340px, calc(100% - 32px));
+    margin: 0 auto;
+  }
+  .aspect-pagehero__kicker {
+    margin: 0 0 12px;
+    color: rgba(255,255,255,.68);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+  .aspect-pagehero__lead {
+    max-width: 560px;
+    margin: 14px 0 0;
+    color: rgba(255,255,255,.82);
+    font-size: 17px;
+    line-height: 1.5;
+  }
+  html body .aspect-pagehero h1 {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    font-size: clamp(40px, 6vw, 76px) !important;
+    line-height: .98 !important;
+    letter-spacing: -0.03em !important;
+    margin: 0 !important;
+    max-width: 12em;
+  }
+  html body .aspect-pagehero h1::after {
+    display: none !important;
+    content: none !important;
+  }
+  html body .aspect-pagehero [class*="__crumbs"] {
+    margin: 0 0 18px;
+    padding: 0 0 4px;
+    color: rgba(255,255,255,.72);
+    border-bottom: 0;
+  }
+  html body .aspect-pagehero [class*="__crumbs"] a,
+  html body .aspect-pagehero [class*="__crumbs"] a:hover,
+  html body .aspect-pagehero [class*="__crumbs"] .current {
+    color: rgba(255,255,255,.82) !important;
+    -webkit-text-fill-color: rgba(255,255,255,.82) !important;
+  }
+  html body .aspect-pagehero [class*="__crumbs"] > span:not(.current)::before {
+    color: rgba(255,255,255,.5);
+  }
+  @media (max-width: 757px) {
+    .aspect-pagehero { padding: 20px 0 64px; }
+    .aspect-pagehero__lead { font-size: 15px; }
+  }
+</style>
 
 {# ---- Глобальные JS-переменные ---- #}
 <script>
   window.__CART_VARIANT_IDS__ = {{ cart_variant_ids|default:"{}"|safe }};
   window.__CART_TOTAL_QTY__ = {{ cart_total_items|default:"0" }};
   window.__CART_TOTAL_PRICE__ = {{ cart_total|default:"0"|floatformat:"0" }};
+  window.aspectEmptyPhoto = function (img) {
+    if (!img || img.dataset.emptyPhoto) return;
+    img.dataset.emptyPhoto = "1";
+    var label = document.createElement("span");
+    label.className = "aspect-photo-empty";
+    label.textContent = img.alt || "Aspect";
+    img.replaceWith(label);
+  };
 </script>
 
 {% block extra_css %}{% endblock %}
@@ -548,7 +614,7 @@ html body .aspect-header__icons .header-cart__btn:hover * {
                 <div x-show="r.price" class="header-search__suggest-price" x-text="r.price ? Number(r.price).toLocaleString('ru-RU') + ' \u20BD' : ''"></div>
               </a>
             </template>
-            <button type="button" @click="submitSearch()" class="header-search__suggest-all">Смотреть всё</button>
+            <button type="button" @click="submitSearch()" class="header-search__suggest-all">Все результаты</button>
           </div>
         </form>
       </div>
@@ -574,7 +640,7 @@ html body .aspect-header__icons .header-cart__btn:hover * {
       </a>
 
       {# Burger — только на мобильном (ДОБАВЛЕН КЛАСС lg:hidden) #}
-      <button type="button" class="icon-btn aspect-header__burger lg:hidden" aria-label="Menю"
+      <button type="button" class="icon-btn aspect-header__burger lg:hidden" aria-label="Меню"
               @click="menuOpen = !menuOpen">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
       </button>
@@ -598,14 +664,17 @@ html body .aspect-header__icons .header-cart__btn:hover * {
 {# ---- Мобильное меню ---- #}
 <aside class="aspect-mobile-menu" x-show="menuOpen" x-cloak @click.stop
        x-transition:enter="transition ease-out duration-200"
-       x-transition:enter-start="opacity-0 translate-x-6"
+       x-transition:enter-start="opacity-0 translate-x-8"
        x-transition:enter-end="opacity-100 translate-x-0"
        x-transition:leave="transition ease-in duration-150"
        x-transition:leave-start="opacity-100 translate-x-0"
-       x-transition:leave-end="opacity-0 translate-x-6">
-  <button type="button" class="aspect-mobile-menu__close" aria-label="Закрыть меню" @click="menuOpen = false">
-    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-  </button>
+       x-transition:leave-end="opacity-0 translate-x-8">
+  <div class="aspect-mobile-menu__head">
+    <span class="aspect-mobile-menu__brand">Меню</span>
+    <button type="button" class="aspect-mobile-menu__close" aria-label="Закрыть меню" @click="menuOpen = false">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
 
   <nav class="aspect-mobile-menu__nav">
     <a href="/catalog/" class="aspect-mobile-menu__title">Каталог</a>

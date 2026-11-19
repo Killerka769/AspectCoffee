@@ -1205,9 +1205,9 @@
         </div>
         <div class="aspect-pd__main">
           {% if primary_image %}
-          <img id="pd-main-image" src="{{ primary_image.url }}" onerror="this.onerror=null;this.src='{% static 'asset/images/product-placeholder.svg' %}'" alt="{{ product.name }}">
+          <img id="pd-main-image" src="{{ primary_image.url }}" onerror="aspectEmptyPhoto(this)" alt="{{ product.name }}">
           {% else %}
-          <img id="pd-main-image" src="{% static 'asset/images/product-placeholder.svg' %}" alt="{{ product.name }}">
+          <span id="pd-main-image" class="aspect-photo-empty">{{ product.name }}</span>
           {% endif %}
         </div>
       </div>

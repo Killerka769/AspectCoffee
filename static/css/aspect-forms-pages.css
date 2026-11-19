@@ -91,13 +91,31 @@ html body .aspect-inquiry button[type="submit"]:hover {
 html body .aspect-auth__submit,
 html body .asp-auth__submit,
 html body .aspect-contact__submit {
-  background: #000000 !important;
+  background: #1E3626 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  border-radius: 0 !important;
+  min-height: 52px;
 }
 
 html body .aspect-auth__submit:hover:not(:disabled),
 html body .asp-auth__submit:hover:not(:disabled),
 html body .aspect-contact__submit:hover:not(:disabled) {
   background: #2a4a34 !important;
+}
+
+html body .aspect-auth__alt {
+  border-radius: 0 !important;
+  border: 1px solid #1E3626 !important;
+  background: transparent !important;
+  color: #1E3626 !important;
+  -webkit-text-fill-color: #1E3626 !important;
+}
+
+html body .aspect-auth__alt:hover {
+  background: #1E3626 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
 }
 
 html body .asp-pwd__btn--primary {
@@ -114,13 +132,60 @@ html body .asp-pwd__btn--ghost {
 }
 
 html body .aspect-auth__social {
-  border-radius: 4px !important;
+  border-radius: 0 !important;
 }
 
-/* Auth card — чуть компактнее радиус */
+html body main.aspect-auth {
+  background: #F7F8F7;
+  padding: 28px 0 72px;
+}
+
 html body .aspect-auth__card,
 html body .asp-auth__card {
-  border-radius: 8px !important;
+  border-radius: 0 !important;
+  border: 1px solid #E5E8E5;
+  box-shadow: none;
+}
+
+html body .aspect-auth__rule {
+  display: block;
+  width: 48px;
+  height: 3px;
+  margin: 0 0 16px;
+  background: #1E3626;
+}
+
+html body .aspect-auth__link,
+html body .aspect-auth__back,
+html body .aspect-auth__terms a {
+  color: #1E3626 !important;
+  -webkit-text-fill-color: #1E3626 !important;
+}
+
+@media (max-width: 599px) {
+  html body main.aspect-auth {
+    padding: 16px 0 48px;
+  }
+  html body .aspect-auth__card {
+    padding: 22px 18px 26px !important;
+  }
+  html body .aspect-auth__input,
+  html body .aspect-auth__phone-code-btn {
+    font-size: 16px !important;
+  }
+  html body .aspect-auth__phone-row {
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+  html body .aspect-auth__phone-code-btn {
+    min-width: 72px;
+    padding-left: 0 !important;
+    padding-right: 8px !important;
+  }
+  html body .aspect-auth__input-wrap {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
 }
 
 html body h1.aspect-auth__title,
@@ -381,7 +446,7 @@ html body .aspect-inquiry form {
 .aspect-404__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
   justify-content: center;
 }
 

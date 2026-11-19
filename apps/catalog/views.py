@@ -333,7 +333,11 @@ def index(request):
     blog_posts = []
     try:
         from apps.blog.models import BlogPost
-        blog_posts = list(BlogPost.objects.filter(is_published=True)[:3])
+        blog_posts = list(
+            BlogPost.objects.filter(is_published=True)
+            .select_related("category")
+            .order_by("-created_at")[:3]
+        )
     except Exception:
         pass
 
@@ -359,19 +363,24 @@ def index(request):
     popular = _trim_for_full_rows(popular, 0)
     new_arrivals = _trim_for_full_rows(new_arrivals, 0)
 
-    coffee_count = Product.objects.filter(is_active=True, category__slug='kofe').count()
+    coffee_count = Product.objects.filter(is_active=True).filter(
+        Q(category__slug="kofe")
+        | Q(category__parent__slug="kofe")
+        | Q(category__name__icontains="кофе")
+    ).distinct().count()
+    catalog_count = Product.objects.filter(is_active=True).count()
     accessories_count = Product.objects.filter(is_active=True, category__slug='aksessuary').count()
 
     espresso_count = Product.objects.filter(
         is_active=True, category__slug='kofe', roast_level='espresso'
     ).count() or Product.objects.filter(
         is_active=True, category__slug='kofe', brew_methods__slug__in=['1b', 'espresso']
-    ).distinct().count() or 42
+    ).distinct().count()
     filter_count = Product.objects.filter(
         is_active=True, category__slug='kofe', roast_level__in=['light', 'medium']
     ).count() or Product.objects.filter(
         is_active=True, category__slug='kofe', brew_methods__slug__in=['3b', 'filter']
-    ).distinct().count() or 30
+    ).distinct().count()
 
     gift_sets = list(
         Product.objects.filter(is_active=True, category__slug__in=['giftbox', 'nabory'])
@@ -411,6 +420,7 @@ def index(request):
         "popular_block_banners": [],
         "new_block_banners": [],
         "coffee_count": coffee_count,
+        "catalog_count": catalog_count,
         "espresso_count": espresso_count,
         "filter_count": filter_count,
         "accessories_count": accessories_count,

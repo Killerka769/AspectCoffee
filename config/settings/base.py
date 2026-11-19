@@ -280,6 +280,9 @@ CDEK_TEST_MODE = config("CDEK_TEST_MODE", default=False, cast=bool)
 CDEK_API_URL = config("CDEK_API_URL", default="") or (
     "https://api.edu.cdek.ru/v2" if CDEK_TEST_MODE else "https://api.cdek.ru/v2"
 )
+CDEK_SENDER_CITY = config("CDEK_SENDER_CITY", default="")
+CDEK_SENDER_CITY_CODE = config("CDEK_SENDER_CITY_CODE", default="")
+CDEK_SENDER_ADDRESS = config("CDEK_SENDER_ADDRESS", default="")
 SENTRY_DSN = config("SENTRY_DSN", default="")
 import sentry_sdk
 if SENTRY_DSN:
@@ -389,19 +392,9 @@ UNFOLD = {
                         "link": reverse_lazy("admin:catalog_roasttype_changelist"),
                     },
                     {
-                        "title": _("Кофейни"),
-                        "icon": "storefront",
-                        "link": reverse_lazy("admin:catalog_cafe_changelist"),
-                    },
-                    {
                         "title": _("Меню «Купить»"),
                         "icon": "menu",
                         "link": reverse_lazy("admin:catalog_navmenuitem_changelist"),
-                    },
-                    {
-                        "title": _("Промо-слайды главной"),
-                        "icon": "view_carousel",
-                        "link": reverse_lazy("admin:catalog_promoslide_changelist"),
                     },
                 ],
             },

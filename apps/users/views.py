@@ -194,8 +194,8 @@ def orders_history(request):
     current_orders = Order.objects.filter(
         user=request.user,
         status__in=[Order.STATUS_NEW, Order.STATUS_PAID, Order.STATUS_ASSEMBLING, Order.STATUS_SHIPPED],
-    ).select_related("payment").prefetch_related("items").order_by("-created_at")
-    orders_qs = Order.objects.filter(user=request.user).select_related("payment").prefetch_related("items").order_by("-created_at")
+    ).select_related("payment").prefetch_related("items__variant__product").order_by("-created_at")
+    orders_qs = Order.objects.filter(user=request.user).select_related("payment").prefetch_related("items__variant__product").order_by("-created_at")
     paginator = Paginator(orders_qs, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)

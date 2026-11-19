@@ -52,9 +52,9 @@ class BlogPostAdmin(ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
     list_display = (
         "title", "category", "unique_views", "likes_total", "comments_total",
-        "is_published", "is_featured", "created_at",
+        "is_published", "created_at",
     )
-    list_filter = ("is_published", "is_featured", "category")
+    list_filter = ("is_published", "category")
     search_fields = ("title", "short_description")
     readonly_fields = ("unique_views", "likes_total", "comments_total", "created_at", "updated_at")
     inlines = (BlogPostViewInline, ArticleLikeInline, ArticleCommentInline)
@@ -66,7 +66,7 @@ class BlogPostAdmin(ModelAdmin):
             "fields": ("content",),
         }),
         ("Публикация", {
-            "fields": ("is_published", "is_featured", "created_at", "updated_at"),
+            "fields": ("is_published", "created_at", "updated_at"),
         }),
         ("Реальная статистика", {
             "fields": ("unique_views", "likes_total", "comments_total"),

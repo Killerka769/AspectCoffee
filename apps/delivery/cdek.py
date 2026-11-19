@@ -16,10 +16,19 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
-# Default sender: Izhevsk (code 224), ul. Baranova 26
-SENDER_CITY_CODE = 224
-SENDER_ADDRESS = "ул. Баранова, д. 26"
-SENDER_CITY = "Ижевск"
+
+def _sender_city_code() -> int | None:
+    raw = getattr(settings, "CDEK_SENDER_CITY_CODE", "")
+    try:
+        code = int(str(raw).strip())
+    except (TypeError, ValueError):
+        return None
+    return code or None
+
+
+def _sender_address() -> str:
+    return str(getattr(settings, "CDEK_SENDER_ADDRESS", "") or "").strip()
+
 
 # Tariff codes for online-shop (type=1, from warehouse)
 TARIFF_WAREHOUSE_TO_PVZ = 136       # склад → склад (ПВЗ)
@@ -197,7 +206,7 @@ class CDEKClient:
         to_city_code: int,
         weight_grams: int,
         tariff_code: int | None = None,
-        from_city_code: int = SENDER_CITY_CODE,
+        from_city_code: int | None = None,
         to_address: str | None = None,
         to_postal_code: str | None = None,
     ) -> dict[str, Any]:
@@ -207,6 +216,10 @@ class CDEKClient:
         """
         if not self.configured():
             return {"error": "CDEK не настроен"}
+        if from_city_code is None:
+            from_city_code = _sender_city_code()
+        if not from_city_code:
+            return {"error": "Город отправления СДЭК не задан"}
         packages = [{
             "weight": weight_grams,
             "length": DEFAULT_LENGTH,
@@ -284,6 +297,9 @@ class CDEKClient:
         """Create a real CDEK order with full payload."""
         if not self.configured():
             return {"error": "CDEK не настроен"}
+        city_code = _sender_city_code()
+        if not city_code:
+            return {"error": "Город отправления СДЭК не задан"}
 
         tariff_code = (
             TARIFF_WAREHOUSE_TO_PVZ if order.delivery_type == "cdek_pvz"
@@ -328,8 +344,8 @@ class CDEKClient:
                 "email": order.contact_email or "",
             },
             "from_location": {
-                "code": SENDER_CITY_CODE,
-                "address": SENDER_ADDRESS,
+                "code": city_code,
+                **({"address": _sender_address()} if _sender_address() else {}),
             },
             "packages": [{
                 "number": f"PKG-{order.pk}",

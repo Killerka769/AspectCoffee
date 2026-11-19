@@ -75,11 +75,10 @@ CDEK_TEST_MODE=False
 
 При переходе в тестовую среду заменить `CDEK_API_URL`, `CDEK_CLIENT_ID` и `CDEK_CLIENT_SECRET` на значения, выданные тестовым кабинетом СДЭК. Нельзя использовать тестовые credentials с боевым endpoint или наоборот.
 
-Отправитель и размеры посылки пока находятся в коде `apps/delivery/cdek.py`:
+Город отправления задаётся в env: `CDEK_SENDER_CITY`, `CDEK_SENDER_CITY_CODE`, `CDEK_SENDER_ADDRESS`. Пока код города пуст, расчёт и накладная не уходят в СДЭК.
 
-- `SENDER_CITY_CODE`;
-- `SENDER_CITY`;
-- `SENDER_ADDRESS`;
+Размеры посылки остаются в `apps/delivery/cdek.py`:
+
 - `DEFAULT_LENGTH`, `DEFAULT_WIDTH`, `DEFAULT_HEIGHT`;
 - `TARIFF_WAREHOUSE_TO_*`.
 

@@ -10,7 +10,7 @@ psycopg2-binary==2.9.10
 
 # Cache & Queue
 celery==5.4.0
-redis==5.0.8
+#redis==5.0.8
 django-redis==5.4.0
 
 # Images

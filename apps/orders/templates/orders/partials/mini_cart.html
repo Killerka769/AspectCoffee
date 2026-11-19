@@ -1,90 +1,50 @@
-{% load static %}
 {% load catalog_extras %}
-<div class="mini-cart-panel flex min-h-0 flex-col p-2 sm:p-4">
-    <div class="shrink-0 flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
-        <h3 class="font-bold text-lg">Ваша корзина</h3>
-        <span class="text-sm text-gray-500">{{ cart.total_items }} {{ cart.total_items|ru_plural:"товар,товара,товаров" }}</span>
-    </div>
+<div class="mini-cart-panel">
+  <div class="mini-cart__head">
+    <h3>Корзина</h3>
+    <span>{{ cart.total_items }} {{ cart.total_items|ru_plural:"товар,товара,товаров" }}</span>
+  </div>
 
-    {% if cart and cart.items.all %}
-    <ul class="mini-cart-products min-h-0 max-h-[350px] overflow-y-auto overscroll-contain pr-1 space-y-4 custom-scroll">
-        {% for item in cart.items.all %}
-        <li class="flex gap-3 pb-3 border-b border-gray-50 last:border-0 last:pb-0">
-            <a href="{{ item.variant.product.get_absolute_url }}" class="w-20 h-20 shrink-0 block rounded-xl overflow-hidden bg-gray-50 border border-gray-100">
-                {% if item.variant.product.main_image %}
-                <img src="{{ item.variant.product.main_image.url }}" alt="{{ item.variant.product.name }}" class="w-full h-full object-contain p-1">
-                {% else %}
-                <div class="w-full h-full bg-gray-100 flex items-center justify-center text-xs text-gray-400">Нет фото</div>
-                {% endif %}
-            </a>
-            <div class="flex-1 min-w-0 flex flex-col justify-between">
-                <div>
-                    <a href="{{ item.variant.product.get_absolute_url }}" class="text-[14px] font-bold text-black leading-tight hover:text-[var(--primary)] transition-colors line-clamp-2 block mb-0.5">
-                        {{ item.variant.product.name }}
-                    </a>
-                    <div class="text-[12px] text-[var(--black-50)] mb-2">{{ item.variant.weight|default:"1000" }} г</div>
-                </div>
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center border border-gray-200 rounded-md bg-white overflow-hidden shadow-sm h-7 w-fit">
-                        <button type="button" class="w-7 h-full flex items-center justify-center text-[var(--black-50)] hover:text-black hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50" {% if item.qty <= 1 %}disabled{% endif %} onclick="var self=this;fetch('{% url 'orders:update_cart' variant_id=item.variant_id %}',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRFToken':(document.querySelector('[name=csrfmiddlewaretoken]')||{}).value||getCookie('csrftoken'),'X-Requested-With':'XMLHttpRequest'},body:'qty={{ item.qty|add:'-1' }}'}).then(function(r){if(r.ok){document.body.dispatchEvent(new CustomEvent('cartUpdated'));}}).catch(function(e){console.error(e);});">-</button>
-                        <span class="w-8 text-center text-[12px] font-medium border-x border-gray-100 h-full flex items-center justify-center">{{ item.qty }}</span>
-                        <button type="button" class="w-7 h-full flex items-center justify-center text-[var(--black-50)] hover:text-black hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer" onclick="var self=this;fetch('{% url 'orders:update_cart' variant_id=item.variant_id %}',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRFToken':(document.querySelector('[name=csrfmiddlewaretoken]')||{}).value||getCookie('csrftoken'),'X-Requested-With':'XMLHttpRequest'},body:'qty={{ item.qty|add:'1' }}'}).then(function(r){if(r.ok){document.body.dispatchEvent(new CustomEvent('cartUpdated'));}}).catch(function(e){console.error(e);});">+</button>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <div class="text-[16px] font-bold text-black whitespace-nowrap">{{ item.total_price|floatformat:0 }} ₽</div>
-                        <button type="button" class="text-[var(--black-50)] hover:text-red-500 transition-colors p-1" title="Удалить" onclick="var self=this;fetch(this.dataset.url,{method:'POST',headers:{'X-CSRFToken':(document.querySelector('[name=csrfmiddlewaretoken]')||{}).value||getCookie('csrftoken'),'X-Requested-With':'XMLHttpRequest'}}).then(function(r){if(r.ok){document.body.dispatchEvent(new CustomEvent('cartUpdated'));}}).catch(function(e){console.error(e);});" data-url="{% url 'orders:remove_from_cart' variant_id=item.variant_id %}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
-
-    <div class="shrink-0 mt-4 pt-4 border-t border-gray-100 bg-white">
-        {% if cart.discount_amount > 0 %}
-        <div class="space-y-1.5 mb-3 text-[13px]">
-            <div class="flex items-center justify-between text-black/55">
-                <span>Товары</span>
-                <span>{{ cart.subtotal|floatformat:0 }} ₽</span>
-            </div>
-            <div class="flex items-center justify-between font-medium text-black">
-                <span>{% if cart.promo_code %}Промокод {{ cart.promo_code.code }}{% else %}Скидка{% endif %}</span>
-                <span>−{{ cart.discount_amount|floatformat:0 }} ₽</span>
-            </div>
-        </div>
+  {% if cart and cart.items.all %}
+  <ul class="mini-cart__list custom-scroll">
+    {% for item in cart.items.all %}
+    <li class="mini-cart__item">
+      <a href="{{ item.variant.product.get_absolute_url }}" class="mini-cart__photo">
+        {% if item.variant.product.main_image %}
+        <img src="{{ item.variant.product.main_image.url }}" alt="{{ item.variant.product.name }}" onerror="aspectEmptyPhoto(this)">
+        {% else %}
+        <span class="aspect-photo-empty">{{ item.variant.product.name }}</span>
         {% endif %}
-        <div class="flex items-center justify-between font-bold text-xl mb-4">
-            <span>Итого:</span>
-            <span>{{ cart.total|floatformat:0 }} ₽</span>
+      </a>
+      <div class="mini-cart__body">
+        <a href="{{ item.variant.product.get_absolute_url }}">{{ item.variant.product.name }}</a>
+        <p>{{ item.variant.weight|default:"1000" }} г</p>
+        <div class="mini-cart__row">
+          <div class="mini-cart__qty">
+            <button type="button" {% if item.qty <= 1 %}disabled{% endif %} onclick="fetch('{% url 'orders:update_cart' variant_id=item.variant_id %}',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRFToken':(document.querySelector('[name=csrfmiddlewaretoken]')||{}).value||getCookie('csrftoken'),'X-Requested-With':'XMLHttpRequest'},body:'qty={{ item.qty|add:'-1' }}'}).then(function(r){if(r.ok){document.body.dispatchEvent(new CustomEvent('cartUpdated'));}});">−</button>
+            <span>{{ item.qty }}</span>
+            <button type="button" onclick="fetch('{% url 'orders:update_cart' variant_id=item.variant_id %}',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRFToken':(document.querySelector('[name=csrfmiddlewaretoken]')||{}).value||getCookie('csrftoken'),'X-Requested-With':'XMLHttpRequest'},body:'qty={{ item.qty|add:'1' }}'}).then(function(r){if(r.ok){document.body.dispatchEvent(new CustomEvent('cartUpdated'));}});">+</button>
+          </div>
+          <strong>{{ item.total_price|floatformat:0 }} ₽</strong>
+          <button type="button" class="mini-cart__remove" title="Удалить" data-url="{% url 'orders:remove_from_cart' variant_id=item.variant_id %}" onclick="fetch(this.dataset.url,{method:'POST',headers:{'X-CSRFToken':(document.querySelector('[name=csrfmiddlewaretoken]')||{}).value||getCookie('csrftoken'),'X-Requested-With':'XMLHttpRequest'}}).then(function(r){if(r.ok){document.body.dispatchEvent(new CustomEvent('cartUpdated'));}});">×</button>
         </div>
-        <a href="{% url 'orders:basket' %}" class="w-full flex justify-center items-center py-3.5 rounded-full text-white bg-black hover:opacity-80 transition-opacity font-bold tracking-wide">
-            Перейти в корзину
-        </a>
-    </div>
-    {% else %}
-    <div class="text-center py-10">
-        <svg class="w-16 h-16 mx-auto text-gray-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-        <p class="text-[var(--black-50)] mb-5">Ваша корзина пока пуста</p>
-        <a href="{% url 'catalog:catalog' %}" @click="cartOpen = false" class="inline-block px-6 py-2 rounded-full border-2 border-[var(--black)] text-[var(--black)] font-bold hover:bg-[var(--black)] hover:text-white transition-colors">
-            В каталог
-        </a>
-    </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <div class="mini-cart__foot">
+    {% if cart.discount_amount > 0 %}
+    <p><span>Товары</span><span>{{ cart.subtotal|floatformat:0 }} ₽</span></p>
+    <p><span>{% if cart.promo_code %}Промокод {{ cart.promo_code.code }}{% else %}Скидка{% endif %}</span><span>−{{ cart.discount_amount|floatformat:0 }} ₽</span></p>
     {% endif %}
+    <div class="mini-cart__total"><span>Итого</span><strong>{{ cart.total|floatformat:0 }} ₽</strong></div>
+    <a href="{% url 'orders:basket' %}">Перейти к оформлению</a>
+  </div>
+  {% else %}
+  <div class="mini-cart__empty">
+    <p>Корзина пока пуста</p>
+    <a href="{% url 'catalog:catalog' %}" @click="cartOpen = false">В каталог</a>
+  </div>
+  {% endif %}
 </div>
-<style>
-.custom-scroll::-webkit-scrollbar {
-    width: 4px;
-}
-.custom-scroll::-webkit-scrollbar-track {
-    background: transparent;
-}
-.custom-scroll::-webkit-scrollbar-thumb {
-    background: #e5e7eb;
-    border-radius: 4px;
-}
-.custom-scroll::-webkit-scrollbar-thumb:hover {
-    background: #d1d5db;
-}
-</style>

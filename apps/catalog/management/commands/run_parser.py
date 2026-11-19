@@ -292,7 +292,7 @@ class Command(BaseCommand):
                         mini_desc = sanitize_imported_html(get_p("mini_description") or "")
                         flavor_html = sanitize_imported_html(get_p("flavor_description") or "")
 
-                        altitude = ""; region = ""; proc = ""; q = None; caffeine = None; roaster = ""; variety = ""
+                        altitude = ""; region = ""; proc = ""; q = None; caffeine = None; variety = ""
                         additional_info = get_p("additional_info", [])
                         if isinstance(additional_info, list):
                             for idx in additional_info:
@@ -303,7 +303,6 @@ class Command(BaseCommand):
                                     if k == "growing_height": altitude = str(v)
                                     elif k == "region": region = str(v)
                                     elif k in ("processing", "processing_method"): proc = str(v)
-                                    elif k == "roaster": roaster = str(v)
                                     elif k == "caffeine": caffeine = clean_decimal(v, 4, 2)
                                     elif k == "q_grader_grade": q = clean_decimal(v, 4, 2)
                                     elif k == "variety": variety = str(v)
@@ -346,12 +345,11 @@ class Command(BaseCommand):
                                 "short_description": mini_desc,
                                 "roast_level": roast,
                                 "processing_method": proc, "altitude": altitude, "region": region,
-                                "caffeine_content": caffeine, "roaster_machine": roaster,
+                                "caffeine_content": caffeine, "variety": variety,
                                 "body": min(10, max(0, body)),
                                 "acidity": min(10, max(0, acidity)),
                                 "sweetness": min(10, max(0, to_int(get_p("sweetness", 5), 5))),
                                 "flavor_description_html": flavor_html,
-                                "composition": variety,
                                 "is_active": True, "in_stock": True,
                                 "is_featured": is_featured,
                                 "is_new": is_new,

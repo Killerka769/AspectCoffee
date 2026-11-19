@@ -144,7 +144,7 @@ class DeliveryCalcView(APIView):
             weight = 500
         client = CDEKClient()
         data = client.calc_tariff_preview(
-            from_location={"city": getattr(settings, "CDEK_SENDER_CITY", "Москва")},
+            from_location={"city": (getattr(settings, "CDEK_SENDER_CITY", "") or "").strip()},
             to_location={"city": city_to or "?"},
             packages=[{"weight": weight}],
         )

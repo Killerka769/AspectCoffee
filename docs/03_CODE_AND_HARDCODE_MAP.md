@@ -33,7 +33,7 @@
 | Привязка Nginx к VPN `10.88.0.1` | `docker-compose.yml` | Изменить `ports`, проверить UFW/HAProxy; ошибочная публикация на `0.0.0.0` откроет сайт наружу |
 | Allowlist заказчика `95.31.19.131` | `/etc/haproxy/haproxy.cfg` и UFW, вне Git | Изменить на сервере, проверить конфиг и reload |
 | Маршрутизация VPN/сайта | `/etc/haproxy/haproxy.cfg`, `/etc/stunnel/aspect-openvpn.conf`, `/etc/openvpn/server/aspect.conf` | Только через серверный runbook |
-| Отправитель СДЭК: Ижевск, код города, адрес | `apps/delivery/cdek.py`: `SENDER_CITY_CODE`, `SENDER_CITY`, `SENDER_ADDRESS` | Изменить код; предпочтительно вынести в `SiteSettings`/env |
+| Отправитель СДЭК: город, код города, адрес | `CDEK_SENDER_CITY`, `CDEK_SENDER_CITY_CODE`, `CDEK_SENDER_ADDRESS` | Задать в env. Пустые значения останавливают расчёт и создание накладной |
 | Тарифы и размеры посылки СДЭК | `apps/delivery/cdek.py`: `TARIFF_*`, `DEFAULT_*` | Изменить после сверки с договором СДЭК и теста расчёта |
 | Источник каталога Aspect Coffee | `apps/catalog/management/commands/run_parser.py`, `check_images.py`: `BASE_URL` | Изменить код либо отключить задачи; см. документ 5 |
 | OAuth endpoints VK ID и Яндекса | `apps/users/oauth_views.py` | Менять только при официальном изменении API провайдера |

@@ -473,7 +473,7 @@ textarea.ckc-field { min-height: 90px; resize: none; }
 .ckc-sidebar__total-suffix {
   font-size: 32px;
   color: rgba(0,0,0,.35);
-  margin-left: 4px;
+  margin-left: 10px;
 }
 .ckc-sidebar__caption {
   font-size: 13px;
@@ -715,6 +715,63 @@ textarea.ckc-field { min-height: 90px; resize: none; }
 }
 
 [x-cloak] { display: none !important; }
+
+.ckc-progress {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ckc-progress li {
+  flex: 1 1 0;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1E3626;
+  color: #FFFFFF;
+  font-family: "Roboto Condensed", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.ckc-progress li + li { background: #2A4A34; }
+.ckc-sticky { display: none; }
+@media (max-width: 1099px) {
+  .checkout-page { padding-bottom: 84px; }
+  .ckc-sticky {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: #1E3626;
+    box-shadow: 0 -12px 32px rgba(0,0,0,.18);
+  }
+  .ckc-sticky__sum { display: flex; flex-direction: column; min-width: 0; color: rgba(255,255,255,.7); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  .ckc-sticky__sum strong { color: #FFFFFF; font-family: "Roboto Condensed", Arial, sans-serif; font-size: 22px; letter-spacing: 0; text-transform: none; }
+  .ckc-sticky__btn {
+    margin-left: auto;
+    min-height: 46px;
+    padding: 0 18px;
+    border: 0;
+    background: #F4F1EA;
+    color: #1E3626;
+    font-family: "Roboto Condensed", Arial, sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .ckc-sticky__btn:disabled { opacity: .45; cursor: not-allowed; }
+}
 </style>
 {% endblock %}
 
@@ -729,6 +786,13 @@ textarea.ckc-field { min-height: 90px; resize: none; }
       <p class="checkout-page__subtitle">
         {% if cart and cart.items.all %}Осталось заполнить контактные данные и выбрать доставку{% else %}Проверьте состав заказа перед оплатой{% endif %}
       </p>
+      {% if cart and cart.items.all %}
+      <ol class="ckc-progress" aria-label="Шаги оформления">
+        <li>Корзина</li>
+        <li>Доставка</li>
+        <li>Оплата</li>
+      </ol>
+      {% endif %}
     </div>
 
     {% if cart and cart.items.all %}
@@ -771,7 +835,9 @@ textarea.ckc-field { min-height: 90px; resize: none; }
                 <li data-variant-id="{{ item.variant.id }}" class="ckc-item">
                   <a href="{{ item.variant.product.get_absolute_url }}" class="ckc-item__img">
                     {% if item.variant.product.main_image %}
-                      <img alt="{{ item.variant.product.name }}" src="{{ item.variant.product.main_image.url }}"/>
+                      <img alt="{{ item.variant.product.name }}" src="{{ item.variant.product.main_image.url }}" onerror="aspectEmptyPhoto(this)"/>
+                    {% else %}
+                      <span class="aspect-photo-empty">{{ item.variant.product.name }}</span>
                     {% endif %}
                   </a>
                   <div>
@@ -991,7 +1057,7 @@ textarea.ckc-field { min-height: 90px; resize: none; }
                   <div class="ckc-opt__icon"><svg viewBox="0 0 24 24" stroke-width="1.8" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></div>
                   <div>
                     <div class="ckc-opt__label">Самовывоз</div>
-                    <div class="ckc-opt__desc">Ижевск, ул. Баранова, 26</div>
+                    <div class="ckc-opt__desc">Сообщим, когда заказ будет готов</div>
                   </div>
                 </label>
               </div>
@@ -1055,7 +1121,7 @@ textarea.ckc-field { min-height: 90px; resize: none; }
                            @input="cdekCityInput()"
                            autocomplete="off"
                            class="ckc-field__input"
-                           placeholder="Например: Москва, Ижевск, Казань..."
+                           placeholder="Например: Москва, Казань, Екатеринбург..."
                            type="text"
                            x-model="cdekCityQuery"/>
                     <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);" x-show="cdekCityLoading">
@@ -1083,7 +1149,7 @@ textarea.ckc-field { min-height: 90px; resize: none; }
                   <div x-show="!cdekSelectedCity" x-cloak style="margin-top:16px;">
                     <p style="font-size:11px;font-weight:600;color:var(--ck-text-muted);letter-spacing:.06em;text-transform:uppercase;margin:0 0 10px;">Популярные города</p>
                     <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                      <template x-for="cityName in ['Москва', 'Санкт-Петербург', 'Ижевск', 'Казань', 'Екатеринбург', 'Новосибирск', 'Нижний Новгород', 'Краснодар']" :key="cityName">
+                      <template x-for="cityName in ['Москва', 'Санкт-Петербург', 'Казань', 'Екатеринбург', 'Новосибирск', 'Нижний Новгород', 'Краснодар', 'Самара']" :key="cityName">
                         <button type="button"
                                 @click="cdekCityQuery = cityName; cdekSearchCities().then(() => { if (cdekCities.length > 0) { const exact = cdekCities.find(c => c.city.toLowerCase() === cityName.toLowerCase()); cdekSelectCity(exact || cdekCities[0]); } });"
                                 style="padding:8px 14px;background:#fff;border:1px solid var(--ck-border);border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;color:#000;"
@@ -1304,6 +1370,14 @@ textarea.ckc-field { min-height: 90px; resize: none; }
             {% endif %}
           </div>
 
+        </div>
+
+        <div class="ckc-sticky">
+          <div class="ckc-sticky__sum">
+            <span>Итого</span>
+            <strong><span x-text="Math.round(checkoutTotal)">0</span> ₽</strong>
+          </div>
+          <button type="button" class="ckc-sticky__btn" :disabled="!canSubmit" @click="handleSubmit($event)">Оформить</button>
         </div>
       </form>
 

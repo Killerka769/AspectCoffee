@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 
 class AspectCoffeePasswordResetForm(PasswordResetForm):
     def save(self, domain_override=None, request=None, **kwargs):
-        # django_site в базе сейчас example.com, поэтому ссылка берётся из адреса запроса.
+        # Ссылка в письме берётся с адреса, по которому человек открыл сайт.
         if not domain_override and request is not None:
             domain_override = request.get_host()
         return super().save(domain_override=domain_override, request=request, **kwargs)

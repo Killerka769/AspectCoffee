@@ -13,17 +13,17 @@
 
 {% block extra_css %}
 <style>
-.aspect-auth { background: #FFFFFF; padding: 60px 0 80px; min-height: 60vh; }
-.aspect-auth__container { width: min(488px, calc(100% - 32px)); margin: 0 auto; }
+.aspect-auth { background: #F7F8F7; padding: 28px 0 72px; min-height: 60vh; }
+.aspect-auth__container { width: min(460px, calc(100% - 32px)); margin: 0 auto; }
 .aspect-auth__card {
   background: #FFFFFF;
   border: 1px solid #E5E8E5;
-  border-radius: 24px;
-  padding: 40px 44px;
+  border-radius: 0;
+  padding: 32px 32px 36px;
 }
 @media (max-width: 599px) {
-  .aspect-auth { padding: 32px 0 60px; }
-  .aspect-auth__card { padding: 28px 22px; border-radius: 18px; }
+  .aspect-auth { padding: 16px 0 48px; }
+  .aspect-auth__card { padding: 22px 18px 26px; }
 }
 
 .aspect-auth__title {
@@ -123,8 +123,8 @@
   width: 100%;
   padding: 16px 24px;
   border: 0;
-  border-radius: 14px;
-  background: #000000;
+  border-radius: 0;
+  background: #1E3626;
   color: #FFFFFF;
   font-family: "Roboto Condensed", Arial, sans-serif;
   font-weight: 900;
@@ -161,7 +161,7 @@
   justify-content: center;
   width: 52px; height: 52px;
   border: 1px solid #E5E8E5;
-  border-radius: 14px;
+  border-radius: 0;
   background: #FFFFFF;
   text-decoration: none;
   transition: border-color .2s ease, transform .2s ease;
@@ -176,10 +176,10 @@
   display: block;
   width: 100%;
   padding: 14px 24px;
-  border: 1px solid #E5E8E5;
-  border-radius: 14px;
-  background: #FFFFFF;
-  color: #000 !important;
+  border: 1px solid #1E3626;
+  border-radius: 0;
+  background: transparent;
+  color: #1E3626 !important;
   -webkit-text-fill-color: #000 !important;
   font-family: "Roboto Condensed", Arial, sans-serif;
   font-weight: 900;
@@ -253,6 +253,7 @@
       </a>
 
       <h1 class="aspect-auth__title">Войти</h1>
+      <span class="aspect-auth__rule" aria-hidden="true"></span>
       <p class="aspect-auth__sub">Войдите в личный кабинет, чтобы отслеживать заказы и получать персональные предложения.</p>
 
       {% if messages %}

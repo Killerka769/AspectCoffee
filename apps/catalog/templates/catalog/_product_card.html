@@ -74,9 +74,9 @@
     <a class="aspect-card__media-link" href="{{ product.get_absolute_url }}">
       {% with primary_image=product.primary_image %}
       {% if primary_image %}
-        <img onerror="this.onerror=null;this.src='{% static 'asset/images/product-placeholder.svg' %}';" alt="{{ product.name }}" loading="lazy" itemprop="image" draggable="false" src="{{ primary_image.url }}">
+        <img onerror="aspectEmptyPhoto(this)" alt="{{ product.name }}" loading="lazy" itemprop="image" draggable="false" src="{{ primary_image.url }}">
       {% else %}
-        <img alt="{{ product.name }}" loading="lazy" itemprop="image" draggable="false" src="{% static 'asset/images/product-placeholder.svg' %}">
+        <span class="aspect-photo-empty">{{ product.name }}</span>
       {% endif %}
       {% endwith %}
     </a>

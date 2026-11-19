@@ -23,7 +23,7 @@ class CategoryAdmin(ModelAdmin):
     search_fields = ["name", "slug"]
     prepopulated_fields = {"slug": ("name",)}
     fieldsets = (
-        (None, {"fields": ("name", "h1", "slug", "parent", "description", "image", "is_active", "is_featured", "order")}),
+        (None, {"fields": ("name", "h1", "slug", "parent", "description", "is_active", "is_featured", "order")}),
         ("SEO", {"fields": ("seo_title", "seo_description"), "classes": ("collapse",)}),
     )
     def view_on_site(self, obj):
@@ -67,8 +67,8 @@ class ProductVariantInline(TabularInline):
     show_change_link = True
 class ProductImageInline(TabularInline):
     model = ProductImage
-    extra = 1
-    fields = ["image", "alt", "order"]
+    extra = 0
+    fields = ["image", "image_preview", "order"]
     readonly_fields = ["image_preview"]
     def image_preview(self, obj):
         if obj.image:
@@ -88,42 +88,43 @@ class ProductAdmin(ImportExportModelAdmin, ModelAdmin):
     readonly_fields = ["rating_avg", "reviews_count", "created_at", "updated_at"]
     fieldsets = (
         (
-            "Основное",
+            "Карточка",
             {
-                "fields": ("name", "slug", "category", "description", "short_description", "main_image"),
-                "description": "Общие данные для любого товара: название, описание, категория и изображение.",
+                "fields": ("name", "slug", "category", "short_description", "description", "main_image"),
+                "description": "Название, короткое описание, полный текст и фото. Это то, что покупатель видит первым.",
             },
         ),
         (
-            "Контентные табы на фронте (необязательно)",
+            "На странице товара",
             {
-                "fields": ("storage_description", "delivery_description"),
-                "description": "Пустые вкладки не выводятся на сайте.",
-            },
-        ),
-        (
-            "Атрибуты кофе (необязательно)",
-            {
-                "classes": ("collapse",),
                 "fields": (
                     "roast_level", "processing_method", "origin_country", "region",
-                    "altitude", "q_score", "harvest_year", "variety", "caffeine_content",
-                    "composition", "brew_methods", "flavor_notes",
+                    "altitude", "variety", "harvest_year", "q_score", "caffeine_content",
+                    "body", "acidity", "flavor_description_html",
                 ),
-                "description": "Заполняйте только для кофе; пустые поля на сайте не показываются.",
+                "description": "Пустые поля на сайте не показываются. Для чая и аксессуаров блок можно не заполнять.",
             },
         ),
         (
-            "Профиль вкуса (необязательно)",
+            "Хранение и доставка",
             {
                 "classes": ("collapse",),
-                "fields": ("body", "acidity", "sweetness", "flavor_description_html"),
+                "fields": ("storage_description", "delivery_description"),
+                "description": "Отдельные вкладки на странице. Если пусто, подставляется общий текст из настроек сайта.",
             },
         ),
-        ("Флаги", {"fields": ("is_active", "is_featured", "is_new", "is_bestseller", "is_microlot", "in_stock")}),
+        (
+            "Фильтры каталога",
+            {
+                "classes": ("collapse",),
+                "fields": ("flavor_notes", "brew_methods", "sweetness", "is_microlot"),
+                "description": "На карточке не пишутся. Вкусовые нотки и способы приготовления работают в фильтрах, сладость — в сравнении, микролот — в подборке каталога.",
+            },
+        ),
+        ("Публикация", {"fields": ("is_active", "in_stock", "is_featured", "is_new", "is_bestseller")}),
         ("Похожие товары", {"fields": ("related_products",), "classes": ("collapse",)}),
-        ("Статистика", {"fields": ("rating_avg", "reviews_count", "created_at", "updated_at"), "classes": ("collapse",)}),
         ("SEO", {"fields": ("seo_title", "seo_description"), "classes": ("collapse",)}),
+        ("Статистика", {"fields": ("rating_avg", "reviews_count", "created_at", "updated_at"), "classes": ("collapse",)}),
     )
     @action(description="Активировать выбранные товары")
     def make_active(self, request, queryset):
@@ -196,7 +197,8 @@ class FlavorNoteAdmin(ModelAdmin):
     search_fields = ["name", "slug"]
 @admin.register(BrewMethod)
 class BrewMethodAdmin(ModelAdmin):
-    list_display = ["name", "slug", "guide_url"]
+    list_display = ["name", "slug"]
+    fields = ["name", "slug"]
     prepopulated_fields = {"slug": ("name",)}
 
 

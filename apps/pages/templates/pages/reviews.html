@@ -10,37 +10,15 @@
    ASPECT REVIEWS
    ========================================================== */
 
-.asp-rev { background: #FFFFFF; padding: 40px 0 80px; }
-.asp-rev__container { width: min(1340px, calc(100% - 32px)); margin: 0 auto; }
-
-.asp-rev__head {
-  padding-bottom: 28px;
-  margin-bottom: 32px;
-  border-bottom: 1px solid #E5E8E5;
-  position: relative;
+.asp-rev { background: #F4F6F4; padding: 0 0 80px; }
+.asp-rev__container { width: min(1340px, calc(100% - 32px)); margin: -40px auto 0; position: relative; z-index: 2; }
+html body h3.asp-rev__filter-title {
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  letter-spacing: .1em !important;
+  margin: 0 0 14px !important;
 }
-.asp-rev__head::after {
-  content: ""; position: absolute;
-  left: 0; bottom: -1px;
-  width: 72px; height: 3px;
-  background: #2A4A34;
-}
-.asp-rev__title {
-  font-family: "Roboto Condensed", Arial, sans-serif;
-  font-weight: 900;
-  font-size: clamp(36px, 5vw, 64px);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-  color: #000;
-  margin: 0;
-}
-.asp-rev__title-count {
-  font-size: .55em;
-  color: #5A5A5A;
-  margin-left: 12px;
-  font-weight: 700;
-}
+html body h3.asp-rev__filter-title::after { display: none !important; content: none !important; }
 
 /* LAYOUT */
 .asp-rev__layout {
@@ -57,6 +35,10 @@
 .asp-rev__sidebar {
   position: sticky;
   top: 100px;
+  background: #FFFFFF;
+  border: 1px solid #E5E8E5;
+  border-radius: 22px;
+  padding: 22px 18px 18px;
 }
 @media (max-width: 1099px) {
   .asp-rev__sidebar { position: static; }
@@ -435,14 +417,14 @@
 
 {% block content %}
 <main class="asp-rev">
-  <div class="asp-rev__container" x-data="reviewFilters()">
-
-    <div class="asp-rev__head">
-      <h1 class="asp-rev__title">
-        Отзывы
-        {% if total_count %}<span class="asp-rev__title-count">{{ total_count }}</span>{% endif %}
-      </h1>
+  <header class="aspect-pagehero">
+    <div class="aspect-pagehero__inner">
+      <p class="aspect-pagehero__kicker">Голоса покупателей{% if total_count %} · {{ total_count }}{% endif %}</p>
+      <h1 class="asp-rev__title">Отзывы</h1>
+      <p class="aspect-pagehero__lead">Оценки магазина и доставки. Можно отфильтровать по звёздам и найти свой отзыв.</p>
     </div>
+  </header>
+  <div class="asp-rev__container" x-data="reviewFilters()">
 
     <div class="asp-rev__layout">
 

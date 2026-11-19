@@ -39,8 +39,7 @@ class RecurringOrderAdmin(ModelAdmin):
                 continue
             plan.status = RecurringOrder.STATUS_ACTIVE
             if not plan.next_charge_at:
-                # TEMP: 10 minutes for auto-repeat testing (was weeks=interval_weeks).
-                plan.next_charge_at = now + timedelta(minutes=10)
+                plan.next_charge_at = now + timedelta(weeks=plan.interval_weeks)
             plan.last_error = ""
             plan.save(update_fields=["status", "next_charge_at", "last_error", "updated_at"])
             activated += 1

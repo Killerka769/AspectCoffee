@@ -330,8 +330,7 @@ def process_due_recurring_orders():
                 recurring_order=plan,
                 scheduled_for=scheduled_for,
             )
-            # TEMP: 10 minutes for auto-repeat testing (was weeks=interval_weeks).
-            plan.next_charge_at = max(scheduled_for, now) + timedelta(minutes=10)
+            plan.next_charge_at = max(scheduled_for, now) + timedelta(weeks=plan.interval_weeks)
             plan.save(update_fields=["next_charge_at", "updated_at"])
         if created or charge.status in (RecurringCharge.STATUS_PENDING, RecurringCharge.STATUS_FAILED):
             process_recurring_charge.delay(charge.id)
