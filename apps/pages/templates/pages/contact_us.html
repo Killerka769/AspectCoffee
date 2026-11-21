@@ -331,8 +331,8 @@ html body .aspect-contact__card--dark a.aspect-contact__social:hover {
             </div>
             <div class="aspect-contact__item-body">
               <p class="aspect-contact__item-label">Телефон</p>
-              <a href="tel:{{ site_settings.contact_phone|default:'+78003334980' }}" class="aspect-contact__item-value">{{ site_settings.contact_phone|default:'8 (800) 333-49-80' }}</a>
-              <p class="aspect-contact__item-hint">Бесплатно по России</p>
+              <a href="tel:{{ site_settings.contact_phone|default:'+79882919392' }}" class="aspect-contact__item-value">{{ site_settings.contact_phone|default:'+7 988 291-93-92' }}</a>
+              <p class="aspect-contact__item-hint">Ответим в рабочий день</p>
             </div>
           </div>
 
@@ -342,7 +342,7 @@ html body .aspect-contact__card--dark a.aspect-contact__social:hover {
             </div>
             <div class="aspect-contact__item-body">
               <p class="aspect-contact__item-label">Email</p>
-              <a href="mailto:hello@aspectcoffee.ru" class="aspect-contact__item-value">hello@aspectcoffee.ru</a>
+              <a href="mailto:{{ site_settings.contact_email|default:'aspectcoffeeroasters@gmail.com' }}" class="aspect-contact__item-value">{{ site_settings.contact_email|default:'aspectcoffeeroasters@gmail.com' }}</a>
               <p class="aspect-contact__item-hint">Ответим в течение рабочего дня</p>
             </div>
           </div>

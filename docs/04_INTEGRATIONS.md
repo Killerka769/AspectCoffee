@@ -131,7 +131,7 @@ https://aspectcoffee.ru/accounts/vk/login/callback/
 ```dotenv
 WEBPUSH_VAPID_PRIVATE_KEY=/run/secrets/vapid_private.pem
 WEBPUSH_VAPID_PUBLIC_KEY=<public-key>
-WEBPUSH_VAPID_SUBJECT=mailto:info@aspectcoffee.ru
+WEBPUSH_VAPID_SUBJECT=mailto:aspectcoffeeroasters@gmail.com
 ```
 
 Приватный ключ запрещено хранить в Git или Docker image. При ротации старые browser subscriptions могут перестать работать, поэтому пользователям потребуется повторная подписка.

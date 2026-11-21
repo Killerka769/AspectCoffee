@@ -26,6 +26,6 @@ class ContactEmailUpgradeTests(TransactionTestCase):
             new_apps = executor.loader.project_state(latest).apps
             site = new_apps.get_model("catalog", "SiteSettings").objects.get(pk=1)
             self.assertEqual(site.site_name, "Existing customer content")
-            self.assertEqual(site.contact_email, "")
+            self.assertEqual(site.contact_email, "aspectcoffeeroasters@gmail.com")
         finally:
             MigrationExecutor(connection).migrate(latest)

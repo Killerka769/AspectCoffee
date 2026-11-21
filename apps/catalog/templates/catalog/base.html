@@ -141,7 +141,7 @@
 <link href="{% static 'css/theme_update.css' %}?v=20260729-1" rel="stylesheet"/>
 <link href="{% static 'css/mobile_app.css' %}?v=20260729-1" rel="stylesheet"/>
 <link href="{% static 'css/aspect-brand.css' %}?v=20261104-2" rel="stylesheet"/>
-<link href="{% static 'css/aspect-redesign.css' %}?v=20261119-6" rel="stylesheet"/>
+<link href="{% static 'css/aspect-redesign.css' %}?v=20261121-1" rel="stylesheet"/>
 <link href="{% static 'css/aspect-stage3.css' %}?v=20261104-4" rel="stylesheet"/>
 <link href="{% static 'css/aspect-motion.css' %}?v=20261104-1" rel="stylesheet"/>
 <link href="{% static 'css/aspect-forms-pages.css' %}?v=20261119-7" rel="stylesheet"/>
@@ -750,28 +750,39 @@ html body .aspect-header__icons .header-cart__btn:hover * {
 (function () {
   var deferred = null;
   var buttons = document.querySelectorAll(".aspect-pwa-install");
+  var mobileQuery = window.matchMedia("(max-width: 1099px)");
   function installed() {
     return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   }
-  function showButtons() {
-    if (installed() || !deferred) return;
-    buttons.forEach(function (button) { button.classList.add("is-ready"); });
+  function isMobile() {
+    return mobileQuery.matches;
   }
-  function hideButtons() {
+  function paint() {
+    var visible = Boolean(deferred) && isMobile() && !installed();
+    buttons.forEach(function (button) { button.classList.toggle("is-ready", visible); });
+  }
+  function clearPrompt() {
     deferred = null;
-    buttons.forEach(function (button) { button.classList.remove("is-ready"); });
+    paint();
   }
   window.addEventListener("beforeinstallprompt", function (event) {
+    if (installed() || !isMobile()) return;
     event.preventDefault();
     deferred = event;
-    showButtons();
+    paint();
   });
-  window.addEventListener("appinstalled", hideButtons);
+  window.addEventListener("appinstalled", clearPrompt);
+  if (typeof mobileQuery.addEventListener === "function") {
+    mobileQuery.addEventListener("change", paint);
+  }
   buttons.forEach(function (button) {
     button.addEventListener("click", function () {
-      if (!deferred) return;
-      deferred.prompt();
-      deferred.userChoice.then(hideButtons, hideButtons);
+      if (!deferred || !isMobile() || installed()) return;
+      var promptEvent = deferred;
+      deferred = null;
+      paint();
+      promptEvent.prompt();
+      promptEvent.userChoice.then(clearPrompt, clearPrompt);
     });
   });
   if ("serviceWorker" in navigator) {

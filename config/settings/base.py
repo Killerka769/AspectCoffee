@@ -239,8 +239,10 @@ EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False, cast=bool)
 EMAIL_USE_SSL = config("EMAIL_USE_SSL", default=False, cast=bool)
 EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", default=10, cast=int)
+# Адрес отправителя писем. На сервере его перекрывает .env.prod: почта уходит
+# через Postfix, поэтому здесь остаётся доменный ящик, а не Gmail.
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="Aspect Coffee <info@aspectcoffee.ru>")
-CONTACT_EMAIL = config("CONTACT_EMAIL", default="")
+CONTACT_EMAIL = config("CONTACT_EMAIL", default="aspectcoffeeroasters@gmail.com")
 PAYMENT_COD_ENABLED = config("PAYMENT_COD_ENABLED", default=False, cast=bool)
 
 # Browser Web Push (VAPID). The private PEM is generated on the production
@@ -253,7 +255,7 @@ WEBPUSH_VAPID_PUBLIC_KEY = config(
     "WEBPUSH_VAPID_PUBLIC_KEY",
     default="BNQgOkoLqdzGpYSThs4Na1IvfOHd2LU0ElkDhNPA86Ba-b2dXrcmHxIcGdcUeZ8OUhWJE6qqApPmrtdNaIpdIgk",
 )
-WEBPUSH_VAPID_SUBJECT = config("WEBPUSH_VAPID_SUBJECT", default="mailto:info@aspectcoffee.ru")
+WEBPUSH_VAPID_SUBJECT = config("WEBPUSH_VAPID_SUBJECT", default="mailto:aspectcoffeeroasters@gmail.com")
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_ALLOW_NONIMAGE_FILES = False
 CKEDITOR_IMAGE_BACKEND = "pillow"

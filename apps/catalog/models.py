@@ -554,13 +554,18 @@ class SiteSettings(models.Model):
     #     default="https://aspectcoffee.ru",
     #     help_text="Базовая ссылка на основной сайт (О компании, Достижения и т.д.). Без / в конце.",
     # )
-    contact_phone = models.CharField("Телефон", max_length=32, default="+78003334980", blank=True)
+    contact_phone = models.CharField("Телефон", max_length=32, default="+7 988 291-93-92", blank=True)
     contact_email = models.EmailField(
-        "Email сайта для заявок", blank=True, default="",
+        "Email сайта для заявок", blank=True, default="aspectcoffeeroasters@gmail.com",
         help_text="Получатель контактных форм, партнёрских заявок и запросов подписки. Пусто — CONTACT_EMAIL или адрес отправителя из настроек сервера.",
     )
     contact_telegram = models.CharField("Telegram", max_length=200, default="", blank=True)
-    contact_whatsapp = models.CharField("WhatsApp", max_length=200, default="https://api.whatsapp.com/send?phone=79508382000", blank=True)
+    contact_whatsapp = models.CharField(
+        "WhatsApp",
+        max_length=200,
+        default="https://api.whatsapp.com/send?phone=79882919392",
+        blank=True,
+    )
     free_delivery_min = models.PositiveIntegerField("Бесплатная доставка от (₽)", default=2500)
     enable_city_courier = models.BooleanField(
         "Курьер по городу (своя доставка)",

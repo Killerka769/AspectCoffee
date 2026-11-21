@@ -897,6 +897,9 @@ html body button.aspect-pwa-install {
   justify-content: center;
 }
 html body button.aspect-pwa-install.is-ready { display: flex; }
+@media (min-width: 1100px) {
+  html body button.aspect-pwa-install.is-ready { display: none; }
+}
 html body .aspect-footer button.aspect-pwa-install {
   width: auto;
   margin: 20px 0 0;
