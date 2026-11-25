@@ -14,8 +14,8 @@ from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils.html import escape
-from django.utils.text import slugify
 
+from apps.catalog.management.commands.run_parser import slugify_ru
 from apps.catalog.models import (
     BrewMethod,
     Category,
@@ -118,8 +118,17 @@ def flavor_parts(text):
     return parts
 
 
+CYRILLIC = re.compile(r"[а-яё]", re.IGNORECASE)
+
+
+def latin_slug(value, max_length):
+    """Адрес только из латиницы: словарь парсера, затем обычный slugify."""
+    base = slugify_ru(value or "")[:max_length].strip("-")
+    return base or "item"
+
+
 def unique_slug(model, value, max_length, exclude_pk=None):
-    base = slugify(value, allow_unicode=True)[:max_length].strip("-") or "item"
+    base = latin_slug(value, max_length)
     slug = base
     number = 2
     while True:
@@ -129,7 +138,7 @@ def unique_slug(model, value, max_length, exclude_pk=None):
         if not taken.exists():
             return slug
         suffix = f"-{number}"
-        slug = f"{base[: max_length - len(suffix)]}{suffix}"
+        slug = f"{base[: max_length - len(suffix)].strip('-')}{suffix}"
         number += 1
 
 
@@ -154,8 +163,16 @@ class Command(BaseCommand):
             action="store_true",
             help="Показать, что будет загружено, без записи в базу.",
         )
+        parser.add_argument(
+            "--fix-slugs",
+            action="store_true",
+            help="Заменить русские буквы в slug уже созданных товаров на латиницу и выйти.",
+        )
 
     def handle(self, *args, **options):
+        if options["fix_slugs"]:
+            self._fix_product_slugs(options["dry_run"])
+            return
         path = self._find_workbook(options["file"])
         image_path = self._find_image(options["image"])
         try:
@@ -218,6 +235,19 @@ class Command(BaseCommand):
             f"Готово. Создано: {created}, обновлено: {updated}, пропущено: {skipped}."
         ))
 
+    def _fix_product_slugs(self, dry_run):
+        fixed = 0
+        for product in Product.objects.all().only("id", "name", "slug").order_by("id"):
+            if not CYRILLIC.search(product.slug or ""):
+                continue
+            new_slug = unique_slug(Product, product.name or product.slug, 300, exclude_pk=product.pk)
+            self.stdout.write(f"{product.slug} -> {new_slug}")
+            if not dry_run and new_slug != product.slug:
+                product.slug = new_slug
+                product.save(update_fields=["slug"])
+            fixed += 1
+        self.stdout.write(self.style.SUCCESS(f"Адресов с русскими буквами: {fixed}."))
+
     def _find_workbook(self, raw):
         if raw:
             path = Path(raw)
@@ -262,7 +292,8 @@ class Command(BaseCommand):
             action = "updated" if product else "created"
             if product is None:
                 product = Product(name=clip(data["name"], 300))
-                product.slug = unique_slug(Product, product.name, 300)
+            if product.pk is None or CYRILLIC.search(product.slug or ""):
+                product.slug = unique_slug(Product, data["name"], 300, exclude_pk=product.pk)
 
             category = self._category(kind)
             description = self._description(data)
@@ -422,7 +453,7 @@ class Command(BaseCommand):
             )
 
     def _unique_sku(self, product_slug, weight, roast_slug):
-        base = slugify(f"{product_slug}-{weight}-{roast_slug}", allow_unicode=True) or "lot"
+        base = latin_slug(f"{product_slug}-{weight}-{roast_slug}", 80)
         sku = f"lot-{base}"[:100]
         number = 2
         while ProductVariant.objects.filter(sku=sku).exists():
