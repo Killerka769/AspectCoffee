@@ -32,7 +32,14 @@ def generate_wholesale_invoice_pdf(order) -> BytesIO:
     story.append(HRFlowable(width="100%", thickness=1, color=colors.black))
     story.append(Spacer(1, 0.4*cm))
 
-    story.append(Paragraph("<b>Продавец:</b> ООО «Aspect Coffee»", styles["Normal"]))
+    story.append(Paragraph(
+        "<b>Продавец:</b> ИП Казиев Ахмед Сулейманович, ИНН 057203224730, ОГРНИП 325050000191402",
+        styles["Normal"],
+    ))
+    story.append(Paragraph(
+        "Р/с 40802810600008882759 в АО «ТБанк», БИК 044525974, к/с 30101810145250000974",
+        styles["Normal"],
+    ))
     story.append(Spacer(1, 0.3*cm))
 
     user = order.user
