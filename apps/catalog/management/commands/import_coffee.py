@@ -254,7 +254,7 @@ class Command(BaseCommand):
             if not path.is_file():
                 raise CommandError(f"Файл не найден: {path}")
             return path
-        names = ("Информация о лотах1.xlsx",)
+        names = ("Информация о лотах1.xlsx", "Информация о лотах  (2).xlsx")
         roots = [Path.cwd(), Path.cwd().parent]
         try:
             from django.conf import settings

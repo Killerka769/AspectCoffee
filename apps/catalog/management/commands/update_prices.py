@@ -28,7 +28,7 @@ PLACEHOLDER_250 = Decimal("1750.00")
 LOTS = (
     ("commercial", "Уганда Другар", None, None, ("уганда другар",)),
     ("milk", "Бразилия Мока PB", None, Decimal("2500.00"), ("бразилия мока",)),
-    ("milk", "Бразилия Жёлтый Бурбон PB", None, Decimal("2600.00"), ("бразилия желтый бурбон", "бразилия жёлтый бурбон")),
+    ("milk", "Бразилия Жёлтый Бурбон PB", None, Decimal("2600.00"), ("бразилия желтый бурбон пиберри", "бразилия желтый бурбон", "бразилия жёлтый бурбон")),
     ("espresso", "Бразилия Даниил Барбоса", None, Decimal("4500.00"), ("бразилия даниил барбоса",)),
     ("espresso", "Гватемала ла Делисия", None, Decimal("3300.00"), ("гватемала ла делисия",)),
     ("espresso", "Руанда Нгома Ньямагабе", None, Decimal("3600.00"), ("руанда нгома",)),
@@ -208,6 +208,10 @@ class Command(BaseCommand):
             product.save(update_fields=["category"])
 
     def _apply_prices(self, product, lot):
+        if lot["price_250"] is None and lot["price_1000"] is None:
+            self._drop_placeholder_250(product)
+            self.stdout.write("  в колонке «Розница» прочерк, цену за 1 кг не ставлю")
+            return
         if lot["price_250"] is not None:
             self._set_price(product, 250, lot["price_250"], lot["section"], order=0)
         else:
