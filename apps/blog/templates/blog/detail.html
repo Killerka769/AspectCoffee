@@ -708,24 +708,10 @@ function toggleArticleLike(btn) {
       }
       if (!data.ok) return;
       textarea.value = '';
-      var empty = document.getElementById('comments-empty');
-      if (empty) empty.remove();
-      var list = document.getElementById('comments-list');
-      var li = document.createElement('li');
-      li.className = 'asp-art__comment';
-      var initial = (data.comment.author || 'П').charAt(0).toUpperCase();
-      li.innerHTML =
-        '<span class="asp-art__comment-avatar">' + initial + '</span>' +
-        '<div class="asp-art__comment-body">' +
-        '<p class="asp-art__comment-head"><span class="c-author"></span><time></time></p>' +
-        '<p class="asp-art__comment-text c-text"></p>' +
-        '</div>';
-      li.querySelector('.c-author').textContent = data.comment.author;
-      li.querySelector('time').textContent = data.comment.date;
-      li.querySelector('.c-text').textContent = data.comment.text;
-      list.appendChild(li);
-      var counter = document.getElementById('comments-count');
-      if (counter) counter.textContent = data.count;
+      if (data.pending_moderation) {
+        alert(data.message || 'Ваш комментарий отправлен на модерацию. Он появится после проверки администратором.');
+        return;
+      }
     }).catch(function(){ btn.disabled = false; });
   });
 })();

@@ -93,12 +93,39 @@ class BlogPostAdmin(ModelAdmin):
         return getattr(obj, "_comments_total", obj.comments.filter(is_approved=True).count())
 
 
+class CommentPublicationFilter(admin.SimpleListFilter):
+    title = "Статус"
+    parameter_name = "publication"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Опубликовано"), ("no", "На модерации"))
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.filter(is_approved=True)
+        if self.value() == "no":
+            return queryset.filter(is_approved=False)
+        return queryset
+
+
 @admin.register(ArticleComment)
 class ArticleCommentAdmin(ModelAdmin):
     list_display = ("post", "user", "text_preview", "is_approved", "created_at")
-    list_filter = ("is_approved", "created_at")
+    list_filter = (CommentPublicationFilter, "created_at")
+    list_editable = ("is_approved",)
     search_fields = ("post__title", "user__email", "text")
     autocomplete_fields = ("post", "user")
+    actions = ("publish_selected", "hide_selected")
+
+    @admin.action(description="Опубликовать выбранные комментарии")
+    def publish_selected(self, request, queryset):
+        updated = queryset.filter(is_approved=False).update(is_approved=True)
+        self.message_user(request, f"Опубликовано комментариев: {updated}")
+
+    @admin.action(description="Снять выбранные комментарии с публикации")
+    def hide_selected(self, request, queryset):
+        updated = queryset.filter(is_approved=True).update(is_approved=False)
+        self.message_user(request, f"Снято с публикации комментариев: {updated}")
 
     @admin.display(description="Комментарий")
     def text_preview(self, obj):

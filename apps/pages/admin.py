@@ -214,11 +214,33 @@ class CommunityPostCommentInline(TabularInline):
     readonly_fields = ("created_at",)
 
 
+class PublishedStatusFilter(admin.SimpleListFilter):
+    title = "Статус"
+    parameter_name = "publication"
+    field_name = "is_published"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Опубликовано"), ("no", "На модерации"))
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.filter(**{self.field_name: True})
+        if self.value() == "no":
+            return queryset.filter(**{self.field_name: False})
+        return queryset
+
+
+class ApprovedStatusFilter(PublishedStatusFilter):
+    parameter_name = "approval"
+    field_name = "is_approved"
+
+
 @admin.register(CommunityPost)
 class CommunityPostAdmin(ModelAdmin):
     list_display = ("title", "user", "likes_total", "comments_total", "is_published", "created_at")
-    list_filter = ("is_published", "created_at")
+    list_filter = (PublishedStatusFilter, "created_at")
     list_editable = ("is_published",)
+    actions = ("publish_selected", "hide_selected")
     search_fields = ("title", "text", "user__email", "user__username")
     readonly_fields = ("created_at", "updated_at")
     inlines = (CommunityPostLikeInline, CommunityPostCommentInline)
@@ -236,6 +258,16 @@ class CommunityPostAdmin(ModelAdmin):
     @admin.display(description="Комментарии", ordering="_comments_total")
     def comments_total(self, obj):
         return obj._comments_total
+
+    @admin.action(description="Опубликовать выбранные записи")
+    def publish_selected(self, request, queryset):
+        updated = queryset.filter(is_published=False).update(is_published=True)
+        self.message_user(request, f"Опубликовано записей: {updated}")
+
+    @admin.action(description="Снять выбранные записи с публикации")
+    def hide_selected(self, request, queryset):
+        updated = queryset.filter(is_published=True).update(is_published=False)
+        self.message_user(request, f"Снято с публикации записей: {updated}")
 
 
 class CommentModerationAdminMixin:
@@ -304,7 +336,7 @@ class CommentModerationAdminMixin:
 @admin.register(CommunityPostComment)
 class CommunityPostCommentAdmin(CommentModerationAdminMixin, ModelAdmin):
     list_display = ("post", "user", "parent_author", "text_preview", "is_approved", "created_at")
-    list_filter = ("is_approved", "created_at")
+    list_filter = (ApprovedStatusFilter, "created_at")
     list_editable = ("is_approved",)
     search_fields = ("post__title", "user__email", "user__username", "text")
     readonly_fields = ("created_at",)
@@ -322,7 +354,7 @@ class CommunityPostCommentAdmin(CommentModerationAdminMixin, ModelAdmin):
 @admin.register(ReviewComment)
 class ReviewCommentAdmin(CommentModerationAdminMixin, ModelAdmin):
     list_display = ("review", "user", "parent_author", "text_preview", "is_approved", "created_at")
-    list_filter = ("is_approved", "created_at")
+    list_filter = (ApprovedStatusFilter, "created_at")
     list_editable = ("is_approved",)
     search_fields = (
         "review__product__name", "review__author_name",

@@ -364,7 +364,7 @@ def reviews_ajax(request):
 def _prepare_review_threads(reviews):
     prepared = list(reviews)
     for review in prepared:
-        comments = list(review.public_comments.all())
+        comments = [comment for comment in review.public_comments.all() if comment.is_approved]
         by_parent = {}
         for comment in comments:
             comment.author_level = comment.user.get_level()
@@ -392,10 +392,13 @@ def community(request, active_tab="best"):
         if form.is_valid():
             post = form.save(commit=False)
             post.user = request.user
+            post.is_published = False
             post.save()
-            messages.success(request, "Запись опубликована в сообществе.")
-            if request.headers.get("X-Requested-With") != "XMLHttpRequest":
-                return redirect("pages:community")
+            notice = "Ваш пост отправлен на модерацию. Он появится после проверки администратором."
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({"ok": True, "pending_moderation": True, "message": notice})
+            messages.success(request, notice)
+            return redirect("pages:community")
 
     q = request.GET.get("q", "").strip()
     selected_scope = request.GET.get("scope", "all")
@@ -441,7 +444,7 @@ def community(request, active_tab="best"):
     for post in posts:
         post.author_level = post.user.get_level()
         post.author_city = post.user.get_city()
-        comments = list(post.comments.all())
+        comments = [comment for comment in post.comments.all() if comment.is_approved]
         by_parent = {}
         for comment in comments:
             comment.author_level = comment.user.get_level()
@@ -499,8 +502,13 @@ def community_post_edit(request, pk):
     if request.method == "POST":
         form = CommunityPostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Запись обновлена")
+            post = form.save(commit=False)
+            post.is_published = False
+            post.save()
+            messages.success(
+                request,
+                "Изменения отправлены на модерацию. Запись появится после проверки администратором.",
+            )
             return redirect("users:community_profile")
     else:
         form = CommunityPostForm(instance=post)
@@ -582,7 +590,7 @@ def community_post_comment_create(request, pk):
         "ok": True,
         "pending_moderation": True,
         "count": post.comments.filter(is_approved=True).count(),
-        "message": "Комментарий отправлен на модерацию и появится после одобрения.",
+        "message": "Ваш комментарий отправлен на модерацию. Он появится после проверки администратором.",
     })
 
 
@@ -637,7 +645,7 @@ def review_comment_create(request, pk):
     return JsonResponse({
         "ok": True,
         "pending_moderation": True,
-        "message": "Комментарий отправлен на модерацию и появится после одобрения.",
+        "message": "Ваш комментарий отправлен на модерацию. Он появится после проверки администратором.",
     })
 
 
@@ -687,4 +695,9 @@ def reviews_create(request):
         status=Review.STATUS_NEW,
     )
 
-    return JsonResponse({"success": True, "review_id": review.pk})
+    return JsonResponse({
+        "success": True,
+        "pending_moderation": True,
+        "review_id": review.pk,
+        "message": "Ваш отзыв отправлен на модерацию. Он появится после проверки администратором.",
+    })

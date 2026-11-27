@@ -103,7 +103,7 @@ class ArticleComment(models.Model):
     post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name="comments", verbose_name="Статья")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="blog_comments", verbose_name="Пользователь")
     text = models.TextField(max_length=2000, verbose_name="Комментарий")
-    is_approved = models.BooleanField(default=True, verbose_name="Опубликован")
+    is_approved = models.BooleanField(default=False, db_index=True, verbose_name="Опубликован")
     created_at = models.DateTimeField("Создан", auto_now_add=True)
 
     class Meta:

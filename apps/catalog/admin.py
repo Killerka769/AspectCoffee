@@ -144,11 +144,32 @@ class ReviewCommentInline(TabularInline):
     readonly_fields = ["created_at"]
 
 
+class ReviewModerationFilter(admin.SimpleListFilter):
+    title = "Статус"
+    parameter_name = "moderation"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("pending", "На модерации"),
+            ("published", "Опубликовано"),
+            ("hidden", "Снято с публикации"),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == "pending":
+            return queryset.filter(status=Review.STATUS_NEW)
+        if self.value() == "published":
+            return queryset.filter(status=Review.STATUS_PUBLISHED)
+        if self.value() == "hidden":
+            return queryset.filter(status=Review.STATUS_UNPUBLISHED)
+        return queryset
+
+
 @admin.register(Review)
 class ReviewAdmin(ModelAdmin):
     list_display = ["product", "author_name", "user", "rating", "delivery_rating", "status", "created_at"]
     list_editable = ["status"]
-    list_filter = ["status", "rating"]
+    list_filter = [ReviewModerationFilter, "rating"]
     search_fields = ["product__name", "text", "author_name"]
     readonly_fields = ["created_at", "is_approved"]
     inlines = [ReviewCommentInline]

@@ -219,13 +219,15 @@ def add_comment(request, slug):
     text = request.POST.get("text", "").strip()
     if not text:
         return JsonResponse({"ok": False, "error": "empty_comment"}, status=400)
-    comment = ArticleComment.objects.create(user=request.user, post=post, text=text[:2000])
+    ArticleComment.objects.create(
+        user=request.user,
+        post=post,
+        text=text[:2000],
+        is_approved=False,
+    )
     return JsonResponse({
         "ok": True,
+        "pending_moderation": True,
+        "message": "Ваш комментарий отправлен на модерацию. Он появится после проверки администратором.",
         "count": post.comments.filter(is_approved=True).count(),
-        "comment": {
-            "author": request.user.first_name or "Пользователь",
-            "text": comment.text,
-            "date": comment.created_at.strftime("%d.%m.%Y %H:%M"),
-        },
     })

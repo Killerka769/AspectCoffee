@@ -179,7 +179,7 @@ class CommunityPost(models.Model):
     title = models.CharField(_("Заголовок"), max_length=160)
     text = models.TextField(_("Текст"))
     image = models.ImageField(_("Изображение"), upload_to="community/", blank=True)
-    is_published = models.BooleanField(_("Опубликовано"), default=True)
+    is_published = models.BooleanField(_("Опубликовано"), default=False, db_index=True)
     created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Обновлено"), auto_now=True)
 

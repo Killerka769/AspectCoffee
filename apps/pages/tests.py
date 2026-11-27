@@ -79,18 +79,14 @@ class ContentLifecycleTests(TestCase):
         response = self.client.post(f"/product/{self.product.slug}/recipe/add/", {"name": "Retired feature"})
         self.assertEqual(response.status_code, 404)
 
-    def test_community_post_visibility_is_controlled_from_admin_flag(self):
+    def test_community_post_stays_hidden_until_published(self):
         response = self.client.post(
             "/community/",
             {"title": "Публикация жизненного цикла", "text": "Текст публикации"},
         )
         self.assertEqual(response.status_code, 302)
         post = CommunityPost.objects.get(title="Публикация жизненного цикла")
-        self.assertTrue(post.is_published)
-        self.assertContains(self.client.get("/community/"), post.title)
-
-        post.is_published = False
-        post.save(update_fields=["is_published"])
+        self.assertFalse(post.is_published)
         self.assertNotContains(self.client.get("/community/"), post.title)
 
         post.is_published = True
